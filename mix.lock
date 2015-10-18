@@ -1,0 +1,5 @@
+%{"can": {:git, "https://github.com/tonyrog/can.git", "4f466e2af6babb356f6a220c40323a62ee32bc58", []},
+  "dthread": {:git, "https://github.com/tonyrog/dthread.git", "d763748f1d2af31762682772e28e412906b8fef5", []},
+  "lager": {:git, "git://github.com/Feuerlabs/lager.git", "e5881d84cc06ec45e2bdddf68cc512f0e9cf9dab", []},
+  "lager_logger": {:git, "https://github.com/PSPDFKit-labs/lager_logger", "0f6374fe3ced05da980ceaf8758f49a1c6223f5b", []},
+  "uart": {:git, "https://github.com/tonyrog/uart.git", "05cba2c72937e9cfd5b13c5077a16ad60a001d93", []}}
