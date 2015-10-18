@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/xadhoom/detectino-core.svg)](https://travis-ci.org/xadhoom/detectino-core)
+
 Detectino
 =========
 
