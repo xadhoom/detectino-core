@@ -1,4 +1,4 @@
-defmodule Dt.Bus.Canhelper do
+defmodule DtBus.Canhelper do
   require Logger
 
   @commands %{1 => :ping, 

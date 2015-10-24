@@ -1,4 +1,4 @@
-defmodule Dt.Bus do
+defmodule DtBus do
   use Application
 
   def start(_type, _args) do

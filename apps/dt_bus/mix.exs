@@ -1,4 +1,4 @@
-defmodule Dt.Bus.Mixfile do
+defmodule DtBus.Mixfile do
   use Mix.Project
 
   def project do
@@ -15,8 +15,7 @@ defmodule Dt.Bus.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [
-      applications: [:logger],
-      mod: {Dt.Bus, []}
+      applications: [:logger]
     ]
   end
 

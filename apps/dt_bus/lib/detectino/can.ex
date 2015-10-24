@@ -1,8 +1,8 @@
-defmodule Dt.Bus.Can do
+defmodule DtBus.Can do
   use GenServer
   use Bitwise
 
-  alias Dt.Bus.Canhelper, as: Canhelper
+  alias DtBus.Canhelper, as: Canhelper
 
   require Logger
 
