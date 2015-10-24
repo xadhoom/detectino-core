@@ -1,4 +1,4 @@
-defmodule Detectino.Cansim do
+defmodule Dt.Bus.Cansim do
   use GenServer
   use Bitwise
 

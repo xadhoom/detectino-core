@@ -1,12 +1,12 @@
-defmodule Detectino do
+defmodule Dt.Bus do
   use Application
 
   def start(_type, _args) do
-    Detectino.start_link
+    __MODULE__.start_link
   end
 
   def start_link do
-    Detectino.Sup.start_link
+    __MODULE__.Sup.start_link
   end
 
 end

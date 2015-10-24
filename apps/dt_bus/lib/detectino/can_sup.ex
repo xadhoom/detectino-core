@@ -1,4 +1,4 @@
-defmodule Detectino.Sup do
+defmodule Dt.Bus.Sup do
   use Supervisor
 
   def start_link do
@@ -6,7 +6,7 @@ defmodule Detectino.Sup do
   end
 
   def init(_) do
-    children = [worker(Detectino.Can, [])]
+    children = [worker(Dt.Bus.Can, [])]
     supervise(children, strategy: :one_for_one)
   end
 

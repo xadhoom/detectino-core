@@ -1,4 +1,4 @@
-defmodule Detectino.Canhelper do
+defmodule Dt.Bus.Canhelper do
   require Logger
 
   @commands %{1 => :ping, 

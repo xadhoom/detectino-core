@@ -1,8 +1,8 @@
-defmodule Detectino.Can do
+defmodule Dt.Bus.Can do
   use GenServer
   use Bitwise
 
-  alias Detectino.Canhelper, as: Canhelper
+  alias Dt.Bus.Canhelper, as: Canhelper
 
   require Logger
 
