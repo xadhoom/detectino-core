@@ -60,20 +60,15 @@ defmodule DtBus.Can do
    8-15 : command
    0- 7 : subcommand
   """
-  defp handle_canframe(frame) do
-    case frame do
-      {:can_frame, msgid, len, data, _intf, _ts} -> 
-        id = band msgid, 0x3FFFFFFF
-        src_node_id = id >>> 23 |> band 0x7f
-        dst_node_id = id >>> 16 |> band 0x7f
-        command = id >>> 8 |>  band(0xff) |> Canhelper.command;
-        subcommand = band(id, 0xff) |> Canhelper.subcommand
-        Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
-        "from id:#{src_node_id} to id:#{dst_node_id} " <>
-        "datalen:#{inspect len} payload:#{inspect data}"
-      default ->
-        Logger.warn "Uh? what're you sending to me #{default}"
-    end
+  defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}) do
+    id = band msgid, 0x3FFFFFFF
+    src_node_id = id >>> 23 |> band 0x7f
+    dst_node_id = id >>> 16 |> band 0x7f
+    command = id >>> 8 |>  band(0xff) |> Canhelper.command;
+    subcommand = band(id, 0xff) |> Canhelper.subcommand
+    Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
+    "from id:#{src_node_id} to id:#{dst_node_id} " <>
+    "datalen:#{inspect len} payload:#{inspect data}"
   end
 
 end
