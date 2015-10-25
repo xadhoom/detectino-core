@@ -6,10 +6,20 @@ defmodule DtBus.Can do
 
   require Logger
 
+  #
+  # Client APIs
+  #
   def start_link do
     GenServer.start_link(__MODULE__, nil, name: :detectino_can)
   end
 
+  def ping(name, node_id) when is_integer node_id do
+    GenServer.call name, {:ping, node_id}
+  end
+
+  #
+  # GenServer callbacks
+  #
   def init(_) do
     Logger.info "Starting CanBus Interface"
     :can.start()
@@ -19,9 +29,18 @@ defmodule DtBus.Can do
     {:ok, nil}
   end
 
-  def handle_call(value, state) do
+  def handle_call({:ping, node_id}, _from, state) do
+    Logger.debug "Got ping request"
+
+    msgid = Canhelper.build_msgid(0, node_id, :ping, :unsolicited)
+    payload = <<"DEADBEEF">>
+    {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
+    {:reply, :ok, state}
+  end
+
+  def handle_call(value, _from, state) do
     Logger.info "Got call message #{inspect value}"
-    {:reply, state}
+    {:reply, nil, state}
   end
 
   def handle_cast(value, state) do
@@ -61,12 +80,9 @@ defmodule DtBus.Can do
    0- 7 : subcommand
   """
   defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}) do
-    id = band msgid, 0x3FFFFFFF
-    src_node_id = id >>> 23 |> band 0x7f
-    dst_node_id = id >>> 16 |> band 0x7f
-    command = id >>> 8 |>  band(0xff) |> Canhelper.command;
-    subcommand = band(id, 0xff) |> Canhelper.subcommand
-    Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
+    {:ok, src_node_id, dst_node_id, command, subcommand} = Canhelper.decode_msgid(msgid)
+    Logger.info "Got command:#{command}, " <>
+    "subcommand:#{subcommand} " <>
     "from id:#{src_node_id} to id:#{dst_node_id} " <>
     "datalen:#{inspect len} payload:#{inspect data}"
   end
