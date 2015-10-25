@@ -26,16 +26,17 @@ defmodule DtBus.Can do
     :can_router.attach()
     cur_ifs = :can_router.interfaces
     Logger.info "Started CanBus Interface #{inspect cur_ifs}"
-    {:ok, nil}
+    {:ok, %{ping: []}}
   end
 
-  def handle_call({:ping, node_id}, _from, state) do
+  def handle_call({:ping, node_id}, from, state) do
     Logger.debug "Got ping request"
 
     msgid = Canhelper.build_msgid(0, node_id, :ping, :unsolicited)
     payload = <<"DEADBEEF">>
     {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
-    {:reply, :ok, state}
+    #{:reply, :ok, state}
+    {:noreply, %{state | ping: [ from | state.ping ]}}
   end
 
   def handle_call(value, _from, state) do
@@ -52,8 +53,10 @@ defmodule DtBus.Can do
     Logger.debug "Got info message #{inspect what}"
 
     case what do
-      {:can_frame, _msgid, _len, _data, _intf, _ts} -> handle_canframe(what)
-      default -> Logger.warn "Got unknown message #{inspect default}"
+      {:can_frame, _msgid, _len, _data, _intf, _ts} -> 
+        {:ok, state} = handle_canframe(what, state)
+      default ->
+        Logger.warn "Got unknown message #{inspect default}"
     end
     {:noreply, state}
   end
@@ -79,12 +82,33 @@ defmodule DtBus.Can do
    8-15 : command
    0- 7 : subcommand
   """
-  defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}) do
+  defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
     {:ok, src_node_id, dst_node_id, command, subcommand} = Canhelper.decode_msgid(msgid)
     Logger.info "Got command:#{command}, " <>
     "subcommand:#{subcommand} " <>
     "from id:#{src_node_id} to id:#{dst_node_id} " <>
     "datalen:#{inspect len} payload:#{inspect data}"
+
+    if dst_node_id == 0 do
+      case command do
+        :pong -> 
+          {:ok, state} = handle_pong(src_node_id, state)
+        default ->
+          Logger.warn "Unhandled command #{inspect default}"
+      end
+    end
+
+    {:ok, state}
+  end
+
+  defp handle_pong(src_node_id, state) do
+    Enum.each(state.ping, fn(from) ->
+      GenServer.reply from, "prot"
+    end)
+    newpings = Enum.filter(state.ping, fn(from) ->
+      
+    end)
+    {:ok, state}
   end
 
 end

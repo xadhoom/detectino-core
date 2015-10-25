@@ -19,7 +19,7 @@ defmodule DtBus.Cansim do
   # GenServer Callbacks
   #
   def init(_) do
-    :timer.send_interval(10000, :status)
+    #:timer.send_interval(10000, :status)
     :can_router.attach()
     {:ok, nil}
   end
@@ -41,6 +41,12 @@ defmodule DtBus.Cansim do
       Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
         "from id:#{src_node_id} to id:#{dst_node_id} " <>
         "datalen:#{inspect len} payload:#{inspect data}"
+      case command do
+        :ping -> 
+          handle_ping(src_node_id, data)
+        unh ->
+          Logger.warn "Unhandled can command #{inspect unh}"
+      end
     end
 
     {:noreply, state}
@@ -71,6 +77,11 @@ defmodule DtBus.Cansim do
   def handle_info(value, state) do
     Logger.debug "Got info message #{inspect value}"
     {:noreply, state}
+  end
+
+  defp handle_ping(src_node_id, data) do
+    msgid = Canhelper.build_msgid(@myid, src_node_id, :pong, :reply)
+    {:can_frame, msgid, 8, data, 0, -1} |> :can_router.send
   end
 
 end
