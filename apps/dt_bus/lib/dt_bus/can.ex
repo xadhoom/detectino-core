@@ -10,11 +10,11 @@ defmodule DtBus.Can do
   # Client APIs
   #
   def start_link do
-    GenServer.start_link(__MODULE__, nil, name: :detectino_can)
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  def ping(name, node_id) when is_integer node_id do
-    GenServer.call name, {:ping, node_id}
+  def ping(node_id) when is_integer node_id do
+    GenServer.call __MODULE__, {:ping, node_id}
   end
 
   #
@@ -30,7 +30,7 @@ defmodule DtBus.Can do
   end
 
   def handle_call({:ping, node_id}, from, state) do
-    Logger.debug "Got ping request"
+    Logger.debug "Pinging node #{node_id}"
 
     msgid = Canhelper.build_msgid(0, node_id, :ping, :unsolicited)
     payload = :crypto.rand_bytes(8)

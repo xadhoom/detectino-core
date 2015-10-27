@@ -6,22 +6,20 @@ defmodule DtBus.CanSim do
 
   require Logger
 
-  @myid 66 # node id on canbus
-
   #
   # Client APIs
   #
-  def start_link do
-    GenServer.start_link(__MODULE__, nil, name: :detectino_sim)
+  def start_link(myid) when is_integer(myid) and myid > 0 and myid < 127 do
+    GenServer.start_link(__MODULE__, myid, name: __MODULE__)
   end
 
   #
   # GenServer Callbacks
   #
-  def init(_) do
+  def init(myid) do
     #:timer.send_interval(10000, :status)
     :can_router.attach()
-    {:ok, nil}
+    {:ok, %{myid: myid}}
   end
 
   def handle_call(value, _from, state) do
@@ -37,13 +35,13 @@ defmodule DtBus.CanSim do
   def handle_info({:can_frame, msgid, len, data, _intf, _ts}, state) do
     {:ok, src_node_id, dst_node_id, command, subcommand} = Canhelper.decode_msgid(msgid)
 
-    if dst_node_id == @myid do
+    if dst_node_id == state.myid do
       Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
         "from id:#{src_node_id} to id:#{dst_node_id} " <>
         "datalen:#{inspect len} payload:#{inspect data}"
       case command do
         :ping -> 
-          handle_ping(src_node_id, data)
+          handle_ping(state.myid, src_node_id, data)
         unh ->
           Logger.warn "Unhandled can command #{inspect unh}"
       end
@@ -54,7 +52,7 @@ defmodule DtBus.CanSim do
 
   def handle_info(:status, state) do
     Logger.debug "Sending can frame"
-    msgid = Canhelper.build_msgid(@myid, 0, :event, :unsolicited)
+    msgid = Canhelper.build_msgid(state.myid, 0, :event, :unsolicited)
 
     # send random analog reads...
     Enum.each(1..8, fn(index) ->
@@ -79,8 +77,8 @@ defmodule DtBus.CanSim do
     {:noreply, state}
   end
 
-  defp handle_ping(src_node_id, data) do
-    msgid = Canhelper.build_msgid(@myid, src_node_id, :pong, :reply)
+  defp handle_ping(myid, src_node_id, data) do
+    msgid = Canhelper.build_msgid(myid, src_node_id, :pong, :reply)
     {:can_frame, msgid, 8, data, 0, -1} |> :can_router.send
   end
 
