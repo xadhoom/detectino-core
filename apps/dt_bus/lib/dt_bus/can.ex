@@ -26,17 +26,19 @@ defmodule DtBus.Can do
     :can_router.attach()
     cur_ifs = :can_router.interfaces
     Logger.info "Started CanBus Interface #{inspect cur_ifs}"
-    {:ok, %{ping: []}}
+    {:ok, %{ping: %{}}}
   end
 
   def handle_call({:ping, node_id}, from, state) do
     Logger.debug "Got ping request"
 
     msgid = Canhelper.build_msgid(0, node_id, :ping, :unsolicited)
-    payload = <<"DEADBEEF">>
+    payload = :crypto.rand_bytes(8)
+
     {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
-    #{:reply, :ok, state}
-    {:noreply, %{state | ping: [ from | state.ping ]}}
+
+    ping = Dict.put_new state.ping, payload, from
+    {:noreply, %{state | ping: ping}}
   end
 
   def handle_call(value, _from, state) do
@@ -92,7 +94,7 @@ defmodule DtBus.Can do
     if dst_node_id == 0 do
       case command do
         :pong -> 
-          {:ok, state} = handle_pong(src_node_id, state)
+          {:ok, state} = handle_pong(data, state)
         default ->
           Logger.warn "Unhandled command #{inspect default}"
       end
@@ -101,14 +103,13 @@ defmodule DtBus.Can do
     {:ok, state}
   end
 
-  defp handle_pong(src_node_id, state) do
-    Enum.each(state.ping, fn(from) ->
-      GenServer.reply from, "prot"
-    end)
-    newpings = Enum.filter(state.ping, fn(from) ->
-      
-    end)
-    {:ok, state}
+  defp handle_pong(data, state) do
+    case res = Dict.pop(state.ping, data) do
+      {nil, ping} -> {:ok, state}
+      {from, ping} ->
+        GenServer.reply from, data
+        {:ok,  %{state | ping: ping}}
+    end
   end
 
 end
