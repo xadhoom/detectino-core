@@ -1,4 +1,4 @@
-defmodule DtBus.Canhelper do
+defmodule DtBus.CanHelper do
   use Bitwise
 
   require Logger

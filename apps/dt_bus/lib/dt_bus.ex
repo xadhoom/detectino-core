@@ -6,7 +6,7 @@ defmodule DtBus do
   end
 
   def start_link do
-    __MODULE__.Sup.start_link
+    __MODULE__.CanSup.start_link
   end
 
 end
