@@ -1,7 +1,7 @@
 defmodule DtBus.CanhelperTest do
   use ExUnit.Case, async: true
 
-  alias DtBus.Canhelper, as: C
+  alias DtBus.CanHelper, as: C
 
   test "command ping" do
     assert C.command(1) == :ping
