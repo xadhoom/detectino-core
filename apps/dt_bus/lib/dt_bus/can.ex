@@ -85,21 +85,24 @@ defmodule DtBus.Can do
    0- 7 : subcommand
   """
   defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
-    {:ok, src_node_id, dst_node_id, command, subcommand} = Canhelper.decode_msgid(msgid)
-    Logger.info "Got command:#{command}, " <>
-    "subcommand:#{subcommand} " <>
-    "from id:#{src_node_id} to id:#{dst_node_id} " <>
-    "datalen:#{inspect len} payload:#{inspect data}"
+    case Canhelper.decode_msgid(msgid) do
+      {:ok, src_node_id, dst_node_id, command, subcommand} ->
+        Logger.info "Got command:#{command}, " <>
+        "subcommand:#{subcommand} " <>
+        "from id:#{src_node_id} to id:#{dst_node_id} " <>
+        "datalen:#{inspect len} payload:#{inspect data}"
 
-    if dst_node_id == 0 do
-      case command do
-        :pong -> 
-          {:ok, state} = handle_pong(data, state)
-        default ->
-          Logger.warn "Unhandled command #{inspect default}"
-      end
+        if dst_node_id == 0 do
+          case command do
+            :pong -> 
+              {:ok, state} = handle_pong(data, state)
+            default ->
+              Logger.warn "Unhandled command #{inspect default}"
+          end
+        end
+
+      _v -> nil
     end
-
     {:ok, state}
   end
 

@@ -33,18 +33,20 @@ defmodule DtBus.CanSim do
   end
 
   def handle_info({:can_frame, msgid, len, data, _intf, _ts}, state) do
-    {:ok, src_node_id, dst_node_id, command, subcommand} = Canhelper.decode_msgid(msgid)
-
-    if dst_node_id == state.myid do
-      Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
-        "from id:#{src_node_id} to id:#{dst_node_id} " <>
-        "datalen:#{inspect len} payload:#{inspect data}"
-      case command do
-        :ping -> 
-          handle_ping(state.myid, src_node_id, data)
-        unh ->
-          Logger.warn "Unhandled can command #{inspect unh}"
-      end
+    case Canhelper.decode_msgid(msgid) do
+      {:ok, src_node_id, dst_node_id, command, subcommand} ->
+        if dst_node_id == state.myid do
+          Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
+            "from id:#{src_node_id} to id:#{dst_node_id} " <>
+            "datalen:#{inspect len} payload:#{inspect data}"
+          case command do
+            :ping -> 
+              handle_ping(state.myid, src_node_id, data)
+            unh ->
+              Logger.warn "Unhandled can command #{inspect unh}"
+          end
+        end
+    _v -> nil
     end
 
     {:noreply, state}

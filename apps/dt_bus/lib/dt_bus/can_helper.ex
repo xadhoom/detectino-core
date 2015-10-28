@@ -39,19 +39,26 @@ defmodule DtBus.CanHelper do
       is_atom(command) and is_atom(subcommand) 
       and is_integer(sender) and is_integer(dest)
       do
-    sender <<< 23 |> # sender id
+    2 <<< 30 |> # set EXT_BIT
+    bor sender <<< 23 |> # sender id
     bor dest <<< 16 |> # dest id
     bor(tocommand(command) <<< 8) |> # command
     bor(tosubcommand(subcommand)) # subcommand
   end
 
   def decode_msgid(msgid) when is_integer(msgid) do
-    id = band msgid, 0x3FFFFFFF
-    src_node_id = id >>> 23 |> band 0x7f
-    dst_node_id = id >>> 16 |> band 0x7f
-    command = id >>> 8 |>  band(0xff) |> command;
-    subcommand = band(id, 0xff) |> subcommand
-    {:ok, src_node_id, dst_node_id, command, subcommand}
+    case msgid >>> 30 do
+      2 ->
+        id = band msgid, 0x3FFFFFFF # clear bit 30,31
+        src_node_id = id >>> 23 |> band 0x7f
+        dst_node_id = id >>> 16 |> band 0x7f
+        command = id >>> 8 |>  band(0xff) |> command;
+        subcommand = band(id, 0xff) |> subcommand
+        {:ok, src_node_id, dst_node_id, command, subcommand}
+      v ->
+        Logger.warn "Not handled #{inspect msgid}"
+        nil
+    end
   end
 
 end

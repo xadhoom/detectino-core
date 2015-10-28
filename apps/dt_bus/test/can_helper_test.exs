@@ -49,12 +49,16 @@ defmodule DtBus.CanhelperTest do
   end
 
   test "build message id" do
-    assert C.build_msgid(33, 99, :event, :unsolicited) == 283312896
+    assert C.build_msgid(33, 99, :event, :unsolicited) == 2430796544
   end
 
-  test "decode message id" do
+  test "decode message id pass" do
     msgid = C.build_msgid(33, 99, :event, :unsolicited)
     assert {:ok, 33, 99, :event, :unsolicited} == C.decode_msgid(msgid)
+  end
+
+  test "decode message id fail" do
+    assert nil == C.decode_msgid(283312896)
   end
 
 end
