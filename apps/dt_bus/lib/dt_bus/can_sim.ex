@@ -42,6 +42,10 @@ defmodule DtBus.CanSim do
           case command do
             :ping -> 
               handle_ping(state.myid, src_node_id, data)
+            :read -> 
+              handle_read(state.myid, subcommand, src_node_id)
+            :readd -> 
+              handle_readd(state.myid, subcommand, src_node_id)
             unh ->
               Logger.warn "Unhandled can command #{inspect unh}"
           end
@@ -82,6 +86,32 @@ defmodule DtBus.CanSim do
   defp handle_ping(myid, src_node_id, data) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :pong, :reply)
     {:can_frame, msgid, 8, data, 0, -1} |> :can_router.send
+  end
+
+  defp handle_read(myid, :read_all, src_node_id) do
+    msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_all)
+
+    Enum.each(1..8, fn(index) ->
+      val = Enum.random(1..1024) #random reading, for now
+      msb = val >>> 8 |> band 0xff
+      lsb = band val, 0xff
+      payload = <<0,0,0,0,0,index,msb,lsb>>
+      {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
+    end)
+
+  end
+  
+  defp handle_read(myid, terminal, src_node_id) do
+    msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_one)
+    val = Enum.random(1..1024) #random reading, for now
+    msb = val >>> 8 |> band 0xff
+    lsb = band val, 0xff
+    subcommand = Canhelper.tosubcommand_read terminal
+    payload = <<0,0,0,0,0,subcommand,msb,lsb>>
+    {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
+  end
+
+  defp handle_readd(myid, subcommand, src_node_id) do
   end
 
 end

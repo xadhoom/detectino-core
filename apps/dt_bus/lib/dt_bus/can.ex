@@ -17,6 +17,14 @@ defmodule DtBus.Can do
     GenServer.call __MODULE__, {:ping, node_id}
   end
 
+  def read(node_id, terminal) when is_integer node_id and is_atom terminal do
+    GenServer.cast __MODULE__, {:read, node_id, terminal}
+  end
+
+  def read_all(node_id) when is_integer node_id do
+    GenServer.cast __MODULE__, {:read, node_id, :read_all}
+  end
+
   #
   # GenServer callbacks
   #
@@ -26,7 +34,9 @@ defmodule DtBus.Can do
     :can_router.attach()
     cur_ifs = :can_router.interfaces
     Logger.info "Started CanBus Interface #{inspect cur_ifs}"
-    {:ok, %{ping: %{}}}
+    {:ok, %{
+        ping: %{}
+      }}
   end
 
   def handle_call({:ping, node_id}, from, state) do
@@ -44,6 +54,17 @@ defmodule DtBus.Can do
   def handle_call(value, _from, state) do
     Logger.info "Got call message #{inspect value}"
     {:reply, nil, state}
+  end
+
+  def handle_cast({:read, node_id, terminal}, state) do
+    Logger.debug "Reading from node #{node_id}: #{terminal}"
+
+    msgid = Canhelper.build_msgid(0, node_id, :read, terminal)
+    payload = <<0,0,0,0,0,0,0,0>>
+
+    {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
+
+    {:noreply, state}
   end
 
   def handle_cast(value, state) do
@@ -107,8 +128,8 @@ defmodule DtBus.Can do
   end
 
   defp handle_pong(data, state) do
-    case res = Dict.pop(state.ping, data) do
-      {nil, ping} -> {:ok, state}
+    case Dict.pop(state.ping, data) do
+      {nil, _ping} -> {:ok, state}
       {from, ping} ->
         GenServer.reply from, data
         {:ok,  %{state | ping: ping}}
