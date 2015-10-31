@@ -65,14 +65,15 @@ defmodule DtBus.CanHelper do
     Dict.get(@fromsubcommands_read, atom, nil)
   end
 
-  def build_msgid(sender, dest, :read, subcommand) when 
+  def build_msgid(sender, dest, command, subcommand) when 
+      (command === :read or command===:readd) and
       is_atom(subcommand) and is_integer(sender) and is_integer(dest)
       do
     Logger.warn "#{inspect subcommand}"
     2 <<< 30 |> # set EXT_BIT
     bor sender <<< 23 |> # sender id
     bor dest <<< 16 |> # dest id
-    bor(tocommand(:read) <<< 8) |> # command
+    bor(tocommand(command) <<< 8) |> # command
     bor(tosubcommand_read(subcommand)) # subcommand
   end
 
@@ -96,6 +97,8 @@ defmodule DtBus.CanHelper do
         command = id >>> 8 |>  band(0xff) |> command
         case command do
           :read ->
+            subcommand = band(id, 0xff) |> subcommand_read
+          :readd ->
             subcommand = band(id, 0xff) |> subcommand_read
           _ ->
             subcommand = band(id, 0xff) |> subcommand

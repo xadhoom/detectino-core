@@ -25,6 +25,14 @@ defmodule DtBus.Can do
     GenServer.cast __MODULE__, {:read, node_id, :read_all}
   end
 
+  def readd(node_id, terminal) when is_integer node_id and is_atom terminal do
+    GenServer.cast __MODULE__, {:readd, node_id, terminal}
+  end
+
+  def readd_all(node_id) when is_integer node_id do
+    GenServer.cast __MODULE__, {:readd, node_id, :read_all}
+  end
+
   #
   # GenServer callbacks
   #
@@ -57,9 +65,20 @@ defmodule DtBus.Can do
   end
 
   def handle_cast({:read, node_id, terminal}, state) do
-    Logger.debug "Reading from node #{node_id}: #{terminal}"
+    Logger.debug "Reading from node #{node_id}: analog #{terminal}"
 
     msgid = Canhelper.build_msgid(0, node_id, :read, terminal)
+    payload = <<0,0,0,0,0,0,0,0>>
+
+    {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:readd, node_id, terminal}, state) do
+    Logger.debug "Reading from node #{node_id}: digital #{terminal}"
+
+    msgid = Canhelper.build_msgid(0, node_id, :readd, terminal)
     payload = <<0,0,0,0,0,0,0,0>>
 
     {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
