@@ -106,7 +106,7 @@ defmodule DtBus.CanHelper do
 
         {:ok, src_node_id, dst_node_id, command, subcommand}
       v ->
-        Logger.warn "Not handled #{inspect msgid}"
+        Logger.warn "Additional bytes #{inspect v} not handled #{inspect msgid}"
         nil
     end
   end
