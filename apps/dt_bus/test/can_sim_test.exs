@@ -34,12 +34,24 @@ defmodule DtBus.CanSimTest do
   test "analog read handler" do
     fun = fn({:can_frame, msgid, 8, data, 0, -1}) -> 
       assert msgid == CH.build_msgid(0, 1, :event, :read_one)
-      <<0, 0, 0, 0, 0, f, _g, _h>> =  data
-      assert f == 1
+      <<0, 0, 0, 0, 0, apin, _msb, _lsb>> =  data
+      assert apin == 1
     end
 
     state = %{myid: 0, sender_fn: fun}
     msgid = CH.build_msgid(1, 0, :read, :read_t1)
+    {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info state
+  end
+
+  test "digital read handler" do
+    fun = fn({:can_frame, msgid, 8, data, 0, -1}) -> 
+      assert msgid == CH.build_msgid(0, 1, :event, :read_one)
+      <<0, 0, 0, 0, dpin, 0, _msb, _lsb>> =  data
+      assert dpin == 1
+    end
+
+    state = %{myid: 0, sender_fn: fun}
+    msgid = CH.build_msgid(1, 0, :readd, :read_t1)
     {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info state
   end
 
