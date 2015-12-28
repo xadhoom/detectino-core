@@ -10,7 +10,7 @@ defmodule DtBus.CanSimTest do
     state = %{myid: 0, sender_fn: fun}
     msgid = CH.build_msgid(1,0,:read,:read_t1)
     payload = <<1,2,3,4,5,6,7,8>>
-    ret = {:can_frame, msgid, 8, payload, nil, nil} |> C.handle_info state
+    ret = {:can_frame, msgid, 8, payload, nil, nil} |> C.handle_info(state)
     assert ret == {:noreply, state}
   end
 
@@ -28,7 +28,7 @@ defmodule DtBus.CanSimTest do
     state = %{myid: 0, sender_fn: fun}
 
     msgid = CH.build_msgid(1, 0, :ping, :unsolicited)
-    {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info state
+    {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info(state)
   end
 
   test "analog read handler" do
@@ -40,7 +40,7 @@ defmodule DtBus.CanSimTest do
 
     state = %{myid: 0, sender_fn: fun}
     msgid = CH.build_msgid(1, 0, :read, :read_t1)
-    {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info state
+    {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info(state)
   end
 
   test "digital read handler" do
@@ -52,7 +52,7 @@ defmodule DtBus.CanSimTest do
 
     state = %{myid: 0, sender_fn: fun}
     msgid = CH.build_msgid(1, 0, :readd, :read_t1)
-    {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info state
+    {:can_frame, msgid, 8, <<"DEADBEEF">>, nil, nil} |> C.handle_info(state)
   end
 
 end

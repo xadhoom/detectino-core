@@ -21,7 +21,7 @@ defmodule DtWeb.ConnCase do
       use Phoenix.ConnTest
 
       alias DtWeb.Repo
-      import Ecto.Model
+      import Ecto
       import Ecto.Query, only: [from: 2]
 
       import DtWeb.Router.Helpers

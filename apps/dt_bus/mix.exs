@@ -6,7 +6,7 @@ defmodule DtBus.Mixfile do
      version: "0.0.1",
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
-     elixir: "~> 1.0",
+     elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -33,7 +33,7 @@ defmodule DtBus.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:can, git: "https://github.com/tonyrog/can.git"},
+      {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},
       {:lager, git: "git://github.com/Feuerlabs/lager.git", override: true},
       {:lager_logger, git: "https://github.com/PSPDFKit-labs/lager_logger"}
     ]

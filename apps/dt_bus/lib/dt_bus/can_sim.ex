@@ -63,7 +63,7 @@ defmodule DtBus.CanSim do
     # send random analog reads...
     Enum.each(1..8, fn(index) ->
       val = Enum.random(1..1024) #random reading, for now
-      msb = val >>> 8 |> band 0xff
+      msb = val >>> 8 |> band(0xff)
       lsb = band val, 0xff
       payload = <<0,0,0,0,0,index,msb,lsb>>
       state.sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
@@ -93,7 +93,7 @@ defmodule DtBus.CanSim do
 
     Enum.each(1..8, fn(index) ->
       val = Enum.random(1..1024) #random reading, for now
-      msb = val >>> 8 |> band 0xff
+      msb = val >>> 8 |> band(0xff)
       lsb = band val, 0xff
       payload = <<0,0,0,0,0,index,msb,lsb>>
       sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
@@ -104,7 +104,7 @@ defmodule DtBus.CanSim do
   defp handle_read(myid, terminal, src_node_id, sender_fn) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_one)
     val = Enum.random(1..1024) #random reading, for now
-    msb = val >>> 8 |> band 0xff
+    msb = val >>> 8 |> band(0xff)
     lsb = band val, 0xff
     subcommand = Canhelper.tosubcommand_read terminal
     payload = <<0,0,0,0,0,subcommand,msb,lsb>>
@@ -116,7 +116,7 @@ defmodule DtBus.CanSim do
 
     Enum.each(1..8, fn(index) ->
       val = Enum.random(1..1024) #random reading, for now
-      msb = val >>> 8 |> band 0xff
+      msb = val >>> 8 |> band(0xff)
       lsb = band val, 0xff
       payload = <<0,0,0,0,index,0,msb,lsb>>
       sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
@@ -127,7 +127,7 @@ defmodule DtBus.CanSim do
   defp handle_readd(myid, terminal, src_node_id, sender_fn) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_one)
     val = Enum.random(1..1024) #random reading, for now
-    msb = val >>> 8 |> band 0xff
+    msb = val >>> 8 |> band(0xff)
     lsb = band val, 0xff
     subcommand = Canhelper.tosubcommand_read terminal
     payload = <<0,0,0,0,subcommand,0,msb,lsb>>

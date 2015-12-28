@@ -27,3 +27,12 @@ import_config "#{Mix.env}.exs"
 config :phoenix, :generators,
   migration: true,
   binary_id: false
+
+# config :joken, config_module: Guardian.JWT
+
+config :guardian, Guardian, 
+  issuer: "DtWeb",
+  ttl: { 10, :days },
+  verify_issuer: true,
+  secret_key: "changemeabsolutelyyaddayadda",
+  serializer: DtWeb.GuardianSerializer
