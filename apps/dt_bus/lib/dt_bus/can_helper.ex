@@ -70,9 +70,9 @@ defmodule DtBus.CanHelper do
       is_atom(subcommand) and is_integer(sender) and is_integer(dest)
       do
     Logger.warn "#{inspect subcommand}"
-    2 <<< 30 |> # set EXT_BIT
-    bor sender <<< 23 |> # sender id
-    bor dest <<< 16 |> # dest id
+    (2 <<< 30) |> # set EXT_BIT
+    bor(sender <<< 23) |> # sender id
+    bor(dest <<< 16) |> # dest id
     bor(tocommand(command) <<< 8) |> # command
     bor(tosubcommand_read(subcommand)) # subcommand
   end
@@ -81,9 +81,9 @@ defmodule DtBus.CanHelper do
       is_atom(command) and is_atom(subcommand) 
       and is_integer(sender) and is_integer(dest)
       do
-    2 <<< 30 |> # set EXT_BIT
-    bor sender <<< 23 |> # sender id
-    bor dest <<< 16 |> # dest id
+    (2 <<< 30) |> # set EXT_BIT
+    bor(sender <<< 23) |> # sender id
+    bor(dest <<< 16) |> # dest id
     bor(tocommand(command) <<< 8) |> # command
     bor(tosubcommand(subcommand)) # subcommand
   end
@@ -92,17 +92,18 @@ defmodule DtBus.CanHelper do
     case msgid >>> 30 do
       2 ->
         id = band msgid, 0x3FFFFFFF # clear bit 30,31
-        src_node_id = id >>> 23 |> band 0x7f
-        dst_node_id = id >>> 16 |> band 0x7f
-        command = id >>> 8 |>  band(0xff) |> command
-        case command do
-          :read ->
-            subcommand = band(id, 0xff) |> subcommand_read
-          :readd ->
-            subcommand = band(id, 0xff) |> subcommand_read
-          _ ->
-            subcommand = band(id, 0xff) |> subcommand
-        end
+        src_node_id = (id >>> 23) |> band(0x7f)
+        dst_node_id = (id >>> 16) |> band(0x7f)
+        command = (id >>> 8) |>  band(0xff) |> command
+        subcommand =
+          case command do
+            :read ->
+              band(id, 0xff) |> subcommand_read
+            :readd ->
+              band(id, 0xff) |> subcommand_read
+            _ ->
+              band(id, 0xff) |> subcommand
+          end
 
         {:ok, src_node_id, dst_node_id, command, subcommand}
       v ->
