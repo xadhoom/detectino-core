@@ -1,3 +1,4 @@
+ExUnit.configure(exclude: [skip: true])
 ExUnit.start
 
 Mix.Task.run "ecto.create", ~w(-r DtWeb.Repo --quiet)
