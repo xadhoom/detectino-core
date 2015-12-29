@@ -1,6 +1,8 @@
 defmodule DtWeb.User do
   use DtWeb.Web, :model
 
+  alias DtWeb.Repo
+
   schema "users" do
     field :name, :string
     field :email, :string
@@ -13,18 +15,16 @@ defmodule DtWeb.User do
   @required_fields ~w(name email encrypted_password password)
   @optional_fields ~w()
 
-  #before_insert :maybe_update_password
-  #before_update :maybe_update_password
-
-  @doc """
-  Creates a changeset based on the `model` and `params`.
-
-  If no params are provided, an invalid changeset is returned
-  with no validation performed.
-  """
-  def changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, ~w(name email password))
+    |> maybe_update_password
+  end
+
+  def update_changeset(model, params \\ :empty) do
+    model
+    |> cast(params, ~w(), ~w(name email password))
+    |> maybe_update_password
   end
 
   def login_changeset(model), do: model |> cast(%{}, ~w(), ~w(email password))
@@ -39,7 +39,9 @@ defmodule DtWeb.User do
 
   def valid_password?(_, nil), do: false
 
-  def valid_password?(password, crypted), do: Comeonin.Bcrypt.checkpw(password, crypted)
+  def valid_password?(password, crypted) do
+    Comeonin.Bcrypt.checkpw(password, crypted)
+  end
 
   defp validate_password(changeset) do
     case Ecto.Changeset.get_field(changeset, :encrypted_password) do
@@ -54,5 +56,15 @@ defmodule DtWeb.User do
   end
 
   defp password_incorrect_error(changeset), do: Ecto.Changeset.add_error(changeset, :password, "is incorrect")
+
+  defp maybe_update_password(changeset) do
+    case Ecto.Changeset.fetch_change(changeset, :password) do
+      { :ok, password } ->
+        changeset
+        |> Ecto.Changeset.put_change(:encrypted_password, Comeonin.Bcrypt.hashpwsalt(password))
+        |> Ecto.Changeset.put_change(:password, nil)
+      :error -> changeset
+    end
+  end
 
 end
