@@ -5,7 +5,7 @@ defmodule DtWeb.UserController do
   alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
 
-  plug EnsureAuthenticated, [handler: { SessionController, :new }] when not action in [:new, :create]
+  plug EnsureAuthenticated, [handler: SessionController] when not action in [:new, :create]
 
   plug :scrub_params, "user" when action in [:create, :update]
 

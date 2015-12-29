@@ -40,7 +40,7 @@ defmodule DtWeb.Mixfile do
      {:phoenix_html, "~> 2.3"},
      {:phoenix_live_reload, "~> 1.0.1", only: :dev},
      {:cowboy, "~> 1.0"},
-     {:guardian, "~> 0.8.1"},
+     {:guardian, "~> 0.9.0"},
      {:comeonin, "~> 2.0"}
    ]
   end

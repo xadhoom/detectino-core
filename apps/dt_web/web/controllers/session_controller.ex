@@ -4,7 +4,7 @@ defmodule DtWeb.SessionController do
   alias DtWeb.User
   alias DtWeb.UserQuery
 
-  def new(conn, params) do
+  def unauthenticated(conn, params) do
     changeset = User.login_changeset(%User{})
     render(conn, DtWeb.SessionView, "new.html", changeset: changeset)
   end
