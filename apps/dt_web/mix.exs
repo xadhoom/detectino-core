@@ -6,7 +6,7 @@ defmodule DtWeb.Mixfile do
      version: "0.0.1",
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
-     elixir: "~> 1.2",
+     elixir: "~> 1.1",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
