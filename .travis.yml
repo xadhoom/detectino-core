@@ -1,9 +1,11 @@
 env:
         - REBAR_DEPS_DIR=$TRAVIS_BUILD_DIR/deps
+sudo: false
 language: elixir
 elixir:
         - 1.1.0
         - 1.1.1
+        - 1.2.0
 otp_release:
          - 18.0
          - 18.1
