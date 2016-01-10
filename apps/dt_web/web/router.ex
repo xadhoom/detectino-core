@@ -16,7 +16,7 @@ defmodule DtWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug Guardian.Plug.VerifySession
+    plug Guardian.Plug.VerifyHeader
     plug Guardian.Plug.LoadResource
   end
 
@@ -31,10 +31,17 @@ defmodule DtWeb.Router do
     get "/logout", SessionController, :delete, as: :logout
 
     resources "/users", UserController
+    #resources "/sensor_events", SensorEventController, except: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", DtWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", DtWeb do
+    pipe_through :api
+
+    post "/login", SessionController, :api_create, as: :api_login
+
+    #resources "/sensor_events", SensorEventController, only: [:create]
+    resources "/sensor_events", SensorEventController, except: [:new, :edit]
+  end
+
 end

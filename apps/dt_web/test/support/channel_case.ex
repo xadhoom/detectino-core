@@ -21,7 +21,7 @@ defmodule DtWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       alias DtWeb.Repo
-      import Ecto
+      import Ecto.Model
       import Ecto.Query, only: [from: 2]
 
 

@@ -35,6 +35,7 @@ defmodule DtWeb.Web do
       import Ecto.Query, only: [from: 1, from: 2]
 
       import DtWeb.Router.Helpers
+      import DtWeb.Gettext
     end
   end
 
@@ -49,6 +50,8 @@ defmodule DtWeb.Web do
       use Phoenix.HTML
 
       import DtWeb.Router.Helpers
+      import DtWeb.ErrorHelpers
+      import DtWeb.Gettext
     end
   end
 
@@ -65,6 +68,7 @@ defmodule DtWeb.Web do
       alias DtWeb.Repo
       import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
+      import DtWeb.Gettext
     end
   end
 

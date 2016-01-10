@@ -21,7 +21,7 @@ defmodule DtWeb.ConnCase do
       use Phoenix.ConnTest
 
       alias DtWeb.Repo
-      import Ecto
+      import Ecto.Model
       import Ecto.Query, only: [from: 2]
 
       import DtWeb.Router.Helpers
@@ -36,6 +36,6 @@ defmodule DtWeb.ConnCase do
       Ecto.Adapters.SQL.restart_test_transaction(DtWeb.Repo, [])
     end
 
-    :ok
+    {:ok, conn: Phoenix.ConnTest.conn()}
   end
 end

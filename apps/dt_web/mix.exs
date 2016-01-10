@@ -22,7 +22,7 @@ defmodule DtWeb.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {DtWeb, []},
-     applications: [:phoenix, :phoenix_html, :cowboy, :logger,
+     applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext,
                     :phoenix_ecto, :postgrex]]
   end
 
@@ -39,9 +39,11 @@ defmodule DtWeb.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:phoenix_html, "~> 2.3"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
+     {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
      {:guardian, "~> 0.9.0"},
-     {:comeonin, "~> 2.0"}
+     {:comeonin, "~> 2.0"},
+     {:uuid, "~> 1.1"}
    ]
   end
 
