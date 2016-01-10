@@ -33,8 +33,14 @@ defmodule DtWeb.SensorEventControllerTest do
     end
   end
 
-  test "forbis create when login is not valid", %{conn: conn} do
+  test "forbis create when token is empty", %{conn: conn} do
     conn = put_req_header(conn, "authorization", "")
+    conn = post conn, sensor_event_path(conn, :create), sensor_event: @valid_attrs
+    response(conn, 403)
+  end
+
+  test "forbis create when token is not valid", %{conn: conn} do
+    conn = put_req_header(conn, "authorization", "deaddog")
     conn = post conn, sensor_event_path(conn, :create), sensor_event: @valid_attrs
     response(conn, 403)
   end
