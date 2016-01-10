@@ -1,7 +1,6 @@
 defmodule DtWeb.SensorEventControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.User
   alias DtWeb.SensorEvent
 
   @valid_attrs %{subtype: "some content", type: "some content", value: "some content"}
@@ -66,14 +65,9 @@ defmodule DtWeb.SensorEventControllerTest do
   end
 
   defp login do
-    create_user
     conn = post conn, api_login_path(conn, :api_create), user: %{email: "admin@local", password: "password"}
     json = json_response(conn, 200)
     json["token"]
   end
 
-  defp create_user do
-    encpass = Comeonin.Bcrypt.hashpwsalt("password")
-    user = Repo.insert! %User{email: "admin@local", encrypted_password: encpass}
-  end
 end

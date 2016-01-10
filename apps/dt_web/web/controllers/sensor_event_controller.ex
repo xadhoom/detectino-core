@@ -6,7 +6,7 @@ defmodule DtWeb.SensorEventController do
   alias Guardian.Plug.EnsureAuthenticated
 
   plug :scrub_params, "sensor_event" when action in [:create, :update]
-  plug EnsureAuthenticated, on_failure: {SessionController, :unauthenticated_api} #when not action in [:new, :create]
+  plug EnsureAuthenticated, [handler: {SessionController, :unauthenticated_api}] #when not action in [:new, :create]
 
   def index(conn, _params) do
     sensor_events = Repo.all(SensorEvent)
