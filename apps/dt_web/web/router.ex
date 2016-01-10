@@ -38,7 +38,7 @@ defmodule DtWeb.Router do
   scope "/api", DtWeb do
     pipe_through :api
 
-    post "/login", SessionController, :api_create, as: :api_login
+    post "/login", SessionApiController, :create, as: :api_login
 
     #resources "/sensor_events", SensorEventController, only: [:create]
     resources "/sensor_events", SensorEventController, except: [:new, :edit]

@@ -1,4 +1,4 @@
-defmodule DtWeb.SessionControllerTest do
+defmodule DtWeb.SessionApiControllerTest do
   use DtWeb.ConnCase
 
   setup %{conn: conn} do
@@ -6,22 +6,22 @@ defmodule DtWeb.SessionControllerTest do
   end
 
   test "login must not exist with GET", %{conn: conn} do
-    conn = get conn, api_login_path(conn, :api_create)
+    conn = get conn, api_login_path(conn, :create)
     response(conn, 404)
   end
 
   test "fail login with no params", %{conn: conn} do
-    conn = post conn, api_login_path(conn, :api_create)
+    conn = post conn, api_login_path(conn, :create)
     response(conn, 401)
   end
 
   test "fail login with invalid password", %{conn: conn} do
-    conn = post conn, api_login_path(conn, :api_create), user: %{email: "admin@local", password: "invalid"}
+    conn = post conn, api_login_path(conn, :create), user: %{email: "admin@local", password: "invalid"}
     response(conn, 401)
   end
   
   test "valid login", %{conn: conn} do
-    conn = post conn, api_login_path(conn, :api_create), user: %{email: "admin@local", password: "password"}
+    conn = post conn, api_login_path(conn, :create), user: %{email: "admin@local", password: "password"}
     json = json_response(conn, 200)
     assert json["token"]
   end

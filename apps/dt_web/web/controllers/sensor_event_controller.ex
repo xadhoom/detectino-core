@@ -2,11 +2,11 @@ defmodule DtWeb.SensorEventController do
   use DtWeb.Web, :controller
 
   alias DtWeb.SensorEvent
-  alias DtWeb.SessionController
+  alias DtWeb.SessionApiController
   alias Guardian.Plug.EnsureAuthenticated
 
   plug :scrub_params, "sensor_event" when action in [:create, :update]
-  plug EnsureAuthenticated, [handler: {SessionController, :unauthenticated_api}] #when not action in [:new, :create]
+  plug EnsureAuthenticated, [handler: SessionApiController] #when not action in [:new, :create]
 
   def index(conn, _params) do
     sensor_events = Repo.all(SensorEvent)

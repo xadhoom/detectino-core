@@ -33,6 +33,12 @@ defmodule DtWeb.SensorEventControllerTest do
     end
   end
 
+  test "forbis create when login is not valid", %{conn: conn} do
+    conn = put_req_header(conn, "authorization", "")
+    conn = post conn, sensor_event_path(conn, :create), sensor_event: @valid_attrs
+    response(conn, 403)
+  end
+
   test "creates and renders resource when data is valid", %{conn: conn} do
     conn = post conn, sensor_event_path(conn, :create), sensor_event: @valid_attrs
     assert json_response(conn, 201)["data"]["id"]
@@ -65,7 +71,7 @@ defmodule DtWeb.SensorEventControllerTest do
   end
 
   defp login do
-    conn = post conn, api_login_path(conn, :api_create), user: %{email: "admin@local", password: "password"}
+    conn = post conn, api_login_path(conn, :create), user: %{email: "admin@local", password: "password"}
     json = json_response(conn, 200)
     json["token"]
   end
