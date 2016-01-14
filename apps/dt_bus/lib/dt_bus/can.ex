@@ -3,6 +3,8 @@ defmodule DtBus.Can do
   use Bitwise
 
   alias DtBus.CanHelper, as: Canhelper
+  alias DtCore.Receiver, as: Receiver
+  alias DtCore.Event, as: Event
 
   require Logger
 
@@ -136,6 +138,23 @@ defmodule DtBus.Can do
           case command do
             :pong -> 
               {:ok, state} = handle_pong(data, state)
+            :event ->
+              << _, _, _, _, portd, porta, msb, lsb >> = data
+              value = msb <<< 8 |> bor(lsb)
+              port = 
+                case porta do
+                  0 -> portd
+                  _ -> porta
+                end
+              subtype =
+                case porta do
+                  0 -> :digital_alarm
+                  _ -> :analog_alarm
+                end
+              %Event{from: src_node_id, 
+                type: :sensor, subtype: subtype, 
+                port: port, value: value} 
+              |> Receiver.put
             default ->
               Logger.warn "Unhandled command #{inspect default}"
           end

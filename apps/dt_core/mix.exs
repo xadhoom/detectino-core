@@ -1,14 +1,14 @@
-defmodule DtBus.Mixfile do
+defmodule DtCore.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :dt_bus,
+    [app: :dt_core,
      version: "0.0.1",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
      deps_path: "../../deps",
      lockfile: "../../mix.lock",
-     elixir: "~> 1.1",
+     elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -16,11 +16,10 @@ defmodule DtBus.Mixfile do
 
   # Configuration for the OTP application
   #
-  # Type `mix help compile.app` for more information
+  # Type "mix help compile.app" for more information
   def application do
-    [
-      applications: [:logger],
-      mod: {DtBus, []}
+    [applications: [:logger],
+      mod: {DtCore, []}
     ]
   end
 
@@ -32,13 +31,13 @@ defmodule DtBus.Mixfile do
   #
   #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
   #
-  # Type `mix help deps` for more examples and options
+  # To depend on another app inside the umbrella:
+  #
+  #   {:myapp, in_umbrella: true}
+  #
+  # Type "mix help deps" for more examples and options
   defp deps do
-    [
-      {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},
-      {:lager, git: "git://github.com/Feuerlabs/lager.git", override: true},
-      {:lager_logger, git: "https://github.com/PSPDFKit-labs/lager_logger"},
-      {:dt_core, in_umbrella: true}
-    ]
+    [ {:ecto, "~> 1.1"},
+      {:dt_web, in_umbrella: true}]
   end
 end
