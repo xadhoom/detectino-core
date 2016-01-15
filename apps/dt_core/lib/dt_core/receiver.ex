@@ -11,6 +11,8 @@ defmodule DtCore.Receiver do
 
   require Logger
   alias DtCore.Event
+  alias DtWeb.Repo, as: Repo
+  alias DtWeb.Sensor, as: Sensor
 
   #
   # Client APIs
@@ -28,12 +30,20 @@ defmodule DtCore.Receiver do
   #
   def init(_) do
     Logger.info "Starting Event Receiver"
-    {:ok, nil}
+    sensors = DtWeb.Repo.all DtWeb.Sensor
+    sensors = Enum.map(sensors, fn(sensor) -> sensor.address end)
+    Logger.debug "Loaded #{length sensors} sensors"
+    {:ok, sensors}
   end
 
-  def handle_call({:put, event = %Event{}}, from, state) do
+  def handle_call({:put, event = %Event{}}, _from, state) do
     Logger.debug "Got event " <> inspect(event)
-
+    state = case Enum.member?(state, event.from) do
+      true ->
+        Logger.debug("Found !")
+        state
+      false -> [ event.from | state ]
+    end
     {:reply, nil, state}
   end
 

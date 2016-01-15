@@ -3,7 +3,7 @@ defmodule DtWeb.SensorTest do
 
   alias DtWeb.Sensor
 
-  @valid_attrs %{configured: true, name: "some content", node: "some content", type_id: 42}
+  @valid_attrs %{configured: true, name: "some content", address: "some content", type_id: 42}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

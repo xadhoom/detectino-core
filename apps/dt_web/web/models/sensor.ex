@@ -2,7 +2,7 @@ defmodule DtWeb.Sensor do
   use DtWeb.Web, :model
 
   schema "sensors" do
-    field :node, :string
+    field :address, :string
     field :name, :string
     field :type_id, :integer
     field :configured, :boolean, default: false
@@ -10,7 +10,7 @@ defmodule DtWeb.Sensor do
     timestamps
   end
 
-  @required_fields ~w(node name type_id configured)
+  @required_fields ~w(address name type_id configured)
   @optional_fields ~w()
 
   @doc """
