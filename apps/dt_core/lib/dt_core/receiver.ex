@@ -30,10 +30,20 @@ defmodule DtCore.Receiver do
   #
   def init(_) do
     Logger.info "Starting Event Receiver"
+    :timer.send_after(500, :start)
+    {:ok, nil}
+  end
+
+  def handle_info(:start, _state) do
     sensors = DtWeb.Repo.all DtWeb.Sensor
     sensors = Enum.map(sensors, fn(sensor) -> sensor.address end)
     Logger.debug "Loaded #{length sensors} sensors"
-    {:ok, sensors}
+    {:noreply, sensors}
+  end
+
+  def handle_call(rq, _, nil) do
+    Logger.notice("System not yet ready for event #{inspect rq}")
+    {:reply, nil, nil}
   end
 
   def handle_call({:put, event = %Event{}}, _from, state) do
