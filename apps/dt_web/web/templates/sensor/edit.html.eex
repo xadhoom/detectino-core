@@ -1,0 +1,6 @@
+<h2>Edit sensor</h2>
+
+<%= render "form.html", changeset: @changeset,
+                        action: sensor_path(@conn, :update, @sensor) %>
+
+<%= link "Back", to: sensor_path(@conn, :index) %>

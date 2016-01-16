@@ -31,7 +31,7 @@ defmodule DtWeb.Router do
     get "/logout", SessionController, :delete, as: :logout
 
     resources "/users", UserController
-    #resources "/sensor_events", SensorEventController, except: [:new, :edit]
+    resources "/sensors", SensorController, except: [:new, :create]
   end
 
   # Other scopes may use custom stacks.
@@ -39,9 +39,6 @@ defmodule DtWeb.Router do
     pipe_through :api
 
     post "/login", SessionApiController, :create, as: :api_login
-
-    #resources "/sensor_events", SensorEventController, only: [:create]
-    resources "/sensor_events", SensorEventController, except: [:new, :edit]
   end
 
 end

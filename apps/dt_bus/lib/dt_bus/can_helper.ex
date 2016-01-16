@@ -69,7 +69,6 @@ defmodule DtBus.CanHelper do
       (command === :read or command===:readd) and
       is_atom(subcommand) and is_integer(sender) and is_integer(dest)
       do
-    Logger.warn "#{inspect subcommand}"
     (2 <<< 30) |> # set EXT_BIT
     bor(sender <<< 23) |> # sender id
     bor(dest <<< 16) |> # dest id
@@ -106,8 +105,7 @@ defmodule DtBus.CanHelper do
           end
 
         {:ok, src_node_id, dst_node_id, command, subcommand}
-      v ->
-        Logger.warn "Additional bytes #{inspect v} not handled #{inspect msgid}"
+      _v ->
         nil
     end
   end

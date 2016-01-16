@@ -151,7 +151,7 @@ defmodule DtBus.Can do
                   0 -> :digital_alarm
                   _ -> :analog_alarm
                 end
-              %Event{from: src_node_id, 
+              %Event{address: src_node_id, 
                 type: :sensor, subtype: subtype, 
                 port: port, value: value} 
               |> Receiver.put

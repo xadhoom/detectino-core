@@ -3,14 +3,14 @@ defmodule DtWeb.Sensor do
 
   schema "sensors" do
     field :address, :string
+    field :port, :integer
     field :name, :string
-    field :type_id, :integer
     field :configured, :boolean, default: false
 
     timestamps
   end
 
-  @required_fields ~w(address name type_id configured)
+  @required_fields ~w(address port)
   @optional_fields ~w()
 
   @doc """
@@ -22,5 +22,8 @@ defmodule DtWeb.Sensor do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> unique_constraint(:address, name: :address_port_idx)
+    |> unique_constraint(:port, name: :address_port_idx)
   end
+
 end

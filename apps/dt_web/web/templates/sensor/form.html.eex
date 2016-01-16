@@ -11,18 +11,18 @@
   <% end %>
 
   <div class="form-group">
+    <%= label f, :address, "Address", class: "control-label" %>
+    <%= text_input f, :address, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
     <%= label f, :name, "Name", class: "control-label" %>
     <%= text_input f, :name, class: "form-control" %>
   </div>
 
   <div class="form-group">
-    <%= label f, :email, "Email", class: "control-label" %>
-    <%= text_input f, :email, class: "form-control" %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :password, "Password", class: "control-label" %>
-    <%= text_input f, :password, class: "form-control" %>
+    <%= label f, :configured, "Configured", class: "control-label" %>
+    <%= checkbox f, :configured %>
   </div>
 
   <div class="form-group">

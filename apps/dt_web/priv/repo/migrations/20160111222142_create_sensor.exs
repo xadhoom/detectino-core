@@ -4,14 +4,13 @@ defmodule DtWeb.Repo.Migrations.CreateSensor do
   def change do
     create table(:sensors) do
       add :address, :string
+      add :port, :integer
       add :name, :string
-      add :type_id, references(:sensor_types)
       add :configured, :boolean, default: false
 
       timestamps
     end
-    create index(:sensors, [:type_id])
-    create index(:sensors, [:address], unique: true)
+    create index(:sensors, [:address, :port], unique: true, name: :address_port_idx)
     create index(:sensors, [:configured])
 
   end
