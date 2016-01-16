@@ -11,7 +11,7 @@ defmodule DtWeb.Repo.Migrations.CreateSensor do
       timestamps
     end
     create index(:sensors, [:type_id])
-    create index(:sensors, [:address])
+    create index(:sensors, [:address], unique: true)
     create index(:sensors, [:configured])
 
   end
