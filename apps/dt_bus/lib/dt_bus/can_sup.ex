@@ -6,7 +6,10 @@ defmodule DtBus.CanSup do
   end
 
   def init(_) do
-    children = [worker(DtBus.Can, [])]
+    children = [
+      worker(DtBus.Can, []),
+      worker(DtBus.CanSim, [10])
+    ]
     supervise(children, strategy: :one_for_one)
   end
 
