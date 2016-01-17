@@ -8,3 +8,5 @@ otp_release:
          - 18.0
          - 18.1
          - 18.2
+script:
+         - "mix do deps.get, compile, coveralls.travis"
