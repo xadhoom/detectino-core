@@ -15,8 +15,13 @@ defmodule DtCore.Receiver do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  def put(event = %Event{address: a, port: p}) when (is_binary(a) or is_number(a)) and is_number(p) do
-    GenServer.call __MODULE__, {:put, event}
+  def put(ev = %Event{address: a, port: p}) when is_binary(a) and is_number(p) do
+    GenServer.call __MODULE__, {:put, ev}
+  end
+
+  def put(ev = %Event{address: a, port: p}) when is_number(a) and is_number(p) do
+    ev = %Event{address: to_string(ev.address), port: ev.port}
+    GenServer.call __MODULE__, {:put, ev}
   end
 
   #
@@ -63,10 +68,9 @@ defmodule DtCore.Receiver do
     {:reply, nil, state}
   end
 
-  defp maybe_on_repo(event = %Event{}, state) do
-    address = to_string(event.address)
+  defp maybe_on_repo(event = %Event{address: a}, state) when is_binary(a) do
     q = from s in Sensor,
-      where: s.address == ^address
+      where: s.address == ^event.address and s.port == ^event.port
     sensor = Repo.one(q)
     state = 
       case sensor do

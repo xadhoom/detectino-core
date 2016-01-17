@@ -54,4 +54,34 @@ defmodule DtCore.ReceiverTest do
     assert Repo.get_by(Sensor, %{address: "10", port: 1234})
   end
 
+  test "different port results in different records" do
+    refute Repo.one(Sensor)
+    ev = %Event{address: 10, port: 1234}
+    Receiver.put(ev)
+    ev = %Event{address: 10, port: 1235}
+    Receiver.put(ev)
+    sensors = Repo.all(Sensor)
+    assert 2 == length(sensors)
+  end
+
+  test "different address results in different records" do
+    refute Repo.one(Sensor)
+    ev = %Event{address: 10, port: 1234}
+    Receiver.put(ev)
+    ev = %Event{address: 11, port: 1234}
+    Receiver.put(ev)
+    sensors = Repo.all(Sensor)
+    assert 2 == length(sensors)
+  end
+
+  test "same address:port results in different records" do
+    refute Repo.one(Sensor)
+    ev = %Event{address: 10, port: 1234}
+    Receiver.put(ev)
+    ev = %Event{address: 10, port: 1234}
+    Receiver.put(ev)
+    sensors = Repo.all(Sensor)
+    assert 1 == length(sensors)
+  end
+
 end
