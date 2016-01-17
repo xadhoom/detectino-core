@@ -1,5 +1,5 @@
 defmodule DtCore.Receiver do
-  @doc """
+  @moduledoc """
   Receive an event and pass it to next step, while keeping
   in memory a list of active and configured %{sensor, port}.
 
@@ -22,11 +22,10 @@ defmodule DtCore.Receiver do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  def put(ev = %Event{address: a, port: p}) when is_binary(a) and is_number(p) do
-    GenServer.call __MODULE__, {:put, ev}
-  end
+  def put(ev = %Event{address: a, port: p,
+    type: t, subtype: s, value: v}) when a != nil and is_number(p)
+    and is_atom(t) and is_atom(s) and t != nil and s != nil do
 
-  def put(ev = %Event{address: a, port: p}) when is_number(a) and is_number(p) do
     ev = %Event{address: to_string(ev.address), port: ev.port}
     GenServer.call __MODULE__, {:put, ev}
   end
