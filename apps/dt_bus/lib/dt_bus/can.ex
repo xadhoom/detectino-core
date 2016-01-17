@@ -148,8 +148,8 @@ defmodule DtBus.Can do
                 end
               subtype =
                 case porta do
-                  0 -> :digital_alarm
-                  _ -> :analog_alarm
+                  0 -> :digital_read
+                  _ -> :analog_read
                 end
               %Event{address: src_node_id, 
                 type: :sensor, subtype: subtype, 
