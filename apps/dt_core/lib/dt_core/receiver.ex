@@ -36,12 +36,12 @@ defmodule DtCore.Receiver do
       where: s.configured == true
     sensors = Repo.all(q)
 
-    sensors = Enum.map(sensors, fn(sensor) -> sensor.address end)
+    sensors = Enum.map(sensors, fn(sensor) -> %{address: sensor.address, port: sensor.port} end)
     Logger.debug "Loaded #{length sensors} sensors"
     {:noreply, sensors}
   end
 
-  def handle_call(rq, _, nil) do
+  def handle_call(rq, _from, nil) do
     Logger.info("System not yet ready for event #{inspect rq}")
     {:reply, nil, nil}
   end
@@ -54,9 +54,9 @@ defmodule DtCore.Receiver do
   """
   def handle_call({:put, event = %Event{}}, _from, state) do
     Logger.debug "Got event " <> inspect(event)
-    state = case Enum.member?(state, event.address) do
+    state = case Enum.member?(state, %{address: event.address, port: event.port}) do
       true ->
-        Logger.debug("Sensor #{event.address} already in my list")
+        Logger.debug("Sensor #{event.address}:#{event.port} already in my list")
         state
       false -> maybe_on_repo(event, state)
     end
@@ -70,7 +70,7 @@ defmodule DtCore.Receiver do
     sensor = Repo.one(q)
     state = 
       case sensor do
-        %Sensor{configured: true} -> [ event.address | state ]
+        %Sensor{configured: true} -> [ %{address: event.address, port: event.port} | state ]
         %Sensor{configured: false} -> state
         nil ->
           add_on_repo(event)

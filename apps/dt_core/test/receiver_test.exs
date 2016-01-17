@@ -1,4 +1,4 @@
-defmodule DtCoreTest do
+defmodule DtCore.ReceiverTest do
   use DtCore.EctoCase
   doctest DtCore
 
