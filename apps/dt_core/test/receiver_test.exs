@@ -74,7 +74,7 @@ defmodule DtCore.ReceiverTest do
     assert 2 == length(sensors)
   end
 
-  test "same address:port results in different records" do
+  test "same address:port results in one record" do
     refute Repo.one(Sensor)
     ev = %Event{address: 10, port: 1234}
     Receiver.put(ev)
