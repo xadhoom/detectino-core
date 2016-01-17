@@ -23,11 +23,12 @@ defmodule DtCore.Handler do
     and is_atom(t) and is_atom(s) and t != nil and s != nil do
 
     case ev.value do
-      nil -> Logger.debug "Dunno what to do with nil value, bailing out"
-      _v -> :will_do_something_here
+      nil -> 
+        Logger.debug "Dunno what to do with nil value, bailing out"
+        nil
+      _v -> :will_do_something_here #GenServer.call __MODULE__, {:put, ev}
     end
 
-    #GenServer.call __MODULE__, {:put, ev}
   end
 
   #

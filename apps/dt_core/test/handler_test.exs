@@ -12,7 +12,7 @@ defmodule DtCore.HandlerTest do
   @wrong_port_addr %Event{address: "1234", port: "10", value: "any value", type: :an_atom, subtype: :another_atom}
   @wrong_addr %Event{address: 1234, port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
 
-  @valid_ev1 %Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
+  @nil_value %Event{address: "1234", port: 10, type: :an_atom, subtype: :another_atom}
 
   test "new event raises FunctionClauseError because missing port" do
     assert_raise FunctionClauseError, fn -> 
@@ -48,6 +48,10 @@ defmodule DtCore.HandlerTest do
     assert_raise FunctionClauseError, fn -> 
       Handler.put(@wrong_port_addr)
     end
+  end
+
+  test "nil value event returns nil" do
+    assert nil == Handler.put(@nil_value)
   end
 
 end
