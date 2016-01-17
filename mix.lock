@@ -18,7 +18,7 @@
   "jose": {:hex, :jose, "1.4.2"},
   "jsx": {:hex, :jsx, "2.6.2"},
   "lager": {:git, "git://github.com/Feuerlabs/lager.git", "e5881d84cc06ec45e2bdddf68cc512f0e9cf9dab", []},
-  "lager_logger": {:git, "https://github.com/PSPDFKit-labs/lager_logger", "0f6374fe3ced05da980ceaf8758f49a1c6223f5b", []},
+  "lager_logger": {:hex, :lager_logger, "1.0.2"},
   "mimerl": {:hex, :mimerl, "1.0.2"},
   "phoenix": {:hex, :phoenix, "1.1.1"},
   "phoenix_ecto": {:hex, :phoenix_ecto, "2.0.0"},
