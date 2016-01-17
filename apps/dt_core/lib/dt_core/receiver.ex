@@ -1,4 +1,11 @@
 defmodule DtCore.Receiver do
+  @doc """
+  Receive an event and pass it to next step, while keeping
+  in memory a list of active and configured %{sensor, port}.
+
+  We don't care about the value here, just create a new entry into
+  the database if the sender is not known and not already configured.
+  """
   use GenServer
 
   import Ecto.Query, only: [from: 2]
