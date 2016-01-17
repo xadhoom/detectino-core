@@ -9,4 +9,4 @@ otp_release:
          - 18.1
          - 18.2
 script:
-         - "mix do deps.get, compile, coveralls.travis"
+        - "mix deps.get && mix deps.compile && mix coveralls.travis --umbrella"
