@@ -1,4 +1,25 @@
 defmodule DtBus.Can do
+  @moduledoc """
+  CAN BUS is used with extended frame format. This allows 29 bit identifiers.
+  We use the 7 MSBs as node id.
+
+  Please note that we don't use message ids to handle also priority,
+  where in can bus lower message id has higher priority, since we don't need it.
+  I prefered (and need) to build the id to be able to address each node
+  in order to get where it is and what it has attached to it.
+
+  Special nodes id:
+  0x0 : the master node (raspberry in detectino project).
+  0x7f: the broadcast address
+
+  The other bits are used to identify destination and commands.
+
+  so here's the bit map:
+  23-29 : node id (source, read from dips)
+  16-22 : destination node id
+   8-15 : command
+   0- 7 : subcommand
+  """
   use GenServer
   use Bitwise
 
@@ -106,28 +127,7 @@ defmodule DtBus.Can do
     {:noreply, state}
   end
 
-  @doc """
-  CAN BUS is used with extended frame format. This allows 29 bit identifiers.
-  We use the 7 MSBs as node id.
-
-  Please note that we don't use message ids to handle also priority,
-  where in can bus lower message id has higher priority, since we don't need it.
-  I prefered (and need) to build the id to be able to address each node
-  in order to get where it is and what it has attached to it.
-
-  Special nodes id:
-  0x0 : the master node (raspberry in detectino project).
-  0x7f: the broadcast address
-
-  The other bits are used to identify destination and commands.
-
-  so here's the bit map:
-  23-29 : node id (source, read from dips)
-  16-22 : destination node id
-   8-15 : command
-   0- 7 : subcommand
-  """
-  defp handle_canframe(canframe = {:can_frame, msgid, len, data, _intf, _ts}, state) do
+  defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
     case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
         Logger.info "Got command:#{command}, " <>
