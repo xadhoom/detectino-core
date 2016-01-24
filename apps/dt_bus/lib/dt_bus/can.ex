@@ -11,8 +11,8 @@ defmodule DtBus.Can do
   #
   # Client APIs
   #
-  def start_link do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+  def start_link(sender_fn \\ &(Receiver.put &1)) do
+    GenServer.start_link(__MODULE__, {sender_fn}, name: __MODULE__)
   end
 
   def ping(node_id) when is_integer node_id do
@@ -38,13 +38,14 @@ defmodule DtBus.Can do
   #
   # GenServer callbacks
   #
-  def init(_) do
+  def init({publish_fn}) do
     Logger.info "Starting CanBus Interface"
     :can.start()
     :can_router.attach()
     cur_ifs = :can_router.interfaces
     Logger.info "Started CanBus Interface #{inspect cur_ifs}"
     {:ok, %{
+        publish_fn: publish_fn,
         ping: %{}
       }}
   end
@@ -126,7 +127,7 @@ defmodule DtBus.Can do
    8-15 : command
    0- 7 : subcommand
   """
-  defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
+  defp handle_canframe(canframe = {:can_frame, msgid, len, data, _intf, _ts}, state) do
     case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
         Logger.info "Got command:#{command}, " <>
@@ -151,10 +152,9 @@ defmodule DtBus.Can do
                   0 -> :digital_read
                   _ -> :analog_read
                 end
-              %Event{address: src_node_id, 
+              state.publish_fn.(%Event{address: src_node_id, 
                 type: :sensor, subtype: subtype, 
-                port: port, value: value} 
-              |> Receiver.put
+                port: port, value: value})
             default ->
               Logger.warn "Unhandled command #{inspect default}"
           end
