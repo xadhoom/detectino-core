@@ -12,7 +12,7 @@ defmodule DtCore.SceneSup do
   end
 
   def start(scene = %Scene{}) do
-    child = worker(Scene, [], id: scene.name, restart: :transient)
+    child = worker(Scene, [], id: get_child_name(scene.name), restart: :transient)
     Supervisor.start_child(__MODULE__, child)
   end
   
@@ -21,7 +21,7 @@ defmodule DtCore.SceneSup do
   end
 
   def stop(scene = %Scene{}) do
-    child_id = scene.name
+    child_id = get_child_name(scene.name)
     case Supervisor.terminate_child(__MODULE__, child_id) do
       :ok -> Supervisor.delete_child(__MODULE__, child_id)
       err -> err
@@ -36,6 +36,10 @@ defmodule DtCore.SceneSup do
   def running do
     status = Supervisor.count_children(__MODULE__)
     status.specs - 1
+  end
+
+  def get_child_name(scene = %Scene{}) do
+    to_string(__MODULE__)  <> "::scene_server_for::" <> scene.name
   end
 
   # 

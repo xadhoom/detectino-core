@@ -77,4 +77,9 @@ defmodule DtCore.SceneSupTest do
     assert SceneSup.running == 0
   end
 
+  test "build child id" do
+    id = SceneSup.get_child_name(%Scene{name: "canemorto"})
+    assert id == "DtCore.SceneSup::scene_server_for::canemorto"
+  end
+
 end
