@@ -1,4 +1,4 @@
-defmodule DtCore.SceneLoader do
+defmodule DtCore.ScenarioLoader do
   use GenServer
 
   require Logger
@@ -14,7 +14,7 @@ defmodule DtCore.SceneLoader do
   # GenServer callbacks
   #
   def init(_) do
-    Logger.info "Starting Scene Loader"
+    Logger.info "Starting Scenario Loader"
     {:ok, nil}
   end
 
