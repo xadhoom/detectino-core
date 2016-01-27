@@ -17,7 +17,9 @@ defmodule DtCore.Scenario do
   #
   def init(_) do
     Logger.info "Starting Scenarios Server"
-    {:ok, nil}
+    {:ok,
+      %{rules: nil}
+    }
   end
 
 end

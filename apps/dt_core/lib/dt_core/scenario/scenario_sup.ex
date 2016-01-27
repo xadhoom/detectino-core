@@ -20,16 +20,31 @@ defmodule DtCore.ScenarioSup do
     Enum.each(scenarios, fn(scenario) -> start(scenario) end)
   end
 
-  def stop(scenario = %Scenario{}) do
-    child_id = get_child_name(scenario)
+  defp stop_byid(child_id) do
     case Supervisor.terminate_child(__MODULE__, child_id) do
       :ok -> Supervisor.delete_child(__MODULE__, child_id)
       err -> err
     end
   end
+
+  def stop(scenario = %Scenario{}) do
+    child_id = get_child_name(scenario)
+    stop_byid(child_id)
+  end
   
   def stop(scenarios) when is_list(scenarios) do
     Enum.each(scenarios, fn(scenario) -> stop(scenario) end)
+    :ok
+  end
+
+  def stopall do
+    Supervisor.which_children(__MODULE__)
+    |> Enum.each(
+      &(case &1 do
+          {child_id, _child, _type, [DtCore.Scenario]} -> stop_byid(child_id)
+          _v -> nil
+        end
+      ))
     :ok
   end
 

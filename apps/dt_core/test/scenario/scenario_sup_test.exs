@@ -56,6 +56,17 @@ defmodule DtCore.ScenarioSupTest do
     assert ScenarioSup.running == 1
   end
 
+  test "Scenario list starts many and stops all" do
+    s1 = %Scenario{name: "s1"}
+    s2 = %Scenario{name: "s2"}
+    scenarios = [s1, s2]
+    ScenarioSup.start(scenarios)
+    assert ScenarioSup.running == 2
+
+    assert ScenarioSup.stopall() == :ok
+    assert ScenarioSup.running == 0
+  end
+
   test "Scenario list start one worker" do
     s1 = %Scenario{name: "s1"}
     ScenarioSup.start(s1)
