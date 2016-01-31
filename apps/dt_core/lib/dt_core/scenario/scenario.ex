@@ -3,7 +3,8 @@ defmodule DtCore.Scenario do
 
   require Logger
 
-  defstruct name: nil
+  defstruct name: nil,
+    model: nil
 
   #
   # Client APIs
