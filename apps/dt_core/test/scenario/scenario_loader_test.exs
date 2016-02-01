@@ -18,6 +18,14 @@ defmodule DtCore.ScenarioLoaderTest do
     assert ScenarioSup.running == 1
   end
 
+  test "Many scenarios starts many server" do
+    Repo.insert! %ScenarioModel{name: "canemorto", enabled: true}
+    Repo.insert! %ScenarioModel{name: "canemorto2", enabled: true}
+    ScenarioLoader.initialize
+
+    assert ScenarioSup.running == 2
+  end
+
   test "Disabled scenario starts nothing" do
     Repo.insert! %ScenarioModel{name: "canemorto", enabled: false}
     ScenarioLoader.initialize
