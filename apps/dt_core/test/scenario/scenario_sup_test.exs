@@ -1,8 +1,11 @@
 defmodule DtCore.ScenarioSupTest do
   use DtCore.EctoCase
 
+  alias DtCore.Event
   alias DtCore.Scenario
   alias DtCore.ScenarioSup
+
+  alias DtWeb.Scenario, as: ScenarioModel
 
   setup do
     ScenarioSup.start_link
@@ -16,6 +19,8 @@ defmodule DtCore.ScenarioSupTest do
   end
 
   test "Scenario list with same name starts one worker" do
+    Repo.insert!(%ScenarioModel{name: "name"})
+
     scenarios = [
       %Scenario{name: "name"},
       %Scenario{name: "name"}
@@ -25,6 +30,8 @@ defmodule DtCore.ScenarioSupTest do
   end
 
   test "Scenario list starts workers" do
+    init_repo_s1s2
+
     scenarios = [
       %Scenario{name: "s1"},
       %Scenario{name: "s2"}
@@ -34,6 +41,8 @@ defmodule DtCore.ScenarioSupTest do
   end
 
   test "Scenario list starts and stops workers" do
+    init_repo_s1s2
+
     scenarios = [
       %Scenario{name: "s1"},
       %Scenario{name: "s2"}
@@ -46,6 +55,8 @@ defmodule DtCore.ScenarioSupTest do
   end
 
   test "Scenario list starts many and stops one worker" do
+    init_repo_s1s2
+
     s1 = %Scenario{name: "s1"}
     s2 = %Scenario{name: "s2"}
     scenarios = [s1, s2]
@@ -57,6 +68,8 @@ defmodule DtCore.ScenarioSupTest do
   end
 
   test "Scenario list starts many and stops all" do
+    init_repo_s1s2
+
     s1 = %Scenario{name: "s1"}
     s2 = %Scenario{name: "s2"}
     scenarios = [s1, s2]
@@ -67,13 +80,15 @@ defmodule DtCore.ScenarioSupTest do
     assert ScenarioSup.running == 0
   end
 
-  test "Scenario list start one worker" do
+  test "Single scenario start one worker" do
+    Repo.insert!(%ScenarioModel{name: "s1"})
     s1 = %Scenario{name: "s1"}
     ScenarioSup.start(s1)
     assert ScenarioSup.running == 1
   end
 
   test "Stop invalid worker" do
+    Repo.insert!(%ScenarioModel{name: "s1"})
     s1 = %Scenario{name: "s1"}
     assert {:error, :not_found} = ScenarioSup.stop(s1)
     assert ScenarioSup.running == 0
@@ -90,11 +105,27 @@ defmodule DtCore.ScenarioSupTest do
 
   test "build child id" do
     id = ScenarioSup.get_child_name(%Scenario{name: "canemorto"})
-    assert id == "Elixir.DtCore.ScenarioSup::scenario_server_for::canemorto"
+    assert id == String.to_atom("Elixir.DtCore.ScenarioSup::scenario_server_for::canemorto")
   end
 
   test "build child id with nil name" do
     assert_raise ArgumentError, fn -> ScenarioSup.get_child_name(%Scenario{}) end
+  end
+
+  @tag :skip
+  test "put event into children" do
+    scenarios = [
+      %Scenario{name: "s1"},
+      %Scenario{name: "s2"}
+      ]
+
+    res = %Event{} |> ScenarioSup.put
+    assert {:ok, 2} = res
+  end
+
+  def init_repo_s1s2 do
+    Repo.insert!(%ScenarioModel{name: "s1"})
+    Repo.insert!(%ScenarioModel{name: "s2"})
   end
 
 end

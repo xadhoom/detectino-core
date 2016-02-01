@@ -1,8 +1,16 @@
 defmodule DtCore.ScenarioSup do
   use Supervisor
 
+  alias DtWeb.Repo
+  import Ecto.Model
+  import Ecto.Query, only: [from: 2]
+
   alias DtCore.Scenario
   alias DtCore.ScenarioLoader
+
+  alias DtWeb.Scenario, as: ScenarioModel
+
+  require Logger
 
   #
   # Client APIs
@@ -12,12 +20,21 @@ defmodule DtCore.ScenarioSup do
   end
 
   def start(scenario = %Scenario{}) do
-    child = worker(Scenario, [], id: get_child_name(scenario), restart: :transient)
+    rules = load_rules(scenario)
+    Logger.debug("Got rules #{inspect rules} for scenario #{inspect scenario.name}")
+    child_name = get_child_name(scenario)
+    child = worker(Scenario, [rules, child_name], id: child_name, restart: :transient)
     Supervisor.start_child(__MODULE__, child)
   end
   
   def start(scenarios) when is_list(scenarios) do
     Enum.each(scenarios, fn(scenario) -> start(scenario) end)
+  end
+
+  defp load_rules(scenario = %Scenario{}) do
+    model = Repo.get_by!(ScenarioModel, %{name: scenario.name})
+    model = Repo.preload model, :rules
+    model.rules
   end
 
   defp stop_byid(child_id) do
@@ -59,6 +76,7 @@ defmodule DtCore.ScenarioSup do
 
   def get_child_name(scenario = %Scenario{}) do
     to_string(__MODULE__)  <> "::scenario_server_for::" <> scenario.name
+    |> String.to_atom
   end
 
   # 
