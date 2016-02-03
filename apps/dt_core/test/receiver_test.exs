@@ -95,9 +95,10 @@ defmodule DtCore.ReceiverTest do
   end
 
   test "existing sensor in repo" do
+    ev = %Event{address: 9999, port: 666, value: "any value", type: :an_atom, subtype: :another_atom}
     refute Repo.one(Sensor)
-    Repo.insert!(%Sensor{address: "1234", port: 10, name: "a name", configured: true})
-    Receiver.put(@valid_ev1)
+    Repo.insert!(%Sensor{address: "9999", port: 666, name: "a name", configured: true})
+    Receiver.put(ev)
     sensors = Repo.all(Sensor)
     assert 1 == length(sensors)
   end
