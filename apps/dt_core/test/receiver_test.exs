@@ -1,6 +1,5 @@
 defmodule DtCore.ReceiverTest do
   use DtCore.EctoCase
-  doctest DtCore
 
   alias DtWeb.Sensor
   alias DtCore.Receiver
@@ -16,6 +15,11 @@ defmodule DtCore.ReceiverTest do
   @valid_ev2 %Event{address: 1235, port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
   @valid_ev3 %Event{address: "1235", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
   @valid_ev4 %Event{address: 1234, port: 11, value: "any value", type: :an_atom, subtype: :another_atom}
+
+  setup_all do
+    Receiver.start_link(false)
+    :ok
+  end
 
   test "new event raises FunctionClauseError because missing port" do
     assert_raise FunctionClauseError, fn -> 

@@ -18,8 +18,8 @@ defmodule DtCore.Receiver do
   #
   # Client APIs
   #
-  def start_link do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+  def start_link(autostart \\ true) do
+    GenServer.start_link(__MODULE__, autostart, name: __MODULE__)
   end
 
   def put(ev = %Event{address: a, port: p,
@@ -33,10 +33,13 @@ defmodule DtCore.Receiver do
   #
   # GenServer callbacks
   #
-  def init(_) do
+  def init(autostart) do
     Logger.info "Starting Event Receiver"
-    :timer.send_after(500, :start)
-    {:ok, nil}
+    case autostart do
+      true -> :timer.send_after(500, :start)
+        {:ok, nil}
+      _ -> {:ok, []}
+    end
   end
   
   @doc """
