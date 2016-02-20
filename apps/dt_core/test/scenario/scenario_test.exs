@@ -36,4 +36,11 @@ defmodule DtCore.ScenarioTest do
     end)
   end
 
+  test "send event" do
+    {:ok, pid} = start_server
+    ev = %Event{type: :test}
+    send pid, {:event, ev}
+    assert ev == Scenario.last_event(pid)
+  end
+
 end
