@@ -11,6 +11,8 @@ defmodule DtCore.Handler do
   alias DtWeb.Repo, as: Repo
   alias DtWeb.Sensor, as: Sensor
 
+  defstruct listeners: %{}
+
   #
   # Client APIs
   #
@@ -31,12 +33,65 @@ defmodule DtCore.Handler do
 
   end
 
+  def get_listener(pid) do
+    GenServer.call(__MODULE__, {:get_listener, pid})
+  end
+
+  def start_listening(filter_fun \\ fn(_) -> true end) do
+    GenServer.call(__MODULE__, {:start_listening, self, filter_fun})
+  end
+
+  def stop_listening do
+    GenServer.call(__MODULE__, {:stop_listening, self})
+  end
+
+  def get_listeners do
+    GenServer.call(__MODULE__, {:get_listeners})
+  end
+
   #
   # GenServer callbacks
   #
   def init(_) do
     Logger.info "Starting Event Handler"
-    {:ok, nil}
+    {:ok, 
+      %DtCore.Handler{}
+    }
+  end
+
+  def handle_call({:get_listener, pid}, _from, state) do
+    key = Base.encode64 :erlang.term_to_binary(pid)
+    pid = case Map.fetch(state.listeners, key) do
+      :error -> nil
+      {:ok, v} -> v[:pid]
+    end
+    {:reply, pid, state}
+  end
+
+  def handle_call({:start_listening, pid, filter_fun}, _from, state) do
+    key = Base.encode64 :erlang.term_to_binary(pid)
+    listeners = Map.put state.listeners, key, %{pid: pid, filter: filter_fun}
+    Process.monitor pid
+    {:reply, {:ok, pid}, %DtCore.Handler{state | listeners: listeners}}
+  end
+
+  def handle_call({:stop_listening, pid}, _from, state) do
+    key = Base.encode64 :erlang.term_to_binary(pid)
+    listeners = Map.delete state.listeners, key
+    Process.unlink pid
+    {:reply, {:ok, pid}, %DtCore.Handler{state | listeners: listeners}}
+  end
+
+  def handle_call({:get_listeners}, _from, state) do
+    listeners = state.listeners
+      |> Map.values
+      |> Enum.map(fn(item) -> Map.get(item, :pid) end)
+    {:reply, listeners, state}
+  end
+
+  def handle_info({:DOWN, _, _, pid, _}, state) do
+    handle_call {:stop_listening, pid}, nil, state
+    {:noreply, state}
   end
 
 end

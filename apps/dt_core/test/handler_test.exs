@@ -54,4 +54,14 @@ defmodule DtCore.HandlerTest do
     assert nil == Handler.put(@nil_value)
   end
 
+  test "register listener" do
+    Handler.start_link
+    assert nil == Handler.get_listener(self)
+    assert {:ok, self} == Handler.start_listening()
+    assert [self] == Handler.get_listeners()
+    assert self == Handler.get_listener(self)
+    assert {:ok, self} == Handler.stop_listening()
+    assert nil == Handler.get_listener(self)
+  end
+
 end
