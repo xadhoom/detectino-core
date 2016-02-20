@@ -64,6 +64,11 @@ defmodule DtCore.HandlerTest do
     assert nil == Handler.get_listener(self)
   end
 
+  test "register listener with cb" do
+    Handler.start_link
+    assert {:ok, self} == Handler.start_listening fn(_) -> :true end
+  end
+
   test "start stop server" do
     Handler.start_link
     assert :ok == Handler.stop
