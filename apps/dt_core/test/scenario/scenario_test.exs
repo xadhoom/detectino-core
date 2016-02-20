@@ -5,6 +5,7 @@ defmodule DtCore.ScenarioTest do
 
   alias DtCore.Scenario
   alias DtCore.Handler
+  alias DtCore.Event
 
   def start_server do
     Handler.start_link
@@ -31,12 +32,6 @@ defmodule DtCore.ScenarioTest do
     Enum.each(rules, fn(rule) ->
       assert %RuleModel{} = rule
     end)
-  end
-
-  @tag :skip
-  test "Put Event" do
-    start_server
-    Scenario.put
   end
 
 end

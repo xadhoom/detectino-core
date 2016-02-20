@@ -3,6 +3,7 @@ defmodule DtCore.ReceiverTest do
 
   alias DtWeb.Sensor
   alias DtCore.Receiver
+  alias DtCore.Handler
   alias DtCore.Event
 
   @missing_port_ev %Event{address: 10, value: "any value", type: :an_atom, subtype: :another_atom}
@@ -17,6 +18,7 @@ defmodule DtCore.ReceiverTest do
   @valid_ev4 %Event{address: 1234, port: 11, value: "any value", type: :an_atom, subtype: :another_atom}
 
   setup_all do
+    Handler.start_link
     Receiver.start_link(false)
     :ok
   end

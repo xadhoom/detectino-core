@@ -28,7 +28,7 @@ defmodule DtCore.Handler do
       nil -> 
         Logger.debug "Dunno what to do with nil value, bailing out"
         nil
-      _v -> :will_do_something_here #GenServer.call __MODULE__, {:put, ev}
+      _v -> GenServer.cast __MODULE__, {:put, ev}
     end
 
   end
@@ -91,6 +91,15 @@ defmodule DtCore.Handler do
       |> Map.values
       |> Enum.map(fn(item) -> Map.get(item, :pid) end)
     {:reply, listeners, state}
+  end
+
+  def handle_cast({:put, ev = %Event{}}, state) do
+    Enum.each state.listeners, fn({_, v}) ->
+      if v.filter.(ev) do
+        send v.pid, {:event, ev}
+      end
+    end
+    {:noreply, state}
   end
 
   def handle_cast({:stop}, state) do

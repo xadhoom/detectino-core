@@ -31,6 +31,22 @@ defmodule DtCore.ScenarioSup do
     Enum.each(scenarios, fn(scenario) -> start(scenario) end)
   end
 
+  def get_worker_by_def(scenario = %Scenario{}) do
+    child_id = get_child_name(scenario)
+    found = Supervisor.which_children(__MODULE__)
+    |> Enum.find( fn(item) ->
+          case item do
+            {^child_id, _child, _type, _modules} -> true
+            _ -> false
+          end
+        end
+      )
+    case found do
+      {^child_id, pid, _, _} -> pid
+      _ -> nil
+    end
+  end
+
   defp load_rules(scenario = %Scenario{}) do
     model = Repo.get_by!(ScenarioModel, %{name: scenario.name})
     model = Repo.preload model, :rules

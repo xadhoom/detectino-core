@@ -11,7 +11,10 @@ defmodule DtCore.Receiver do
   import Ecto.Query, only: [from: 2]
 
   require Logger
+
   alias DtCore.Event
+  alias DtCore.Handler
+
   alias DtWeb.Repo, as: Repo
   alias DtWeb.Sensor, as: Sensor
 
@@ -26,7 +29,7 @@ defmodule DtCore.Receiver do
     type: t, subtype: s, value: v}) when a != nil and is_number(p)
     and is_atom(t) and is_atom(s) and t != nil and s != nil do
 
-    ev = %Event{address: to_string(ev.address), port: ev.port}
+    ev = %Event{ev | address: to_string(ev.address)}
     GenServer.call __MODULE__, {:put, ev}
   end
 
@@ -74,6 +77,10 @@ defmodule DtCore.Receiver do
         state
       false -> maybe_on_repo(event, state)
     end
+
+    # forward to event handler
+    Handler.put(event)
+
     {:reply, nil, state}
   end
 

@@ -2,6 +2,7 @@ defmodule DtCore.Scenario do
   use GenServer
 
   require Logger
+  alias DtCore.Event
   alias DtCore.Handler
 
   defstruct name: nil,
@@ -19,8 +20,8 @@ defmodule DtCore.Scenario do
     GenServer.call server_name, {:get_rules}
   end
 
-  def put(server_name, event) do
-    GenServer.cast server_name, {:put, event}
+  def last_event(server_name) do
+    GenServer.call server_name, {:last_event}
   end
 
   #
@@ -30,7 +31,9 @@ defmodule DtCore.Scenario do
     Logger.info "Starting Scenarios Server"
     {:ok, self} = Handler.start_listening
     {:ok,
-      %{rules: rules}
+      %{rules: rules,
+        last_event: nil
+      }
     }
   end
 
@@ -38,8 +41,12 @@ defmodule DtCore.Scenario do
     {:reply, state.rules, state}
   end
 
-  def handle_cast({:put, event}, state) do
-    {:noreply, state}
+  def handle_call({:last_event}, _from, state) do
+    {:reply, state.last_event, state}
+  end
+
+  def handle_info({:event, event}, state) do
+    {:noreply, %{state | last_event: event}}
   end
 
 end

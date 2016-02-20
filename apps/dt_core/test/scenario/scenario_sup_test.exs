@@ -89,6 +89,20 @@ defmodule DtCore.ScenarioSupTest do
     assert ScenarioSup.running == 1
   end
 
+  test "Get worker by name when does not exists" do
+    assert ScenarioSup.running == 0
+    s1 = %Scenario{name: "s1"}
+    assert nil == ScenarioSup.get_worker_by_def s1
+  end
+
+  test "Get worker by name" do
+    Repo.insert!(%ScenarioModel{name: "s1"})
+    s1 = %Scenario{name: "s1"}
+    {:ok, pid} = ScenarioSup.start(s1)
+    assert ScenarioSup.running == 1
+    assert pid == ScenarioSup.get_worker_by_def s1
+  end
+
   test "Stop invalid worker" do
     Repo.insert!(%ScenarioModel{name: "s1"})
     s1 = %Scenario{name: "s1"}
@@ -112,17 +126,6 @@ defmodule DtCore.ScenarioSupTest do
 
   test "build child id with nil name" do
     assert_raise ArgumentError, fn -> ScenarioSup.get_child_name(%Scenario{}) end
-  end
-
-  @tag :skip
-  test "put event into children" do
-    scenarios = [
-      %Scenario{name: "s1"},
-      %Scenario{name: "s2"}
-      ]
-
-    res = %Event{} |> ScenarioSup.put
-    assert {:ok, 2} = res
   end
 
   def init_repo_s1s2 do
