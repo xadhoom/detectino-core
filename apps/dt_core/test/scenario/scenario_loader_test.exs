@@ -5,8 +5,10 @@ defmodule DtCore.ScenarioLoaderTest do
 
   alias DtCore.ScenarioLoader
   alias DtCore.ScenarioSup
+  alias DtCore.Handler
 
   setup do
+    Handler.start_link
     ScenarioSup.start_link
     :ok
   end

@@ -2,12 +2,14 @@ defmodule DtCore.ScenarioSupTest do
   use DtCore.EctoCase
 
   alias DtCore.Event
+  alias DtCore.Handler
   alias DtCore.Scenario
   alias DtCore.ScenarioSup
 
   alias DtWeb.Scenario, as: ScenarioModel
 
   setup do
+    Handler.start_link
     ScenarioSup.start_link
     :ok
   end

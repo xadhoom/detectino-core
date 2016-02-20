@@ -4,15 +4,23 @@ defmodule DtCore.ScenarioTest do
   alias DtWeb.Rule, as: RuleModel
 
   alias DtCore.Scenario
+  alias DtCore.Handler
 
   def start_server do
+    Handler.start_link
     [ %RuleModel{}, %RuleModel{} ]
     |> Scenario.start_link(:some_name)
   end
 
   test "Init scenario" do
+    Handler.start_link
     [ %RuleModel{}, %RuleModel{} ]
     |> Scenario.start_link(:some_name)
+  end
+
+  test "Check scenario is registered" do
+    {:ok, pid} = start_server
+    assert [pid] == Handler.get_listeners()
   end
 
   test "Get Rules" do
@@ -25,8 +33,10 @@ defmodule DtCore.ScenarioTest do
     end)
   end
 
+  @tag :skip
   test "Put Event" do
-    assert true
+    start_server
+    Scenario.put
   end
 
 end
