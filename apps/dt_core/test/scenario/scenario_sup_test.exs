@@ -1,7 +1,6 @@
 defmodule DtCore.ScenarioSupTest do
   use DtCore.EctoCase
 
-  alias DtCore.Event
   alias DtCore.Handler
   alias DtCore.Scenario
   alias DtCore.ScenarioSup

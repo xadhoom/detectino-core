@@ -23,7 +23,15 @@ defmodule DtCore.ScenarioTest do
 
   test "Check scenario is registered" do
     {:ok, pid} = start_server
-    assert [pid] == Handler.get_listeners()
+    found = Handler.get_listeners()
+    |> Enum.find(fn(item) ->
+        case item do
+          ^pid -> true
+          _ -> false
+        end
+      end
+      )
+    assert found == pid
   end
 
   test "Get Rules" do

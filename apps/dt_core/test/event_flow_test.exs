@@ -1,8 +1,6 @@
 defmodule DtCore.EventFlowTest do
   use DtCore.EctoCase
 
-  alias DtWeb.Rule, as: RuleModel
-    
   alias DtCore.Event
   alias DtCore.Handler
   alias DtCore.Receiver
@@ -25,12 +23,12 @@ defmodule DtCore.EventFlowTest do
   test "new event ends up into scenario last event" do
 
     Repo.insert!(%ScenarioModel{name: "canemorto"})
-    {:ok, pid} = ScenarioSup.start @scenario
+    {:ok, _pid} = ScenarioSup.start @scenario
 
     Receiver.put @event
     scenario = ScenarioSup.get_worker_by_def @scenario
 
-    assert @event_normal == Scenario.last_event(pid)
+    assert @event_normal == Scenario.last_event(scenario)
   end
 
 end
