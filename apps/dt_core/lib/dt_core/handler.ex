@@ -49,6 +49,10 @@ defmodule DtCore.Handler do
     GenServer.call(__MODULE__, {:get_listeners})
   end
 
+  def stop do
+    GenServer.cast(__MODULE__, {:stop})
+  end
+
   #
   # GenServer callbacks
   #
@@ -87,6 +91,15 @@ defmodule DtCore.Handler do
       |> Map.values
       |> Enum.map(fn(item) -> Map.get(item, :pid) end)
     {:reply, listeners, state}
+  end
+
+  def handle_cast({:stop}, state) do
+    {:stop, :normal, state}
+  end
+
+  def terminate(reason, _state) do
+    Logger.info "Terminating with #{inspect reason}"
+    :ok
   end
 
   def handle_info({:DOWN, _, _, pid, _}, state) do

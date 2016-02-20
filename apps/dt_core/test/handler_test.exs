@@ -64,4 +64,10 @@ defmodule DtCore.HandlerTest do
     assert nil == Handler.get_listener(self)
   end
 
+  test "start stop server" do
+    Handler.start_link
+    assert :ok == Handler.stop
+  end
+
 end
+
