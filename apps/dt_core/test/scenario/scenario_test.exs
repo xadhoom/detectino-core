@@ -7,16 +7,18 @@ defmodule DtCore.ScenarioTest do
   alias DtCore.Handler
   alias DtCore.Event
 
-  def start_server do
+  setup do
     Handler.start_link
+    :ok
+  end
+
+  def start_server do
     [ %RuleModel{}, %RuleModel{} ]
     |> Scenario.start_link(:some_name)
   end
 
   test "Init scenario" do
-    Handler.start_link
-    [ %RuleModel{}, %RuleModel{} ]
-    |> Scenario.start_link(:some_name)
+    {:ok, _pid} = start_server
   end
 
   test "Check scenario is registered" do
