@@ -23,17 +23,19 @@ defmodule DtBus.Can do
   use GenServer
   use Bitwise
 
+  alias DtBus.Event, as: Event
   alias DtBus.CanHelper, as: Canhelper
-  alias DtCore.Receiver, as: Receiver
-  alias DtCore.Event, as: Event
 
   require Logger
+
+  defstruct listeners: %{},
+    ping: %{}
 
   #
   # Client APIs
   #
-  def start_link(sender_fn \\ &(Receiver.put &1)) do
-    GenServer.start_link(__MODULE__, {sender_fn}, name: __MODULE__)
+  def start_link do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def ping(node_id) when is_integer node_id do
@@ -56,19 +58,26 @@ defmodule DtBus.Can do
     GenServer.cast __MODULE__, {:readd, node_id, :read_all}
   end
 
+  def start_listening(filter_fun \\ fn(_) -> true end) do
+    GenServer.cast(__MODULE__, {:start_listening, self, filter_fun})
+  end
+
+  def stop_listening do
+    GenServer.cast(__MODULE__, {:stop_listening, self})
+  end
+
   #
   # GenServer callbacks
   #
-  def init({publish_fn}) do
+  def init(_) do
     Logger.info "Starting CanBus Interface"
     :can.start()
     :can_router.attach()
     cur_ifs = :can_router.interfaces
     Logger.info "Started CanBus Interface #{inspect cur_ifs}"
-    {:ok, %{
-        publish_fn: publish_fn,
-        ping: %{}
-      }}
+    {:ok, 
+      %DtBus.Can{}
+    }
   end
 
   def handle_call({:ping, node_id}, from, state) do
@@ -86,6 +95,20 @@ defmodule DtBus.Can do
   def handle_call(value, _from, state) do
     Logger.info "Got call message #{inspect value}"
     {:reply, nil, state}
+  end
+
+  def handle_cast({:start_listening, pid, filter_fun}, state) do
+    key = Base.encode64 :erlang.term_to_binary(pid)
+    listeners = Map.put state.listeners, key, %{pid: pid, filter: filter_fun}
+    Process.monitor pid
+    {:noreply, %DtBus.Can{state | listeners: listeners}}
+  end
+
+  def handle_cast({:stop_listening, pid}, state) do
+    key = Base.encode64 :erlang.term_to_binary(pid)
+    listeners = Map.delete state.listeners, key
+    Process.unlink pid
+    {:noreply, %DtBus.Can{state | listeners: listeners}}
   end
 
   def handle_cast({:read, node_id, terminal}, state) do
@@ -115,6 +138,11 @@ defmodule DtBus.Can do
     {:noreply, state}
   end
 
+  def handle_info({:DOWN, _, _, pid, _}, state) do
+    handle_call {:stop_listening, pid}, nil, state
+    {:noreply, state}
+  end
+
   def handle_info(what, state) do
     Logger.debug "Got info message #{inspect what}"
 
@@ -125,6 +153,14 @@ defmodule DtBus.Can do
         Logger.warn "Got unknown message #{inspect default}"
     end
     {:noreply, state}
+  end
+
+  defp sendmessage(state, ev) do
+    Enum.each state.listeners, fn({_, v}) ->
+      if v.filter.(ev) do
+        send v.pid, ev
+      end
+    end
   end
 
   defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
@@ -152,7 +188,7 @@ defmodule DtBus.Can do
                   0 -> :digital_read
                   _ -> :analog_read
                 end
-              state.publish_fn.(%Event{address: src_node_id, 
+              sendmessage(state, %Event{address: src_node_id, 
                 type: :sensor, subtype: subtype, 
                 port: port, value: value})
             default ->
