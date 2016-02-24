@@ -8,6 +8,7 @@
   "decimal": {:hex, :decimal, "1.1.1"},
   "dthread": {:git, "https://github.com/tonyrog/dthread.git", "d763748f1d2af31762682772e28e412906b8fef5", []},
   "ecto": {:hex, :ecto, "1.1.1"},
+  "ex_abnf": {:hex, :ex_abnf, "0.2.7"},
   "excoveralls": {:hex, :excoveralls, "0.4.5"},
   "exjsx": {:hex, :exjsx, "3.2.0"},
   "fs": {:hex, :fs, "0.9.2"},

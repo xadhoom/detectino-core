@@ -1,0 +1,28 @@
+if-rule = "IF" *SP lcondition *SP operator *SP rcondition *SP "THEN" *SP consequent !!!
+	[op, _, lcond, _, comp, _, rcond, _, then, _, cons] = string_values
+	{:ok, state, 
+		%{
+			op: op,
+			lcond: lcond,
+			comp: comp,
+			rcond: rcond,
+			then: then,
+			cons: cons
+		}
+	}
+!!!
+
+operator = ">" / "<" / "=="
+
+lcondition = *( 1*ALPHA "." ) 1*ALPHA 
+
+rcondition = 1*DIGIT
+
+consequent = 1*ALPHA
+
+SP = %x20
+
+ALPHA =  %x41-5A / %x61-7A   ; A-Z / a-z
+
+DIGIT =  %x30-39
+
