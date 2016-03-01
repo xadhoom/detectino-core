@@ -158,7 +158,7 @@ defmodule DtBus.Can do
   defp sendmessage(state, ev) do
     Enum.each state.listeners, fn({_, v}) ->
       if v.filter.(ev) do
-        send v.pid, %{event: ev}
+        send v.pid, {:event, ev}
       end
     end
   end
