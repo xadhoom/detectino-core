@@ -14,7 +14,6 @@ defmodule DtCore.Receiver do
 
   alias DtCore.Event
   alias DtBus.Event, as: BusEvent
-  alias DtCore.Handler
 
   alias DtWeb.Repo, as: Repo
   alias DtWeb.Sensor, as: Sensor
@@ -72,15 +71,16 @@ defmodule DtCore.Receiver do
     end
 
     # forward to event handler
-    Handler.put(event)
+    GenServer.whereis(:DtCoreHandler)
+    |> send({:event, event})
 
     {:noreply, state}
   end
 
-  #def handle_info({:event, ev}, state) do
-    #  Logger.error("Unhandled event #{inspect ev}")
-    #{:noreply, state}
-    #end
+  def handle_info({:event, ev}, state) do
+    Logger.error("Unhandled event #{inspect ev}")
+    {:noreply, state}
+  end
 
   def handle_info(rq, nil) do
     Logger.info("System not yet ready for event #{inspect rq}")

@@ -5,68 +5,57 @@ defmodule DtCore.HandlerTest do
   alias DtCore.Handler
   alias DtCore.Event
 
-  @missing_port_ev %Event{address: "10", value: "any value", type: :an_atom, subtype: :another_atom}
-  @missing_addr_ev %Event{port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
-  @missing_type_ev %Event{address: "10", port: 10, value: "any value", subtype: :another_atom}
-  @missing_subtype_ev %Event{address: "10", port: 10, value: "any value", type: :an_atom}
-  @wrong_port_addr %Event{address: "1234", port: "10", value: "any value", type: :an_atom, subtype: :another_atom}
-  @wrong_addr %Event{address: 1234, port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
+  @missing_port_ev {:event, %Event{address: "10", value: "any value", type: :an_atom, subtype: :another_atom}}
+  @missing_addr_ev {:event, %Event{port: 10, value: "any value", type: :an_atom, subtype: :another_atom}}
+  @missing_type_ev {:event, %Event{address: "10", port: 10, value: "any value", subtype: :another_atom}}
+  @missing_subtype_ev {:event, %Event{address: "10", port: 10, value: "any value", type: :an_atom}}
+  @wrong_port_addr {:event, %Event{address: "1234", port: "10", value: "any value", type: :an_atom, subtype: :another_atom}}
+  @wrong_addr {:event, %Event{address: 1234, port: 10, value: "any value", type: :an_atom, subtype: :another_atom}}
 
-  @nil_value %Event{address: "1234", port: 10, type: :an_atom, subtype: :another_atom}
+  @nil_value {:event, %Event{address: "1234", port: 10, type: :an_atom, subtype: :another_atom}}
 
-  test "new event raises FunctionClauseError because missing port" do
-    assert_raise FunctionClauseError, fn -> 
-      Handler.put(@missing_port_ev)
-    end
+  defp start_handler do
+    {:ok, pid} = Handler.start_link
+    ref = Process.monitor pid
+    Process.unlink pid
+    {:ok, ref, pid}
   end
 
-  test "new event raises FunctionClauseError because missing address" do
-    assert_raise FunctionClauseError, fn -> 
-      Handler.put(@missing_addr_ev)
-    end
-  end
-
-  test "new event raises FunctionClauseError because missing type" do
-    assert_raise FunctionClauseError, fn -> 
-      Handler.put(@missing_type_ev)
-    end
-  end
-
-  test "new event raises FunctionClauseError because missing subtype" do
-    assert_raise FunctionClauseError, fn -> 
-      Handler.put(@missing_subtype_ev)
-    end
-  end
-
-  test "new event raises FunctionClauseError because wrong address format" do
-    assert_raise FunctionClauseError, fn -> 
-      Handler.put(@wrong_addr)
-    end
-  end
-
-  test "new event raises FunctionClauseError because wrong port format" do
-    assert_raise FunctionClauseError, fn -> 
-      Handler.put(@wrong_port_addr)
-    end
-  end
-
-  test "nil value event returns nil" do
-    assert nil == Handler.put(@nil_value)
+  test "invalid events" do
+    {:ok, ref, pid} = start_handler
+    assert {:ok, self} == Handler.start_listening fn(_) -> raise("I should not be called") end
+    send pid, @missing_port_ev
+    send pid, @missing_addr_ev
+    send pid, @missing_type_ev
+    send pid, @missing_subtype_ev
+    send pid, @wrong_addr
+    send pid, @wrong_port_addr
+    GenServer.stop pid, :normal
   end
 
   test "register listener" do
-    Handler.start_link
+    {:ok, ref, pid} = start_handler
     assert nil == Handler.get_listener(self)
     assert {:ok, self} == Handler.start_listening()
     assert [self] == Handler.get_listeners()
     assert self == Handler.get_listener(self)
     assert {:ok, self} == Handler.stop_listening()
     assert nil == Handler.get_listener(self)
+    GenServer.stop pid, :normal
   end
 
-  test "register listener with cb" do
-    Handler.start_link
-    assert {:ok, self} == Handler.start_listening fn(_) -> :true end
+  test "register listener with cb and execute it" do
+    ev = %Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
+
+    {:ok, ref, pid} = start_handler
+    assert {:ok, self} == Handler.start_listening fn(ev) ->
+      assert %Event{} = ev
+      true
+    end
+    send pid, {:event, ev}
+
+    assert_receive ev, 1000
+    GenServer.stop pid, :normal
   end
 
   test "start stop server" do

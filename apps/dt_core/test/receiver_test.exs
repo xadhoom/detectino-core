@@ -7,10 +7,10 @@ defmodule DtCore.ReceiverTest do
   alias DtBus.Event
 
   @missing_port_ev {:event, %Event{address: 10, value: "any value", type: :an_atom, subtype: :another_atom}}
-  @missing_addr_ev %Event{port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
-  @missing_type_ev %Event{address: 10, port: 10, value: "any value", subtype: :another_atom}
-  @missing_subtype_ev %Event{address: 10, port: 10, value: "any value", type: :an_atom}
-  @wrong_port_addr %Event{address: 1234, port: "10", value: "any value", type: :an_atom, subtype: :another_atom}
+  @missing_addr_ev {:event, %Event{port: 10, value: "any value", type: :an_atom, subtype: :another_atom}}
+  @missing_type_ev {:event, %Event{address: 10, port: 10, value: "any value", subtype: :another_atom}}
+  @missing_subtype_ev {:event, %Event{address: 10, port: 10, value: "any value", type: :an_atom}}
+  @wrong_port_addr {:event, %Event{address: 1234, port: "10", value: "any value", type: :an_atom, subtype: :another_atom}}
 
   @valid_ev1 {:event, %Event{address: 1234, port: 10, value: "any value", type: :an_atom, subtype: :another_atom}}
   @valid_ev2 {:event, %Event{address: 1235, port: 10, value: "any value", type: :an_atom, subtype: :another_atom}}
@@ -23,40 +23,21 @@ defmodule DtCore.ReceiverTest do
   end
 
   defp start_receiver do
-    {:ok, pid} = Receiver.start_link(false)
+    {:ok, pid} = Receiver.start_link false
     ref = Process.monitor pid
     Process.unlink pid
     {:ok, ref, pid}
   end
 
-  test "Missing port event kills server" do
+  test "invalid events" do
     {:ok, ref, pid} = start_receiver
     send pid, @missing_port_ev
-    assert_receive {:DOWN, ^ref, :process, _, {:function_clause, _any}}, 500
-  end
-
-  test "Missing address event kills server" do
-    {:ok, ref, pid} = start_receiver
     send pid, @missing_addr_ev
-    assert_receive {:DOWN, ^ref, :process, _, {:function_clause, _any}}, 500
-  end
-
-  test "Missing type event kills server" do
-    {:ok, ref, pid} = start_receiver
     send pid, @missing_type_ev
-    assert_receive {:DOWN, ^ref, :process, _, {:function_clause, _any}}, 500
-  end
-
-  test "Missing subtype event kills server" do
-    {:ok, ref, pid} = start_receiver
     send pid, @missing_subtype_ev
-    assert_receive {:DOWN, ^ref, :process, _, {:function_clause, _any}}, 500
-  end
-
-  test "Wrong port event kills server" do
-    {:ok, ref, pid} = start_receiver
     send pid, @wrong_port_addr
-    assert_receive {:DOWN, ^ref, :process, _, {:function_clause, _any}}, 500
+    refute Repo.one(Sensor)
+    GenServer.stop pid, :normal
   end
 
   test "new event into repo" do

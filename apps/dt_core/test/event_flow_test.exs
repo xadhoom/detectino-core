@@ -6,11 +6,12 @@ defmodule DtCore.EventFlowTest do
   alias DtCore.Receiver
   alias DtCore.Scenario
   alias DtCore.ScenarioSup
+  alias DtCore.TimerHelper
 
   alias DtWeb.Scenario, as: ScenarioModel
 
   @event {:event, %Event{address: 1234, port: 10, value: "any value", type: :an_atom, subtype: :another_atom}}
-  @event_normal %Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
+  @event_normal %DtCore.Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
   @scenario %Scenario{name: "canemorto"}
 
   setup do
@@ -28,7 +29,10 @@ defmodule DtCore.EventFlowTest do
     send pid, @event
     scenario = ScenarioSup.get_worker_by_def @scenario
 
-    assert @event_normal == Scenario.last_event(scenario)
+    TimerHelper.wait_until fn ->  
+      assert @event_normal == Scenario.last_event(scenario)
+    end
+
   end
 
 end

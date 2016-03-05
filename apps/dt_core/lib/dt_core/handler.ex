@@ -13,44 +13,33 @@ defmodule DtCore.Handler do
 
   defstruct listeners: %{}
 
+  @server_name :DtCoreHandler
+
   #
   # Client APIs
   #
   def start_link do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
-  end
-
-  def put(ev = %Event{address: a, port: p,
-    type: t, subtype: s, value: v}) when is_binary(a) and is_number(p) 
-    and is_atom(t) and is_atom(s) and t != nil and s != nil do
-
-    case ev.value do
-      nil -> 
-        Logger.debug "Dunno what to do with nil value, bailing out"
-        nil
-      _v -> GenServer.cast __MODULE__, {:put, ev}
-    end
-
+    GenServer.start_link(__MODULE__, nil, name: @server_name)
   end
 
   def get_listener(pid) do
-    GenServer.call(__MODULE__, {:get_listener, pid})
+    GenServer.call(@server_name, {:get_listener, pid})
   end
 
   def start_listening(filter_fun \\ fn(_) -> true end) do
-    GenServer.call(__MODULE__, {:start_listening, self, filter_fun})
+    GenServer.call(@server_name, {:start_listening, self, filter_fun})
   end
 
   def stop_listening do
-    GenServer.call(__MODULE__, {:stop_listening, self})
+    GenServer.call(@server_name, {:stop_listening, self})
   end
 
   def get_listeners do
-    GenServer.call(__MODULE__, {:get_listeners})
+    GenServer.call(@server_name, {:get_listeners})
   end
 
   def stop do
-    GenServer.cast(__MODULE__, {:stop})
+    GenServer.cast(@server_name, {:stop})
   end
 
   #
@@ -93,12 +82,25 @@ defmodule DtCore.Handler do
     {:reply, listeners, state}
   end
 
-  def handle_cast({:put, ev = %Event{}}, state) do
-    Enum.each state.listeners, fn({_, v}) ->
-      if v.filter.(ev) do
-        send v.pid, {:event, ev}
-      end
+  def handle_info({:event, ev = %Event{address: a, port: p,
+    type: t, subtype: s, value: v}}, state) when is_binary(a) and is_number(p) 
+    and is_atom(t) and is_atom(s) and t != nil and s != nil do
+
+    case ev.value do
+      nil ->
+        Logger.debug "Dunno what to do with nil value, bailing out"
+      _ -> 
+        Enum.each state.listeners, fn({_, v}) ->
+          if v.filter.(ev) do
+            send v.pid, {:event, ev}
+          end
+        end
     end
+    {:noreply, state}
+  end
+
+  def handle_info(any, state) do
+    Logger.error "Unhandled info #{inspect any}"
     {:noreply, state}
   end
 
