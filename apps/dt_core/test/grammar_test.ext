@@ -1,4 +1,4 @@
-defmodule DtCore.RulesTest do
+defmodule DtCore.GrammarTest do
   use ExUnit.Case, async: true
 
   test "check grammar validity" do
