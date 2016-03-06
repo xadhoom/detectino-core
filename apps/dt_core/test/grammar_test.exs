@@ -8,14 +8,9 @@ defmodule DtCore.GrammarTest do
   test "check gt than rule" do
     grammar = ABNF.load_file "priv/rules.abnf"
 
-    res = ABNF.apply grammar, "if-rule", 'IF event.value > 10 THEN what', %{} 
+    res = ABNF.apply grammar, "if-rule", 'IF event.value > "10" THEN what', %{}
     values = Enum.at res.values, 0
-    assert 'event.value' == values.lcond
-    assert '10' == values.rcond
-    assert 'what' == values.cons
-    assert '>' == values.comp
-    assert 'IF' == values.op
-    assert 'THEN' == values.then
+    assert 'if event.value > "10" do :what end' == values.code
   end
 
   test "check invalid rule" do
@@ -43,6 +38,32 @@ defmodule DtCore.GrammarTest do
     refute is_nil(res)
   end
 
+  test "check complex condition" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+    res = ABNF.apply grammar, "if-rule", 'IF event.value == "something here" AND event.value > 10 THEN what', %{} 
+    refute is_nil(res)
+  end
+
+  test "check longer complex condition" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+    res = ABNF.apply grammar, "if-rule", 'IF event.value == "something here" AND event.value > 10 OR event.value < 8 THEN what', %{} 
+    refute is_nil(res)
+
+    res = ABNF.apply grammar, "if-rule", 'IF event.value == "something here" OR event.value > 10 AND event.value < 8 THEN what', %{} 
+    refute is_nil(res)
+  end
+
+  test "check wrapped condition" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+    res = ABNF.apply grammar, "if-rule", 'IF (event.value == "something here") THEN what', %{} 
+    refute is_nil(res)
+  end
+
+  test "check complex, nested condition" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+    res = ABNF.apply grammar, "if-rule", 'IF event.value == "something here" AND (event.value > 10 OR event.value < 10) THEN what', %{} 
+    refute is_nil(res)
+  end
 
 end
 

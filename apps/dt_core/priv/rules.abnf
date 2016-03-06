@@ -1,32 +1,41 @@
-if-rule = "IF" *SP lcondition *SP operator *SP rcondition *SP "THEN" *SP consequent !!!
-	_ = rule
-	_ = values
-	[op, _, lcond, _, comp, _, rcond, _, then, _, cons] = string_values
-	expression = "if " <> to_string(lcond) <> " " <> to_string(comp) <> " " <> to_string(rcond) <> " do :" <> to_string(cons) <> " end"
+if-rule = "IF" condition "THEN" SPS consequent !!!
+	[_op, condition, _then, _, cons] = string_values
+	expression = "if" <> to_string(condition) <> "do :" <> to_string(cons) <> " end"
+	|> to_char_list
 	{:ok, state, 
-		%{
-			op: op,
-			lcond: lcond,
-			comp: comp,
-			rcond: rcond,
-			then: then,
-			cons: cons,
-			code: expression
-		}
+		%{code: expression}
 	}
 !!!
 
-operator = ">" / "<" / "==" / "!="
+operator = ">" / "<" / "==" / "!=" !!!
+	{:ok, state, :lists.flatten(values)}	
+!!!
 
-lcondition = *( 1*ALPHA "." ) 1*ALPHA 
+condition = *( ( wrapcond / simplecond ) [ ("AND" / "OR") condition ] )
 
-rcondition = DQUOTE *( ALPHA / SP / DIGIT ) DQUOTE / 1*DIGIT
+wrapcond = SPS "(" simplecond [ ("AND" / "OR") simplecond ] ")" SPS
 
-consequent = 1*ALPHA
+simplecond = SPS lcondition SPS operator SPS rcondition SPS
+
+lcondition = *( 1*ALPHA "." ) 1*ALPHA !!!
+	{:ok, state, :lists.flatten(values)}	
+!!!
+
+rcondition = DQUOTE *( ALPHA / SP / DIGIT ) DQUOTE / 1*DIGIT !!!
+	{:ok, state, :lists.flatten(values)}	
+!!!
+
+consequent = 1*ALPHA !!!
+	{:ok, state, :lists.flatten(values)}	
+!!!
 
 DQUOTE = %x22
 
-SP = %x20
+SPS = *SP !!!
+	{:ok, state, :lists.flatten(values)}	
+!!!
+
+SP = %x20 
 
 ALPHA = %x41-5A / %x61-7A   ; A-Z / a-z
 

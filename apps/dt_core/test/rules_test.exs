@@ -24,5 +24,25 @@ defmodule DtCore.RulesTest do
     assert :value == Rule.apply event, 'if event.value != "ciao" then value'
   end
 
+  test "check structured rule" do
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert :gotit == Rule.apply event, 'if event.value != "ciao" and event.value == "hello" then gotit'
+
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert nil == Rule.apply event, 'if event.value != "ciao" and event.value != "hello" then gotit'
+
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert :gotit == Rule.apply event, 'if event.value != "ciao" and (event.value != "hello" or event.value == "hello") then gotit'
+
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert :gotit == Rule.apply event, 'if event.value == "ciao" or event.value == "hello" then gotit'
+
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert :gotit == Rule.apply event, 'if event.value == "ciao" or (event.value != "hello" or event.value == "hello") then gotit'
+
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert :gotit == Rule.apply event, 'if (event.value == "ciao") or (event.value == "hello") then gotit'
+  end
+
 end
 
