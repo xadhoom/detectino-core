@@ -1,4 +1,6 @@
 if-rule = "IF" *SP lcondition *SP operator *SP rcondition *SP "THEN" *SP consequent !!!
+	_ = rule
+	_ = values
 	[op, _, lcond, _, comp, _, rcond, _, then, _, cons] = string_values
 	{:ok, state, 
 		%{
