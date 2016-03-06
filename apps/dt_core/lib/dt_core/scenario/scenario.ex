@@ -46,7 +46,6 @@ defmodule DtCore.Scenario do
   end
 
   def handle_info({:event, event}, state) do
-    IO.inspect event
     {:noreply, %{state | last_event: event}}
   end
 

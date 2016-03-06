@@ -22,7 +22,7 @@ defmodule DtCore.HandlerTest do
   end
 
   test "invalid events" do
-    {:ok, ref, pid} = start_handler
+    {:ok, _ref, pid} = start_handler
     assert {:ok, self} == Handler.start_listening fn(_) -> raise("I should not be called") end
     send pid, @missing_port_ev
     send pid, @missing_addr_ev
@@ -34,7 +34,7 @@ defmodule DtCore.HandlerTest do
   end
 
   test "register listener" do
-    {:ok, ref, pid} = start_handler
+    {:ok, _ref, pid} = start_handler
     assert nil == Handler.get_listener(self)
     assert {:ok, self} == Handler.start_listening()
     assert [self] == Handler.get_listeners()
@@ -47,7 +47,7 @@ defmodule DtCore.HandlerTest do
   test "register listener with cb and execute it" do
     ev = %Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
 
-    {:ok, ref, pid} = start_handler
+    {:ok, _ref, pid} = start_handler
     assert {:ok, self} == Handler.start_listening fn(ev) ->
       assert %Event{} = ev
       true
