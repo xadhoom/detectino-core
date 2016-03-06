@@ -5,8 +5,9 @@ defmodule DtCore.GrammarTest do
     ABNF.load_file "priv/rules.abnf"
   end
 
-  test "check simple rule" do
+  test "check gt than rule" do
     grammar = ABNF.load_file "priv/rules.abnf"
+
     res = ABNF.apply grammar, "if-rule", 'IF event.value > 10 THEN what', %{} 
     values = Enum.at res.values, 0
     assert 'event.value' == values.lcond
@@ -16,6 +17,32 @@ defmodule DtCore.GrammarTest do
     assert 'IF' == values.op
     assert 'THEN' == values.then
   end
+
+  test "check invalid rule" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+    res = ABNF.apply grammar, "if-rule", 'IF event.value > something', %{} 
+    assert is_nil(res)
+  end
+
+  test "check different, equal rule" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+
+    res = ABNF.apply grammar, "if-rule", 'IF event.value != "something" THEN what', %{} 
+    refute is_nil(res)
+
+    res = ABNF.apply grammar, "if-rule", 'IF event.value == "something" THEN what', %{} 
+    refute is_nil(res)
+
+    res = ABNF.apply grammar, "if-rule", 'IF event.value > "Something" THEN what', %{} 
+    refute is_nil(res)
+  end
+
+  test "check string with space" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+    res = ABNF.apply grammar, "if-rule", 'IF event.value == "something here" THEN what', %{} 
+    refute is_nil(res)
+  end
+
 
 end
 

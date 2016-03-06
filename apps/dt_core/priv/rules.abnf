@@ -2,6 +2,7 @@ if-rule = "IF" *SP lcondition *SP operator *SP rcondition *SP "THEN" *SP consequ
 	_ = rule
 	_ = values
 	[op, _, lcond, _, comp, _, rcond, _, then, _, cons] = string_values
+	expression = "if " <> to_string(lcond) <> " " <> to_string(comp) <> " " <> to_string(rcond) <> " do :" <> to_string(cons) <> " end"
 	{:ok, state, 
 		%{
 			op: op,
@@ -9,22 +10,25 @@ if-rule = "IF" *SP lcondition *SP operator *SP rcondition *SP "THEN" *SP consequ
 			comp: comp,
 			rcond: rcond,
 			then: then,
-			cons: cons
+			cons: cons,
+			code: expression
 		}
 	}
 !!!
 
-operator = ">" / "<" / "=="
+operator = ">" / "<" / "==" / "!="
 
 lcondition = *( 1*ALPHA "." ) 1*ALPHA 
 
-rcondition = 1*DIGIT
+rcondition = DQUOTE *( ALPHA / SP / DIGIT ) DQUOTE / 1*DIGIT
 
 consequent = 1*ALPHA
 
+DQUOTE = %x22
+
 SP = %x20
 
-ALPHA =  %x41-5A / %x61-7A   ; A-Z / a-z
+ALPHA = %x41-5A / %x61-7A   ; A-Z / a-z
 
-DIGIT =  %x30-39
+DIGIT = %x30-39
 
