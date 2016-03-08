@@ -3,6 +3,8 @@ defmodule DtWeb.Rule do
 
   schema "rules" do
     field :name, :string
+    field :expression, :string
+    field :continue, :boolean, default: false
     field :priority, :integer
     field :enabled, :boolean, default: false
 

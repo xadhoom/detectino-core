@@ -51,4 +51,42 @@ defmodule DtCore.ScenarioTest do
     assert ev == Scenario.last_event(pid)
   end
 
+  test "process rules" do
+    ev = %Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
+
+    rules = [
+      %RuleModel{expression: "if event.port == 10 then alarm", continue: false},
+      %RuleModel{expression: 'if event.address == "1234" then idle', continue: false}
+    ]
+
+    state = %{
+      parser: DtCore.Rule.load,
+      rules: rules,
+      last_event: nil
+      }
+
+    res = Scenario.process_rules(ev, state)
+    assert [:alarm] == res
+
+  end
+
+  test "process rules with continue" do
+    ev = %Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
+
+    rules = [
+      %RuleModel{expression: "if event.port == 10 then alarm", continue: true},
+      %RuleModel{expression: 'if event.address == "1234" then idle', continue: true}
+    ]
+
+    state = %{
+      parser: DtCore.Rule.load,
+      rules: rules,
+      last_event: nil
+      }
+
+    res = Scenario.process_rules(ev, state)
+    assert [:alarm, :idle] == res
+
+  end
+
 end

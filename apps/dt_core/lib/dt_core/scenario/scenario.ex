@@ -2,6 +2,7 @@ defmodule DtCore.Scenario do
   use GenServer
 
   require Logger
+  alias DtCore.Rule
   alias DtCore.Event
   alias DtCore.Handler
 
@@ -31,7 +32,9 @@ defmodule DtCore.Scenario do
     Logger.info "Starting Scenarios Server"
     {:ok, self} = Handler.start_listening
     {:ok,
-      %{rules: rules,
+      %{
+        parser: Rule.load,
+        rules: rules,
         last_event: nil
       }
     }
@@ -47,6 +50,17 @@ defmodule DtCore.Scenario do
 
   def handle_info({:event, event}, state) do
     {:noreply, %{state | last_event: event}}
+  end
+
+  def process_rules(event, state) do
+    Enum.reduce_while(state.rules, [], fn rule, acc ->
+      result = Rule.apply state.parser, event, rule.expression
+      acc = List.insert_at acc, -1, result
+      case rule.continue do
+        :true -> {:cont, acc}
+        :false -> {:halt, acc}
+      end
+    end)
   end
 
 end

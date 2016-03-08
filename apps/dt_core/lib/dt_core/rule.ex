@@ -4,16 +4,19 @@ defmodule DtCore.Rule do
 
   require Logger
 
-  def apply(event, expression) when is_binary(expression) do
-    _apply event, String.to_char_list(expression)
+  def load do
+    ABNF.load_file "priv/rules.abnf"
   end
 
-  def apply(event, expression) when is_list(expression) do
-    _apply event, expression
+  def apply(grammar, event, expression) when is_binary(expression) do
+    _apply grammar, event, String.to_char_list(expression)
   end
 
-  defp _apply(event = %Event{}, expression) do
-    grammar = ABNF.load_file "priv/rules.abnf"
+  def apply(grammar, event, expression) when is_list(expression) do
+    _apply grammar, event, expression
+  end
+
+  defp _apply(grammar, event = %Event{}, expression) do
     res = ABNF.apply grammar, "if-rule", expression, %{}
     values = Enum.at res.values, 0
     expression = values.code
