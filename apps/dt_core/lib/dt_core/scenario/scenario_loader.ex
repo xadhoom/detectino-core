@@ -17,7 +17,7 @@ defmodule DtCore.ScenarioLoader do
   end
 
   def initialize do
-    GenServer.call __MODULE__, {:initialize}
+    GenServer.call __MODULE__, {:initialize}, 10000
   end
 
   #
