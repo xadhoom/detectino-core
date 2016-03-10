@@ -6,14 +6,16 @@ defmodule DtCore.ScenarioTest do
   alias DtCore.Scenario
   alias DtCore.Handler
   alias DtCore.Event
+  alias DtCore.Action
 
   setup do
+    Action.start_link
     Handler.start_link
     :ok
   end
 
   def start_server do
-    [ %RuleModel{}, %RuleModel{} ]
+    [ %RuleModel{expression: "if event.port > 10 then something"}, %RuleModel{expression: "if event.port < 10 then another"} ]
     |> Scenario.start_link(:some_name)
   end
 
@@ -46,7 +48,7 @@ defmodule DtCore.ScenarioTest do
 
   test "send event" do
     {:ok, pid} = start_server
-    ev = %Event{type: :test}
+    ev = %Event{address: "1234", port: 10, value: "any value", type: :an_atom, subtype: :another_atom}
     send pid, {:event, ev}
     assert ev == Scenario.last_event(pid)
   end

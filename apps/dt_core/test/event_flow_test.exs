@@ -2,6 +2,7 @@ defmodule DtCore.EventFlowTest do
   use DtCore.EctoCase
 
   alias DtBus.Event
+  alias DtCore.Action
   alias DtCore.Handler
   alias DtCore.Receiver
   alias DtCore.Scenario
@@ -15,15 +16,20 @@ defmodule DtCore.EventFlowTest do
   @scenario %Scenario{name: "canemorto"}
 
   setup do
+    Action.start_link
     Handler.start_link
     ScenarioSup.start_link
+
     :ok
   end
   
-  test "new event ends up into scenario last event" do
+  test "new event gets dispatched into action handler" do
     {:ok, pid} = Receiver.start_link false
 
-    Repo.insert!(%ScenarioModel{name: "canemorto"})
+    scenario = Repo.insert!(%ScenarioModel{name: "canemorto"})
+    rule = Ecto.build_assoc scenario, :rules, expression: "if event.value == \"any value\" then alarm"
+    Repo.insert!(rule)
+
     {:ok, _pid} = ScenarioSup.start @scenario
 
     send pid, @event
@@ -31,6 +37,26 @@ defmodule DtCore.EventFlowTest do
 
     TimerHelper.wait_until fn ->  
       assert @event_normal == Scenario.last_event(scenario)
+    end
+
+    TimerHelper.wait_until fn ->  
+      assert Action.last == :alarm
+    end
+
+  end
+
+  test "not matching filter will not go on" do
+    {:ok, pid} = Receiver.start_link false
+
+    scenario = Repo.insert!(%ScenarioModel{name: "canemorto"})
+    rule = Ecto.build_assoc scenario, :rules, expression: "if event.value == \"invalid\" then alarm"
+    Repo.insert!(rule)
+
+    {:ok, _pid} = ScenarioSup.start @scenario
+    send pid, @event
+
+    TimerHelper.wait_until fn ->  
+      assert Action.last == :nil
     end
 
   end

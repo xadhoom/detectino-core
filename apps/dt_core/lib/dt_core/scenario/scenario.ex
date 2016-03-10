@@ -5,6 +5,7 @@ defmodule DtCore.Scenario do
   alias DtCore.Rule
   alias DtCore.Event
   alias DtCore.Handler
+  alias DtCore.Action
 
   defstruct name: nil,
     model: nil
@@ -49,16 +50,22 @@ defmodule DtCore.Scenario do
   end
 
   def handle_info({:event, event}, state) do
+    process_rules(event, state)
+    |> Action.dispatch
+
     {:noreply, %{state | last_event: event}}
   end
 
   def process_rules(event, state) do
     Enum.reduce_while(state.rules, [], fn rule, acc ->
-      result = Rule.apply state.parser, event, rule.expression
-      acc = List.insert_at acc, -1, result
+      acc = case Rule.apply state.parser, event, rule.expression do
+        nil -> acc  
+        result -> List.insert_at acc, -1, result
+      end
       case rule.continue do
         :true -> {:cont, acc}
         :false -> {:halt, acc}
+        _ -> {:halt, acc}
       end
     end)
   end
