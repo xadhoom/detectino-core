@@ -99,7 +99,7 @@ defmodule DtCore.ScenarioSup do
   # Callbacks
   #
   def init(_) do
-    Logger.debug("Starting Scenario Supervisor")
+    Logger.info("Starting Scenario Supervisor")
     children = [worker(ScenarioLoader, [])]
     supervise(children, strategy: :one_for_one)
   end

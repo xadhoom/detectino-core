@@ -25,6 +25,7 @@ defmodule DtCore.Action do
   # GenServer Callbacks
   #
   def init(_) do
+    Logger.info "Starting Actions Dispatcher"
     {:ok, %DtCore.Action{}}
   end
 

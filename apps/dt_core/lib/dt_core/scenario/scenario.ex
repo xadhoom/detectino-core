@@ -15,7 +15,7 @@ defmodule DtCore.Scenario do
   #
   def start_link(rules, server_name) when is_list(rules) and is_atom(server_name) do
     Logger.debug("Starting Scenario Server with #{inspect rules} rules")
-    GenServer.start_link(__MODULE__, {rules}, name: server_name)
+    GenServer.start_link(__MODULE__, {rules, server_name}, name: server_name)
   end
 
   def get_rules(server_name) do
@@ -29,8 +29,8 @@ defmodule DtCore.Scenario do
   #
   # GenServer callbacks
   #
-  def init({rules}) do
-    Logger.info "Starting Scenarios Server"
+  def init({rules, name}) do
+    Logger.info "Starting Scenario Server " <> to_string(name)
     {:ok, self} = Handler.start_listening
     {:ok,
       %{
