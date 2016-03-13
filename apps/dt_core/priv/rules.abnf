@@ -1,5 +1,10 @@
 if-rule = "IF" condition "THEN" SPS consequent !!!
-	[_op, condition, _then, _, cons] = string_values
+	_rule =  rule
+	_string_values = string_values
+
+	[_, condition, _, _, cons] = values
+	condition = :lists.flatten condition
+	cons = :lists.flatten cons
 	expression = "if" <> to_string(condition) <> "do :" <> to_string(cons) <> " end"
 	|> to_char_list
 	{:ok, state, 
@@ -8,6 +13,9 @@ if-rule = "IF" condition "THEN" SPS consequent !!!
 !!!
 
 operator = ">" / "<" / "==" / "!=" !!!
+	_rule =  rule
+	_string_values = string_values
+
 	{:ok, state, :lists.flatten(values)}	
 !!!
 
@@ -18,20 +26,45 @@ wrapcond = SPS "(" simplecond [ ("AND" / "OR") simplecond ] ")" SPS
 simplecond = SPS lcondition SPS operator SPS rcondition SPS
 
 lcondition = *( 1*ALPHA "." ) 1*ALPHA !!!
+	_rule =  rule
+	_string_values = string_values
+
 	{:ok, state, :lists.flatten(values)}	
 !!!
 
-rcondition = DQUOTE *( ALPHA / SP / DIGIT ) DQUOTE / 1*DIGIT !!!
+rcondition = string / 1*DIGIT / atom !!!
+	_rule =  rule
+	_string_values = string_values
+
 	{:ok, state, :lists.flatten(values)}	
 !!!
 
 consequent = 1*ALPHA !!!
+	_rule =  rule
+	_string_values = string_values
+
 	{:ok, state, :lists.flatten(values)}	
+!!!
+
+string = DQUOTE *( ALPHA / SP / DIGIT ) DQUOTE
+
+atom = *( ALPHA / "_" / "-" / "@" / DIGIT ) !!!
+	_rule =  rule
+	_string_values = string_values
+
+	value = :lists.flatten(values)
+	|> to_string
+	value = ":" <> value
+	|> String.to_char_list
+	{:ok, state, value}	
 !!!
 
 DQUOTE = %x22
 
 SPS = *SP !!!
+	_rule =  rule
+	_string_values = string_values
+
 	{:ok, state, :lists.flatten(values)}	
 !!!
 

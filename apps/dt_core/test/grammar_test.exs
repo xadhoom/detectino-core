@@ -19,6 +19,16 @@ defmodule DtCore.GrammarTest do
     assert is_nil(res)
   end
 
+  test "atoms in condition" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+
+    res = ABNF.apply grammar, "if-rule", 'IF event.value != something THEN what', %{} 
+    refute is_nil(res)
+
+    res = ABNF.apply grammar, "if-rule", 'IF event.value != an_atom THEN what', %{} 
+    refute is_nil(res)
+  end
+
   test "check different, equal rule" do
     grammar = ABNF.load_file "priv/rules.abnf"
 

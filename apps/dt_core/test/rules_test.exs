@@ -13,6 +13,16 @@ defmodule DtCore.RulesTest do
     assert false == Rule.apply grammar, event, 'if event.value != 2 then false'
   end
 
+  test "rule against atom fields in event" do
+    grammar = Rule.load
+
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert true == Rule.apply grammar, event, 'if event.type == an_atom then true'
+
+    event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
+    assert true == Rule.apply grammar, event, 'if event.subtype == another_atom then true'
+  end
+
   test "check rule against string value" do
     grammar = Rule.load
 
