@@ -20,8 +20,12 @@ defmodule DtCore.Rule do
     res = ABNF.apply grammar, "if-rule", expression, %{}
     values = Enum.at res.values, 0
     expression = values.code
+    param = values.param
     {value, _binding} = Code.eval_string expression, [event: event], __ENV__
-    value
+    case param do
+      [] -> value
+      v -> {value, param}
+    end
   end
 
 end

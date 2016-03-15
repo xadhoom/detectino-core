@@ -1,14 +1,19 @@
-if-rule = "IF" condition "THEN" SPS consequent !!!
+if-rule = "IF" condition "THEN" SPS consequent [consparam] !!!
 	_rule =  rule
 	_string_values = string_values
 
-	[_, condition, _, _, cons] = values
+	[_, condition, _, _, cons, conspar] = values
 	condition = :lists.flatten condition
 	cons = :lists.flatten cons
+	conspar = :lists.flatten conspar
+
 	expression = "if" <> to_string(condition) <> "do :" <> to_string(cons) <> " end"
 	|> to_char_list
+
 	{:ok, state, 
-		%{code: expression}
+		%{code: expression,
+		  param: conspar
+		 }
 	}
 !!!
 
@@ -44,6 +49,17 @@ consequent = 1*ALPHA !!!
 	_string_values = string_values
 
 	{:ok, state, :lists.flatten(values)}	
+!!!
+
+consparam = "(" *( 1*ALPHA / 1*DIGIT ) ")" !!!
+	_rule =  rule
+	_string_values = string_values
+
+	[_, val, _] = values
+	val = :lists.flatten val
+	|> to_char_list
+
+	{:ok, state, val}	
 !!!
 
 string = DQUOTE *( ALPHA / SP / DIGIT ) DQUOTE

@@ -75,5 +75,12 @@ defmodule DtCore.GrammarTest do
     refute is_nil(res)
   end
 
+  test "check rule with result with variable" do
+    grammar = ABNF.load_file "priv/rules.abnf"
+    res = ABNF.apply grammar, "if-rule", 'IF event.value == "something here" AND (event.value > 10 OR event.value < 10) THEN what(20)', %{} 
+    value = Enum.at res.values, 0
+    assert value.param == '20'
+  end
+
 end
 
