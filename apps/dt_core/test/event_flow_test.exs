@@ -2,7 +2,6 @@ defmodule DtCore.EventFlowTest do
   use DtCore.EctoCase
 
   alias DtBus.Event
-  alias DtCore.Action
   alias DtCore.Handler
   alias DtCore.Receiver
   alias DtCore.Scenario
@@ -16,7 +15,6 @@ defmodule DtCore.EventFlowTest do
   @scenario %Scenario{name: "canemorto"}
 
   setup do
-    Action.start_link
     Handler.start_link
     ScenarioSup.start_link
 
@@ -40,9 +38,45 @@ defmodule DtCore.EventFlowTest do
     end
 
     TimerHelper.wait_until fn ->  
-      assert Action.last == :alarm
+      assert Scenario.last_action(scenario) == :alarm
     end
+  end
 
+  test "delayed alarm action" do
+    {:ok, pid} = Receiver.start_link false
+
+    scenario = Repo.insert!(%ScenarioModel{name: "canemorto"})
+    rule = Ecto.build_assoc scenario, :rules, expression: "if event.value == \"any value\" then alarm(3)"
+    Repo.insert!(rule)
+
+    {:ok, _pid} = ScenarioSup.start @scenario
+    send pid, @event
+
+    scenario = ScenarioSup.get_worker_by_def @scenario
+    TimerHelper.wait_until 10000, fn ->  
+      assert :alarm == Scenario.last_action(scenario)
+    end
+  end
+
+  test "cancelled scenario does not fire action" do
+    {:ok, pid} = Receiver.start_link false
+
+    scenario = Repo.insert!(%ScenarioModel{name: "canemorto"})
+    rule = Ecto.build_assoc scenario, :rules, expression: "if event.value == \"any value\" then alarm(2)"
+    Repo.insert!(rule)
+
+    {:ok, _pid} = ScenarioSup.start @scenario
+    send pid, @event
+
+    scenario = ScenarioSup.get_worker_by_def @scenario
+    processor = Scenario.get_processor scenario
+    assert GenServer.whereis(processor)
+
+    assert :ok == ScenarioSup.stopall
+
+    TimerHelper.wait_until fn ->  
+      assert false == Process.alive? processor
+    end
   end
 
   test "not matching filter will not go on" do
@@ -55,10 +89,10 @@ defmodule DtCore.EventFlowTest do
     {:ok, _pid} = ScenarioSup.start @scenario
     send pid, @event
 
+    scenario = ScenarioSup.get_worker_by_def @scenario
     TimerHelper.wait_until fn ->  
-      assert Action.last == :nil
+      assert Scenario.last_action(scenario) == :nil
     end
-
   end
 
 end

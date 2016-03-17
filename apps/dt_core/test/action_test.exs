@@ -4,20 +4,20 @@ defmodule DtCore.ActionTest do
   alias DtCore.Action
 
   test "dispatcher client api" do
-    Action.start_link
+    {:ok, server} = Action.start_link
 
     assert_raise FunctionClauseError, fn ->
-      Action.dispatch :something
+      Action.dispatch server, :something
     end
 
-    Action.dispatch [:a]
-    assert Action.last == :a
+    Action.dispatch server, [:a]
+    assert Action.last(server) == :a
 
-    Action.dispatch [:a, :b, :c]
-    assert Action.last == :c
+    Action.dispatch server, [:a, :b, :c]
+    assert Action.last(server) == :c
 
-    Action.dispatch []
-    assert Action.last == :c
+    Action.dispatch server, []
+    assert Action.last(server) == :c
   end
 
 end

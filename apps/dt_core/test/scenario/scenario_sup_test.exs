@@ -4,6 +4,7 @@ defmodule DtCore.ScenarioSupTest do
   alias DtCore.Handler
   alias DtCore.Scenario
   alias DtCore.ScenarioSup
+  alias DtCore.TimerHelper
 
   alias DtWeb.Scenario, as: ScenarioModel
 
@@ -84,8 +85,13 @@ defmodule DtCore.ScenarioSupTest do
   test "Single scenario start one worker" do
     Repo.insert!(%ScenarioModel{name: "s1"})
     s1 = %Scenario{name: "s1"}
-    ScenarioSup.start(s1)
+    {:ok, pid} = ScenarioSup.start(s1)
     assert ScenarioSup.running == 1
+    assert GenServer.whereis(pid)
+
+    assert ScenarioSup.stopall == :ok
+  
+    assert false == Process.alive? pid
   end
 
   test "Get worker by name when does not exists" do

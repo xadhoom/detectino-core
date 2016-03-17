@@ -6,10 +6,8 @@ defmodule DtCore.ScenarioTest do
   alias DtCore.Scenario
   alias DtCore.Handler
   alias DtCore.Event
-  alias DtCore.Action
 
   setup do
-    Action.start_link
     Handler.start_link
     :ok
   end

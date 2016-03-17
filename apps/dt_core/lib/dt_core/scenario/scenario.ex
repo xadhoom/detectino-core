@@ -26,16 +26,26 @@ defmodule DtCore.Scenario do
     GenServer.call server_name, {:last_event}
   end
 
+  def last_action(server_name) do
+    GenServer.call server_name, {:last_action}
+  end
+
+  def get_processor(server_name) do
+    GenServer.call server_name, {:get_processor}
+  end
+
   #
   # GenServer callbacks
   #
   def init({rules, name}) do
     Logger.info "Starting Scenario Server " <> to_string(name)
     {:ok, self} = Handler.start_listening
+    {:ok, pid} = Action.start_link
     {:ok,
       %{
         parser: Rule.load,
         rules: rules,
+        processor: pid,
         last_event: nil
       }
     }
@@ -49,11 +59,30 @@ defmodule DtCore.Scenario do
     {:reply, state.last_event, state}
   end
 
+  def handle_call({:get_processor}, _from, state) do
+    {:reply, state.processor, state}
+  end
+
+  def handle_call({:last_action}, _from, state) do
+    last_action = Action.last state.processor
+    {:reply, last_action, state}
+  end
+
   def handle_info({:event, event}, state) do
-    process_rules(event, state)
-    |> Action.dispatch
+    res = process_rules(event, state)
+    Action.dispatch state.processor, res
 
     {:noreply, %{state | last_event: event}}
+  end
+
+  def terminate(:normal, state) do
+    IO.inspect "stopping action server"
+    Action.stop state.processor
+  end
+
+  def terminate(:shutdown, state) do
+    IO.inspect "stopping action server"
+    Process.exit state.processor, :normal
   end
 
   def process_rules(event, state) do

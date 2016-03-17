@@ -10,15 +10,15 @@ defmodule DtCore.Action do
   # Client APIs
   #
   def start_link do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+    GenServer.start_link(__MODULE__, nil)
   end
 
-  def dispatch(actions) when is_list(actions) do
-    GenServer.cast __MODULE__, {:dispatch, actions}
+  def dispatch(server, actions) when is_list(actions) do
+    GenServer.cast server, {:dispatch, actions}
   end
 
-  def last do
-    GenServer.call __MODULE__, :last
+  def last(server) do
+    GenServer.call server, :last
   end
 
   #
@@ -38,14 +38,36 @@ defmodule DtCore.Action do
   end
 
   def handle_cast({:dispatch, actions}, state) do
-    last = Enum.reduce actions, fn(action, last_item) ->
-      case action do
-        :alarm -> Logger.info "Alarm action"
-        _  -> Logger.info "Catchall action"
-      end
-      action
+    last = Enum.reduce actions, :nil, fn(action, acc) ->
+      router action
     end
     {:noreply, %DtCore.Action{state | last_action: last}}
+  end
+
+  def handle_info(ev = :alarm, state) do
+    last = router ev
+    {:noreply, %DtCore.Action{state | last_action: last}}
+  end
+
+  defp router(:alarm) do
+    Logger.info "Alarm action"
+    :alarm
+  end
+
+  defp router({:alarm, timer}) do
+    Logger.info "Alarm action with delay"
+    timer = List.to_integer timer
+    Process.send_after self, :alarm, timer * 1000
+    :nil
+  end
+
+  defp router(any) do
+    Logger.error "Unhandled action #{inspect any}"
+    any
+  end
+
+  defp alarm do
+    :alarm
   end
 
 end

@@ -99,6 +99,11 @@ defmodule DtCore.Handler do
     {:noreply, state}
   end
 
+  def handle_info({:DOWN, _, _, pid, _}, state) do
+    handle_call {:stop_listening, pid}, nil, state
+    {:noreply, state}
+  end
+
   def handle_info(any, state) do
     Logger.error "Unhandled info #{inspect any}"
     {:noreply, state}
@@ -113,9 +118,5 @@ defmodule DtCore.Handler do
     :ok
   end
 
-  def handle_info({:DOWN, _, _, pid, _}, state) do
-    handle_call {:stop_listening, pid}, nil, state
-    {:noreply, state}
-  end
 
 end
