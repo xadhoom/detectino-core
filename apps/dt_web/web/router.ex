@@ -22,16 +22,7 @@ defmodule DtWeb.Router do
 
   scope "/", DtWeb do
     pipe_through [:browser, :browser_session] # Use the default browser stack
-
-    get "/", PageController, :index
-
-    get "/login", SessionController, :new, as: :login
-    post "/login", SessionController, :create, as: :login
-    delete "/logout", SessionController, :delete, as: :logout
-    get "/logout", SessionController, :delete, as: :logout
-
-    resources "/users", UserController
-    resources "/sensors", SensorController, except: [:new, :create]
+    get "/*path", PageController, :index
   end
 
   # Other scopes may use custom stacks.

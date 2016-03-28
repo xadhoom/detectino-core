@@ -17,7 +17,7 @@ defmodule DtWeb.SessionController do
         conn
         |> put_flash(:info, "Logged in.")
         |> Guardian.Plug.sign_in(user, :token)
-        |> redirect(to: user_path(conn, :index))
+        #|> redirect(to: user_path(conn, :index))
       else
         render(conn, "new.html", changeset: changeset)
       end

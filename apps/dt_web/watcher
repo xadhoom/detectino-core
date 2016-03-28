@@ -1,0 +1,4 @@
+#!/bin/bash
+pushd webapp
+npm run build.dev.watch
+popd

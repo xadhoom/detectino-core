@@ -5,6 +5,15 @@ language: elixir
 elixir:
         - 1.2.3
 otp_release:
-         - 18.2
+        - 18.2
+before_install:
+        - . $HOME/.nvm/nvm.sh
+        - nvm install stable
+        - nvm use stable
+        - npm --version
+        - export CHROME_BIN=chromium-browser
+        - export DISPLAY=:99.0
+        - sh -e /etc/init.d/xvfb start
 script:
+        - "pushd apps/dt_web/webapp; npm install; npm run test; popd"
         - "mix deps.get && mix deps.compile && mix coveralls.travis --umbrella"

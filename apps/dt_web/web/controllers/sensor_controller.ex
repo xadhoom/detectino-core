@@ -33,7 +33,7 @@ defmodule DtWeb.SensorController do
       {:ok, sensor} ->
         conn
         |> put_flash(:info, "Sensor updated successfully.")
-        |> redirect(to: sensor_path(conn, :show, sensor))
+        #|> redirect(to: sensor_path(conn, :show, sensor))
       {:error, changeset} ->
         render(conn, "edit.html", sensor: sensor, changeset: changeset)
     end
@@ -46,6 +46,6 @@ defmodule DtWeb.SensorController do
 
     conn
     |> put_flash(:info, "Sensor deleted successfully.")
-    |> redirect(to: sensor_path(conn, :index))
+    #|> redirect(to: sensor_path(conn, :index))
   end
 end
