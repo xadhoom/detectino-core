@@ -39,9 +39,9 @@ defmodule DtWeb.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [{:phoenix, "~> 1.1"},
-     {:phoenix_ecto, "~> 2.0"},
+     {:phoenix_ecto, "~> 3.0.0-beta2"},
      {:postgrex, ">= 0.0.0"},
-     {:phoenix_html, "~> 2.3"},
+     {:phoenix_html, "~> 2.5"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
