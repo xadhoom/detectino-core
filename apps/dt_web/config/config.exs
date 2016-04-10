@@ -32,7 +32,7 @@ config :phoenix, :generators,
 
 config :guardian, Guardian, 
   issuer: "DtWeb",
-  ttl: { 10, :days },
+  ttl: { 1, :days },
   verify_issuer: true,
   secret_key: "changemeabsolutelyyaddayadda",
   serializer: DtWeb.GuardianSerializer

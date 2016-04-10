@@ -35,6 +35,7 @@ build/Release
 .vscode
 *.iml
 
+npm-debug.log*
 /tools/**/*.js
 gulpfile.js
 dist

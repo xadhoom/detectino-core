@@ -5,33 +5,34 @@ defmodule DtWeb.User do
 
   schema "users" do
     field :name, :string
-    field :email, :string
+    field :username, :string
     field :encrypted_password, :string
     field :password, :string
+    field :role, :string
 
     timestamps
   end
 
-  @required_fields ~w(name email encrypted_password password)
+  @required_fields ~w(name username encrypted_password password role)
   @optional_fields ~w()
 
   def create_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(name email password))
+    |> cast(params, ~w(name username password role))
     |> maybe_update_password
   end
 
   def update_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(), ~w(name email password))
+    |> cast(params, ~w(), ~w(name username password role))
     |> maybe_update_password
   end
 
-  def login_changeset(model), do: model |> cast(%{}, ~w(), ~w(email password))
+  def login_changeset(model), do: model |> cast(%{}, ~w(), ~w(username password))
 
   def login_changeset(model, params) do
     model
-    |> cast(params, ~w(email password), ~w())
+    |> cast(params, ~w(username password), ~w())
     |> validate_password
   end
 

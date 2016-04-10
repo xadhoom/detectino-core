@@ -3,33 +3,29 @@ defmodule DtWeb.SessionController do
 
   alias DtWeb.User
   alias DtWeb.UserQuery
+  alias DtWeb.StatusCodes
 
-  def unauthenticated(conn, params) do
-    changeset = User.login_changeset(%User{})
-    render(conn, DtWeb.SessionView, "new.html", changeset: changeset)
+  def unauthenticated(conn, _params) do
+    send_resp(conn, 401, StatusCodes.status_code(401))
   end
 
   def create(conn, params = %{}) do
-    user = Repo.one(UserQuery.by_email(params["user"]["email"] || ""))
+    user = Repo.one(UserQuery.by_username(params["user"]["username"] || ""))
     if user do
       changeset = User.login_changeset(user, params["user"])
       if changeset.valid? do
+        claims = Guardian.Claims.app_claims
+        |> Map.put("role", user.role)
+        |> Guardian.Claims.ttl({1, :hours})
+        { :ok, jwt, full_claims } = Guardian.encode_and_sign(user, :token, claims)
         conn
-        |> put_flash(:info, "Logged in.")
-        |> Guardian.Plug.sign_in(user, :token)
-        #|> redirect(to: user_path(conn, :index))
+        |> render(:logged_in, token: jwt)
       else
-        render(conn, "new.html", changeset: changeset)
+        send_resp(conn, 401, StatusCodes.status_code(401))
       end
     else
-      changeset = User.login_changeset(%User{}) |> Ecto.Changeset.add_error(:login, "not found")
-      render(conn, "new.html", changeset: changeset)
+      send_resp(conn, 401, StatusCodes.status_code(401))
     end
   end
 
-  def delete(conn, _params) do
-    Guardian.Plug.sign_out(conn)
-    |> put_flash(:info, "Logged out successfully.")
-    |> redirect(to: "/")
-  end
 end

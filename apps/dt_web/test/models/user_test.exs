@@ -7,7 +7,7 @@ defmodule DtWeb.UserTest do
 
   test "login changeset with valid attributes" do
     changeset = User.login_changeset(%User{encrypted_password: "$2b$12$YVI.NrsX3O2z5SwD4hOPt.J9yU8xlt3ns2dcMqSm3oYGVygMZQmb6"}, 
-      %{email: "some content", 
+      %{username: "some content", 
         name: "some content", 
         password: "password"})
     assert changeset.valid?

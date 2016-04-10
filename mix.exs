@@ -6,7 +6,7 @@ defmodule Detectino.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps,
-     aliases: ["test": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo", "test"]],
+     aliases: aliases,
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, 
        "coveralls.post": :test, "coveralls.travis": :test]
@@ -27,5 +27,11 @@ defmodule Detectino.Mixfile do
   # and cannot be accessed from applications inside the apps folder
   defp deps do
     [{:excoveralls, "~> 0.4"}]
+  end
+
+  defp aliases do
+    ["test": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo", "test"],
+      "ecto.migrate": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo"]
+    ]
   end
 end

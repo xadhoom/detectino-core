@@ -45,7 +45,7 @@ defmodule DtWeb.Mixfile do
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
-     {:guardian, "~> 0.9.0"},
+     {:guardian, "~> 0.10.1"},
      {:comeonin, "~> 2.0"},
      {:uuid, "~> 1.1"}
    ]
@@ -59,7 +59,9 @@ defmodule DtWeb.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-     "ecto.reset": ["ecto.drop", "ecto.setup"]]
+     "ecto.reset": ["ecto.drop", "ecto.setup"],
+     "test": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo", "test"]]
   end
+
 end
 

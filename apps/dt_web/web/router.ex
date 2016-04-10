@@ -9,11 +9,6 @@ defmodule DtWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :browser_session do
-    plug Guardian.Plug.VerifySession
-    plug Guardian.Plug.LoadResource
-  end
-
   pipeline :api do
     plug :accepts, ["json"]
     plug Guardian.Plug.VerifyHeader
@@ -21,7 +16,7 @@ defmodule DtWeb.Router do
   end
 
   scope "/", DtWeb do
-    pipe_through [:browser, :browser_session] # Use the default browser stack
+    pipe_through [:browser] # Use the default browser stack
     get "/*path", PageController, :index
   end
 
@@ -29,7 +24,7 @@ defmodule DtWeb.Router do
   scope "/api", DtWeb do
     pipe_through :api
 
-    post "/login", SessionApiController, :create, as: :api_login
+    post "/login", SessionController, :create, as: :api_login
   end
 
 end

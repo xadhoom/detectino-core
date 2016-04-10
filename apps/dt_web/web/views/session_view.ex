@@ -1,4 +1,4 @@
-defmodule DtWeb.SessionApiView do
+defmodule DtWeb.SessionView do
   use DtWeb.Web, :view
 
   def render("logged_in.json", %{token: token}) do

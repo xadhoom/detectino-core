@@ -4,9 +4,10 @@ defmodule DtWeb.Repo.Migrations.CreateUser do
   def change do
     create table(:users) do
       add :name, :string
-      add :email, :string
-      add :encrypted_password, :string
+      add :username, :string
       add :password, :string
+      add :encrypted_password, :string
+      add :role, :string
 
       timestamps
     end
