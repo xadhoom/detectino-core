@@ -16,7 +16,13 @@ export class LoginComponent {
 
   login(event: Event, username: string, password: string) {
     event.preventDefault();
-    this.auth.login(username, password);
-    //this.router.parent.navigate(['Home']);
+    this.auth.login(username, password).
+      subscribe( res => {
+      if(res) {
+        this.router.parent.navigate(['Home']);
+      } else {
+        console.log('ayee cannot log');
+      }
+    }, error => console.log('ayeee error in log'));
   }
 }
