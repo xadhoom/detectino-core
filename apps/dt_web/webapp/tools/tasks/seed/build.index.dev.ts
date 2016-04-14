@@ -15,6 +15,7 @@ export = () => {
     .pipe(gulp.dest(APP_DEST));
 };
 
+
 function inject(name?: string) {
   return plugins.inject(gulp.src(getInjectablesDependenciesRef(name), { read: false }), {
     name,
@@ -38,7 +39,6 @@ function mapPath(dep: any) {
 
 function transformPath() {
   return function (filepath: string) {
-    filepath = filepath.replace(APP_DEST, '');
     arguments[0] = join(APP_BASE, filepath) + `?${Date.now()}`;
     return slash(plugins.inject.transform.apply(plugins.inject.transform, arguments));
   };

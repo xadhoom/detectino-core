@@ -37,10 +37,13 @@ build/Release
 
 npm-debug.log*
 /tools/**/*.js
-gulpfile.js
 dist
 dev
 docs
 lib
 test
 tmp
+
+gulpfile.js
+gulpfile.js.map
+

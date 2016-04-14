@@ -17,7 +17,7 @@ gulp.task('build.dev', (done: any) =>
               'build.html_css',
               'build.js.dev',
               'build.index.dev',
-	      'symlink.js.dev',
+              'symlink.js.dev',
               done));
 
 // --------------

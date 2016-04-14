@@ -1,5 +1,5 @@
 import {argv} from 'yargs';
-import {normalize, join} from 'path';
+import {join} from 'path';
 import {InjectableDependency, Environments} from './seed.config.interfaces';
 
 export const ENVIRONMENTS: Environments = {
@@ -10,7 +10,7 @@ export const ENVIRONMENTS: Environments = {
 
 export class SeedConfig {
   PORT                 = argv['port']                        || 5555;
-  PROJECT_ROOT         = normalize(join(__dirname, '..'));
+  PROJECT_ROOT         = join(__dirname, '../..');
   ENV                  = getEnvironment();
   DEBUG                = argv['debug']                       || false;
   DOCS_PORT            = argv['docs-port']                   || 4003;
@@ -26,6 +26,7 @@ export class SeedConfig {
 
   APP_SRC              = 'src';
   ASSETS_SRC           = `${this.APP_SRC}/assets`;
+  CSS_SRC              = `${this.APP_SRC}/css`;
 
   TOOLS_DIR            = 'tools';
   SEED_TASKS_DIR       = join(process.cwd(), this.TOOLS_DIR, 'tasks', 'seed');
@@ -63,7 +64,7 @@ export class SeedConfig {
 
   // Declare local files that needs to be injected
   APP_ASSETS: InjectableDependency[] = [
-    { src: `${this.ASSETS_SRC}/main.css`, inject: true, vendor: false }
+    { src: `${this.CSS_SRC}/main.css`, inject: true, vendor: false }
   ];
 
 
@@ -120,6 +121,7 @@ export class SeedConfig {
       [this.BOOTSTRAP_MODULE]: `${this.APP_BASE}${this.BOOTSTRAP_MODULE}`,
       'angular2/*': `${this.APP_BASE}angular2/*`,
       'rxjs/*': `${this.APP_BASE}rxjs/*`,
+      'app/*': `/app/*`,
       '*': `${this.APP_BASE}node_modules/*`
     },
     packages: {
@@ -132,6 +134,7 @@ export class SeedConfig {
 
   SYSTEM_BUILDER_CONFIG = {
     defaultJSExtensions: true,
+    packageConfigPaths: [join(this.PROJECT_ROOT, 'node_modules', '*', 'package.json')],
     paths: {
       [`${this.TMP_DIR}/*`]: `${this.TMP_DIR}/*`,
       '*': 'node_modules/*'
