@@ -13,7 +13,9 @@ before_install:
         - npm --version
         - export CHROME_BIN=chromium-browser
         - export DISPLAY=:99.0
+before_script:
         - sh -e /etc/init.d/xvfb start
+        - sleep 1  # give server time to start
 script:
         - "pushd apps/dt_web/webapp; npm install; npm run test; popd"
         - "mix deps.get && mix deps.compile && mix coveralls.travis --umbrella"
