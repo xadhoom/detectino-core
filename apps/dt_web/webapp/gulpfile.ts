@@ -45,6 +45,7 @@ gulp.task('build.prod', (done: any) =>
               'css-lint',
               'build.assets.prod',
               'build.html_css',
+              'symlink.js.prod',
               'copy.js.prod',
               'build.js.prod',
               'build.bundles',
