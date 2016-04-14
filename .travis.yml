@@ -16,6 +16,8 @@ before_install:
 before_script:
         - sh -e /etc/init.d/xvfb start
         - sleep 1  # give server time to start
+after_script:
+        - cat /home/travis/build/xadhoom/detectino-core/apps/dt_web/webapp/npm-debug.log
 script:
         - "pushd apps/dt_web/webapp; npm install; npm run test; popd"
         - "mix deps.get && mix deps.compile && mix coveralls.travis --umbrella"
