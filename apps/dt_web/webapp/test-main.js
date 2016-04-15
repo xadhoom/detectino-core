@@ -23,7 +23,8 @@ System.config({
   defaultJSExtensions: true,
   paths: {
     'angular2/*': 'node_modules/angular2/*.js',
-    'rxjs/*': 'node_modules/rxjs/*.js'
+    'rxjs/*': 'node_modules/rxjs/*.js',
+    "angular2-jwt": "node_modules/angular2-jwt/angular2-jwt"
   }
 });
 

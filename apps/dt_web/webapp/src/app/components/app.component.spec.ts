@@ -34,7 +34,8 @@ export function main() {
           .then(rootTC => {
             rootTC.detectChanges();
             let appDOMEl = rootTC.debugElement.children[0].nativeElement;
-            expect(DOM.querySelectorAll(appDOMEl, 'sd-app > sd-navbar > nav > a')[1].href).toMatch(/http:\/\/localhost:\d+\/about/);
+            expect(DOM.querySelectorAll(appDOMEl, 'sd-app > sd-navbar > nav > a')[1].href).toMatch(/http:\/\/localhost:\d+\/login/);
+            expect(DOM.querySelectorAll(appDOMEl, 'sd-app > sd-navbar > nav > a')[2].href).toMatch(/http:\/\/localhost:\d+\/about/);
           });
       }));
   });
