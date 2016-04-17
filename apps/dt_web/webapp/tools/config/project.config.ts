@@ -21,6 +21,9 @@ export class ProjectConfig extends SeedConfig {
 
     (<any>this.SYSTEM_CONFIG_DEV.paths)['angular2-jwt'] =
       `${this.APP_BASE}node_modules/angular2-jwt/angular2-jwt`;
+    (<any>this.SYSTEM_CONFIG_DEV.paths)['ng2-material'] =
+      `${this.APP_BASE}node_modules/ng2-material/all`;
+
 
     this.APP_ASSETS = [
       { src: `${this.CSS_SRC}/main.scss`, inject: true }, // renamed SASS file

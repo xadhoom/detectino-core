@@ -24,7 +24,8 @@ System.config({
   paths: {
     'angular2/*': 'node_modules/angular2/*.js',
     'rxjs/*': 'node_modules/rxjs/*.js',
-    "angular2-jwt": "node_modules/angular2-jwt/angular2-jwt"
+    "angular2-jwt": "node_modules/angular2-jwt/angular2-jwt",
+    "ng2-material/*": "node_modules/ng2-material/*.js"
   }
 });
 

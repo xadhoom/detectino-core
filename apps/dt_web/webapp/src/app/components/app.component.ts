@@ -7,7 +7,7 @@ import {LoginComponent} from '../../login/components/login.component';
 import {NameListService} from '../../shared/services/name-list.service';
 
 @Component({
-  selector: 'md-content',
+  selector: 'sd-app',
   viewProviders: [NameListService],
   moduleId: module.id,
   templateUrl: './app.component.html',

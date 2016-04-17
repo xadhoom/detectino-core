@@ -32,7 +32,8 @@ module.exports = function(config) {
       { pattern: 'node_modules/angular2/**/*.js', included: false, watched: false },
       { pattern: 'node_modules/rxjs/**/*.js', included: false, watched: false },
       { pattern: 'node_modules/angular2-jwt/*.js', included: false, watched: false },
-      { pattern: '../priv/static/dev/**/*.js', included: false, watched: true },
+      { pattern: 'node_modules/ng2-material/**/*.js', included: false, watched: false },
+      { pattern: '../priv/static/dev/**/*', included: false, watched: true },
       { pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: false, watched: false }, // PhantomJS2 (and possibly others) might require it
 
       'test-main.js'

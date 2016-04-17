@@ -14,6 +14,7 @@ import {RootRouter} from 'angular2/src/router/router';
 
 import {DOM} from 'angular2/src/platform/dom/dom_adapter';
 import {AppComponent} from './app.component';
+import {MATERIAL_BROWSER_PROVIDERS} from 'ng2-material/all';
 
 export function main() {
 
@@ -23,6 +24,7 @@ export function main() {
     beforeEachProviders(() => [
       RouteRegistry,
       DirectiveResolver,
+      MATERIAL_BROWSER_PROVIDERS,
       provide(Location, {useClass: SpyLocation}),
       provide(ROUTER_PRIMARY_COMPONENT, {useValue: AppComponent}),
       provide(Router, {useClass: RootRouter})
@@ -34,8 +36,8 @@ export function main() {
           .then(rootTC => {
             rootTC.detectChanges();
             let appDOMEl = rootTC.debugElement.children[0].nativeElement;
-            expect(DOM.querySelectorAll(appDOMEl, 'sd-app > sd-navbar > nav > a')[1].href).toMatch(/http:\/\/localhost:\d+\/login/);
-            expect(DOM.querySelectorAll(appDOMEl, 'sd-app > sd-navbar > nav > a')[2].href).toMatch(/http:\/\/localhost:\d+\/about/);
+            expect(DOM.querySelectorAll(appDOMEl,
+              'sd-app > md-toolbar > div > md-sidenav-container button')[0].outerHTML).toMatch(/\/about/);
           });
       }));
   });
