@@ -7,7 +7,7 @@ defmodule DtWeb.SessionControllerTest do
 
   test "login must not exist with GET", %{conn: conn} do
     conn = get conn, api_login_path(conn, :create)
-    response(conn, 406)
+    response(conn, 404)
   end
 
   test "fail login with no params", %{conn: conn} do
