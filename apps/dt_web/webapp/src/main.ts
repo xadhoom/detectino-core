@@ -6,11 +6,14 @@ import {HTTP_PROVIDERS} from 'angular2/http';
 //import {AuthHttp, AuthConfig} from 'angular2-jwt';
 import {AppComponent} from './app/components/app.component';
 
+import {MATERIAL_BROWSER_PROVIDERS} from 'ng2-material/all';
+
 if ('<%= ENV %>' === 'prod') { enableProdMode(); }
 
 bootstrap(AppComponent, [
   ROUTER_PROVIDERS,
   HTTP_PROVIDERS,
+  MATERIAL_BROWSER_PROVIDERS,
   provide(APP_BASE_HREF, { useValue: '<%= APP_BASE %>' }),
   /*
   provide(AuthHttp, {

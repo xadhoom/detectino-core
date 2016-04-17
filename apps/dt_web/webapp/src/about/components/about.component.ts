@@ -12,7 +12,7 @@ export class AboutComponent {
 
   ngOnInit() {
     console.log('ayee');
-    this.router.parent.navigate(['Home']);
+    //this.router.parent.navigate(['Home']);
   }
 
   ngOnDestroy() {

@@ -15,10 +15,16 @@ export class ProjectConfig extends SeedConfig {
 
     const seedDependencies = this.NPM_DEPENDENCIES;
 
+    this.CSS_PROD_BUNDLE = 'main.css';
+
     this.NPM_DEPENDENCIES = seedDependencies.concat(additional_deps);
 
     (<any>this.SYSTEM_CONFIG_DEV.paths)['angular2-jwt'] =
       `${this.APP_BASE}node_modules/angular2-jwt/angular2-jwt`;
+
+    this.APP_ASSETS = [
+      { src: `${this.CSS_SRC}/main.scss`, inject: true }, // renamed SASS file
+    ];
 
   }
 }
