@@ -22,6 +22,7 @@ cache:
         directories:
                 - apps/dt_web/webapp/node_modules
                 - deps
+                - _build
 script:
         - "pushd apps/dt_web/webapp; npm install; npm run test; popd"
         - "mix deps.get && mix deps.compile && mix coveralls.travis --umbrella"
