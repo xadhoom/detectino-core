@@ -8,8 +8,7 @@ otp_release:
         - 18.2
 before_install:
         - . $HOME/.nvm/nvm.sh
-        - nvm install stable
-        - nvm use stable
+        - nvm install 4
         - npm --version
         - export CHROME_BIN=chromium-browser
         - export DISPLAY=:99.0
