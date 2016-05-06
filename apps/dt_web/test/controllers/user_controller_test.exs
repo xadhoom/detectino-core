@@ -18,6 +18,8 @@ defmodule DtWeb.UserControllerTest do
     conn = get conn, user_path(conn, :index)
     json = json_response(conn, 200)
 
+    assert Enum.count(json) == 1
+
     first = Enum.at(json, 0)
     assert first["username"] == "admin@local"
   end
