@@ -27,6 +27,13 @@ defmodule DtWeb.Router do
     pipe_through :api
 
     post "/login", SessionController, :create, as: :api_login
+
+    resources "/users", UserController
+
+    resources "/scenarios", ScenarioController do
+      resources "/rules", RuleController
+    end
+
   end
 
 end

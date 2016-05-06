@@ -52,6 +52,8 @@ defmodule DtWeb.Web do
       import DtWeb.Router.Helpers
       import DtWeb.ErrorHelpers
       import DtWeb.Gettext
+
+      alias DtWeb.EctoRenderer
     end
   end
 
