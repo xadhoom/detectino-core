@@ -11,6 +11,9 @@ defmodule DtWeb.UserController do
 
   def index(conn, _params) do
     users = Repo.all(User)
+    total = Enum.count(users)
+    |> Integer.to_string
+    conn = put_resp_header(conn, "x-total-count", total)
     render(conn, users: users)
   end
 

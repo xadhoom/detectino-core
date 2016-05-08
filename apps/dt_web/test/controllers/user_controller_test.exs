@@ -1,6 +1,8 @@
 defmodule DtWeb.UserControllerTest do
   use DtWeb.ConnCase
 
+  alias DtWeb.ControllerHelperTest, as: Helper
+
   @valid_attrs %{email: "some content", encrypted_password: "some content", name: "some content", password: "some content"}
   @invalid_attrs %{}
 
@@ -19,6 +21,9 @@ defmodule DtWeb.UserControllerTest do
     json = json_response(conn, 200)
 
     assert Enum.count(json) == 1
+
+    total = Helper.get_total(conn)
+    assert total == 1
 
     first = Enum.at(json, 0)
     assert first["username"] == "admin@local"
