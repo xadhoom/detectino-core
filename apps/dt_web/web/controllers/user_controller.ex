@@ -5,15 +5,14 @@ defmodule DtWeb.UserController do
   alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
 
+  alias DtWeb.CtrlHelpers.Crud
+
   plug EnsureAuthenticated, [handler: SessionController]
 
   plug :scrub_params, "user" when action in [:create, :update]
 
-  def index(conn, _params) do
-    users = Repo.all(User)
-    total = Enum.count(users)
-    |> Integer.to_string
-    conn = put_resp_header(conn, "x-total-count", total)
+  def index(conn, params) do
+    {conn, users} = Crud.all(conn, params, Repo, User)
     render(conn, users: users)
   end
 
