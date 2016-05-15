@@ -1,6 +1,8 @@
 defmodule DtWeb.Router do
   use DtWeb.Web, :router
 
+  @api_methods [:index, :show, :create, :update, :delete]
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -28,10 +30,10 @@ defmodule DtWeb.Router do
 
     post "/login", SessionController, :create, as: :api_login
 
-    resources "/users", UserController
+    resources "/users", UserController, only: @api_methods
 
-    resources "/scenarios", ScenarioController do
-      resources "/rules", RuleController
+    resources "/scenarios", ScenarioController, only: @api_methods do
+      resources "/rules", RuleController, only: @api_methods
     end
 
   end
