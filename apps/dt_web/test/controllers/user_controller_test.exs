@@ -1,6 +1,7 @@
 defmodule DtWeb.UserControllerTest do
   use DtWeb.ConnCase
 
+  alias DtWeb.User
   alias DtWeb.ControllerHelperTest, as: Helper
 
   @valid_attrs %{email: "some content", encrypted_password: "some content", name: "some content", password: "some content"}
@@ -29,7 +30,20 @@ defmodule DtWeb.UserControllerTest do
     assert first["username"] == "admin@local"
   end
 
-  def login(conn) do
+  test "auth: get one user", %{conn: conn} do
+    conn = login(conn)
+    conn = get conn, user_path(conn, :show, struct(User, %{"id": "1"}))
+    json = json_response(conn, 200)
+    assert json["username"] == "admin@local"
+  end
+
+  test "auth: get not existent user", %{conn: conn} do
+    conn = login(conn)
+    conn = get conn, user_path(conn, :show, struct(User, %{"id": "2"}))
+    assert conn.status == 404
+  end
+
+  defp login(conn) do
     conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
     json = json_response(conn, 200)
 

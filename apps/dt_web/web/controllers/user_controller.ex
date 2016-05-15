@@ -3,9 +3,10 @@ defmodule DtWeb.UserController do
 
   alias DtWeb.User
   alias DtWeb.SessionController
-  alias Guardian.Plug.EnsureAuthenticated
-
+  alias DtWeb.StatusCodes
   alias DtWeb.CtrlHelpers.Crud
+
+  alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
 
@@ -30,8 +31,11 @@ defmodule DtWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
-    render(conn, user: user)
+    user = Repo.get(User, id)
+    case user do
+      nil -> send_resp(conn, 404, StatusCodes.status_code(404))
+      _ -> render(conn, user: user)
+    end
   end
 
   def edit(conn, %{"id" => id}) do
