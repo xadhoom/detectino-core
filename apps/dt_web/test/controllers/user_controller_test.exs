@@ -4,7 +4,14 @@ defmodule DtWeb.UserControllerTest do
   alias DtWeb.User
   alias DtWeb.ControllerHelperTest, as: Helper
 
-  @valid_attrs %{email: "some content", encrypted_password: "some content", name: "some content", password: "some content"}
+  @valid_attrs %{username: "test@local", email: "some content",
+    encrypted_password: "some content",
+    name: "some content", password: "some content"}
+
+  @missing_username %{email: "some content",
+    encrypted_password: "some content",
+    name: "some content", password: "some content"}
+
   @invalid_attrs %{}
 
   setup %{conn: conn} do
@@ -41,6 +48,22 @@ defmodule DtWeb.UserControllerTest do
     conn = login(conn)
     conn = get conn, user_path(conn, :show, struct(User, %{"id": "2"}))
     assert conn.status == 404
+  end
+
+  test "auth: save one user", %{conn: conn} do
+    conn = login(conn)
+    conn = post conn, user_path(conn, :create), user: @valid_attrs
+    json = json_response(conn, 201)
+    assert json["username"] == "test@local"
+  end
+
+  test "auth: save one invalid user", %{conn: conn} do
+    conn = login(conn)
+    conn = post conn, user_path(conn, :create), user: @invalid_attrs
+    assert conn.status == 400
+
+    conn = post conn, user_path(conn, :create), user: @missing_username
+    assert conn.status == 400
   end
 
   defp login(conn) do

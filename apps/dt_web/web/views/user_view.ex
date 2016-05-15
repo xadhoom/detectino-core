@@ -9,6 +9,10 @@ defmodule DtWeb.UserView do
     render_one(user, __MODULE__, "user.json")
   end
 
+  def render("create.json", %{user: user}) do
+    render_one(user, __MODULE__, "user.json")
+  end
+
   def render("user.json", %{user: user}) do
     EctoRenderer.render user
   end

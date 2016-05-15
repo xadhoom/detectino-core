@@ -21,12 +21,13 @@ defmodule DtWeb.UserController do
     changeset = User.create_changeset(%User{}, user_params)
 
     case Repo.insert(changeset) do
-      {:ok, _user} ->
+      {:ok, user} ->
         conn
-        |> put_flash(:info, "User created successfully.")
-        #|> redirect(to: user_path(conn, :index))
+        |> put_resp_header("location", user_path(conn, :show, user))
+        |> put_status(201)
+        |> render(user: user)
       {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        send_resp(conn, 400, StatusCodes.status_code(400))
     end
   end
 
