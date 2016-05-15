@@ -10,12 +10,12 @@ defmodule DtWeb.UserControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  test "anon: get user", %{conn: conn} do 
+  test "anon: get all users", %{conn: conn} do
     conn = get conn, user_path(conn, :index)
     response(conn, 401)
   end
 
-  test "auth: get user", %{conn: conn} do
+  test "auth: get all users", %{conn: conn} do
     conn = login(conn)
     conn = get conn, user_path(conn, :index)
     json = json_response(conn, 200)

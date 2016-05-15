@@ -13,5 +13,4 @@ defmodule DtWeb.UserView do
     EctoRenderer.render user
   end
 
-
 end
