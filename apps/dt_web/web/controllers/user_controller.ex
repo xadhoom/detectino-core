@@ -16,11 +16,6 @@ defmodule DtWeb.UserController do
     render(conn, users: users)
   end
 
-  def new(conn, _params) do
-    changeset = User.create_changeset(%User{})
-    render(conn, "new.html", changeset: changeset)
-  end
-
   def create(conn, %{"user" => user_params}) do
     changeset = User.create_changeset(%User{}, user_params)
 
