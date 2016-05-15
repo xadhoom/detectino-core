@@ -47,7 +47,9 @@ defmodule DtWeb.Mixfile do
      {:cowboy, "~> 1.0"},
      {:guardian, "~> 0.10.1"},
      {:comeonin, "~> 2.0"},
-     {:uuid, "~> 1.1"}
+     {:uuid, "~> 1.1"},
+     {:exprintf, "~> 0.1"},
+     {:ex_link_header, git: "https://github.com/xadhoom/ex_link_header.git", branch: "build_header"}
    ]
   end
 
