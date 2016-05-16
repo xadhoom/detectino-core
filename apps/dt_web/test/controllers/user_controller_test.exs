@@ -73,6 +73,24 @@ defmodule DtWeb.UserControllerTest do
     assert conn.status == 400
   end
 
+  test "auth: update one user", %{conn: conn} do
+    u = Repo.one!(User)
+    assert u.username == "admin@local"
+
+    conn = login(conn)
+    params = Map.put(@valid_attrs, "id", "1")
+    conn = put conn, user_path(conn, :update, struct(User, %{"id": "1"})), params
+    json = json_response(conn, 200)
+    assert json["username"] == "test@local"
+
+    u = Repo.one!(User)
+    assert u.username == "test@local"
+
+    cnt = Repo.all(User)
+    |> Enum.count
+    assert cnt == 1
+  end
+
   defp login(conn) do
     conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
     json = json_response(conn, 200)

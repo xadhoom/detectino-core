@@ -25,7 +25,8 @@ defmodule DtWeb.User do
 
   def update_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(), ~w(name username password role))
+    |> cast(params, ~w(name username password role))
+    |> validate_required([:name, :username, :password, :role])
     |> maybe_update_password
   end
 

@@ -10,8 +10,6 @@ defmodule DtWeb.UserController do
 
   plug EnsureAuthenticated, [handler: SessionController]
 
-  plug :scrub_params, "user" when action in [:create, :update]
-
   def index(conn, params) do
     {conn, users} = Crud.all(conn, params, Repo, User)
     render(conn, users: users)
@@ -27,7 +25,6 @@ defmodule DtWeb.UserController do
         |> put_status(201)
         |> render(user: user)
       {:error, changeset} ->
-        put_status conn, 400
         send_resp(conn, 400, StatusCodes.status_code(400))
     end
   end
@@ -40,17 +37,21 @@ defmodule DtWeb.UserController do
     end
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
+  def update(conn, params) do
+    id = case Map.get(params, "id") do
+      :nil -> send_resp(conn, 400, StatusCodes.status_code(400))
+      v -> v
+    end
     user = Repo.get!(User, id)
-    changeset = User.update_changeset(user, user_params)
+    changeset = User.update_changeset(user, params)
 
     case Repo.update(changeset) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "User updated successfully.")
-        #|> redirect(to: user_path(conn, :show, user))
+        |> put_status(200)
+        |> render(user: user)
       {:error, changeset} ->
-        render(conn, "edit.html", user: user, changeset: changeset)
+        send_resp(conn, 400, StatusCodes.status_code(400))
     end
   end
 
