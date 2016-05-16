@@ -5,8 +5,8 @@ defmodule DtWeb.UserControllerTest do
   alias DtWeb.ControllerHelperTest, as: Helper
 
   @valid_attrs %{username: "test@local", email: "some content",
-    encrypted_password: "some content",
-    name: "some content", password: "some content"}
+    role: "some content", name: "some content",
+    password: "some content"}
 
   @missing_username %{email: "some content",
     encrypted_password: "some content",
@@ -62,6 +62,13 @@ defmodule DtWeb.UserControllerTest do
     conn = post conn, user_path(conn, :create), user: @invalid_attrs
     assert conn.status == 400
 
+    token = get_req_header(conn, "authorization")
+    |> Enum.at(0)
+
+    conn = Phoenix.ConnTest.build_conn
+    |> put_req_header("accept", "application/json")
+    |> put_req_header("authorization", token)
+
     conn = post conn, user_path(conn, :create), user: @missing_username
     assert conn.status == 400
   end
@@ -70,7 +77,7 @@ defmodule DtWeb.UserControllerTest do
     conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
     json = json_response(conn, 200)
 
-    Phoenix.ConnTest.conn()
+    Phoenix.ConnTest.build_conn
     |> put_req_header("accept", "application/json")
     |> put_req_header("authorization", json["token"])
   end

@@ -10,7 +10,7 @@ defmodule DtWeb.CtrlHelpersCrudTest do
   @user3 %User{name: "c", username: "c"}
 
   test "Get all" do
-    conn = Phoenix.ConnTest.conn()
+    conn = Phoenix.ConnTest.build_conn
     {conn, _items} = Crud.all(conn, %{}, Repo, User)
     total_h = get_resp_header(conn, "x-total-count")
 
@@ -18,7 +18,7 @@ defmodule DtWeb.CtrlHelpersCrudTest do
   end
 
   test "link header" do
-    conn = Phoenix.ConnTest.conn()
+    conn = Phoenix.ConnTest.build_conn
     Crud.links(conn, 2, 5, 26)
     |> ExLinkHeader.parse!
   end
@@ -28,7 +28,7 @@ defmodule DtWeb.CtrlHelpersCrudTest do
     Repo.insert!(@user2)
     Repo.insert!(@user3)
 
-    conn = Phoenix.ConnTest.conn()
+    conn = Phoenix.ConnTest.build_conn
     params = %{"per_page" => "2"}
     {conn, items} = Crud.all(conn, params, Repo, User)
     total_h = get_resp_header(conn, "x-total-count")
