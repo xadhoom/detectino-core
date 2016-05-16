@@ -28,7 +28,6 @@ defmodule DtWeb.UserController do
         |> render(user: user)
       {:error, changeset} ->
         put_status conn, 400
-        #IO.inspect conn
         send_resp(conn, 400, StatusCodes.status_code(400))
     end
   end
