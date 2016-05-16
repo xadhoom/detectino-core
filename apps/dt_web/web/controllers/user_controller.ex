@@ -15,8 +15,8 @@ defmodule DtWeb.UserController do
     render(conn, users: users)
   end
 
-  def create(conn, %{"user" => user_params}) do
-    changeset = User.create_changeset(%User{}, user_params)
+  def create(conn, params) do
+    changeset = User.create_changeset(%User{}, params)
 
     case Repo.insert(changeset) do
       {:ok, user} ->

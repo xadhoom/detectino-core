@@ -52,14 +52,14 @@ defmodule DtWeb.UserControllerTest do
 
   test "auth: save one user", %{conn: conn} do
     conn = login(conn)
-    conn = post conn, user_path(conn, :create), user: @valid_attrs
+    conn = post conn, user_path(conn, :create), @valid_attrs
     json = json_response(conn, 201)
     assert json["username"] == "test@local"
   end
 
   test "auth: save one invalid user", %{conn: conn} do
     conn = login(conn)
-    conn = post conn, user_path(conn, :create), user: @invalid_attrs
+    conn = post conn, user_path(conn, :create), @invalid_attrs
     assert conn.status == 400
 
     token = get_req_header(conn, "authorization")
@@ -69,7 +69,7 @@ defmodule DtWeb.UserControllerTest do
     |> put_req_header("accept", "application/json")
     |> put_req_header("authorization", token)
 
-    conn = post conn, user_path(conn, :create), user: @missing_username
+    conn = post conn, user_path(conn, :create), @missing_username
     assert conn.status == 400
   end
 
