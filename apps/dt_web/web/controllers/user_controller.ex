@@ -42,16 +42,13 @@ defmodule DtWeb.UserController do
       :nil -> send_resp(conn, 400, StatusCodes.status_code(400))
       v -> v
     end
-    user = Repo.get!(User, id)
-    changeset = User.update_changeset(user, params)
 
-    case Repo.update(changeset) do
-      {:ok, user} ->
-        conn
-        |> put_status(200)
-        |> render(user: user)
-      {:error, changeset} ->
-        send_resp(conn, 400, StatusCodes.status_code(400))
+    changeset = case Repo.get(User, id) do
+      nil -> send_resp(conn, 400, StatusCodes.status_code(400))
+      user ->
+        User.update_changeset(user, params)
+        |> perform_update(user, conn)
+      _ -> send_resp(conn, 400, StatusCodes.status_code(400))
     end
   end
 
@@ -66,4 +63,16 @@ defmodule DtWeb.UserController do
     |> put_flash(:info, "User deleted successfully.")
     #|> redirect(to: user_path(conn, :index))
   end
+
+  defp perform_update(changeset, user, conn) do
+    case Repo.update(changeset) do
+      {:ok, user} ->
+        conn
+        |> put_status(200)
+        |> render(user: user)
+      {:error, changeset} ->
+        send_resp(conn, 400, StatusCodes.status_code(400))
+    end
+  end
+
 end
