@@ -44,24 +44,31 @@ defmodule DtWeb.UserController do
     end
 
     changeset = case Repo.get(User, id) do
-      nil -> send_resp(conn, 400, StatusCodes.status_code(400))
+      nil -> send_resp(conn, 404, StatusCodes.status_code(404))
       user ->
         User.update_changeset(user, params)
         |> perform_update(user, conn)
-      _ -> send_resp(conn, 400, StatusCodes.status_code(400))
+      _ -> send_resp(conn, 500, StatusCodes.status_code(500))
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
+  def delete(conn, %{"id" => "1"}) do
+    send_resp(conn, 403, StatusCodes.status_code(403))
+  end
 
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(user)
+  def delete(conn, %{"id" => id}) when is_binary(id) do
+    user = case Repo.get(User, id) do
+      nil -> send_resp(conn, 404, StatusCodes.status_code(404))
+      user ->
+        Repo.delete!(user)
+        conn
+        |> send_resp(204, StatusCodes.status_code(204))
+      _ -> send_resp(conn, 500, StatusCodes.status_code(500))
+    end
+  end
 
-    conn
-    |> put_flash(:info, "User deleted successfully.")
-    #|> redirect(to: user_path(conn, :index))
+  def delete(conn, _) do
+    send_resp(conn, 403, StatusCodes.status_code(403))
   end
 
   defp perform_update(changeset, user, conn) do

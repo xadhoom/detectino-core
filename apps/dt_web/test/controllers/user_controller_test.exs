@@ -55,6 +55,11 @@ defmodule DtWeb.UserControllerTest do
     conn = post conn, user_path(conn, :create), @valid_attrs
     json = json_response(conn, 201)
     assert json["username"] == "test@local"
+
+    location = get_resp_header(conn, "location")
+    |> Enum.at(0)
+
+    assert location == "/api/users/" <> Integer.to_string(json["id"])
   end
 
   test "auth: save one invalid user", %{conn: conn} do
@@ -62,14 +67,8 @@ defmodule DtWeb.UserControllerTest do
     conn = post conn, user_path(conn, :create), @invalid_attrs
     assert conn.status == 400
 
-    token = get_req_header(conn, "authorization")
-    |> Enum.at(0)
-
-    conn = Phoenix.ConnTest.build_conn
-    |> put_req_header("accept", "application/json")
-    |> put_req_header("authorization", token)
-
-    conn = post conn, user_path(conn, :create), @missing_username
+    conn = newconn(conn)
+    |> post(user_path(conn, :create), @missing_username)
     assert conn.status == 400
   end
 
@@ -98,11 +97,26 @@ defmodule DtWeb.UserControllerTest do
     conn = login(conn)
     params = Map.put(@valid_attrs, "id", "2")
     conn = put conn, user_path(conn, :update, struct(User, %{"id": "2"})), params
-    assert conn.status == 400
+    assert conn.status == 404
 
     u = Repo.one!(User)
     assert u.username == "admin@local"
 
+  end
+
+  test "auth: delete admin user", %{conn: conn} do
+    conn = login(conn)
+    conn = delete conn, user_path(conn, :delete, struct(User, %{"id": "1"}))
+    assert conn.status == 403
+  end
+
+  test "auth: delete an user", %{conn: conn} do
+    conn = login(conn)
+    conn = post conn, user_path(conn, :create), @valid_attrs
+    json = json_response(conn, 201)
+    conn = newconn(conn)
+    |> delete(user_path(conn, :delete, struct(User, %{"id": json["id"]})))
+    assert conn.status == 204
   end
 
   defp login(conn) do
@@ -114,4 +128,12 @@ defmodule DtWeb.UserControllerTest do
     |> put_req_header("authorization", json["token"])
   end
 
+  defp newconn(conn) do
+    token = get_req_header(conn, "authorization")
+    |> Enum.at(0)
+
+    Phoenix.ConnTest.build_conn
+    |> put_req_header("accept", "application/json")
+    |> put_req_header("authorization", token)
+  end
 end
