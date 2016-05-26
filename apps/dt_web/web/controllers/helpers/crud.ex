@@ -1,7 +1,10 @@
 defmodule DtWeb.CtrlHelpers.Crud do
+  use Phoenix.Controller
 
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
+
+  alias DtWeb.StatusCodes
 
   def all(conn, params, repo, model) do
     page = Map.get(params, "page", "1")
@@ -60,6 +63,21 @@ defmodule DtWeb.CtrlHelpers.Crud do
     }
     |> ExLinkHeader.build
 
+  end
+
+  def create(conn, params, module, repo, path_fn) do
+    changeset = module.create_changeset(struct(module), params)
+
+    case repo.insert(changeset) do
+      {:ok, record} ->
+        path = apply(DtWeb.Router.Helpers, path_fn, [conn, :show, record])
+        conn
+        |> put_resp_header("location", path)
+        |> put_status(201)
+        |> render(item: record)
+      {:error, changeset} ->
+        send_resp(conn, 400, StatusCodes.status_code(400))
+    end
   end
 
 end

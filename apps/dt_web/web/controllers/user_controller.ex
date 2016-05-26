@@ -12,28 +12,18 @@ defmodule DtWeb.UserController do
 
   def index(conn, params) do
     {conn, users} = Crud.all(conn, params, Repo, User)
-    render(conn, users: users)
+    render(conn, items: users)
   end
 
   def create(conn, params) do
-    changeset = User.create_changeset(%User{}, params)
-
-    case Repo.insert(changeset) do
-      {:ok, user} ->
-        conn
-        |> put_resp_header("location", user_path(conn, :show, user))
-        |> put_status(201)
-        |> render(user: user)
-      {:error, changeset} ->
-        send_resp(conn, 400, StatusCodes.status_code(400))
-    end
+    Crud.create(conn, params, User, Repo, :user_path)
   end
 
   def show(conn, %{"id" => id}) do
     user = Repo.get(User, id)
     case user do
       nil -> send_resp(conn, 404, StatusCodes.status_code(404))
-      _ -> render(conn, user: user)
+      _ -> render(conn, item: user)
     end
   end
 
@@ -76,7 +66,7 @@ defmodule DtWeb.UserController do
       {:ok, user} ->
         conn
         |> put_status(200)
-        |> render(user: user)
+        |> render(item: user)
       {:error, changeset} ->
         send_resp(conn, 400, StatusCodes.status_code(400))
     end
