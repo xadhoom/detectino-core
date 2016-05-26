@@ -30,7 +30,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
     links = links(conn, page, per_page, total)
     conn = put_resp_header(conn, "link", links)
 
-    {conn, items}
+    render(conn, items: items)
   end
 
   def links(conn, page, per_page, total) do
