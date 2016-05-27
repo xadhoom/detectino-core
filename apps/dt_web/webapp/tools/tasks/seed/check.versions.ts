@@ -3,7 +3,7 @@ import {VERSION_NPM, VERSION_NODE} from '../../config';
 function reportError(message: string) {
   console.error(require('chalk').white.bgRed.bold(message));
   process.exit(1);
-}
+};
 
 export = () => {
   let exec = require('child_process').exec;
@@ -30,4 +30,4 @@ export = () => {
         reportError('NODE is not in required version! Required is ' + VERSION_NODE + ' and you\'re using ' + stdout);
       }
     });
-}
+};

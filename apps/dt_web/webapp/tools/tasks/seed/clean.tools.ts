@@ -8,7 +8,7 @@ import {TOOLS_DIR} from '../../config';
 export = (done: any) => {
   deleteAndWalk(TOOLS_DIR);
   done();
-}
+};
 
 function walk(path: any) {
   let files = readdirSync(path);
@@ -18,7 +18,7 @@ function walk(path: any) {
       deleteAndWalk(curPath);
     }
   }
-}
+};
 
 function deleteAndWalk(path: any) {
   try {
@@ -28,4 +28,4 @@ function deleteAndWalk(path: any) {
     util.log('Error while deleting', chalk.yellow(`${path}/*.js`), e);
   }
   walk(path);
-}
+};
