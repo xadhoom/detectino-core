@@ -29,8 +29,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     links = links(conn, page, per_page, total)
     conn = put_resp_header(conn, "link", links)
-
-    render(conn, items: items)
+  
+    {conn, items}
   end
 
   def links(conn, page, per_page, total) do
@@ -71,12 +71,12 @@ defmodule DtWeb.CtrlHelpers.Crud do
     case repo.insert(changeset) do
       {:ok, record} ->
         path = apply(DtWeb.Router.Helpers, path_fn, [conn, :show, record])
-        conn
-        |> put_resp_header("location", path)
-        |> put_status(201)
-        |> render(item: record)
-      {:error, changeset} ->
-        send_resp(conn, 400, StatusCodes.status_code(400))
+        conn = conn
+                |> put_resp_header("location", path)
+                |> put_status(201)
+        {:ok, conn, record}
+      {:error, _changeset} ->
+        {:error, conn, 400}
     end
   end
 
