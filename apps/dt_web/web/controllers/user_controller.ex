@@ -42,19 +42,10 @@ defmodule DtWeb.UserController do
     send_resp(conn, 403, StatusCodes.status_code(403))
   end
 
-  def delete(conn, %{"id" => id}) when is_binary(id) do
-    user = case Repo.get(User, id) do
-      nil -> send_resp(conn, 404, StatusCodes.status_code(404))
-      user ->
-        Repo.delete!(user)
-        conn
-        |> send_resp(204, StatusCodes.status_code(204))
-      _ -> send_resp(conn, 500, StatusCodes.status_code(500))
+  def delete(conn, params) do
+    case Crud.delete(conn, params, Repo, User) do
+      {:response, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
     end
   end
-
-  def delete(conn, _) do
-    send_resp(conn, 403, StatusCodes.status_code(403))
-  end
-
 end

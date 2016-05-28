@@ -111,6 +111,22 @@ defmodule DtWeb.CtrlHelpers.Crud do
     end
   end
 
+  def delete(conn, params, repo, model) do
+    case Map.get(params, "id") do
+      id when is_binary(id) ->
+        case repo.get(model, id) do
+          nil -> {:error, conn, 404}
+          record ->
+            repo.delete!(record)
+            {:response, conn, 204}
+          _ -> {:error, conn, 500}
+        end
+      _ -> {:error, conn, 403}
+    end
+  end
 
+  def delete(conn, _) do
+    {:error, conn, 403}
+  end
 
 end
