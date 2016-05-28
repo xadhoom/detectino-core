@@ -25,10 +25,9 @@ defmodule DtWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get(User, id)
-    case user do
-      nil -> send_resp(conn, 404, StatusCodes.status_code(404))
-      _ -> render(conn, item: user)
+    case Crud.show(conn, id, User, Repo) do
+      {:ok, conn, item} -> render(conn, item: item)
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
     end
   end
 

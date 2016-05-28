@@ -80,4 +80,11 @@ defmodule DtWeb.CtrlHelpers.Crud do
     end
   end
 
+  def show(conn, id, module, repo) do
+    case repo.get(module, id) do
+      nil -> {:error, conn, 404}
+      record -> {:ok, conn, record}
+    end
+  end
+
 end
