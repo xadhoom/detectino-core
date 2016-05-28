@@ -11,8 +11,10 @@ defmodule DtWeb.UserController do
   plug EnsureAuthenticated, [handler: SessionController]
 
   def index(conn, params) do
-    {conn, items} = Crud.all(conn, params, Repo, User)
-    render(conn, items: items)
+    case Crud.all(conn, params, Repo, User) do
+      {:ok, conn, items} -> render(conn, items: items)
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+    end
   end
 
   def create(conn, params) do

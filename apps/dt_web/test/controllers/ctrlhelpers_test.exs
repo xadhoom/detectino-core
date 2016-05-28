@@ -11,7 +11,7 @@ defmodule DtWeb.CtrlHelpersCrudTest do
 
   test "Get all" do
     conn = Phoenix.ConnTest.build_conn
-    {conn, _items} = Crud.all(conn, %{}, Repo, User)
+    {:ok, conn, _items} = Crud.all(conn, %{}, Repo, User)
     total_h = get_resp_header(conn, "x-total-count")
 
     assert total_h == ["1"]
@@ -30,7 +30,7 @@ defmodule DtWeb.CtrlHelpersCrudTest do
 
     conn = Phoenix.ConnTest.build_conn
     params = %{"per_page" => "2"}
-    {conn, items} = Crud.all(conn, params, Repo, User)
+    {:ok, conn, items} = Crud.all(conn, params, Repo, User)
     total_h = get_resp_header(conn, "x-total-count")
 
     assert total_h == ["4"]
