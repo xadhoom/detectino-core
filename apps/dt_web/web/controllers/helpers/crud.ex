@@ -86,5 +86,31 @@ defmodule DtWeb.CtrlHelpers.Crud do
       record -> {:ok, conn, record}
     end
   end
+  
+  def update(conn, params, repo, model) do
+    case Map.get(params, "id") do
+      :nil -> {:error, conn, 400}
+      id -> 
+        case repo.get(model, id) do
+          nil -> {:error, conn, 404}
+          record ->
+            model.update_changeset(record, params)
+            |> perform_update(record, repo, conn)
+          _ -> {:error, conn, 500}
+        end
+    end
+  end
+
+  defp perform_update(changeset, record, repo, conn) do
+    case repo.update(changeset) do
+      {:ok, record} ->
+        conn = put_status(conn, 200)
+        {:ok, conn, record}
+      {:error, changeset} ->
+        {:error, conn, 400}
+    end
+  end
+
+
 
 end

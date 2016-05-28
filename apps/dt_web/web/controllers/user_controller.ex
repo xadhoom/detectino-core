@@ -32,17 +32,9 @@ defmodule DtWeb.UserController do
   end
 
   def update(conn, params) do
-    id = case Map.get(params, "id") do
-      :nil -> send_resp(conn, 400, StatusCodes.status_code(400))
-      v -> v
-    end
-
-    changeset = case Repo.get(User, id) do
-      nil -> send_resp(conn, 404, StatusCodes.status_code(404))
-      user ->
-        User.update_changeset(user, params)
-        |> perform_update(user, conn)
-      _ -> send_resp(conn, 500, StatusCodes.status_code(500))
+    case Crud.update(conn, params, Repo, User) do
+      {:ok, conn, item} -> render(conn, item: item)
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
     end
   end
 
@@ -63,17 +55,6 @@ defmodule DtWeb.UserController do
 
   def delete(conn, _) do
     send_resp(conn, 403, StatusCodes.status_code(403))
-  end
-
-  defp perform_update(changeset, user, conn) do
-    case Repo.update(changeset) do
-      {:ok, user} ->
-        conn
-        |> put_status(200)
-        |> render(item: user)
-      {:error, changeset} ->
-        send_resp(conn, 400, StatusCodes.status_code(400))
-    end
   end
 
 end
