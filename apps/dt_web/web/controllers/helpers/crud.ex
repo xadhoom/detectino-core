@@ -4,8 +4,6 @@ defmodule DtWeb.CtrlHelpers.Crud do
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 
-  alias DtWeb.StatusCodes
-
   def all(conn, params, repo, model) do
     page = Map.get(params, "page", "1")
     |> String.to_integer
@@ -34,9 +32,6 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   def links(conn, page, per_page, total) do
-    schema = conn.scheme
-    host = conn.host
-    path = conn.request_path
     next_p = page + 1
     last_p = Float.ceil(total / per_page)
     |> trunc
@@ -95,18 +90,17 @@ defmodule DtWeb.CtrlHelpers.Crud do
           nil -> {:error, conn, 404}
           record ->
             model.update_changeset(record, params)
-            |> perform_update(record, repo, conn)
-          _ -> {:error, conn, 500}
+            |> perform_update(repo, conn)
         end
     end
   end
 
-  defp perform_update(changeset, record, repo, conn) do
+  defp perform_update(changeset, repo, conn) do
     case repo.update(changeset) do
       {:ok, record} ->
         conn = put_status(conn, 200)
         {:ok, conn, record}
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:error, conn, 400}
     end
   end
@@ -119,7 +113,6 @@ defmodule DtWeb.CtrlHelpers.Crud do
           record ->
             repo.delete!(record)
             {:response, conn, 204}
-          _ -> {:error, conn, 500}
         end
       _ -> {:error, conn, 403}
     end
