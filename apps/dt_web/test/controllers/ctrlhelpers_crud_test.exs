@@ -1,4 +1,4 @@
-defmodule DtWeb.CtrlHelpersCrudTest do
+defmodule DtWeb.CtrlHelpers.CrudTest do
   use DtWeb.ConnCase
 
   alias DtWeb.Repo
