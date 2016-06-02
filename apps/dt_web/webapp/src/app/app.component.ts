@@ -29,7 +29,7 @@ import { AuthService } from './auth';
   encapsulation: ViewEncapsulation.None,
   styles: [
     require('normalize.css'),
-    require('./app.css')
+    require('./app.component.css')
   ],
   template: require('./app.component.html')
 })
