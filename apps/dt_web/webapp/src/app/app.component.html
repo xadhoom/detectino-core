@@ -1,27 +1,36 @@
-<md-content>
+<md-sidenav-layout fullscreen>
+
   <md-toolbar color="primary">
-      <span>{{ name }}</span>
-      <span class="fill"></span>
-      <button md-button router-active [routerLink]=" ['Index'] ">
+    <span>{{ name }}</span>
+    <span class="fill"></span>
+    <button md-button router-active [routerLink]=" ['Index'] ">
         Index
-      </button>
-      <button md-button router-active [routerLink]=" ['Home'] ">
+    </button>
+    <button md-button router-active [routerLink]=" ['Home'] ">
         Home
-      </button>
-      <button md-button router-active [routerLink]=" ['About'] " *ngIf="auth.authenticated()">
-        About
-      </button>
-      <button md-button router-active [routerLink]=" ['Login'] " *ngIf="!auth.authenticated()">
-        Log In
-      </button>
-      <button md-button (click)="auth.logout()" *ngIf="auth.authenticated()">
-        Log Out
-      </button>
+    </button>
+    <button md-icon-button (click)="sidenav.open()">
+      <md-icon>menu</md-icon>
+    </button>
   </md-toolbar>
+
+  <md-sidenav #sidenav align="end">
+    <md-nav-list>
+      <a md-list-item router-active [routerLink]=" ['About'] " *ngIf="auth.authenticated()">
+        <span md-line (click)="sidenav.close()">About</span>
+      </a>
+      <a md-list-item router-active [routerLink]=" ['Login'] " *ngIf="!auth.authenticated()">
+        <span md-line (click)="sidenav.close()">Log In</span>
+      </a>
+      <a md-list-item router-active (click)="auth.logout()" *ngIf="auth.authenticated()">
+        <span md-line (click)="sidenav.close()">Log Out</span>
+      </a>
+    </md-nav-list>
+  </md-sidenav>
 
   <md-progress-bar mode="indeterminate" color="primary" *ngIf="loading"></md-progress-bar>
 
   <router-outlet></router-outlet>
 
-</md-content>
+</md-sidenav-layout>
 

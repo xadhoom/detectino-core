@@ -5,6 +5,10 @@ import { Component, ViewEncapsulation, provide } from '@angular/core';
 import { RouteConfig, Router } from '@angular/router-deprecated';
 import { Http } from '@angular/http';
 
+import {MD_SIDENAV_DIRECTIVES} from '@angular2-material/sidenav';
+import {MD_LIST_DIRECTIVES} from '@angular2-material/list';
+import {MdIcon, MdIconRegistry} from '@angular2-material/icon';
+
 import { Home } from './home';
 import { About } from './about';
 import { Login } from './login';
@@ -17,9 +21,13 @@ import { AuthService } from './auth';
  */
 @Component({
   selector: 'app',
-  moduleId: module.id,
   pipes: [ ],
-  directives: [ RouterActive ],
+  directives: [
+    RouterActive,
+    MD_SIDENAV_DIRECTIVES,
+    MD_LIST_DIRECTIVES,
+    MdIcon
+  ],
   providers: [
     provide(AuthService, {
       useClass: AuthService,
