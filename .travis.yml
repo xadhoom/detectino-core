@@ -1,11 +1,16 @@
 env:
         - REBAR_DEPS_DIR=$TRAVIS_BUILD_DIR/deps
+
 sudo: false
+
 language: elixir
+
 elixir:
         - 1.2.3
+
 otp_release:
         - 18.2
+
 before_install:
         - . $HOME/.nvm/nvm.sh
         - nvm install 4
@@ -15,13 +20,16 @@ before_install:
           #before_script:
           #- sh -e /etc/init.d/xvfb start
           #- sleep 1  # give server time to start
-          #after_scripit:
-          #- cat /home/travis/build/xadhoom/detectino-core/apps/dt_web/webapp/npm-debug.log
+
+after_script:
+          - cat /home/travis/build/xadhoom/detectino-core/apps/dt_web/webapp/npm-debug.log
+
 cache:
         directories:
                 - apps/dt_web/webapp/node_modules
                 - deps
                 - _build
+
 script:
-        - "pushd apps/dt_web/webapp; npm install; npm run test; popd"
+        - "pushd apps/dt_web/webapp; npm install; npm run build; npm run test; popd"
         - "mix deps.get && mix deps.compile && mix coveralls.travis --umbrella"
