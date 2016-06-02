@@ -17,6 +17,7 @@ import { AuthService } from './auth';
  */
 @Component({
   selector: 'app',
+  moduleId: module.id,
   pipes: [ ],
   directives: [ RouterActive ],
   providers: [
@@ -30,34 +31,7 @@ import { AuthService } from './auth';
     require('normalize.css'),
     require('./app.css')
   ],
-  template: `
-    <md-content>
-      <md-toolbar color="primary">
-          <span>{{ name }}</span>
-          <span class="fill"></span>
-          <button md-button router-active [routerLink]=" ['Index'] ">
-            Index
-          </button>
-          <button md-button router-active [routerLink]=" ['Home'] ">
-            Home
-          </button>
-          <button md-button router-active [routerLink]=" ['About'] " *ngIf="auth.authenticated()">
-            About
-          </button>
-          <button md-button router-active [routerLink]=" ['Login'] " *ngIf="!auth.authenticated()">
-            Log In
-          </button>
-          <button md-button (click)="auth.logout()" *ngIf="auth.authenticated()">
-            Log Out
-          </button>
-      </md-toolbar>
-
-      <md-progress-bar mode="indeterminate" color="primary" *ngIf="loading"></md-progress-bar>
-
-      <router-outlet></router-outlet>
-
-      </md-content>
-  `
+  template: require('./app.component.html')
 })
 
 @RouteConfig([
