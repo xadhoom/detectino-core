@@ -11,8 +11,8 @@ config :dt_web, DtWeb.Endpoint,
   debug_errors: true,
   #code_reloader: true,
   cache_static_lookup: false,
-  check_origin: false,
-  watchers: [sh: ["watcher"]]
+  check_origin: false
+  #watchers: [sh: ["watcher"]]
 
 # Watch static and templates for browser reloading.
 #config :dt_web, DtWeb.Endpoint,

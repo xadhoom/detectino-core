@@ -10,13 +10,13 @@ before_install:
         - . $HOME/.nvm/nvm.sh
         - nvm install 4
         - npm --version
-        - export CHROME_BIN=chromium-browser
-        - export DISPLAY=:99.0
-before_script:
-        - sh -e /etc/init.d/xvfb start
-        - sleep 1  # give server time to start
-after_script:
-        - cat /home/travis/build/xadhoom/detectino-core/apps/dt_web/webapp/npm-debug.log
+          #- export CHROME_BIN=chromium-browser
+          #- export DISPLAY=:99.0
+          #before_script:
+          #- sh -e /etc/init.d/xvfb start
+          #- sleep 1  # give server time to start
+          #after_scripit:
+          #- cat /home/travis/build/xadhoom/detectino-core/apps/dt_web/webapp/npm-debug.log
 cache:
         directories:
                 - apps/dt_web/webapp/node_modules
