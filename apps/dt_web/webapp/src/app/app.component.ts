@@ -12,8 +12,9 @@ import {MdIcon, MdIconRegistry} from '@angular2-material/icon';
 import { Home } from './home';
 import { About } from './about';
 import { Login } from './login';
+import { Users } from './users';
 import { RouterActive } from './router-active';
-import { AuthService } from './auth';
+import { AuthService } from './services';
 
 /*
  * App Component
@@ -46,7 +47,8 @@ import { AuthService } from './auth';
   { path: '/',      name: 'Index', component: Home, useAsDefault: true },
   { path: '/home',  name: 'Home',  component: Home },
   { path: '/about', name: 'About', component: About },
-  { path: '/login', name: 'Login', component: Login }
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/users', name: 'Users', component: Users }
 ])
 
 export class App {

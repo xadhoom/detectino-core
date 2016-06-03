@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {Router} from '@angular/router-deprecated';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../services';
 
 @Component({
   selector: 'login',

@@ -9,7 +9,6 @@ import 'rxjs/add/operator/map';
 export class AuthService {
   jwtHelper: JwtHelper = new JwtHelper();
 
-
   constructor(private http: Http, private router: Router) {}
 
   public authenticated() {

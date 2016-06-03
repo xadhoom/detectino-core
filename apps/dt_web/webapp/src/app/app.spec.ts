@@ -7,7 +7,7 @@ import {
 
 // Load the implementations that should be tested
 import { App } from './app.component';
-import { AuthService } from './auth';
+import { AuthService } from './services';
 import { provide } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router-deprecated';

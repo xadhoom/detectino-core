@@ -19,6 +19,9 @@
       <a md-list-item router-active [routerLink]=" ['About'] " *ngIf="auth.authenticated()">
         <span md-line (click)="sidenav.close()">About</span>
       </a>
+      <a md-list-item router-active [routerLink]=" ['Users'] " *ngIf="auth.authenticated()">
+        <span md-line (click)="sidenav.close()">Users</span>
+      </a>
       <a md-list-item router-active [routerLink]=" ['Login'] " *ngIf="!auth.authenticated()">
         <span md-line (click)="sidenav.close()">Log In</span>
       </a>

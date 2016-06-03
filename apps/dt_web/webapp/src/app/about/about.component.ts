@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {CanActivate} from '@angular/router-deprecated';
 import {tokenNotExpired} from 'angular2-jwt';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../services';
 
 /*
  * We're loading this component asynchronously
