@@ -52,7 +52,7 @@ import { AuthService } from './auth';
 export class App {
   angularclassLogo = 'assets/img/angularclass-avatar.png';
   loading = false;
-  name = 'Angular 2 Webpack Starter';
+  name = 'Detectino';
   url = 'https://twitter.com/AngularClass';
 
   constructor(private auth: AuthService) { }

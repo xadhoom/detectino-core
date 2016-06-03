@@ -21,7 +21,7 @@
     "preclean:start": "npm run clean",
     "clean:start": "npm start",
     "watch": "npm run watch:dev",
-    "watch:dev": "npm run build:dev -- --watch",
+    "watch:dev": "npm run build:dev -- --watch --progress",
     "watch:test": "npm run test -- --auto-watch --no-single-run",
     "watch:prod": "npm run build:prod -- --watch",
     "build": "npm run build:dev",

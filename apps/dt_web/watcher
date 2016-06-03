@@ -1,4 +1,4 @@
 #!/bin/bash
 pushd webapp
-npm run build.dev.watch
+npm run watch
 popd
