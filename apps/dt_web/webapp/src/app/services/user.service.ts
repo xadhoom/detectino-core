@@ -13,7 +13,7 @@ export class UserService {
 
   constructor (private http: AuthHttp) {}
 
-  getUsers() {
+  getUsers(): Observable<User[]> {
     return this.http.get(this.url).
       map(this.parseResponse).
       catch(this.handleError);
@@ -21,7 +21,7 @@ export class UserService {
 
   private parseResponse(res: Response) {
     let body = res.json();
-    return body.data || [];
+    return body || [];
   };
 
   private handleError(error: any) {
