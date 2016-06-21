@@ -1,0 +1,31 @@
+<form [ngFormModel]="form" (ngSubmit)="onSubmit()">
+  <input type="hidden" [(ngModel)]="user.id">
+  <table class="user-table" cellspacing="0">
+    <tbody>
+      <tr>
+        <td>
+          <input type="text" pInputText [(ngModel)]="user.name" ngControl="name" required [placeholder]="'Enter your username'">
+        </td>
+        <td>
+          <input type="text" pInputText [(ngModel)]="user.username" ngControl="username">
+        </td>
+        <td>
+          <input type="text" pInputText [(ngModel)]="user.role">
+        </td>
+        <td>
+          <input type="text" pInputText [(ngModel)]="user.password">
+        </td>
+        <td>
+          <button md-mini-fab color="warn">
+            <md-icon class="md-24">remove</md-icon>
+          </button>
+        </td>
+        <td>
+          <button md-mini-fab type="submit">
+            <md-icon class="md-24">save</md-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</form>

@@ -1,0 +1,14 @@
+.user-table {
+  width: 100%;
+}
+
+.user-table td {
+  text-align: left;
+  width: 25%;
+}
+
+.user-table th {
+  text-align: left;
+  width: 25%;
+}
+

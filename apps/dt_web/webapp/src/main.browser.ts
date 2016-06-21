@@ -1,3 +1,4 @@
+import 'script!primeui/primeui-ng-all.min.js';
 /*
  * Providers provided by Angular
  */
@@ -14,6 +15,7 @@ import { ENV_PROVIDERS } from './platform/environment';
 * our top level component that holds all of our components
 */
 import { App, APP_PROVIDERS } from './app';
+import { APP_ROUTER_PROVIDERS } from './app/app.routes';
 
 /*
  * Bootstrap our Angular app with a top level component `App` and inject
@@ -24,6 +26,7 @@ bootstrap(App, [
   ENV_PROVIDERS,
   DIRECTIVES,
   PIPES,
+  APP_ROUTER_PROVIDERS,
   APP_PROVIDERS
 ])
 .catch(err => console.error(err));

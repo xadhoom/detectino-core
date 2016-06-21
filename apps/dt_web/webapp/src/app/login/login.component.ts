@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {Router} from '@angular/router-deprecated';
 import {AuthService} from '../services';
 
 @Component({
@@ -10,7 +9,7 @@ import {AuthService} from '../services';
 })
 
 export class Login {
-  constructor(public router: Router, public auth: AuthService) {
+  constructor(public auth: AuthService) {
   }
 
   login(event: Event, username: string, password: string) {

@@ -1,39 +1,14 @@
-<md-sidenav-layout fullscreen>
+<p-toolbar>
+   <div class="ui-toolbar-group-left">
+     <button icon="fa-plus" pButton type="button" label="Index" (click)="router.navigate(['/home'])"></button>
+     <button pButton type="button" label="Home" (click)="router.navigate(['/home'])"></button>
+     <button pButton type="button" label="Users" (click)="router.navigate(['/users'])" *ngIf="auth.authenticated()"></button>
+     <button pButton type="button" label="Users Nocheck" (click)="router.navigate(['/users'])"></button>
+     <button pButton type="button" label="Login" (click)="router.navigate(['/login'])" *ngIf="!auth.authenticated()"></button>
+     <button pButton type="button" label="Logout" (click)="auth.logout()" *ngIf="auth.authenticated()"></button>
+   </div>
+</p-toolbar>
 
-  <md-toolbar color="primary">
-    <span>{{ name }}</span>
-    <span class="fill"></span>
-    <button md-button router-active [routerLink]=" ['Index'] ">
-        Index
-    </button>
-    <button md-button router-active [routerLink]=" ['Home'] ">
-        Home
-    </button>
-    <button md-icon-button (click)="sidenav.open()">
-      <md-icon>menu</md-icon>
-    </button>
-  </md-toolbar>
+<router-outlet></router-outlet>
 
-  <md-sidenav #sidenav align="end">
-    <md-nav-list>
-      <a md-list-item router-active [routerLink]=" ['About'] " *ngIf="auth.authenticated()">
-        <span md-line (click)="sidenav.close()">About</span>
-      </a>
-      <a md-list-item router-active [routerLink]=" ['Users'] " *ngIf="auth.authenticated()">
-        <span md-line (click)="sidenav.close()">Users</span>
-      </a>
-      <a md-list-item router-active [routerLink]=" ['Login'] " *ngIf="!auth.authenticated()">
-        <span md-line (click)="sidenav.close()">Log In</span>
-      </a>
-      <a md-list-item router-active (click)="auth.logout()" *ngIf="auth.authenticated()">
-        <span md-line (click)="sidenav.close()">Log Out</span>
-      </a>
-    </md-nav-list>
-  </md-sidenav>
-
-  <md-progress-bar mode="indeterminate" color="primary" *ngIf="loading"></md-progress-bar>
-
-  <router-outlet></router-outlet>
-
-</md-sidenav-layout>
 

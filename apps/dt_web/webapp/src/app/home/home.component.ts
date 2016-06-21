@@ -1,8 +1,5 @@
 import { Component } from '@angular/core';
 
-import { Title } from './title';
-import { XLarge } from './x-large';
-
 @Component({
   // The selector is what angular internally uses
   // for `document.querySelectorAll(selector)` in our index.html
@@ -10,12 +7,10 @@ import { XLarge } from './x-large';
   selector: 'home',  // <home></home>
   // We need to tell Angular's Dependency Injection which providers are in our app.
   providers: [
-    Title
   ],
   // We need to tell Angular's compiler which directives are in our template.
   // Doing so will allow Angular to attach our behavior to an element
   directives: [
-    XLarge
   ],
   // We need to tell Angular's compiler which custom pipes are in our template.
   pipes: [ ],
@@ -28,13 +23,12 @@ export class Home {
   // Set our default values
   localState = { value: '' };
   // TypeScript public modifiers
-  constructor(public title: Title) {
+  constructor() {
 
   }
 
   ngOnInit() {
     console.log('hello `Home` component');
-    // this.title.getData().subscribe(data => this.data = data);
   }
 
   submitState(value) {

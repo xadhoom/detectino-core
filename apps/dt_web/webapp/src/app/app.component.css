@@ -1,34 +1,25 @@
-html, body{
-  height: 100%;
-  background: #F4FAFA;
+@charset "UTF-8";
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/roboto-v15-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Roboto'), local('Roboto-Regular'),
+       url('/fonts/roboto-v15-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('/fonts/roboto-v15-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('/fonts/roboto-v15-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('/fonts/roboto-v15-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('/fonts/roboto-v15-latin-regular.svg#Roboto') format('svg'); /* Legacy iOS */
 }
-button.active{
-  background: #fff;
-  color: #009688;
+
+body {
+  margin:0px;
+  height:100%;
+  overflow-x:hidden;
+  overflow-y:auto;
+  font-family: 'Roboto', "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-weight:normal;
+  color:#404C51
 }
-button.active:hover{
-  color: #fff;
-}
-.fill{
-  flex: 1 1 auto;
-}
-.app-state{
-  margin: 15px;
-  flex: 1;
-}
-.home{
-  flex: 1;
-}
-md-content{
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-footer{
-  flex: 0 0 60px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-}
+

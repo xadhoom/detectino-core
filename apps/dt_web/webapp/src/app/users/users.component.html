@@ -1,5 +1,26 @@
-<md-list>
-  <md-list-item *ngFor="let user of users">
-    {{user.name}}
-  </md-list-item>
-</md-list>
+<md-card>
+  <table class="user-table" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Password</th>
+        <th>
+          <button md-mini-fab (click)="newUser()">
+            <md-icon>add</md-icon>
+          </button>
+        </th>
+        <th>
+          <button md-mini-fab>
+            <md-icon>undo</md-icon>
+          </button>
+        </th>
+      </tr>
+    </thead>
+  </table>
+</md-card>
+
+<md-card *ngFor="let user of users">
+  <user-form [user]="user"></user-form>
+</md-card>

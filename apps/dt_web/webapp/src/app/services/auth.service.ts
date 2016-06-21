@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Http} from '@angular/http';
-import {Router} from '@angular/router-deprecated';
+import {Router} from '@angular/router';
 import {JwtHelper, tokenNotExpired} from 'angular2-jwt';
 import {contentHeaders} from '../shared/utils/headers';
 import 'rxjs/add/operator/map';
@@ -33,6 +33,6 @@ export class AuthService {
 
   public logout() {
     localStorage.removeItem('id_token');
-    this.router.navigate(['Home']);
+    this.router.navigate(['home']);
   }
 }

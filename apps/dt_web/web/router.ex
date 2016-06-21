@@ -20,6 +20,7 @@ defmodule DtWeb.Router do
   scope "/", DtWeb do
     pipe_through [:browser] # Use the default browser stack
     get "/", PageController, :index
+    get "/home", PageController, :index
     get "/login", PageController, :index
     get "/about", PageController, :index
   end

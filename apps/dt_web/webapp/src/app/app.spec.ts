@@ -10,19 +10,22 @@ import { App } from './app.component';
 import { AuthService } from './services';
 import { provide } from '@angular/core';
 import { Http } from '@angular/http';
-import { Router } from '@angular/router-deprecated';
+import { Router, RootRouter } from '@angular/router';
 
 describe('App', () => {
   // provide our implementations or mocks to the dependency injector
   beforeEachProviders(() => [
-    App,
     provide(AuthService, {
       deps: [Http, Router]
-    })
+    }),
+    provide(Router, {useClass: RootRouter}),
+    App
   ]);
 
-  it('should have a url', inject([ App ], (app) => {
-    expect(app.url).toEqual('https://twitter.com/AngularClass');
+  it('should have a name', inject([ App ], (app) => {
+    console.log(app);
+
+    expect(app.name).toEqual('Detectino');
   }));
 
 });
