@@ -1,19 +1,19 @@
-<form [ngFormModel]="form" (ngSubmit)="onSubmit()">
-  <input type="hidden" [(ngModel)]="user.id">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <input type="hidden" [(ngModel)]="user.id" name="id">
   <table class="user-table" cellspacing="0">
     <tbody>
       <tr>
         <td>
-          <input type="text" pInputText [(ngModel)]="user.name" ngControl="name" required [placeholder]="'Enter your username'">
+          <input type="text" pInputText [(ngModel)]="user.name" name="name" [placeholder]="'Enter your username'">
         </td>
         <td>
-          <input type="text" pInputText [(ngModel)]="user.username" ngControl="username">
+          <input type="text" pInputText [(ngModel)]="user.username" name="username">
         </td>
         <td>
-          <input type="text" pInputText [(ngModel)]="user.role">
+          <input type="text" pInputText [(ngModel)]="user.role" name="role">
         </td>
         <td>
-          <input type="text" pInputText [(ngModel)]="user.password">
+          <input type="text" pInputText [(ngModel)]="user.password" name="password">
         </td>
         <td>
           <button md-mini-fab color="warn">

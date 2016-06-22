@@ -3,7 +3,8 @@
  */
 
 // Angular 2
-import { FORM_PROVIDERS, HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { FormBuilder, disableDeprecatedForms, provideForms } from '@angular/forms';
 // Angular 2 Http
 import { HTTP_PROVIDERS } from '@angular/http';
 
@@ -12,11 +13,13 @@ import { HTTP_PROVIDERS } from '@angular/http';
 * providers/directives/pipes that only live in our browser environment
 */
 export const APPLICATION_PROVIDERS = [
-  ...FORM_PROVIDERS,
-  ...HTTP_PROVIDERS,
+  disableDeprecatedForms(),
+  provideForms(),
+  FormBuilder,
+  HTTP_PROVIDERS,
   {provide: LocationStrategy, useClass: HashLocationStrategy }
 ];
 
 export const PROVIDERS = [
-  ...APPLICATION_PROVIDERS
+  APPLICATION_PROVIDERS
 ];
