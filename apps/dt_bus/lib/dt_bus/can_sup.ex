@@ -1,4 +1,8 @@
 defmodule DtBus.CanSup do
+  @moduledoc """
+  CanBus Supervisor
+  """
+
   use Supervisor
 
   def start_link do

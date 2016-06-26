@@ -42,6 +42,7 @@ defmodule DtBus.Mixfile do
       {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},
       {:lager, git: "git://github.com/Feuerlabs/lager.git", override: true},
       {:lager_logger, "~> 1.0"},
+      {:credo, "~> 0.3", only: [:dev, :test]}
     ]
   end
 end

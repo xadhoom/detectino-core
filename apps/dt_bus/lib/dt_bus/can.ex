@@ -203,10 +203,10 @@ defmodule DtBus.Can do
 
   defp handle_pong(data, state) do
     case Dict.pop(state.ping, data) do
-      {nil, _ping} -> {:ok, state}
-      {from, ping} ->
+      {nil, _pingrq} -> {:ok, state}
+      {from, pingrq} ->
         GenServer.reply from, data
-        {:ok,  %{state | ping: ping}}
+        {:ok,  %{state | ping: pingrq}}
     end
   end
 

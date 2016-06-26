@@ -1,4 +1,8 @@
 defmodule DtBus do
+  @moduledoc """
+  DtBus application entry point
+  """
+
   use Application
 
   def start(_type, _args) do

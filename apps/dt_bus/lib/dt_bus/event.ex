@@ -1,4 +1,7 @@
 defmodule DtBus.Event do
+  @moduledoc """
+  Detectino event structure
+  """
 
   defstruct address: nil,
     port: nil,

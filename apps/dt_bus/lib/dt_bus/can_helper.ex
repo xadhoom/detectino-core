@@ -1,4 +1,8 @@
 defmodule DtBus.CanHelper do
+  @moduledoc """
+  Various helper fun to aid in detectino message handling
+  """
+
   use Bitwise
 
   require Logger
@@ -66,7 +70,7 @@ defmodule DtBus.CanHelper do
   end
 
   def build_msgid(sender, dest, command, subcommand) when 
-      (command === :read or command===:readd) and
+      (command === :read or command === :readd) and
       is_atom(subcommand) and is_integer(sender) and is_integer(dest)
       do
     (2 <<< 30) |> # set EXT_BIT

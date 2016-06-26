@@ -1,4 +1,8 @@
 defmodule DtBus.CanSim do
+  @moduledoc """
+  Provide a CanBus simulator to aid in development and testing.
+  """
+
   use GenServer
   use Bitwise
 
