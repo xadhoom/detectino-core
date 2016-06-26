@@ -93,7 +93,7 @@ defmodule DtCore.Receiver do
     sensor = Repo.one(q)
     state = 
       case sensor do
-        %Sensor{configured: true} -> [ %{address: event.address, port: event.port} | state ]
+        %Sensor{configured: true} -> [%{address: event.address, port: event.port} | state]
         %Sensor{configured: false} -> state
         nil ->
           add_on_repo(event)

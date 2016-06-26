@@ -51,6 +51,8 @@ defmodule DtCore.Mixfile do
     [ {:ecto, "~> 2.0"},
       {:ex_abnf, "~> 0.2.7"},
       {:dt_bus, in_umbrella: true},
-      {:dt_web, in_umbrella: true}]
+      {:dt_web, in_umbrella: true},
+      {:credo, "~> 0.3", only: [:dev, :test]}
+    ]
   end
 end

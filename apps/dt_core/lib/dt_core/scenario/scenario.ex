@@ -39,7 +39,7 @@ defmodule DtCore.Scenario do
   #
   def init({rules, name}) do
     Logger.info "Starting Scenario Server " <> to_string(name)
-    {:ok, self} = Handler.start_listening
+    {:ok, _myself} = Handler.start_listening
     {:ok, pid} = Action.start_link
     {:ok,
       %{

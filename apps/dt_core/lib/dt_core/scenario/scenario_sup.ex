@@ -34,7 +34,7 @@ defmodule DtCore.ScenarioSup do
   def get_worker_by_def(scenario = %Scenario{}) do
     child_id = get_child_name(scenario)
     found = Supervisor.which_children(__MODULE__)
-    |> Enum.find( fn(item) ->
+    |> Enum.find(fn(item) ->
           case item do
             {^child_id, _child, _type, _modules} -> true
             _ -> false
