@@ -17,7 +17,7 @@ defmodule DtWeb.SessionController do
         claims = Guardian.Claims.app_claims
         |> Map.put("role", user.role)
         |> Guardian.Claims.ttl({1, :hours})
-        { :ok, jwt, full_claims } = Guardian.encode_and_sign(user, :token, claims)
+        {:ok, jwt, full_claims} = Guardian.encode_and_sign(user, :token, claims)
         conn
         |> render(:logged_in, token: jwt)
       else

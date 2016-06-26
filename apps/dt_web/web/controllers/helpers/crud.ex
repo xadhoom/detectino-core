@@ -13,7 +13,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     q = from m in model,
       limit: ^per_page,
-      offset: ^((page-1) * per_page)
+      offset: ^((page - 1) * per_page)
     items = repo.all(q)
 
     q = from m in model,

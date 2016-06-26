@@ -62,7 +62,7 @@ defmodule DtWeb.User do
 
   defp maybe_update_password(changeset) do
     case Ecto.Changeset.fetch_change(changeset, :password) do
-      { :ok, password } ->
+      {:ok, password} ->
         changeset
         |> Ecto.Changeset.put_change(:encrypted_password, Comeonin.Bcrypt.hashpwsalt(password))
         |> Ecto.Changeset.put_change(:password, nil)

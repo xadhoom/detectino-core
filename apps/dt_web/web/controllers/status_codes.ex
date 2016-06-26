@@ -62,7 +62,8 @@ defmodule DtWeb.StatusCodes do
   }
 
   @atom_to_status_code \
-    Enum.map(@http_status_codes, fn {code, message} ->
+    @http_status_codes
+    |> Enum.map(fn {code, message} ->
      {message
        |> String.downcase
        |> String.replace(~r/[\s-]/, "_")
