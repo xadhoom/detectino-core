@@ -9,6 +9,7 @@ defmodule DtWeb.User do
     field :encrypted_password, :string
     field :password, :string
     field :role, :string
+    field :pin, :string
 
     timestamps
   end
@@ -18,15 +19,19 @@ defmodule DtWeb.User do
 
   def create_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(name username password role))
+    |> cast(params, ~w(name username password role pin))
     |> validate_required([:name, :username, :password, :role])
+    |> unique_constraint(:username)
+    |> unique_constraint(:pin)
     |> maybe_update_password
   end
 
   def update_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(name username password role))
-    |> validate_required([:name, :username, :password, :role])
+    |> cast(params, ~w(id name username password role pin))
+    |> validate_required([:id, :name, :username, :password, :role])
+    |> unique_constraint(:username)
+    |> unique_constraint(:pin)
     |> maybe_update_password
   end
 

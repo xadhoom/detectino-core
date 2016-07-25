@@ -70,8 +70,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
                 |> put_resp_header("location", path)
                 |> put_status(201)
         {:ok, conn, record}
-      {:error, _changeset} ->
-        {:error, conn, 400}
+      {:error, changeset} -> {:error, conn, 400, changeset}
     end
   end
 

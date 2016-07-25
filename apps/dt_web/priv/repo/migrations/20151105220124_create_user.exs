@@ -8,9 +8,13 @@ defmodule DtWeb.Repo.Migrations.CreateUser do
       add :password, :string
       add :encrypted_password, :string
       add :role, :string
+      add :pin, :string
 
       timestamps
     end
+
+    create unique_index(:users, [:username])
+    create unique_index(:users, [:pin])
 
   end
 end

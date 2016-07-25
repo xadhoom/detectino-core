@@ -26,10 +26,14 @@ defmodule DtWeb.ErrorHelpers do
     #
     #     dngettext "errors", "1 file", "%{count} files", count
     #
-    Gettext.dngettext(DtWeb.Gettext, "errors", msg, msg, opts[:count], opts)
+    Enum.reduce opts, msg, fn {k, v}, acc ->
+      String.replace(acc, "%{#{k}}", to_string(v))
+    end
+    #Gettext.dngettext(DtWeb.Gettext, "errors", msg, msg, opts[:count], opts)
   end
 
   def translate_error(msg) do
-    Gettext.dgettext(DtWeb.Gettext, "errors", msg)
+    msg
+    #Gettext.dgettext(DtWeb.Gettext, "errors", msg)
   end
 end

@@ -17,4 +17,5 @@ defmodule DtWeb.UserTest do
     changeset = User.login_changeset(%User{}, @invalid_attrs)
     refute changeset.valid?
   end
+
 end

@@ -62,14 +62,23 @@ defmodule DtWeb.UserControllerTest do
     assert location == "/api/users/" <> Integer.to_string(json["id"])
   end
 
+  test "auth: save a duplicated user", %{conn: conn} do
+    attrs = %{username: "admin@local", email: "some content",
+      role: "some content", name: "some content",
+      password: "some content"}
+    conn = login(conn)
+    conn = post conn, user_path(conn, :create), attrs
+    json_response(conn, 400)
+  end
+
   test "auth: save one invalid user", %{conn: conn} do
     conn = login(conn)
     conn = post conn, user_path(conn, :create), @invalid_attrs
-    assert conn.status == 400
+    json_response(conn, 400)
 
     conn = newconn(conn)
     |> post(user_path(conn, :create), @missing_username)
-    assert conn.status == 400
+    json_response(conn, 400)
   end
 
   test "auth: update one user", %{conn: conn} do

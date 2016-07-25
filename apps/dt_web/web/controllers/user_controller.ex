@@ -20,7 +20,10 @@ defmodule DtWeb.UserController do
   def create(conn, params) do
     case Crud.create(conn, params, User, Repo, :user_path) do
       {:ok, conn, item} -> render(conn, item: item)
-      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+      {:error, conn, code, changeset} ->
+        conn
+        |> put_status(code)
+        |> render(DtWeb.ChangesetView, :error, changeset: changeset)
     end
   end
 
