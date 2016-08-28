@@ -4,10 +4,16 @@
 import { Component, ViewEncapsulation, provide } from '@angular/core';
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import { Subscription }   from 'rxjs/Subscription';
 
 import { AuthService } from './services';
 
-import {Button, Toolbar} from 'primeng/primeng';
+import { NotificationService } from './services';
+
+import { Message } from 'primeng/primeng';
+
+declare var Modena: any;
 
 /*
  * App Component
@@ -15,17 +21,6 @@ import {Button, Toolbar} from 'primeng/primeng';
  */
 @Component({
   selector: 'app',
-  pipes: [ ],
-  directives: [
-    Toolbar,
-    Button
-  ],
-  providers: [
-    provide(AuthService, {
-      useClass: AuthService,
-      deps: [Http, Router]
-    })
-  ],
   encapsulation: ViewEncapsulation.None,
   styles: [
     require('./app.component.css')
@@ -33,11 +28,24 @@ import {Button, Toolbar} from 'primeng/primeng';
   template: require('./app.component.html')
 })
 
-export class App {
+export class AppComponent {
   angularclassLogo = 'assets/img/angularclass-avatar.png';
   loading = false;
   name = 'Detectino';
 
-  constructor(private router: Router, private auth: AuthService) { }
+  subscription: Subscription;
 
+  notifications: Message[] = [];
+
+  constructor(private router: Router, private auth: AuthService,
+              private notificationService: NotificationService) {
+
+                this.subscription = notificationService.messages$.subscribe(
+                  messages => { this.notifications = messages; console.log(messages); }
+                );
+  }
+
+  ngAfterViewInit() {
+    Modena.init();
+  }
 }

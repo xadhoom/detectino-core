@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {Router} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs/Observable';
 
-import {tokenNotExpired} from 'angular2-jwt';
+import { tokenNotExpired } from 'angular2-jwt';
 
 @Injectable()
 export class AuthGuard {

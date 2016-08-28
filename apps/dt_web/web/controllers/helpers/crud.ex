@@ -99,7 +99,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
       {:ok, record} ->
         conn = put_status(conn, 200)
         {:ok, conn, record}
-      {:error, _changeset} ->
+      {:error, changeset} ->
+        IO.inspect changeset
         {:error, conn, 400}
     end
   end

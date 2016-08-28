@@ -1,43 +1,99 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import {UserService} from '../services';
+import { UserService, NotificationService } from '../services';
 
-import {User} from '../models/user';
+import { User } from '../models/user';
 
-import {UserForm} from './user.form';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
     selector: 'users',
-    providers: [UserService],
-    directives: [UserForm],
     template: require('./users.component.html'),
     styles: [ require('./users.component.css') ]
 })
 
-export class Users {
+export class Users implements OnInit {
+
+  user: User;
 
   users: User[];
-  userForms: UserForm[] = [];
+  roles: SelectItem[];
+
+  selectedUser: User;
+
+  displayDialog: boolean;
+
+  newUser: boolean;
+
   errorMessage: string;
 
-  constructor(private userService: UserService) {};
+  constructor(private userService: UserService,
+              private notificationService: NotificationService) {};
 
-  ngOnInit() { this.getUsers(); };
+  ngOnInit() {
+    this.roles = [];
+    this.getUsers();
 
-  addUserForm(userForm: UserForm) {
-    this.userForms.push(userForm);
+    this.roles.push({label: 'Select Role', value: undefined});
+    this.roles.push({label: 'Admin', value: 'admin'});
+    this.roles.push({label: 'User', value: 'user'});
   };
 
   getUsers() {
     this.userService.getUsers().
       subscribe(
         users => this.users = users,
-        error => this.errorMessage = <any>error);
+        error => this.onError(error)
+    );
   };
 
-  newUser() {
-    this.users.push(new User(0));
+  save() {
+    this.userService.save(this.user).
+      subscribe(
+        user => this.refresh(),
+        error => this.onError(error)
+    );
   };
+
+  destroy() {
+    this.userService.destroy(this.user).
+      subscribe(
+        success => this.refresh(),
+        error => this.onError(error)
+    );
+  };
+
+  onError(error: any) {
+    this.errorMessage = <any>error;
+    this.notificationService.error(this.errorMessage);
+  };
+
+  refresh() {
+    this.displayDialog = false;
+    this.getUsers();
+  };
+
+  showDialogToAdd() {
+    this.newUser = true;
+    this.user = new User();
+    this.displayDialog = true;
+  }
+
+  onRowSelect(event) {
+    this.newUser = false;
+    this.user = this.cloneUser(event.data);
+    this.displayDialog = true;
+  };
+
+  cloneUser(u: User): User {
+    let user = new User();
+    for (let prop in u) {
+      if (prop) {
+        user[prop] = u[prop];
+      }
+    }
+    return user;
+  }
 
 }
 

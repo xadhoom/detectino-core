@@ -1,20 +1,17 @@
-import { Component } from '@angular/core';
 import {
-  beforeEachProviders,
-  describe,
   inject,
-  injectAsync,
-  it
+  addProviders
 } from '@angular/core/testing';
-import { BaseRequestOptions, Http } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
+import { Component } from '@angular/core';
+import { BaseRequestOptions, Http } from '@angular/http';
 
 // Load the implementations that should be tested
 import { Home } from './';
 
 describe('Home', () => {
   // provide our implementations or mocks to the dependency injector
-  beforeEachProviders(() => [
+  beforeEach(() => addProviders([
     BaseRequestOptions,
     MockBackend,
     {
@@ -25,11 +22,7 @@ describe('Home', () => {
       deps: [MockBackend, BaseRequestOptions]
     },
     Home
-  ]);
-
-  it('should have default data', inject([ Home ], (home) => {
-    expect(home.localState).toEqual({ value: '' });
-  }));
+  ]));
 
   it('should log ngOnInit', inject([ Home ], (home) => {
     spyOn(console, 'log');

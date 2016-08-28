@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
-import {Router} from '@angular/router';
-import {JwtHelper, tokenNotExpired} from 'angular2-jwt';
-import {contentHeaders} from '../shared/utils/headers';
+import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Router } from '@angular/router';
+import { JwtHelper, tokenNotExpired } from 'angular2-jwt';
+import { contentHeaders } from '../shared/utils/headers';
 import 'rxjs/add/operator/map';
 
 @Injectable()

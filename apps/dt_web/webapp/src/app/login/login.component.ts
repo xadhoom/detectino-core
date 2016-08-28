@@ -1,11 +1,9 @@
-import {Component} from '@angular/core';
-import {AuthService} from '../services';
+import { Component } from '@angular/core';
+import { AuthService } from '../services';
 
 @Component({
   selector: 'login',
-  moduleId: module.id,
-  template: require('./login.template.html'),
-  providers: [AuthService]
+  template: require('./login.template.html')
 })
 
 export class Login {

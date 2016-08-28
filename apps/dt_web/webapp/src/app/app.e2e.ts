@@ -7,18 +7,18 @@ describe('App', () => {
 
   it('should have a title', () => {
     let subject = browser.getTitle();
-    let result  = 'Angular2 Webpack Starter by @gdi2290 from @AngularClass';
+    let result  = 'Detectino';
     expect(subject).toEqual(result);
   });
 
-  it('should have <md-toolbar>', () => {
-    let subject = element(by.css('app md-toolbar')).isPresent();
+  it('should have top menu', () => {
+    let subject = element(by.css('app ul#top-menu')).isPresent();
     let result  = true;
     expect(subject).toEqual(result);
   });
 
-  it('should have <md-content>', () => {
-    let subject = element(by.css('app md-content')).isPresent();
+  it('should have <router-outlet>', () => {
+    let subject = element(by.css('app router-outlet')).isPresent();
     let result  = true;
     expect(subject).toEqual(result);
   });

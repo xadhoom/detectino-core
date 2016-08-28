@@ -1,35 +1,33 @@
-import {Injectable} from '@angular/core';
-import {Http, Response} from '@angular/http';
-import {AuthHttp} from 'angular2-jwt';
+import { Injectable } from '@angular/core';
+import { Http, Response, Request, RequestMethod, Headers } from '@angular/http';
+import { AuthHttp } from 'angular2-jwt';
 
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
+import { of} from 'rxjs/observable/of';
 import 'rxjs/add/operator/catch';
 
-import {User} from '../models/user';
+import { User } from '../models/user';
+import { Crud } from './crud';
 
 @Injectable()
-export class UserService {
+export class UserService extends Crud {
 
-  private url = 'api/users';
+  private baseurl = 'api/users';
 
-  constructor (private http: AuthHttp) {}
+  constructor(protected http: AuthHttp) {
+    super(http);
+  }
 
   getUsers(): Observable<User[]> {
-    return this.http.get(this.url).
-      map(this.parseResponse).
-      catch(this.handleError);
+    return this._read(this.baseurl);
   };
 
-  private parseResponse(res: Response) {
-    let body = res.json();
-    return body || [];
-  };
+  destroy(u: User): Observable<User> {
+    return this._destroy(u, this.baseurl);
+  }
 
-  private handleError(error: any) {
-    let errMsg = (error.message) ? error.message :
-      error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-    console.error(errMsg);
-    return Observable.throw(errMsg);
+  save(u: User): Observable<User> {
+    return this._save(u, this.baseurl);
   };
 
 }

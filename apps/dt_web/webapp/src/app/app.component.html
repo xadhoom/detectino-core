@@ -1,14 +1,32 @@
-<p-toolbar>
-   <div class="ui-toolbar-group-left">
-     <button icon="fa-plus" pButton type="button" label="Index" (click)="router.navigate(['/home'])"></button>
-     <button pButton type="button" label="Home" (click)="router.navigate(['/home'])"></button>
-     <button pButton type="button" label="Users" (click)="router.navigate(['/users'])" *ngIf="auth.authenticated()"></button>
-     <button pButton type="button" label="Users Nocheck" (click)="router.navigate(['/users'])"></button>
-     <button pButton type="button" label="Login" (click)="router.navigate(['/login'])" *ngIf="!auth.authenticated()"></button>
-     <button pButton type="button" label="Logout" (click)="auth.logout()" *ngIf="auth.authenticated()"></button>
-   </div>
-</p-toolbar>
+<div id="layout-topbar">
+  <a [routerLink]="['home']" id="logo">
+    <img src="assets/layout/images/logo.svg" class="Fleft" />
+  </a>
 
-<router-outlet></router-outlet>
+  <a id="show-top-menu" class="ShowOnMobile ripplelink"><i class="icon-more_vert" id="active"></i><i class="icon-close DispNone" id="passive"></i> </a>
 
+  <ul id="top-menu">
+    <li>
+      <a class="ripplelink"><i class="icon-cog"></i> <span class="ShowOnMobile">Settings</span></a>
+      <ul>
+        <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/users'])"><i class="icon-settings"></i>Users</a></li>
+        <li><a (click)="router.navigate(['/users'])"><i class="icon-settings"></i>Users 2</a></li>
+        <li *ngIf="!auth.authenticated()"><a (click)="router.navigate(['/login'])"><i class="icon-power"></i>Login</a></li>
+        <li *ngIf="auth.authenticated()"><a (click)="auth.logout()"><i class="icon-power Red"></i>Logout</a></li>
+      </ul>
+    </li>
+  </ul>
+
+</div>
+
+<div id="wrapper">
+  <div id="wrapperIndent">
+    <div id="layout-portlets-cover">
+      <div class="Container96 Fnone MarAuto">
+        <p-growl [value]="notifications"></p-growl>
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>
 

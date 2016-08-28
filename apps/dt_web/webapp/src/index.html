@@ -6,7 +6,8 @@
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="description" content="<%= webpackConfig.metadata.title %>">
 
   <!-- use http://www.favicon-generator.org/ to replace files in public/icon-->
@@ -26,22 +27,40 @@
   <link rel="manifest" href="/assets/manifest.json">
   <meta name="msapplication-TileColor" content="#00bcd4">
   <meta name="msapplication-TileImage" content="/assets/icon/ms-icon-144x144.png">
-  <meta name="theme-color" content="#00bcd4">
   <!-- end favicon -->
 
+  <link rel="stylesheet" type="text/css" href="/assets/theme/theme.css">
+  <link rel="stylesheet" type="text/css" href="/assets/layout/css/core-layout.css">
+  <link rel="stylesheet" type="text/css" href="/assets/layout/css/animate.css">
+  <link rel="stylesheet" type="text/css" href="/assets/layout/css/modena-font.css">
+  <link rel="stylesheet" type="text/css" href="/assets/layout/css/ripple-effect.css">
+  <link rel="stylesheet" type="text/css" href="/assets/layout/css/perfect-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="/assets/layout/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/assets/layout/css/modena-layout.css">
+  <link rel="stylesheet" type="text/css" href="/assets/css/primeui-ng-all.min.css" />
+
+  <!--
   <link rel="stylesheet" type="text/css" href="/assets/css/theme.css" />
   <link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css" />
-  <link rel="stylesheet" type="text/css" href="/assets/css/primeui-ng-all.min.css" />
+  -->
 
   <!-- base url -->
   <base href="<%= webpackConfig.metadata.baseUrl %>">
 
 </head>
 
-<body>
+<body class="BlueModena Geometry">
 
   <app>
-    Loading...
+  <div style="height:100%;text-align:center">
+    <div style="padding-top:200px">
+      <img src="assets/theme/images/logo-dark.svg" style="height:50px;"/>
+    </div>
+
+    <div style="margin-top:25px">
+      <img src="assets/layout/images/loader.gif" />
+    </div>
+  </div>
   </app>
 
   <% if (webpackConfig.metadata.ENV === 'development') { %>

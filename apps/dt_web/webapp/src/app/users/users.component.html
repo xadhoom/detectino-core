@@ -1,26 +1,47 @@
-<md-card>
-  <table class="user-table" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Password</th>
-        <th>
-          <button md-mini-fab (click)="newUser()">
-            <md-icon>add</md-icon>
+<div class="Container100">
+  <div class="Card ShadowEffect">
+    <p-dataTable [value]="users" [rows]="10" [paginator]="true"
+      selectionMode="single" [(selection)]="selectedUser" (onRowSelect)="onRowSelect($event)" [responsive]="true" *ngIf="!displayDialog">
+      <header>Users</header>
+      <p-column field="name" header="Name" [sortable]="true"></p-column>
+      <p-column field="username" header="Username" [sortable]="true"></p-column>
+      <p-column field="role" header="Role" [sortable]="true"></p-column>
+      <p-column field="pin" header="Pin" [sortable]="false"></p-column>
+      <footer>
+        <div class="ui-helper-clearfix" style="width:100%">
+          <button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
           </button>
-        </th>
-        <th>
-          <button md-mini-fab>
-            <md-icon>undo</md-icon>
-          </button>
-        </th>
-      </tr>
-    </thead>
-  </table>
-</md-card>
-
-<md-card *ngFor="let user of users">
-  <user-form [user]="user"></user-form>
-</md-card>
+        </div>
+      </footer>
+    </p-dataTable>
+    <div class=" ui-fluid" *ngIf="displayDialog">
+      <button type="button" pButton icon="fa-arrow-left" (click)="refresh()" label="Edit User"></button>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Name</h2>
+        <input pInputText id="name" [(ngModel)]="user.name" />
+      </div>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Username</h2>
+        <input pInputText id="username" [(ngModel)]="user.username" />
+      </div>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Role</h2>
+        <p-dropdown [options]="roles" id="role" [(ngModel)]="user.role"></p-dropdown>
+      </div>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Pin</h2>
+        <input pInputText id="pin" [(ngModel)]="user.pin" />
+      </div>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Password</h2>
+        <input pInputText pPassword type="password" id="password" [(ngModel)]="user.password" />
+      </div>
+        <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+          <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><button type="button" pButton icon="fa-check" (click)="save()" label="Save" class="GreenButton"></button></div>
+            <div class="ui-grid-col-6"><button type="button" pButton icon="fa-close" (click)="destroy()" label="Delete" class="RedButton"></button></div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
