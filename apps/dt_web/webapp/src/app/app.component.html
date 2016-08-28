@@ -10,7 +10,6 @@
       <a class="ripplelink"><i class="icon-cog"></i> <span class="ShowOnMobile">Settings</span></a>
       <ul>
         <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/users'])"><i class="icon-settings"></i>Users</a></li>
-        <li><a (click)="router.navigate(['/users'])"><i class="icon-settings"></i>Users 2</a></li>
         <li *ngIf="!auth.authenticated()"><a (click)="router.navigate(['/login'])"><i class="icon-power"></i>Login</a></li>
         <li *ngIf="auth.authenticated()"><a (click)="auth.logout()"><i class="icon-power Red"></i>Logout</a></li>
       </ul>
