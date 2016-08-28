@@ -2,20 +2,35 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "noEmitHelpers": true
+    "noEmitHelpers": true,
+    "baseUrl": "./src",
+		"paths": [],
+    "lib": [
+      "dom",
+      "es6"
+    ],
+    "types": [
+      "core-js",
+      "hammerjs",
+      "jasmine",
+      "node",
+      "protractor",
+      "selenium-webdriver",
+      "source-map",
+      "uglify-js",
+      "webpack"
+    ]
   },
   "exclude": [
      "./node_modules"
-   ],
+  ],
   "files": [
-    "./src/app/**/*.ts",
-    "./src/platform/**/*.ts",
-    "!./node_modules/**",
-    "./src/custom-typings.d.ts",
-    "./typings/index.d.ts"
+    "./src/custom-typings.d.ts"
   ],
   "awesomeTypescriptLoaderOptions": {
     "resolveGlobs": true,
