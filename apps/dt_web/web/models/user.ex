@@ -29,7 +29,7 @@ defmodule DtWeb.User do
   def update_changeset(model, params \\ :empty) do
     model
     |> cast(params, ~w(id name username password role pin))
-    |> validate_required([:id, :name, :username, :password, :role])
+    |> validate_required([:id, :name, :username, :role])
     |> unique_constraint(:username)
     |> unique_constraint(:pin)
     |> maybe_update_password
