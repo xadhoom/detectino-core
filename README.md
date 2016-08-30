@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/xadhoom/detectino-core.svg)](https://travis-ci.org/xadhoom/detectino-core) [![Coverage Status](https://coveralls.io/repos/xadhoom/detectino-core/badge.svg?branch=master&service=github)](https://coveralls.io/github/xadhoom/detectino-core?branch=master)
+[![Build Status](https://travis-ci.org/xadhoom/detectino-core.svg)](https://travis-ci.org/xadhoom/detectino-core) [![Coverage Status](https://coveralls.io/repos/github/xadhoom/detectino-core/badge.svg?branch=master)](https://coveralls.io/github/xadhoom/detectino-core?branch=master)
 
 Detectino
 =========
