@@ -3,49 +3,48 @@ defmodule DtWeb.SensorController do
 
   alias DtWeb.Sensor
   alias DtWeb.SessionController
+  alias DtWeb.StatusCodes
+  alias DtWeb.CtrlHelpers.Crud
+
   alias Guardian.Plug.EnsureAuthenticated
 
-  plug EnsureAuthenticated, [handler: SessionController] #when not action in [:new, :create]
+  plug EnsureAuthenticated, [handler: SessionController]
 
-  plug :scrub_params, "sensor" when action in [:create, :update]
-
-  def index(conn, _params) do
-    sensors = Repo.all(Sensor)
-    render(conn, "index.html", sensors: sensors)
-  end
-
-  def show(conn, %{"id" => id}) do
-    sensor = Repo.get!(Sensor, id)
-    render(conn, "show.html", sensor: sensor)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    sensor = Repo.get!(Sensor, id)
-    changeset = Sensor.changeset(sensor)
-    render(conn, "edit.html", sensor: sensor, changeset: changeset)
-  end
-
-  def update(conn, %{"id" => id, "sensor" => sensor_params}) do
-    sensor = Repo.get!(Sensor, id)
-    changeset = Sensor.changeset(sensor, sensor_params)
-
-    case Repo.update(changeset) do
-      {:ok, sensor} ->
-        conn
-        |> put_flash(:info, "Sensor updated successfully.")
-        #|> redirect(to: sensor_path(conn, :show, sensor))
-      {:error, changeset} ->
-        render(conn, "edit.html", sensor: sensor, changeset: changeset)
+  def index(conn, params) do
+    case Crud.all(conn, params, Repo, Sensor) do
+      {:ok, conn, items} -> render(conn, items: items)
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    sensor = Repo.get!(Sensor, id)
+  def create(conn, params) do
+    case Crud.create(conn, params, User, Sensor, :sensor_path) do
+      {:ok, conn, item} -> render(conn, item: item)
+      {:error, conn, code, changeset} ->
+        conn
+        |> put_status(code)
+        |> render(DtWeb.ChangesetView, :error, changeset: changeset)
+    end
+  end
 
-    Repo.delete!(sensor)
+  def show(conn, %{"id" => id}) do
+    case Crud.show(conn, id, Sensor, Repo) do
+      {:ok, conn, item} -> render(conn, item: item)
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+    end
+  end
 
-    conn
-    |> put_flash(:info, "Sensor deleted successfully.")
-    #|> redirect(to: sensor_path(conn, :index))
+  def update(conn, params) do
+    case Crud.update(conn, params, Repo, Sensor) do
+      {:ok, conn, item} -> render(conn, item: item)
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+    end
+  end
+
+  def delete(conn, params) do
+    case Crud.delete(conn, params, Repo, Sensor) do
+      {:response, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+    end
   end
 end
