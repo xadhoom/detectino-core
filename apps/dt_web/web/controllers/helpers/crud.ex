@@ -32,31 +32,37 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   def links(conn, page, per_page, total) do
-    next_p = page + 1
+    next_p = nil
+
     last_p = Float.ceil(total / per_page)
     |> trunc
 
-    %ExLinkHeader{
+    link = %ExLinkHeader{
       first: %ExLinkHeaderEntry{
         scheme: conn.scheme,
         host: conn.host,
         path: conn.request_path,
-        q_params: %{per_page: per_page, page: 1}
-      },
-      next: %ExLinkHeaderEntry{
-        scheme: conn.scheme,
-        host: conn.host,
-        path: conn.request_path,
-        q_params: %{per_page: per_page, page: next_p}
+        params: %{per_page: per_page, page: 1}
       },
       last: %ExLinkHeaderEntry{
         scheme: conn.scheme,
         host: conn.host,
         path: conn.request_path,
-        q_params: %{per_page: per_page, page: last_p}
-      },
+        params: %{per_page: per_page, page: last_p}
+      }
     }
-    |> ExLinkHeader.build
+
+    if total > (page * per_page) do
+      next_p = page + 1
+      link = %ExLinkHeader{ link | next: %ExLinkHeaderEntry{
+          scheme: conn.scheme,
+          host: conn.host,
+          path: conn.request_path,
+          params: %{per_page: per_page, page: next_p}
+        }}
+    end
+
+    ExLinkHeader.build(link)
 
   end
 
