@@ -12,7 +12,7 @@
   "dthread": {:git, "https://github.com/tonyrog/dthread.git", "d763748f1d2af31762682772e28e412906b8fef5", []},
   "ecto": {:hex, :ecto, "2.0.1", "cf97a4d353e14af3d3cc3b4452cfbd18b3aeee1fb4075475efeccec3853444a9", [:mix], [{:db_connection, "~> 1.0-rc.2", [hex: :db_connection, optional: true]}, {:decimal, "~> 1.0", [hex: :decimal, optional: false]}, {:mariaex, "~> 0.7.7", [hex: :mariaex, optional: true]}, {:poison, "~> 1.5 or ~> 2.0", [hex: :poison, optional: true]}, {:poolboy, "~> 1.5", [hex: :poolboy, optional: false]}, {:postgrex, "~> 0.11.2", [hex: :postgrex, optional: true]}, {:sbroker, "~> 1.0-beta", [hex: :sbroker, optional: true]}]},
   "ex_abnf": {:hex, :ex_abnf, "0.2.7", "630dc597c8f610e50f6546a40fd477db4bc986a96071ebcdce03fd9dd389db11", [:mix], []},
-  "ex_link_header": {:git, "https://github.com/xadhoom/ex_link_header.git", "e760470e6145cfd82dd0b2827abafa6fbc2dbe4c", [branch: "build_header"]},
+  "ex_link_header": {:hex, :ex_link_header, "0.0.5", "d46a71fc8b473ad324a498c70f76ce778bf185beb2467550be0df0f41b1bdf15", [:mix], []},
   "excoveralls": {:hex, :excoveralls, "0.5.4", "1a6e116bcf980da8b7fe33140c1d7e61aa0a4e51951cadbfacc420c12d2b9b8f", [:mix], [{:exjsx, "~> 3.0", [hex: :exjsx, optional: false]}, {:hackney, ">= 0.12.0", [hex: :hackney, optional: false]}]},
   "exjsx": {:hex, :exjsx, "3.2.0", "7136cc739ace295fc74c378f33699e5145bead4fdc1b4799822d0287489136fb", [:mix], [{:jsx, "~> 2.6.2", [hex: :jsx, optional: false]}]},
   "exprintf": {:hex, :exprintf, "0.1.6", "b5b0a38bf78a357dbc61cdf7364fea004af6fdf5214be44021eb2ea7edf61f6e", [:mix], []},
