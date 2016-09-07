@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
-import {Subject} from 'rxjs/Subject';
+import { Subject } from 'rxjs/Subject';
 
-import {Message} from 'primeng/primeng';
+import { Message } from 'primeng/primeng';
 
 @Injectable()
 export class NotificationService {

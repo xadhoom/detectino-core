@@ -1,6 +1,6 @@
 import 'script!primeui/primeui-ng-all.min.js';
-import 'script!assets/layout/js/perfect-scrollbar';
-import 'script!assets/layout/js/layout';
+import 'script!./assets/layout/js/perfect-scrollbar.js';
+import 'script!./assets/layout/js/layout.js';
 /*
  * Providers provided by Angular
  */

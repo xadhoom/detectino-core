@@ -1,7 +1,7 @@
 /*
  * Angular 2 decorators and services
  */
-import { Component, ViewEncapsulation, provide } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';

@@ -1,9 +1,8 @@
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
 
-import { provide } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 
@@ -17,14 +16,19 @@ class MockRouter {
 
 describe('App', () => {
   // provide our implementations or mocks to the dependency injector
-  beforeEach(() => addProviders([
-    provide(AuthService, {
-      deps: [Http, Router]
-    }),
-    provide(Router, {useClass: MockRouter}),
-    NotificationService,
-    AppComponent
-  ]));
+  beforeEach(() => TestBed.configureTestingModule({
+    providers: [
+      { provide: AuthService, deps: [Http, Router] },
+      { provide: Router,
+        useFactory: function() {
+          return new MockRouter();
+        },
+        deps: [MockRouter]
+      },
+      NotificationService,
+      AppComponent,
+      MockRouter
+    ]}));
 
   it('should have a name', inject([ AppComponent ], (app) => {
     console.log(app);

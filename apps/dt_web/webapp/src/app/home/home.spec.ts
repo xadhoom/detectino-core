@@ -1,6 +1,6 @@
 import {
   inject,
-  addProviders
+  TestBed
 } from '@angular/core/testing';
 import { MockBackend } from '@angular/http/testing';
 import { Component } from '@angular/core';
@@ -11,18 +11,18 @@ import { Home } from './';
 
 describe('Home', () => {
   // provide our implementations or mocks to the dependency injector
-  beforeEach(() => addProviders([
-    BaseRequestOptions,
-    MockBackend,
-    {
-      provide: Http,
-      useFactory: function(backend, defaultOptions) {
-        return new Http(backend, defaultOptions);
+  beforeEach(() => TestBed.configureTestingModule({
+    providers: [
+      BaseRequestOptions,
+      MockBackend,
+      { provide: Http,
+        useFactory: function(backend, defaultOptions) {
+          return new Http(backend, defaultOptions);
+        },
+        deps: [MockBackend, BaseRequestOptions]
       },
-      deps: [MockBackend, BaseRequestOptions]
-    },
-    Home
-  ]));
+      Home
+    ]}));
 
   it('should log ngOnInit', inject([ Home ], (home) => {
     spyOn(console, 'log');
