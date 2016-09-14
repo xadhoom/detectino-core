@@ -15,12 +15,14 @@ import { ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
   DataTableModule
   } from 'primeng/primeng';
 
-import { AuthService, NotificationService, UserService } from './services';
+import { AuthService, NotificationService,
+  UserService, SensorService } from './services';
 import { AuthGuard } from './services/auth.guard';
 
 import { Home } from './home';
 import { Login } from './login';
 import { Users } from './users';
+import { Sensors } from './sensors';
 
 // Application wide providers
 const APP_PROVIDERS = [
@@ -31,6 +33,7 @@ const APP_PROVIDERS = [
   },
   NotificationService,
   UserService,
+  SensorService,
   AuthGuard,
   { provide: AuthHttp,
     useFactory: (http) => {
@@ -53,7 +56,8 @@ const APP_PROVIDERS = [
     AppComponent,
     Home,
     Login,
-    Users
+    Users,
+    Sensors
   ],
   imports: [ BrowserModule,
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
