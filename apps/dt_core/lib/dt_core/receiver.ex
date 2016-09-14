@@ -104,7 +104,7 @@ defmodule DtCore.Receiver do
 
   defp add_on_repo(event = %Event{}) do
     address = to_string(event.address)
-    Sensor.changeset(%Sensor{}, %{address: address, port: event.port, configured: false}) |> Repo.insert!
+    Sensor.create_changeset(%Sensor{}, %{address: address, port: event.port, configured: false}) |> Repo.insert!
     Logger.debug("inserted new sensor with address #{address}")
   end
 
