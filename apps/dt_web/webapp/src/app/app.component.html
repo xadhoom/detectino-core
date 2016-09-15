@@ -11,6 +11,7 @@
       <ul>
         <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/users'])"><i class="icon-settings"></i>Users</a></li>
         <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/sensors'])"><i class="icon-settings"></i>Sensors</a></li>
+        <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/scenarios'])"><i class="icon-settings"></i>Scenarios</a></li>
         <li *ngIf="!auth.authenticated()"><a (click)="router.navigate(['/login'])"><i class="icon-power"></i>Login</a></li>
         <li *ngIf="auth.authenticated()"><a (click)="auth.logout()"><i class="icon-power Red"></i>Logout</a></li>
       </ul>
