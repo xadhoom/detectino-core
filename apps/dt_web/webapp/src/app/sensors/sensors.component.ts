@@ -17,7 +17,6 @@ export class Sensors implements OnInit {
   sensor: Sensor;
 
   sensors: Sensor[];
-  roles: SelectItem[];
 
   selectedSensor: Sensor;
 
