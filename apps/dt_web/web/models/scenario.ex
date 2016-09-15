@@ -1,6 +1,8 @@
 defmodule DtWeb.Scenario do
   use DtWeb.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :name, :enabled]}
+
   schema "scenarios" do
     field :name, :string
     field :enabled, :boolean, default: false
@@ -13,15 +15,16 @@ defmodule DtWeb.Scenario do
   @required_fields ~w(name enabled)
   @optional_fields ~w()
 
-  @doc """
-  Creates a changeset based on the `model` and `params`.
-
-  If no params are provided, an invalid changeset is returned
-  with no validation performed.
-  """
-  def changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> unique_constraint(:name, name: :name_idx)
   end
+
+  def update_changeset(model, params \\ :empty) do
+    model
+    |> cast(params, @required_fields, @optional_fields)
+    |> unique_constraint(:name, name: :name_idx)
+  end
+
 end

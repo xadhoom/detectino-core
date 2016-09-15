@@ -28,7 +28,7 @@ defmodule DtWeb.CrudMacroView do
 
 	  def render(_, map) do
 		{:ok, item} = Map.fetch map, @model
-		DtWeb.EctoRenderer.render item
+        DtWeb.EctoRenderer.render item
 	  end
 
 	end

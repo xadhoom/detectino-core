@@ -7,12 +7,12 @@ defmodule DtWeb.ScenarioTest do
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
-    changeset = Scenario.changeset(%Scenario{}, @valid_attrs)
+    changeset = Scenario.create_changeset(%Scenario{}, @valid_attrs)
     assert changeset.valid?
   end
 
   test "changeset with invalid attributes" do
-    changeset = Scenario.changeset(%Scenario{}, @invalid_attrs)
+    changeset = Scenario.create_changeset(%Scenario{}, @invalid_attrs)
     refute changeset.valid?
   end
 end

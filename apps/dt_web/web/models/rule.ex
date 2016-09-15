@@ -1,6 +1,7 @@
 defmodule DtWeb.Rule do
   use DtWeb.Web, :model
 
+  @derive {Poison.Encoder, except: [:scenario]}
   schema "rules" do
     field :name, :string
     field :expression, :string
