@@ -10,6 +10,7 @@ defmodule DtWeb.CrudMacroView do
 
   defmacro __before_compile__(_env) do
 	quote do
+
 	  def render("index.json", %{items: items}) do
 		render_many(items, __MODULE__, "#{Atom.to_string @model}.json")
 	  end
@@ -28,7 +29,9 @@ defmodule DtWeb.CrudMacroView do
 
 	  def render(_, map) do
 		{:ok, item} = Map.fetch map, @model
-        DtWeb.EctoRenderer.render item
+        item
+        |> Map.from_struct
+        |> Map.drop([:__meta__, :__struct__])
 	  end
 
 	end
