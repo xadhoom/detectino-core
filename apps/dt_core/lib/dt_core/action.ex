@@ -56,9 +56,14 @@ defmodule DtCore.Action do
 
   defp router({:alarm, timer}) do
     Logger.info "Alarm action with delay"
-    timer = List.to_integer timer
-    Process.send_after self, :alarm, timer * 1000
-    :nil
+    delay = case :string.to_float timer do
+      {_, :no_float} ->
+        {val, _} = :string.to_integer timer
+        val
+      {val, []} -> val
+    end
+    Process.send_after self, :alarm, trunc(delay * 1000)
+    {:deferred, {:alarm, timer}}
   end
 
   defp router(any) do
