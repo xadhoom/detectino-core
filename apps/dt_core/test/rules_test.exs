@@ -67,7 +67,11 @@ defmodule DtCore.RulesTest do
 
     event = %DtCore.Event{address: "1234", port: 10, value: "hello", type: :an_atom, subtype: :another_atom}
     assert {:gotit, '10'} == Rule.apply grammar, event, 'if (event.value == "ciao") or (event.value == "hello") then gotit(10)'
+    assert :gotit == Rule.apply grammar, event, 'if (event.value == "ciao") or (event.value == "hello") then gotit(10.)'
+    assert {:gotit, '0.01'} == Rule.apply grammar, event, 'if (event.value == "ciao") or (event.value == "hello") then gotit(0.01)'
+    assert {:gotit, '10.0'} == Rule.apply grammar, event, 'if (event.value == "ciao") or (event.value == "hello") then gotit(10.0)'
     assert {:gotit, 'ola'} == Rule.apply grammar, event, 'if (event.value == "ciao") or (event.value == "hello") then gotit(ola)'
+    assert :gotit == Rule.apply grammar, event, 'if (event.value == "ciao") or (event.value == "hello") then gotit(ola.)'
   end
 
 end

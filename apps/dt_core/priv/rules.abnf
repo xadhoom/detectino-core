@@ -51,7 +51,7 @@ consequent = 1*ALPHA !!!
 	{:ok, state, :lists.flatten(values)}	
 !!!
 
-consparam = "(" *( 1*ALPHA / 1*DIGIT ) ")" !!!
+consparam = "(" *( 1*ALPHA / 1*(1*DIGIT / (1*DIGIT "." 1*DIGIT)) ) ")" !!!
 	_rule =  rule
 	_string_values = string_values
 
