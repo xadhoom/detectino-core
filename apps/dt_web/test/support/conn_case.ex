@@ -22,7 +22,7 @@ defmodule DtWeb.ConnCase do
 
       alias DtWeb.Repo
       import Ecto.Model
-      import Ecto.Query, only: [from: 2]
+      import Ecto.Query, only: [from: 2, first: 1]
 
       import DtWeb.Router.Helpers
 

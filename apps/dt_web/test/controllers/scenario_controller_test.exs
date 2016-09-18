@@ -1,7 +1,6 @@
 defmodule DtWeb.ScenarioControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.Scenario
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do
@@ -16,7 +15,7 @@ defmodule DtWeb.ScenarioControllerTest do
   test "auth: get all scenarios", %{conn: conn} do
     conn = login(conn)
 
-    # create a user
+    # create a scenario
     conn = post conn, scenario_path(conn, :create), %{name: "this is a test"}
     json = json_response(conn, 201)
     assert json["name"] == "this is a test"

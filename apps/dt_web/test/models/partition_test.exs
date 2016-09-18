@@ -1,0 +1,18 @@
+defmodule DtWeb.PartitionTest do
+  use DtWeb.ModelCase
+
+  alias DtWeb.Partition
+
+  @valid_attrs %{entry_delay: 42, exit_delay: 42, name: "some content"}
+  @invalid_attrs %{}
+
+  test "changeset with valid attributes" do
+    changeset = Partition.changeset(%Partition{}, @valid_attrs)
+    assert changeset.valid?
+  end
+
+  test "changeset with invalid attributes" do
+    changeset = Partition.changeset(%Partition{}, @invalid_attrs)
+    refute changeset.valid?
+  end
+end

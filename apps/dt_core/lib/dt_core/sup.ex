@@ -8,8 +8,8 @@ defmodule DtCore.Sup do
   def init(_) do
     children = [
       worker(DtCore.Receiver, []),
-      worker(DtCore.Handler, []),
-      worker(DtCore.Action, []),
+      #worker(DtCore.Handler, []),
+      #worker(DtCore.Action, []),
     ]
     supervise(children, strategy: :one_for_one)
   end

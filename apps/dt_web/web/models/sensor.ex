@@ -5,9 +5,11 @@ defmodule DtWeb.Sensor do
     field :address, :string
     field :port, :integer
     field :name, :string
-    field :configured, :boolean, default: false
+    field :enabled, :boolean, default: false
 
-    timestamps
+    timestamps()
+
+    many_to_many :partitions, DtWeb.Partition, join_through: DtWeb.PartitionSensor
   end
 
   @required_fields ~w(address port)
