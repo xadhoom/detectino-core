@@ -51,7 +51,7 @@ defmodule DtWeb.Mixfile do
      {:uuid, "~> 1.1"},
      {:exprintf, "~> 0.1"},
      {:ex_link_header, "~> 0.0.5"},
-     {:credo, "~> 0.3", only: [:dev, :test]}
+     {:credo, "~> 0.4", only: [:dev, :test]}
    ]
   end
 
