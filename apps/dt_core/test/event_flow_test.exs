@@ -53,7 +53,7 @@ defmodule DtCore.EventFlowTest do
     send pid, @event
 
     scenario = ScenarioSup.get_worker_by_def @scenario
-    TimerHelper.wait_until 10000, fn ->  
+    TimerHelper.wait_until 10_000, fn ->  
       assert :alarm == Scenario.last_action(scenario)
     end
   end

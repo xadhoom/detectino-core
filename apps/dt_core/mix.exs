@@ -48,7 +48,8 @@ defmodule DtCore.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [ {:ecto, "~> 2.0"},
+    [
+      {:ecto, "~> 2.0"},
       {:ex_abnf, "~> 0.2.7"},
       {:dt_bus, in_umbrella: true},
       {:dt_web, in_umbrella: true},

@@ -54,7 +54,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     if total > (page * per_page) do
       next_p = page + 1
-      link = %ExLinkHeader{ link | next: %ExLinkHeaderEntry{
+      link = %ExLinkHeader{link | next: %ExLinkHeaderEntry{
           scheme: conn.scheme,
           host: conn.host,
           path: conn.request_path,
@@ -106,7 +106,6 @@ defmodule DtWeb.CtrlHelpers.Crud do
         conn = put_status(conn, 200)
         {:ok, conn, record}
       {:error, changeset} ->
-        IO.inspect changeset
         {:error, conn, 400}
     end
   end

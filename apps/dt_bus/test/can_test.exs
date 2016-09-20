@@ -20,7 +20,7 @@ defmodule DtBus.CanTest do
     send pid, msg
 
     receive do
-      ev -> assert {:event, %DtBus.Event{address: 1}}= ev
+      ev -> assert {:event, %DtBus.Event{address: 1}} = ev
     end
 
   end

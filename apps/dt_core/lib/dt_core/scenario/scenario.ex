@@ -76,12 +76,10 @@ defmodule DtCore.Scenario do
   end
 
   def terminate(:normal, state) do
-    IO.inspect "stopping action server"
     Action.stop state.processor
   end
 
   def terminate(:shutdown, state) do
-    IO.inspect "stopping action server"
     Process.exit state.processor, :normal
   end
 

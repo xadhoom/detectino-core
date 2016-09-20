@@ -5,7 +5,7 @@ defmodule DtWeb.ScenarioView do
   @model :scenario
 
   def render(_, %{scenario: item}) do
-	item
+    item
   end
 
 end
