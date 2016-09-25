@@ -1,4 +1,4 @@
-defmodule DtCore.SensorSupTest do
+defmodule DtCore.Test.Sensor.Server do
   use DtCore.EctoCase
 
   alias DtCore.Sensor.Sup
