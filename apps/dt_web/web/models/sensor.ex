@@ -1,6 +1,7 @@
 defmodule DtWeb.Sensor do
   use DtWeb.Web, :model
 
+  @derive {Poison.Encoder, only: [:address, :port, :name, :enabled]}
   schema "sensors" do
     field :address, :string
     field :port, :integer
