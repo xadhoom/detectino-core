@@ -228,7 +228,7 @@ defmodule DtCore.Sensor.Server do
   defp start_worker(sensor, state) do
     id = build_worker_id(sensor.address, sensor.port)
     case Supervisor.start_child(state.worker_sup,
-          worker(Worker, [sensor], restart: :temporary, id: id)) do
+          worker(Worker, [sensor], restart: :transient, id: id)) do
       {:ok, pid} ->
         Logger.info "Started sensor worker with pid #{inspect pid}"
       {:error, err} ->
