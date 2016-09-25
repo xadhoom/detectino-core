@@ -59,11 +59,11 @@ defmodule DtBus.Can do
   end
 
   def start_listening(filter_fun \\ fn(_) -> true end) do
-    GenServer.cast(__MODULE__, {:start_listening, self, filter_fun})
+    GenServer.call(__MODULE__, {:start_listening, self, filter_fun})
   end
 
   def stop_listening do
-    GenServer.cast(__MODULE__, {:stop_listening, self})
+    GenServer.call(__MODULE__, {:stop_listening, self})
   end
 
   #
@@ -92,23 +92,23 @@ defmodule DtBus.Can do
     {:noreply, %{state | ping: ping}}
   end
 
-  def handle_call(value, _from, state) do
-    Logger.info "Got call message #{inspect value}"
-    {:reply, nil, state}
-  end
-
-  def handle_cast({:start_listening, pid, filter_fun}, state) do
+  def handle_call({:start_listening, pid, filter_fun}, _from, state) do
     key = Base.encode64 :erlang.term_to_binary(pid)
     listeners = Map.put state.listeners, key, %{pid: pid, filter: filter_fun}
     Process.monitor pid
-    {:noreply, %DtBus.Can{state | listeners: listeners}}
+    {:reply, {:ok, pid}, %DtBus.Can{state | listeners: listeners}}
   end
 
-  def handle_cast({:stop_listening, pid}, state) do
+  def handle_call({:stop_listening, pid}, _from, state) do
     key = Base.encode64 :erlang.term_to_binary(pid)
     listeners = Map.delete state.listeners, key
     Process.unlink pid
-    {:noreply, %DtBus.Can{state | listeners: listeners}}
+    {:reply, {:ok, pid}, %DtBus.Can{state | listeners: listeners}}
+  end
+
+  def handle_call(value, _from, state) do
+    Logger.info "Got call message #{inspect value}"
+    {:reply, nil, state}
   end
 
   def handle_cast({:read, node_id, terminal}, state) do

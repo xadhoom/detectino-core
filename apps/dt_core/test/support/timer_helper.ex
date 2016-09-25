@@ -1,4 +1,4 @@
-defmodule DtCore.TimerHelper do
+defmodule DtCore.Test.TimerHelper do
 
   def wait_until(fun), do: wait_until(1000, fun)
 
