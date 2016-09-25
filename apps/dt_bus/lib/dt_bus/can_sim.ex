@@ -17,13 +17,21 @@ defmodule DtBus.CanSim do
     GenServer.start_link(__MODULE__, {myid, sender_fn}, name: __MODULE__)
   end
 
+  def autorun do
+    GenServer.call(__MODULE__, {:autorun})
+  end
+
   #
   # GenServer Callbacks
   #
   def init({myid, sender_fn}) do
-    #:timer.send_interval(10000, :status)
     :can_router.attach()
     {:ok, %{myid: myid, sender_fn: sender_fn}}
+  end
+
+  def handle_call({:autorun}, _from, state) do
+    :timer.send_interval(10000, :status)
+    {:reply, :ok, state}
   end
 
   def handle_call(value, _from, state) do
