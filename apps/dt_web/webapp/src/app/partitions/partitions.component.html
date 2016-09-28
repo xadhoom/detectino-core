@@ -1,0 +1,38 @@
+<div class="Container100">
+  <div class="Card ShadowEffect">
+    <p-dataTable [value]="partitions" [rows]="10" [paginator]="true"
+      selectionMode="single" [(selection)]="selectedPartition" (onRowSelect)="onRowSelect($event)" [responsive]="true" *ngIf="!displayDialog">
+      <header>Partitions</header>
+      <p-column field="name" header="Name" [sortable]="true"></p-column>
+      <p-column field="entry_delay" header="Entry Delay" [sortable]="true"></p-column>
+      <p-column field="exit_delay" header="Exit Delay" [sortable]="true"></p-column>
+      <footer>
+        <div class="ui-helper-clearfix" style="width:100%">
+          <button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
+          </button>
+        </div>
+      </footer>
+    </p-dataTable>
+    <div class=" ui-fluid" *ngIf="displayDialog">
+      <button type="button" pButton icon="fa-arrow-left" (click)="refresh()" label="Edit Partition"></button>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Name</h2>
+        <input pInputText id="name" [(ngModel)]="partition.name" />
+      </div>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Entry Delay</h2>
+        <p-spinner [(ngModel)]="partition.entry_delay" [min]="0" [max]="3600"></p-spinner>
+      </div>
+      <div class="ContainerIndent">
+        <h2 class="BigTopic">Exit Delay</h2>
+        <p-spinner [(ngModel)]="partition.exit_delay" [min]="0" [max]="3600"></p-spinner>
+      </div>
+        <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+          <div class="ui-grid-row">
+            <div class="ui-grid-col-6"><button type="button" pButton icon="fa-check" (click)="save()" label="Save" class="GreenButton"></button></div>
+            <div class="ui-grid-col-6"><button type="button" pButton icon="fa-close" (click)="destroy()" label="Delete" class="RedButton"></button></div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

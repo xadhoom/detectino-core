@@ -19,13 +19,13 @@ defmodule DtWeb.Scenario do
   def create_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> unique_constraint(:name, name: :name_idx)
+    |> unique_constraint(:name)
   end
 
   def update_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> unique_constraint(:name, name: :name_idx)
+    |> unique_constraint(:name)
   end
 
 end

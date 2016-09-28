@@ -12,6 +12,7 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
 
       timestamps()
     end
+    create index(:partitions, [:name], unique: true)
 
     # Sensors are the basic item of an alarm system.
     # They will provide readings and send out events based
@@ -24,7 +25,7 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
 
       timestamps()
     end
-    create index(:sensors, [:address, :port], unique: true, name: :address_port_idx)
+    create index(:sensors, [:address, :port], unique: true)
     create index(:sensors, [:enabled])
 
     create table(:partitions_sensors) do
@@ -41,7 +42,7 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
       add :enabled, :boolean, default: false
       timestamps()
     end
-    create index(:scenarios, [:name], unique: true, name: :name_idx)
+    create index(:scenarios, [:name], unique: true)
 
     create table(:partitions_scenarios) do
       add :partition_id, references(:partitions, on_delete: :delete_all, on_update: :update_all)

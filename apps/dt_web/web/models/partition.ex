@@ -1,6 +1,7 @@
 defmodule DtWeb.Partition do
   use DtWeb.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :name, :entry_delay, :exit_delay]}
   schema "partitions" do
     field :name, :string
     field :entry_delay, :integer
@@ -15,9 +16,18 @@ defmodule DtWeb.Partition do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
-  def changeset(struct, params \\ %{}) do
+  def create_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:name, :entry_delay, :exit_delay])
     |> validate_required([:name, :entry_delay, :exit_delay])
+    |> unique_constraint(:name)
   end
+
+  def update_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:name, :entry_delay, :exit_delay])
+    |> validate_required([:name, :entry_delay, :exit_delay])
+    |> unique_constraint(:name)
+  end
+
 end
