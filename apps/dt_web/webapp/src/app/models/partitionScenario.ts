@@ -4,7 +4,7 @@ export class PartitionScenario {
   scenario_id: number; // tslint:disable-line
   partition_id: number; // tslint:disable-line
 
-  constructor(scenario_id) {
-    this.scenario_id = scenario_id;
+  constructor(scenarioId) {
+    this.scenario_id = scenarioId; // tslint:disable-line
   };
 }

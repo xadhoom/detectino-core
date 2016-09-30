@@ -54,7 +54,7 @@ export class Scenarios implements OnInit {
     s2 = this.partitionsscenarios ? this.partitionsscenarios.saveAll() : null;
     let s3 = null;
 
-    if(s2) {
+    if (s2) {
       s3 = Observable.concat(s1, s2);
     } else {
       s3 = s1;

@@ -30,11 +30,11 @@ export class PartitionsScenarios implements OnInit {
               private notificationService: NotificationService) {};
 
   ngOnInit() {
-    this.modes = [{label: "Select a mode", value: null}];
-    this.modes.push({label: "Immediate", value: "IMMEDIATE"});
-    this.modes.push({label: "Delayed", value: "DELAYED"});
+    this.modes = [{label: 'Select a mode', value: null}];
+    this.modes.push({label: 'Immediate', value: 'IMMEDIATE'});
+    this.modes.push({label: 'Delayed', value: 'DELAYED'});
 
-    this.partitions = [{label: "Select a partition", value: null}];
+    this.partitions = [{label: 'Select a partition', value: null}];
     this.partitionService.all().
       subscribe(
         items => {
@@ -66,11 +66,11 @@ export class PartitionsScenarios implements OnInit {
 
   saveAll() {
     let s: Observable<any> = null;
-    for(let item of this.items) {
-      if(!item.mode || !item.partition_id) {
+    for (let item of this.items) {
+      if (!item.mode || !item.partition_id) {
         continue;
       }
-      if(s) {
+      if (s) {
         s = Observable.concat(s, this.service.save(this.scenarioid, item));
       } else {
         s = this.service.save(this.scenarioid, item);
@@ -80,8 +80,8 @@ export class PartitionsScenarios implements OnInit {
   };
 
   destroy(idx) {
-    let item=this.items[idx];
-    if(!item.id) {
+    let item = this.items[idx];
+    if (!item.id) {
       this.items.splice(idx, 1);
       return;
     }
