@@ -4,6 +4,10 @@ defmodule DtWeb.CtrlHelpers.Crud do
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 
+  #
+  # XXX implement filtering by relations id also in delete, show, update...
+  #
+
   def all(conn, params, repo, model) do
     filter = model.__schema__(:fields)
     |> build_filter(params)
