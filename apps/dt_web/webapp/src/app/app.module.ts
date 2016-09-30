@@ -12,11 +12,12 @@ import { AppComponent }   from './app.component';
 
 import { ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
   DialogModule, InputTextModule, DropdownModule, PasswordModule,
-  DataTableModule, SpinnerModule
+  DataTableModule, SpinnerModule, CheckboxModule
   } from 'primeng/primeng';
 
 import { AuthService, NotificationService,
-  UserService, SensorService, ScenarioService, PartitionService } from './services';
+  UserService, SensorService, ScenarioService, PartitionService,
+  PartitionScenarioService } from './services';
 import { AuthGuard } from './services/auth.guard';
 
 import { Home } from './home';
@@ -25,6 +26,7 @@ import { Users } from './users';
 import { Sensors } from './sensors';
 import { Scenarios } from './scenarios';
 import { Partitions } from './partitions';
+import { PartitionsScenarios } from './scenarios';
 
 // Application wide providers
 const APP_PROVIDERS = [
@@ -38,6 +40,7 @@ const APP_PROVIDERS = [
   SensorService,
   ScenarioService,
   PartitionService,
+  PartitionScenarioService,
   AuthGuard,
   { provide: AuthHttp,
     useFactory: (http) => {
@@ -63,12 +66,13 @@ const APP_PROVIDERS = [
     Users,
     Sensors,
     Scenarios,
-    Partitions
+    Partitions,
+    PartitionsScenarios
   ],
   imports: [ BrowserModule,
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
     DialogModule, InputTextModule, DropdownModule, PasswordModule,
-    DataTableModule, SpinnerModule,
+    DataTableModule, SpinnerModule, CheckboxModule,
     FormsModule,
     HttpModule,
     JsonpModule,

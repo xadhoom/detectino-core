@@ -7,12 +7,12 @@ defmodule DtWeb.PartitionTest do
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
-    changeset = Partition.changeset(%Partition{}, @valid_attrs)
+    changeset = Partition.create_changeset(%Partition{}, @valid_attrs)
     assert changeset.valid?
   end
 
   test "changeset with invalid attributes" do
-    changeset = Partition.changeset(%Partition{}, @invalid_attrs)
+    changeset = Partition.create_changeset(%Partition{}, @invalid_attrs)
     refute changeset.valid?
   end
 end

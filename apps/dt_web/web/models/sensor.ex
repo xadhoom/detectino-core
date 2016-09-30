@@ -25,15 +25,15 @@ defmodule DtWeb.Sensor do
   def create_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> unique_constraint(:address, name: :address_port_idx)
-    |> unique_constraint(:port, name: :address_port_idx)
+    |> unique_constraint(:address, name: :sensors_address_port_index)
+    |> unique_constraint(:port, name: :sensors_address_port_index)
   end
 
   def update_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> unique_constraint(:address, name: :address_port_idx)
-    |> unique_constraint(:port, name: :address_port_idx)
+    |> unique_constraint(:address, name: :sensors_address_port_index)
+    |> unique_constraint(:port, name: :sensors_address_port_index)
   end
 
 end

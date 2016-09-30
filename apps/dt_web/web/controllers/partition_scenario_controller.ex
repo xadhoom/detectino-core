@@ -1,9 +1,8 @@
-defmodule DtWeb.ScenarioController do
+defmodule DtWeb.PartitionScenarioController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros
 
-  alias DtWeb.CtrlHelpers.Crud
-  alias DtWeb.Scenario
+  alias DtWeb.PartitionScenario
   alias DtWeb.SessionController
 
   alias Guardian.Plug.EnsureAuthenticated
@@ -11,6 +10,6 @@ defmodule DtWeb.ScenarioController do
   plug EnsureAuthenticated, [handler: SessionController]
 
   @repo Repo
-  @model Scenario
+  @model PartitionScenario
 
 end

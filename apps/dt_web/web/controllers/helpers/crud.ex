@@ -5,6 +5,9 @@ defmodule DtWeb.CtrlHelpers.Crud do
   import Ecto.Query, only: [from: 2]
 
   def all(conn, params, repo, model) do
+    filter = model.__schema__(:fields)
+    |> build_filter(params)
+
     page = Map.get(params, "page", "1")
     |> String.to_integer
 
@@ -12,12 +15,14 @@ defmodule DtWeb.CtrlHelpers.Crud do
     |> String.to_integer
 
     q = from m in model,
+      where: ^filter,
       limit: ^per_page,
       offset: ^((page - 1) * per_page)
     items = repo.all(q)
 
     q = from m in model,
-      select: count(m.id)
+      select: count(m.id),
+      where: ^filter
     total = repo.one(q)
 
     total_s = total
@@ -100,16 +105,6 @@ defmodule DtWeb.CtrlHelpers.Crud do
     end
   end
 
-  defp perform_update(changeset, repo, conn) do
-    case repo.update(changeset) do
-      {:ok, record} ->
-        conn = put_status(conn, 200)
-        {:ok, conn, record}
-      {:error, changeset} ->
-        {:error, conn, 400}
-    end
-  end
-
   def delete(conn, params, repo, model) do
     case Map.get(params, "id") do
       id when is_binary(id) ->
@@ -125,6 +120,32 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
   def delete(conn, _) do
     {:error, conn, 403}
+  end
+
+  defp build_filter(fields, params) do
+    params = Enum.map(params, fn(param) ->
+      {key, value} = param
+      {String.to_atom(key), value}
+    end
+    )
+    Enum.filter_map(fields, fn(field) ->
+      Keyword.has_key?(params, field)
+    end,
+    fn(field) ->
+      value = Keyword.get(params, field)
+      {field, value}
+    end
+    )
+  end
+
+  defp perform_update(changeset, repo, conn) do
+    case repo.update(changeset) do
+      {:ok, record} ->
+        conn = put_status(conn, 200)
+        {:ok, conn, record}
+      {:error, changeset} ->
+        {:error, conn, 400}
+    end
   end
 
 end

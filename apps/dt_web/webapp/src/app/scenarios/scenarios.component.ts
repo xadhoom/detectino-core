@@ -1,10 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { ScenarioService, NotificationService } from '../services';
 
 import { Scenario } from '../models/scenario';
+import { PartitionsScenarios } from './partitionsScenarios.component';
 
 import { SelectItem } from 'primeng/primeng';
+
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/operator/concatAll';
 
 @Component({
     selector: 'scenarios',
@@ -13,6 +17,9 @@ import { SelectItem } from 'primeng/primeng';
 })
 
 export class Scenarios implements OnInit {
+
+  @ViewChild('partitionsscenarios')
+  partitionsscenarios: PartitionsScenarios;
 
   scenario: Scenario;
 
@@ -42,9 +49,19 @@ export class Scenarios implements OnInit {
   };
 
   save() {
-    this.scenarioService.save(this.scenario).
+    let s2: Observable<any> =  null;
+    let s1 = this.scenarioService.save(this.scenario);
+    s2 = this.partitionsscenarios ? this.partitionsscenarios.saveAll() : null;
+    let s3 = null;
+
+    if(s2) {
+      s3 = Observable.concat(s1, s2);
+    } else {
+      s3 = s1;
+    }
+    s3.
       subscribe(
-        scenario => this.refresh(),
+        success => this.refresh(),
         error => this.onError(error)
     );
   };
