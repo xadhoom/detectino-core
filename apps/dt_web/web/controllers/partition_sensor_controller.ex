@@ -1,4 +1,4 @@
-defmodule DtWeb.PartitionController do
+defmodule DtWeb.PartitionSensorController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtWeb.Partition]
 

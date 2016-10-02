@@ -30,7 +30,7 @@ defmodule DtBus.CanSim do
   end
 
   def handle_call({:autorun}, _from, state) do
-    :timer.send_interval(10000, :status)
+    :timer.send_interval(10_000, :status)
     {:reply, :ok, state}
   end
 

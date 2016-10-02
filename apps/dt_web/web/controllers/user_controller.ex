@@ -1,8 +1,7 @@
 defmodule DtWeb.UserController do
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros
+  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtWeb.User]
 
-  alias DtWeb.User
   alias DtWeb.SessionController
   alias DtWeb.StatusCodes
 
@@ -10,11 +9,12 @@ defmodule DtWeb.UserController do
 
   plug EnsureAuthenticated, [handler: SessionController]
 
-  @repo Repo
-  @model User
-
   def delete(conn, %{"id" => "1"}) do
     send_resp(conn, 403, StatusCodes.status_code(403))
+  end
+
+  def delete(conn, params) do
+    super(conn, params)
   end
 
 end

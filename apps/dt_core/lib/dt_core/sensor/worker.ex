@@ -9,12 +9,13 @@ defmodule DtCore.Sensor.Worker do
   require Logger
   alias DtWeb.Sensor, as: SensorModel
   alias DtCore.Event, as: Event
+  alias DtWeb.Repo
 
   #
   # Client APIs
   #
   def start_link(config = %SensorModel{}) do
-    Logger.debug("Starting sensor with #{inspect config} config")
+    Logger.debug("Starting sensor worker with #{inspect config} config")
     GenServer.start_link(__MODULE__, config)
   end
 
@@ -22,15 +23,17 @@ defmodule DtCore.Sensor.Worker do
   # GenServer callbacks
   #
   def init(config) do
-    Logger.info "Starting Sensor Worker with addr #{inspect config.address} " <>
-      "and port #{inspect config.port}"
-    #{:ok, _myself} = Handler.start_listening
-    #{:ok, pid} = Action.start_link
-    {:ok, %{}}
+    Logger.info "Starting Sensor Worker with addr #{config.address} " <>
+      "and port #{config.port}"
+    {:ok, %{config: config}}
   end
 
-  def handle_info({:event, _ev = %Event{}}, state) do
-    Logger.debug("Got event from server")
+  def handle_info({:event, ev = %Event{}}, state) do
+    case state.config.enabled do
+      false -> Logger.debug("Got event from server, but I'm not online, ignoring")
+      true -> Logger.debug("Got event from server") 
+      _ -> Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
+    end
     {:noreply, state}
   end
 

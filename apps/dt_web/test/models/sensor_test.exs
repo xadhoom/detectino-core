@@ -3,7 +3,7 @@ defmodule DtWeb.SensorTest do
 
   alias DtWeb.Sensor
 
-  @valid_attrs %{address: "some content", port: 1234}
+  @valid_attrs %{address: "some content", port: 1234, name: "mandatory"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
@@ -28,12 +28,12 @@ defmodule DtWeb.SensorTest do
 
   test "uniqueness on address:port" do
     %Sensor{}
-    |> Sensor.create_changeset(%{address: "10", port: 10})
+    |> Sensor.create_changeset(%{address: "10", port: 10, name: "a name"})
     |> Repo.insert!
 
     sensor2 =
       %Sensor{}
-      |> Sensor.create_changeset(%{address: "10", port: 10})
+      |> Sensor.create_changeset(%{address: "10", port: 10, name: "another name"})
 
     assert {:error, _changeset} = Repo.insert(sensor2)
 

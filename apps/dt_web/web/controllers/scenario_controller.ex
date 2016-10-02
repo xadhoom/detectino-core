@@ -1,16 +1,11 @@
 defmodule DtWeb.ScenarioController do
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros
+  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtWeb.Scenario]
 
-  alias DtWeb.CtrlHelpers.Crud
-  alias DtWeb.Scenario
   alias DtWeb.SessionController
 
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
-
-  @repo Repo
-  @model Scenario
 
 end

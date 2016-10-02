@@ -3,19 +3,11 @@ defmodule DtWeb.CrudMacros do
   alias DtWeb.CtrlHelpers.Crud
   alias DtWeb.StatusCodes
 
-  defmacro __using__(_options) do
+  defmacro __using__(opts) do
 
     quote do
-      import unquote(__MODULE__)
-      Module.register_attribute __MODULE__, :repo, accumulate: false
-      Module.register_attribute __MODULE__, :model, accumulate: false
-      @before_compile unquote(__MODULE__)
-    end
-
-  end
-
-  defmacro __before_compile__(_env) do
-    quote do
+      @repo unquote(opts) |> Keyword.get(:repo)
+      @model unquote(opts) |> Keyword.get(:model)
 
       def index(conn, params) do
         case Crud.all(conn, params, @repo, @model) do
@@ -55,7 +47,10 @@ defmodule DtWeb.CrudMacros do
         end
       end
 
+      defoverridable [index: 2, create: 2, show: 2, update: 2, delete: 2]
+
     end
+
   end
 
 end

@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
-import { SensorService, NotificationService } from '../services';
+import { PartitionService, SensorService, NotificationService } from '../services';
 
 import { Sensor } from '../models/sensor';
+import { Partition } from '../models/partition';
 
-import { SelectItem } from 'primeng/primeng';
 
 @Component({
     selector: 'sensors',
     template: require('./sensors.component.html'),
-    styles: [ require('./sensors.component.css') ]
+    styles: [ require('./sensors.component.css') ],
+    encapsulation: ViewEncapsulation.None
 })
 
 export class Sensors implements OnInit {
@@ -17,6 +18,9 @@ export class Sensors implements OnInit {
   sensor: Sensor;
 
   sensors: Sensor[];
+
+  selectedPartitions: Partition[];
+  partitions: Partition[];
 
   selectedSensor: Sensor;
 
@@ -27,21 +31,35 @@ export class Sensors implements OnInit {
   errorMessage: string;
 
   constructor(private sensorService: SensorService,
+              private partitionService: PartitionService,
               private notificationService: NotificationService) {};
 
   ngOnInit() {
     this.all();
   };
 
+  allPartitions() {
+    this.partitionService.all().
+      subscribe(
+        items => this.partitions = items,
+        error => this.onError(error)
+    );
+  };
+
   all() {
+    this.partitions = [];
+    this.selectedPartitions = [];
+    this.allPartitions();
+
     this.sensorService.all().
       subscribe(
-        sensors => this.sensors = sensors,
+        items => this.sensors = items,
         error => this.onError(error)
     );
   };
 
   save() {
+    this.sensor.partitions = this.selectedPartitions;
     this.sensorService.save(this.sensor).
       subscribe(
         sensor => this.refresh(),
@@ -76,7 +94,15 @@ export class Sensors implements OnInit {
   onRowSelect(event) {
     this.newSensor = false;
     this.sensor = this.cloneSensor(event.data);
+    this.selectedPartitions = this.sensor.partitions;
+    this.partitions = this.availPartitions(this.partitions, this.selectedPartitions);
     this.displayDialog = true;
+  };
+
+  availPartitions(avail: Array<any>, used: Array<any>): Array<any> {
+    let aIDs = avail.map(i => i.id);
+    let bIDs = used.map(i => i.id);
+    return avail.filter(i => bIDs.indexOf(i.id) < 0);
   };
 
   cloneSensor(s: Sensor): Sensor {

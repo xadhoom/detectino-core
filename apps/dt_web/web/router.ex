@@ -35,7 +35,9 @@ defmodule DtWeb.Router do
     resources "/scenarios", ScenarioController, only: @api_methods do
       resources "/partitions_scenarios", PartitionScenarioController, only: @api_methods
     end
-    resources "/sensors", SensorController, only: @api_methods
+    resources "/sensors", SensorController, only: @api_methods do
+      resources "/partitions_sensors", PartitionSensorController, only: @api_methods
+    end
     resources "/users", UserController, only: @api_methods
 
   end

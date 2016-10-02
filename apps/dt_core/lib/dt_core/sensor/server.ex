@@ -210,7 +210,7 @@ defmodule DtCore.Sensor.Server do
   # sensor was not in our repo, so add it and cache on state.
   defp add_on_repo({ev = %Event{}, state}) do
     %SensorModel{}
-    |> SensorModel.create_changeset(%{address: ev.address, port: ev.port})
+    |> SensorModel.create_changeset(%{address: ev.address, port: ev.port, name: "AUTO"})
     |> Repo.insert!
     |> start_worker(state)
     sensors = [%{address: ev.address, port: ev.port} | state.sensors]

@@ -6,7 +6,7 @@
       <p-column field="address" header="Address" [sortable]="true"></p-column>
       <p-column field="port" header="Port" [sortable]="true"></p-column>
       <p-column field="name" header="Name" [sortable]="true"></p-column>
-      <p-column field="configured" header="Configured" [sortable]="false"></p-column>
+      <p-column field="enabled" header="Enabled" [sortable]="false"></p-column>
       <footer>
         <div class="ui-helper-clearfix" style="width:100%">
           <button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
@@ -29,15 +29,27 @@
         <input pInputText id="port" [(ngModel)]="sensor.port" />
       </div>
       <div class="ContainerIndent">
-        <h2 class="BigTopic">Configured</h2>
-        <input pInputText id="configured" [(ngModel)]="sensor.configured" />
+        <h2 class="BigTopic">Enabled</h2>
+        <p-checkbox [(ngModel)]="sensor.enabled" binary="true"></p-checkbox>
       </div>
-        <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
-          <div class="ui-grid-row">
-            <div class="ui-grid-col-6"><button type="button" pButton icon="fa-check" (click)="save()" label="Save" class="GreenButton"></button></div>
-            <div class="ui-grid-col-6"><button type="button" pButton icon="fa-close" (click)="destroy()" label="Delete" class="RedButton"></button></div>
-          </div>
+
+			<div class="ContainerIndent">
+				<h2 class="BigTopic">Associated Partitions</h2>
+				<p-pickList [source]="partitions" [target]="selectedPartitions" sourceHeader="Available" targetHeader="Selected" [responsive]="true">
+          <template let-item>
+            <li class="ui-picklist-item ui-helper-clearfix" style="padding:5px 5px !important;">
+              <div style="font-size: 16px;">{{item.name}}</div>
+            </li>
+          </template>
+				</p-pickList>
+			</div>
+
+      <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-6"><button type="button" pButton icon="fa-check" (click)="save()" label="Save" class="GreenButton"></button></div>
+          <div class="ui-grid-col-6"><button type="button" pButton icon="fa-close" (click)="destroy()" label="Delete" class="RedButton"></button></div>
         </div>
+      </div>
     </div>
   </div>
 </div>

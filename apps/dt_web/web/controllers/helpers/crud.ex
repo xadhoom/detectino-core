@@ -5,10 +5,10 @@ defmodule DtWeb.CtrlHelpers.Crud do
   import Ecto.Query, only: [from: 2]
 
   #
-  # XXX implement filtering by relations id also in delete, show, update...
+  # XXX implement filtering (scoping) by relations id also in delete, show, update...
   #
 
-  def all(conn, params, repo, model) do
+  def all(conn, params, repo, model, assocs \\ []) do
     filter = model.__schema__(:fields)
     |> build_filter(params)
 
@@ -21,7 +21,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
     q = from m in model,
       where: ^filter,
       limit: ^per_page,
-      offset: ^((page - 1) * per_page)
+      offset: ^((page - 1) * per_page),
+      preload: ^assocs
     items = repo.all(q)
 
     q = from m in model,
@@ -75,11 +76,15 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
   end
 
-  def create(conn, params, module, repo, path_fn) do
+  def create(conn, params, module, repo, path_fn, assocs \\ []) do
     changeset = module.create_changeset(struct(module), params)
 
     case repo.insert(changeset) do
       {:ok, record} ->
+        record = assocs
+        |> Enum.reduce(record, fn(assoc, _acc) ->
+          repo.preload(record, assoc)
+        end)
         path = apply(DtWeb.Router.Helpers, path_fn, [conn, :show, record])
         conn = conn
                 |> put_resp_header("location", path)
@@ -147,7 +152,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
       {:ok, record} ->
         conn = put_status(conn, 200)
         {:ok, conn, record}
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:error, conn, 400}
     end
   end

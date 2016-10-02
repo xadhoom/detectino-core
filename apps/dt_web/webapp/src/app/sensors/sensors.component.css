@@ -1,0 +1,11 @@
+.ui-picklist-source-controls {
+  display: none !important;
+}
+
+.ui-picklist-target-controls {
+  display: none !important;
+}
+
+.ui-picklist-listwrapper {
+  width: 45% !important;
+}

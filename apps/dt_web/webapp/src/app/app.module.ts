@@ -12,7 +12,7 @@ import { AppComponent }   from './app.component';
 
 import { ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
   DialogModule, InputTextModule, DropdownModule, PasswordModule,
-  DataTableModule, SpinnerModule, CheckboxModule
+  DataTableModule, SpinnerModule, CheckboxModule, PickListModule
   } from 'primeng/primeng';
 
 import { AuthService, NotificationService,
@@ -72,7 +72,7 @@ const APP_PROVIDERS = [
   imports: [ BrowserModule,
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
     DialogModule, InputTextModule, DropdownModule, PasswordModule,
-    DataTableModule, SpinnerModule, CheckboxModule,
+    DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
     FormsModule,
     HttpModule,
     JsonpModule,
