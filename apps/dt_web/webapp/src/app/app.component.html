@@ -1,34 +1,73 @@
-<div id="layout-topbar">
-  <a [routerLink]="['home']" id="logo">
-    <img src="assets/layout/images/logo.svg" class="Fleft" />
-  </a>
+<div class="layout-wrapper"><!-- layout-compact"-->
+  <div class="layout-container">
+    <div class="topbar clearfix">
+      <!--div class="topbar-left">
+        <div class="logo"></div>
+      </div-->
+      <div class="topbar-right">
+        <!--
+        <a id="menu-button" href="#">
+          <i></i>
+        </a>
+        -->
 
-  <a id="show-top-menu" class="ShowOnMobile ripplelink"><i class="icon-more_vert" id="active"></i><i class="icon-close DispNone" id="passive"></i> </a>
+        <a id="topbar-menu-button" href="#">
+          <i class="material-icons">menu</i>
+        </a>
 
-  <ul id="top-menu">
-    <li>
-      <a class="ripplelink"><i class="icon-cog"></i> <span class="ShowOnMobile">Settings</span></a>
-      <ul>
-        <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/users'])"><i class="icon-settings"></i>Users</a></li>
-        <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/sensors'])"><i class="icon-settings"></i>Sensors</a></li>
-        <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/scenarios'])"><i class="icon-settings"></i>Scenarios</a></li>
-        <li *ngIf="auth.authenticated()"><a (click)="router.navigate(['/partitions'])"><i class="icon-settings"></i>Partitions</a></li>
-        <li *ngIf="!auth.authenticated()"><a (click)="router.navigate(['/login'])"><i class="icon-power"></i>Login</a></li>
-        <li *ngIf="auth.authenticated()"><a (click)="auth.logout()"><i class="icon-power Red"></i>Logout</a></li>
-      </ul>
-    </li>
-  </ul>
-
-</div>
-
-<div id="wrapper">
-  <div id="wrapperIndent">
-    <div id="layout-portlets-cover">
-      <div class="Container96 Fnone MarAuto">
-        <p-growl [value]="notifications"></p-growl>
-        <router-outlet></router-outlet>
+        <ul class="topbar-items fadeInDown animated">
+          <li>
+            <a href="#">
+              <i class="topbar-icon material-icons">settings</i>
+              <span class="topbar-item-name">Settings</span>
+            </a>
+            <ul class="ultima-menu animated">
+              <li role="menuitem" *ngIf="auth.authenticated()">
+                <a (click)="router.navigate(['/users'])">
+                  <i class="material-icons">face</i>
+                  <span>Users</span>
+                </a>
+              </li>
+              <li role="menuitem" *ngIf="auth.authenticated()">
+                <a (click)="router.navigate(['/sensors'])">
+                  <i class="material-icons">settings</i>
+                  <span>Sensors</span>
+                </a>
+              </li>
+              <li role="menuitem" *ngIf="auth.authenticated()">
+                <a (click)="router.navigate(['/scenarios'])">
+                  <i class="material-icons">settings</i>
+                  <span>Scenarios</span>
+                </a>
+              </li>
+              <li role="menuitem" *ngIf="auth.authenticated()">
+                <a (click)="router.navigate(['/partitions'])">
+                  <i class="material-icons">settings</i>
+                  <span>Partitions</span>
+                </a>
+              </li>
+              <li role="menuitem" *ngIf="!auth.authenticated()">
+                <a (click)="router.navigate(['/login'])">
+                  <i class="material-icons Red">lock</i>
+                  <span>Login</span>
+                </a>
+              </li>
+              <li role="menuitem" *ngIf="auth.authenticated()">
+                <a (click)="auth.logout()">
+                  <i class="material-icons Red">lock</i>
+                  <span>Logout</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </div>
+
+    <div class="layout-main">
+      <p-messages [value]="notifications"></p-messages>
+      <router-outlet></router-outlet>
+    </div>
+
   </div>
 </div>
-

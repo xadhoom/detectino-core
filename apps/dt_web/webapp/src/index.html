@@ -6,7 +6,7 @@
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="description" content="<%= webpackConfig.metadata.title %>">
 
@@ -29,38 +29,33 @@
   <meta name="msapplication-TileImage" content="/assets/icon/ms-icon-144x144.png">
   <!-- end favicon -->
 
-  <link rel="stylesheet" type="text/css" href="/assets/theme/theme.css">
-  <link rel="stylesheet" type="text/css" href="/assets/layout/css/core-layout.css">
-  <link rel="stylesheet" type="text/css" href="/assets/layout/css/animate.css">
-  <link rel="stylesheet" type="text/css" href="/assets/layout/css/modena-font.css">
-  <link rel="stylesheet" type="text/css" href="/assets/layout/css/ripple-effect.css">
-  <link rel="stylesheet" type="text/css" href="/assets/layout/css/perfect-scrollbar.css">
-  <link rel="stylesheet" type="text/css" href="/assets/layout/css/font-awesome.min.css">
-  <link rel="stylesheet" type="text/css" href="/assets/layout/css/modena-layout.css">
-  <link rel="stylesheet" type="text/css" href="/assets/css/primeui-ng-all.min.css" />
+  <!-- Ultima CSS -->
+  <link id="theme-css" rel="stylesheet" type="text/css" href="/assets/theme/theme-indigo.css">
+  <link rel="stylesheet" type="text/css" href="assets/theme/layout/css/animate.css">
+  <link id="layout-css" rel="stylesheet" type="text/css" href="/assets/theme/layout/css/layout-indigo.css">
 
-  <!--
-  <link rel="stylesheet" type="text/css" href="/assets/css/theme.css" />
-  <link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css" />
-  -->
+  <!-- PrimeNG CSS -->
+  <link rel="stylesheet" type="text/css" href="/assets/css/primeui-ng-all.min.css" />
 
   <!-- base url -->
   <base href="<%= webpackConfig.metadata.baseUrl %>">
 
 </head>
 
-<body class="BlueModena Geometry">
+<body>
 
   <app>
-  <div style="height:100%;text-align:center">
-    <div style="padding-top:200px">
-      <img src="assets/theme/images/logo-dark.svg" style="height:50px;"/>
-    </div>
+          <div class="splash-screen">
+              <div class="splash-container">
+                  <div class="logo"></div>
+                  <div class="load-bar">
+                      <div class="bar"></div>
+                      <div class="bar"></div>
+                      <div class="bar"></div>
+                  </div>
+              </div>
+          </div>
 
-    <div style="margin-top:25px">
-      <img src="assets/layout/images/loader.gif" />
-    </div>
-  </div>
   </app>
 
   <% if (webpackConfig.metadata.ENV === 'development') { %>

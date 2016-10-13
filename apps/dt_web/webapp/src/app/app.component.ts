@@ -1,7 +1,7 @@
 /*
  * Angular 2 decorators and services
  */
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -13,11 +13,14 @@ import { NotificationService } from './services';
 
 import { Message } from 'primeng/primeng';
 
-declare var Modena: any;
+declare var Ultima: any;
 
 /*
  * App Component
  * Top Level Component
+ *
+ * XXX ElementRef is discouraged, check if we can avoid it
+ *
  */
 @Component({
   selector: 'app',
@@ -28,7 +31,7 @@ declare var Modena: any;
   template: require('./app.component.html')
 })
 
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   angularclassLogo = 'assets/img/angularclass-avatar.png';
   loading = false;
   name = 'Detectino';
@@ -37,7 +40,7 @@ export class AppComponent {
 
   notifications: Message[] = [];
 
-  constructor(private router: Router, private auth: AuthService,
+  constructor(private el: ElementRef, private router: Router, private auth: AuthService,
               private notificationService: NotificationService) {
 
                 this.subscription = notificationService.messages$.subscribe(
@@ -46,6 +49,6 @@ export class AppComponent {
   }
 
   ngAfterViewInit() {
-    Modena.init();
+    Ultima.init(this.el.nativeElement);
   }
 }
