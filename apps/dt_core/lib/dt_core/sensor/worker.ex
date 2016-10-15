@@ -40,7 +40,8 @@ defmodule DtCore.Sensor.Worker do
   @doc """
   handles the sensor event and spits out the system event used
   to trigger actions.
-  The function is not private because I want to test it :)
+  The function is not private because I want to test it :), but
+  not should be called from outside
   """
   def process_event(%Event{address: a, port: p, value: v}, state) when is_nil(a) or is_nil(p) or is_nil(v) do
     {:error, state}
