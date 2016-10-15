@@ -34,7 +34,7 @@ export class PartitionsScenarios implements OnInit {
     this.modes.push({label: 'Arm', value: 'ARM'});
     this.modes.push({label: 'Stay Arm', value: 'ARMSTAY'});
     this.modes.push({label: 'Immediate Stay', value: 'ARMSTAYIMMEDIATE'});
-    this.modes.push({label: 'DISARM', value: 'DISARM'});
+    this.modes.push({label: 'Disarm', value: 'DISARM'});
     this.modes.push({label: 'None', value: 'NONE'});
 
     this.partitions = [{label: 'Select a partition', value: null}];
