@@ -31,8 +31,11 @@ export class PartitionsScenarios implements OnInit {
 
   ngOnInit() {
     this.modes = [{label: 'Select a mode', value: null}];
-    this.modes.push({label: 'Immediate', value: 'IMMEDIATE'});
-    this.modes.push({label: 'Delayed', value: 'DELAYED'});
+    this.modes.push({label: 'Arm', value: 'ARM'});
+    this.modes.push({label: 'Stay Arm', value: 'ARMSTAY'});
+    this.modes.push({label: 'Immediate Stay', value: 'ARMSTAYIMMEDIATE'});
+    this.modes.push({label: 'DISARM', value: 'DISARM'});
+    this.modes.push({label: 'None', value: 'NONE'});
 
     this.partitions = [{label: 'Select a partition', value: null}];
     this.partitionService.all().
