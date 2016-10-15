@@ -58,12 +58,46 @@ defmodule DtCore.Sensor.Worker do
   end
 
   defp nc(ev = %Event{}, state) do
+    me = state.config
+    th1 = me.th1
+    case ev.value do
+      v when (v < th1) ->
+        ret = build_ev_type(:standby, ev.address, ev.port)
+        {ret, state}
+      _ -> 
+        ret = build_ev_type(:alarm, ev.address, ev.port)
+        {ret, state}
+    end
   end
 
   defp no(ev = %Event{}, state) do
+    me = state.config
+    th1 = me.th1
+    case ev.value do
+      v when (v < th1) ->
+        ret = build_ev_type(:alarm, ev.address, ev.port)
+        {ret, state}
+      _ -> 
+        ret = build_ev_type(:standby, ev.address, ev.port)
+        {ret, state}
+    end
   end
 
   defp eol(ev = %Event{}, state) do
+    me = state.config
+    th1 = me.th1
+    th2 = me.th2
+    case ev.value do
+      v when (v < th1) ->
+        ret = build_ev_type(:short, ev.address, ev.port)
+        {ret, state}
+      v when (v < th2) ->
+        ret = build_ev_type(:standby, ev.address, ev.port)
+        {ret, state}
+      _ -> 
+        ret = build_ev_type(:alarm, ev.address, ev.port)
+        {ret, state}
+    end
   end
 
   defp deol(ev = %Event{}, state) do
