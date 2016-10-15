@@ -5,6 +5,8 @@ defmodule DtWeb.Output do
     field :name, :string
     field :type, :string
     field :enabled, :boolean, default: false
+    embeds_one :bus_settings, DtWeb.BusSettings
+    embeds_one :email_settings, DtWeb.EmailSettings
 
     timestamps
 

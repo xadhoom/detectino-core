@@ -21,6 +21,11 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
       add :address, :string
       add :port, :integer
       add :name, :string
+      add :balance, :string
+      add :th1, :integer
+      add :th2, :integer
+      add :th3, :integer
+      add :th4, :integer
       add :enabled, :boolean, default: false
 
       timestamps()
@@ -55,16 +60,24 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
     # Ouputs are commands sent when a certain action is triggered by an event
     create table(:outputs) do
       add :name, :string
+      add :description, :string
       add :type, :string
       add :enabled, :boolean, default: false
+      add :bus_settings, :map
+      add :email_settings, :map
+
       timestamps()
     end
+    create index(:outputs, [:name], unique: true)
 
-    # Holds all the event types handled by the application
+    # Events are the bridge between sensors and outputs
     create table(:events) do
       add :name, :string
+      add :description, :string
+
       timestamps()
     end
+    create index(:events, [:name], unique: true)
 
     create table(:events_outputs) do
       add :event_id, references(:events, on_delete: :delete_all, on_update: :update_all)

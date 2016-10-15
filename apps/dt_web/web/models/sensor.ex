@@ -6,6 +6,11 @@ defmodule DtWeb.Sensor do
     field :address, :string
     field :port, :integer
     field :name, :string
+    field :balance, :string
+    field :th1, :integer
+    field :th2, :integer
+    field :th3, :integer
+    field :th4, :integer
     field :enabled, :boolean, default: false
 
     timestamps()
@@ -14,8 +19,9 @@ defmodule DtWeb.Sensor do
   end
 
   @required_fields ~w(name address port)
-  @optional_fields ~w(enabled)
+  @optional_fields ~w(enabled balance th1 th2 th3 th4)
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
+  @balance_types ["NC", "NO", "EOL", "DEOL", "TEOL"]
 
   @doc """
   Creates a changeset based on the `model` and `params`.
@@ -27,6 +33,7 @@ defmodule DtWeb.Sensor do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_required(@validate_required)
+    |> validate_inclusion(:balance, @balance_types)
     |> unique_constraint(:address, name: :sensors_address_port_index)
     |> unique_constraint(:port, name: :sensors_address_port_index)
   end
@@ -35,6 +42,7 @@ defmodule DtWeb.Sensor do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_required(@validate_required)
+    |> validate_inclusion(:balance, @balance_types)
     |> unique_constraint(:address, name: :sensors_address_port_index)
     |> unique_constraint(:port, name: :sensors_address_port_index)
   end
