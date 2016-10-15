@@ -9,7 +9,7 @@
     "sourceMap": true,
     "noEmitHelpers": true,
     "baseUrl": "./src",
-		"paths": [],
+    "paths": [],
     "lib": [
       "dom",
       "es6"
@@ -26,10 +26,10 @@
     ]
   },
   "exclude": [
-     "./node_modules"
+    "./node_modules"
   ],
-  "files": [
-    "./src/custom-typings.d.ts"
+  "filesGlob": [
+    "src/**/*.ts"
   ],
   "awesomeTypescriptLoaderOptions": {
     "resolveGlobs": true,
@@ -37,5 +37,7 @@
   },
   "compileOnSave": false,
   "buildOnSave": false,
-  "atom": { "rewriteTsconfig": false }
+  "atom": {
+    "rewriteTsconfig": false
+  }
 }
