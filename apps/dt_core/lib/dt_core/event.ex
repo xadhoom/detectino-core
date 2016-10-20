@@ -1,6 +1,6 @@
 defmodule DtCore.Event do
   @moduledoc """
-  Event struct for DtCore events
+  Event struct for DtCore events (from bus)
   """
 
   defstruct address: nil,
@@ -9,4 +9,30 @@ defmodule DtCore.Event do
     subtype: nil,
     value: nil
 
+end
+
+defmodule DtCore.SensorEv do
+  @doc """
+    type values:
+      :reading
+      :alarm
+      :short
+      :standby
+      :fault
+      :tamper
+  """
+  defstruct type: nil,
+    delayed: false,
+    address: nil,
+    port: nil
+end
+
+defmodule DtCore.PartitionEv do
+  @doc """
+    type values:
+      :alarm
+  """
+  defstruct name: nil,
+    delayed: false,
+    type: nil
 end

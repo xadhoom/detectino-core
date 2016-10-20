@@ -9,6 +9,8 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
       add :name, :string
       add :entry_delay, :integer
       add :exit_delay, :integer
+      add :armed, :string
+      add :last_armed, :string
 
       timestamps()
     end
@@ -27,6 +29,10 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
       add :th3, :integer
       add :th4, :integer
       add :enabled, :boolean, default: false
+      add :full24h, :boolean, default: false
+      add :tamp24h, :boolean, default: false
+      add :entry_delay, :boolean, default: false
+      add :exit_delay, :boolean, default: false
 
       timestamps()
     end

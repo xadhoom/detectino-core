@@ -17,8 +17,11 @@ defmodule DtCore.Sensor.Server do
   alias DtCore.Event
   alias DtCore.Sensor.Worker
   alias DtCore.Sensor.WorkerSup
+  alias DtCore.Sensor.Partition
+  alias DtCore.Sensor.PartitionSup
   alias DtWeb.Repo
   alias DtWeb.Sensor, as: SensorModel
+  alias DtWeb.Partition, as: PartitionModel
 
   require Logger
 
@@ -63,7 +66,9 @@ defmodule DtCore.Sensor.Server do
     {:ok, %{
         sup: sup,
         worker_sup: nil,
-        sensors: []
+        partition_sup: nil,
+        sensors: [],
+        partitions: []
       }
     }
   end
@@ -83,8 +88,14 @@ defmodule DtCore.Sensor.Server do
   def handle_call({:reload}, _from, state) do
     case Supervisor.stop(state.worker_sup, :normal) do
       :ok ->
-        send self(), :start
-        {:reply, :ok, %{state | worker_sup: nil}}
+        case Supervisor.stop(state.partition_sup, :normal) do
+          :ok ->
+            send self(), :start
+            {:reply, :ok, %{state | worker_sup: nil, partition_sup: nil}}
+          any ->
+            Logger.error "Error stopping partition worker sup #{inspect any}"
+            {:reply, {:error, any}, state}
+          end
       any ->
         Logger.error "Error stopping sensor worker sup #{inspect any}"
         {:reply, {:error, any}, state}
@@ -107,10 +118,19 @@ defmodule DtCore.Sensor.Server do
     case Supervisor.start_child(state.sup, supervisor(WorkerSup, [],
                                 restart: :temporary)) do
       {:ok, pid} ->
-        Process.monitor pid
-        state = %{state | worker_sup: pid}
-        start_workers(state)
-        {:noreply, state}
+        case Supervisor.start_child(state.sup, supervisor(PartitionSup, [],
+                                restart: :temporary)) do
+          {:ok, partpid} ->
+            Process.monitor pid
+            Process.monitor partpid
+            state = %{state | worker_sup: pid, partition_sup: partpid}
+            start_workers(state)
+            start_partitions(state)
+            {:noreply, state}
+          {:error, err} ->
+            Logger.error "Error starting Partition Sup #{inspect err}"
+            {:stop, err, state}        
+        end
       {:error, err} ->
         Logger.error "Error starting Worker Sup #{inspect err}"
         {:stop, err, state}
@@ -135,13 +155,18 @@ defmodule DtCore.Sensor.Server do
   and restart everything
   """
   def handle_info({:DOWN, _ref, _process, pid, reason}, state) do
-    case state.worker_sup do
-      ^pid ->
+    worker_sup = state.worker_sup
+    partition_sup = state.partition_sup
+    case pid do
+      ^worker_sup ->
         Logger.error "Worker Sup died with reason #{inspect reason}, I quit!"
+        {:stop, reason, state}
+      ^partition_sup ->
+        Logger.error "Partition Sup died with reason #{inspect reason}, I quit!"
         {:stop, reason, state}
       any ->
         Logger.info "Got :DOWN message from #{inspect any} " <>
-          "but is not my sensor worker supervisor, ignoring...."
+          "but is not my sensor/partition worker supervisor, ignoring...."
         {:noreply, state}
     end
   end
@@ -212,6 +237,7 @@ defmodule DtCore.Sensor.Server do
     %SensorModel{}
     |> SensorModel.create_changeset(%{address: ev.address, port: ev.port, name: "AUTO"})
     |> Repo.insert!
+    |> Repo.preload([:partitions])
     |> start_worker(state)
     sensors = [%{address: ev.address, port: ev.port} | state.sensors]
     {ev, %{state | sensors: sensors}}
@@ -220,20 +246,45 @@ defmodule DtCore.Sensor.Server do
   defp start_workers(state) do
     SensorModel
     |> Repo.all
+    |> Repo.preload([:partitions])
     |> Enum.each(fn(sensor) ->
       start_worker(sensor, state)
     end)
   end
 
+  defp start_partitions(state) do
+    PartitionModel
+    |> Repo.all
+    |> Enum.each(fn(partition) ->
+      start_partition(partition, state)
+    end)
+  end
+
   defp start_worker(sensor, state) do
     id = build_worker_id(sensor.address, sensor.port)
+    # XXX self will be updated with real receiver of sensor events
+    receiver = self
     case Supervisor.start_child(state.worker_sup,
-          worker(Worker, [sensor], restart: :transient, id: id)) do
+          worker(Worker, [{sensor, receiver}], restart: :transient, id: id)) do
       {:ok, pid} ->
         Logger.info "Started sensor worker with pid #{inspect pid}"
       {:error, err} ->
         Logger.error "Cannot start sensor worker: " <>
           "#{inspect err} #{inspect sensor}"
+    end
+  end
+
+  defp start_partition(partition, state) do
+    id = partition.name
+    # XXX self will be updated with real receiver of partition events
+    receiver = self
+    case Supervisor.start_child(state.partition_sup,
+          worker(Partition, [{partition, receiver}], restart: :transient, id: id)) do
+      {:ok, pid} ->
+        Logger.info "Started partition worker with pid #{inspect pid}"
+      {:error, err} ->
+        Logger.error "Cannot start partition worker: " <>
+          "#{inspect err} #{inspect partition}"
     end
   end
 

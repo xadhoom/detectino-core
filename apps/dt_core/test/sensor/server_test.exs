@@ -21,7 +21,7 @@ defmodule DtCore.Test.Sensor.Server do
   end
 
   test "One sensor starts one worker" do
-    %SensorModel{name: "a", enabled: true}
+    %SensorModel{name: "a", enabled: true, address: "one", port: 123}
     |> Repo.insert!
 
     assert :ok == Server.reload
