@@ -199,6 +199,9 @@ defmodule DtCore.Test.Sensor.Worker do
       address: "1", port: 1,
       enabled: true
     }
-    assert {:ok, pid} = Worker.start_link({config, self})
+    Process.flag(:trap_exit, true)
+    {:ok, pid} = Worker.start_link({config, self})
+    {:EXIT, ^pid, :dead_partitions}
+    |> assert_receive(1000)
   end
 end
