@@ -19,6 +19,32 @@ defmodule DtCore.Sensor.Partition do
     |> GenServer.call({:arming_status})
   end
 
+  def alive?(config = %PartitionModel{}) do
+    pid = config
+    |> Utils.partition_server_pid
+    case pid do
+      :undefined -> false
+      pid -> pid |> Process.alive?
+    end
+  end
+
+  @doc """
+  Returns true if the area transitioned between
+  an armed to a disarmed one
+  """
+  def entry?(nil) do
+    nil
+  end
+
+  def entry?(config = %PartitionModel{}) do
+    config
+    |> Utils.partition_server_pid
+    |> GenServer.call({:entry?})
+  end
+
+  #
+  # GenServer Callbacks
+  #
   def init({config, receiver}) do
     Logger.debug("Starting partition worker with " <>
       "#{inspect config} config")
@@ -33,4 +59,17 @@ defmodule DtCore.Sensor.Partition do
     res = state.config.armed
     {:reply, res, state}
   end
+
+  def handle_call({:entry?}, _from, state) do
+    res = case state.config.armed do
+      v when v in ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"] ->
+        case state.config.last_armed do
+          "DISARM" -> false
+          _ -> true
+        end
+      _ -> false
+    end
+    {:reply, res, state}
+  end
+
 end

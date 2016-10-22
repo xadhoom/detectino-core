@@ -115,24 +115,24 @@ defmodule DtCore.Sensor.Server do
   sensors from the DB
   """
   def handle_info(:start, state) do
-    case Supervisor.start_child(state.sup, supervisor(WorkerSup, [],
+    case Supervisor.start_child(state.sup, supervisor(PartitionSup, [],
                                 restart: :temporary)) do
-      {:ok, pid} ->
-        case Supervisor.start_child(state.sup, supervisor(PartitionSup, [],
+      {:ok, partpid} ->
+        case Supervisor.start_child(state.sup, supervisor(WorkerSup, [],
                                 restart: :temporary)) do
-          {:ok, partpid} ->
+          {:ok, pid} ->
             Process.monitor pid
             Process.monitor partpid
             state = %{state | worker_sup: pid, partition_sup: partpid}
-            start_workers(state)
             start_partitions(state)
+            start_workers(state)
             {:noreply, state}
           {:error, err} ->
-            Logger.error "Error starting Partition Sup #{inspect err}"
+            Logger.error "Error starting Sensor Sup #{inspect err}"
             {:stop, err, state}        
         end
       {:error, err} ->
-        Logger.error "Error starting Worker Sup #{inspect err}"
+        Logger.error "Error starting Partition Sup #{inspect err}"
         {:stop, err, state}
     end
   end
@@ -270,7 +270,7 @@ defmodule DtCore.Sensor.Server do
         Logger.info "Started sensor worker with pid #{inspect pid}"
       {:error, err} ->
         Logger.error "Cannot start sensor worker: " <>
-          "#{inspect err} #{inspect sensor}"
+          "#{inspect err}\n#{inspect sensor}"
     end
   end
 

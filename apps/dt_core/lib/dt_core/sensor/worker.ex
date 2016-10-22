@@ -10,6 +10,7 @@ defmodule DtCore.Sensor.Worker do
   alias DtCore.Sensor.Utils
   alias DtCore.Sensor.Partition
   alias DtWeb.Sensor, as: SensorModel
+  alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event, as: Event
   alias DtCore.SensorEv
   alias DtWeb.Repo
@@ -32,8 +33,25 @@ defmodule DtCore.Sensor.Worker do
       config: config,
       receiver: pid
     } 
-    :ok = process_delays(state)
+    send self(), :start
     {:ok, state}
+  end
+
+  def handle_info(:start, state) do
+    parts_alive? = state.config.partitions
+    |> Enum.reduce(true, fn(part, acc) ->
+      case Partition.alive?(part) do
+        true -> true
+        _ -> false
+      end
+    end)
+    case parts_alive? do
+      true -> 
+        :ok = process_delays(state)
+        {:noreply, state}
+      _ ->
+        {:stop, :dead_partitions, state}
+    end
   end
 
   def handle_info({:event, ev = %Event{}}, state) do
@@ -63,20 +81,51 @@ defmodule DtCore.Sensor.Worker do
   end
 
   defp process_delays(state) do
-    state.config.partitions 
-    |> Enum.each(fn(partition) ->
-      is_entry = entry?(partition)
-      delay = case is_entry do
-        true ->
-          zone_entry_delay(state, partition.entry_delay)
-          |> will_reset_delay(:entry)
-        false ->
-          zone_exit_delay(state, partition.exit_delay)
-          |> will_reset_delay(:exit)
-        nil -> Logger.debug("Partition delay not set")
-          will_reset_delay(0, :entry)
-      end
-    end)
+    tmp = case Enum.empty?(state.config.partitions) do
+      true -> 0
+      false -> 
+        state.config.partitions
+        |> Enum.min_by(fn(item) ->
+          item.entry_delay
+        end)
+    end
+    entry_delay = case tmp do
+      %PartitionModel{entry_delay: v} -> v
+      _ -> 0
+    end
+
+    tmp = case Enum.empty?(state.config.partitions) do
+      true -> 0
+      false -> 
+        state.config.partitions
+        |> Enum.min_by(fn(item) ->
+          item.exit_delay
+        end)
+    end
+    exit_delay = case tmp do
+      %PartitionModel{exit_delay: v} -> v
+      _ -> 0
+    end
+
+    # if we have many partitions, one may been just armed
+    # while the other is disarmed, depending on the scenario
+    # so just get the first and we'll use it to determine
+    # if we need to use entry or exit delay
+    is_entry = state.config.partitions
+    |> Enum.at(0)
+    |> Partition.entry?
+
+    delay = case is_entry do
+      true ->
+        zone_entry_delay(state, entry_delay)
+        |> will_reset_delay(:entry)
+      false ->
+        zone_exit_delay(state, exit_delay)
+        |> will_reset_delay(:exit)
+      nil -> Logger.debug("Partition delay not set")
+        will_reset_delay(0, :entry)
+    end
+
     :ok
   end
 
@@ -110,17 +159,19 @@ defmodule DtCore.Sensor.Worker do
     |> Enum.reduce([], fn(partition, acc) ->
       armed = partition
       |> Partition.arming_status
-      case armed do
+
+      ret = case armed do
         "DISARM" ->
           case state.config.full24h do
             true ->
-              acc ++ process_inarm(ev, partition, state)
+              process_inarm(ev, partition, state)
             _ ->
-              acc ++ process_indisarm(ev, partition, state)
+              process_indisarm(ev, partition, state)
           end
-        "ARM" -> 
-          acc ++ process_inarm(ev, partition, state)
+        "ARM" ->
+          process_inarm(ev, partition, state)
       end
+      Enum.concat(acc, [ret])
     end)
   end
 
@@ -144,17 +195,6 @@ defmodule DtCore.Sensor.Worker do
         _timer = Process.send_after(self, {:event, ev},
           delay + 1000)
         %SensorEv{sensor_ev | delayed: true}
-    end
-  end
-
-  defp entry?(partition) do
-    case partition.armed do
-      v when v in ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"] ->
-        case partition.last_armed do
-          "DISARM" -> false
-          _ -> true
-        end
-      _ -> false
     end
   end
 

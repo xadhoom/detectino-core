@@ -35,7 +35,7 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
 
-    %SensorEv{type: :reading, address: "1", port: 1}
+    [%SensorEv{type: :reading, address: "1", port: 1}]
     |> assert_receive(5000)
   end
 
@@ -49,7 +49,7 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
   end
 
@@ -68,27 +68,27 @@ defmodule DtCore.Test.Sensor.Worker do
 
     ev = %Event{address: "1", port: 1, value: 45}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :tamper, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 35}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :fault, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :fault, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 25}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :standby, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :standby, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 5}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :short, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :short, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
   end
 
@@ -112,10 +112,39 @@ defmodule DtCore.Test.Sensor.Worker do
     {:ok, pid} = Worker.start_link({config, self})
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: true}]
     |> assert_receive(5000)
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: false}]
+    |> assert_receive(5000)
+  end
+  
+  test "delayed alarm uses min delay values of partitions" do
+    part1 = %PartitionModel{name: "part1", armed: @arm_armed, entry_delay: 1}
+    part2 = %PartitionModel{name: "part2", armed: @arm_armed, entry_delay: 10}
+    config = %SensorModel{
+      name: "sense2",
+      address: "1",
+      port: 1,
+      balance: "NC",
+      th1: 10,
+      entry_delay: true,
+      partitions: [part1, part2],
+      enabled: true
+    }
+    {:ok, ppid1} = Partition.start_link({part1, self})
+    {:ok, ppid2} = Partition.start_link({part2, self})
+    {:ok, pid} = Worker.start_link({config, self})
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+
+    # we get an immediate delayed event, one per partition
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: true},
+     %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}]
+    |> assert_receive(2000)
+
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: false},
+     %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
   end
 
@@ -139,14 +168,14 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: true}]
     |> assert_receive(5000)
 
     GenServer.stop(ppid)
     part = %PartitionModel{part | armed: @arm_disarmed}
     {:ok, ppid} = Partition.start_link({part, self})
 
-    %SensorEv{type: :reading, address: "1", port: 1, delayed: false}
+    [%SensorEv{type: :reading, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
   end 
 
@@ -155,4 +184,21 @@ defmodule DtCore.Test.Sensor.Worker do
     assert_raise MatchError, fn -> Worker.start_link({config, self}) end
   end
 
+  test "correctly handle dead partition worker" do
+    part = %PartitionModel{
+      name: "part1",
+      armed: @arm_armed,
+      entry_delay: 1
+      }
+    config = %SensorModel{
+      name: "sense1",
+      balance: "NC",
+      th1: 10,
+      entry_delay: true,
+      partitions: [part],
+      address: "1", port: 1,
+      enabled: true
+    }
+    assert {:ok, pid} = Worker.start_link({config, self})
+  end
 end
