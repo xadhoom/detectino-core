@@ -129,7 +129,7 @@ defmodule DtCore.Sensor.Server do
             {:noreply, state}
           {:error, err} ->
             Logger.error "Error starting Sensor Sup #{inspect err}"
-            {:stop, err, state}        
+            {:stop, err, state}
         end
       {:error, err} ->
         Logger.error "Error starting Partition Sup #{inspect err}"
@@ -235,7 +235,9 @@ defmodule DtCore.Sensor.Server do
   # sensor was not in our repo, so add it and cache on state.
   defp add_on_repo({ev = %Event{}, state}) do
     %SensorModel{}
-    |> SensorModel.create_changeset(%{address: ev.address, port: ev.port, name: "AUTO"})
+    |> SensorModel.create_changeset(%{
+      address: ev.address, port: ev.port, name: "AUTO"
+    })
     |> Repo.insert!
     |> Repo.preload([:partitions])
     |> start_worker(state)
@@ -279,7 +281,8 @@ defmodule DtCore.Sensor.Server do
     # XXX self will be updated with real receiver of partition events
     receiver = self
     case Supervisor.start_child(state.partition_sup,
-          worker(Partition, [{partition, receiver}], restart: :transient, id: id)) do
+          worker(Partition, [{partition, receiver}],
+            restart: :transient, id: id)) do
       {:ok, pid} ->
         Logger.info "Started partition worker with pid #{inspect pid}"
       {:error, err} ->

@@ -32,7 +32,7 @@ defmodule DtCore.Sensor.Worker do
     state = %{
       config: config,
       receiver: pid
-    } 
+    }
     send self(), :start
     {:ok, state}
   end
@@ -46,7 +46,7 @@ defmodule DtCore.Sensor.Worker do
       end
     end)
     case parts_alive? do
-      true -> 
+      true ->
         :ok = process_delays(state)
         {:noreply, state}
       _ ->
@@ -56,11 +56,11 @@ defmodule DtCore.Sensor.Worker do
 
   def handle_info({:event, ev = %Event{}}, state) do
     case state.config.enabled do
-      false -> Logger.debug("Got event from server, but I'm not online, ignoring")
+      false -> Logger.debug("Ignoring event from server  cause I'm not online")
       true ->
         Logger.debug("Got event from server")
         events = build_events(ev, state)
-        :ok = Process.send(state.receiver, events, []) 
+        :ok = Process.send(state.receiver, events, [])
       _ -> Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
     end
     {:noreply, state}
@@ -83,7 +83,7 @@ defmodule DtCore.Sensor.Worker do
   defp process_delays(state) do
     tmp = case Enum.empty?(state.config.partitions) do
       true -> 0
-      false -> 
+      false ->
         state.config.partitions
         |> Enum.min_by(fn(item) ->
           item.entry_delay
@@ -96,7 +96,7 @@ defmodule DtCore.Sensor.Worker do
 
     tmp = case Enum.empty?(state.config.partitions) do
       true -> 0
-      false -> 
+      false ->
         state.config.partitions
         |> Enum.min_by(fn(item) ->
           item.exit_delay
@@ -117,15 +117,16 @@ defmodule DtCore.Sensor.Worker do
 
     delay = case is_entry do
       true ->
-        zone_entry_delay(state, entry_delay)
+        state
+        |> zone_entry_delay(entry_delay)
         |> will_reset_delay(:entry)
       false ->
-        zone_exit_delay(state, exit_delay)
+        state
+        |> zone_exit_delay(exit_delay)
         |> will_reset_delay(:exit)
       nil -> Logger.debug("Partition delay not set")
         will_reset_delay(0, :entry)
     end
-
     :ok
   end
 
@@ -141,14 +142,14 @@ defmodule DtCore.Sensor.Worker do
   defp zone_entry_delay(state, delay) do
     case state.config.entry_delay do
       true -> delay
-      _ -> 0      
+      _ -> 0
     end
   end
 
   defp zone_exit_delay(state, delay) do
     case state.config.exit_delay do
       true -> delay
-      _ -> 0      
+      _ -> 0
     end
   end
 
@@ -219,7 +220,7 @@ defmodule DtCore.Sensor.Worker do
     case ev.value do
       v when (v < th1) ->
         build_ev_type(:standby, ev.address, ev.port)
-      _ -> 
+      _ ->
         build_ev_type(:alarm, ev.address, ev.port)
     end
   end
@@ -230,7 +231,7 @@ defmodule DtCore.Sensor.Worker do
     case ev.value do
       v when (v < th1) ->
         build_ev_type(:alarm, ev.address, ev.port)
-      _ -> 
+      _ ->
         build_ev_type(:standby, ev.address, ev.port)
     end
   end
@@ -244,7 +245,7 @@ defmodule DtCore.Sensor.Worker do
         build_ev_type(:short, ev.address, ev.port)
       v when (v < th2) ->
         build_ev_type(:standby, ev.address, ev.port)
-      _ -> 
+      _ ->
         build_ev_type(:alarm, ev.address, ev.port)
     end
   end
@@ -261,7 +262,7 @@ defmodule DtCore.Sensor.Worker do
         build_ev_type(:standby, ev.address, ev.port)
       v when (v < th3) ->
         build_ev_type(:alarm, ev.address, ev.port)
-      _ -> 
+      _ ->
         build_ev_type(:tamper, ev.address, ev.port)
     end
   end
@@ -281,7 +282,7 @@ defmodule DtCore.Sensor.Worker do
         build_ev_type(:alarm, ev.address, ev.port)
       v when (v < th4) ->
         build_ev_type(:fault, ev.address, ev.port)
-      _ -> 
+      _ ->
         build_ev_type(:tamper, ev.address, ev.port)
     end
   end

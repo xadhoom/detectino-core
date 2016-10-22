@@ -12,7 +12,7 @@ defmodule DtCore.Event do
 end
 
 defmodule DtCore.SensorEv do
-  @doc """
+  @moduledoc """
     type values:
       :reading
       :alarm
@@ -28,7 +28,7 @@ defmodule DtCore.SensorEv do
 end
 
 defmodule DtCore.PartitionEv do
-  @doc """
+  @moduledoc """
     type values:
       :alarm
   """
