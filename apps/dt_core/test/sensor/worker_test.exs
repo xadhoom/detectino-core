@@ -5,7 +5,6 @@ defmodule DtCore.Test.Sensor.Worker do
   alias DtCore.Sensor.Partition
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
-  alias DtCore.Test.TimerHelper
   alias DtCore.Event, as: Event
   alias DtCore.SensorEv
 
@@ -29,7 +28,7 @@ defmodule DtCore.Test.Sensor.Worker do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed}
     config = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [part], enabled: true, address: "1", port: 1}
-    {:ok, ppid} = Partition.start_link({part, self})
+    {:ok, _ppid} = Partition.start_link({part, self})
     {:ok, pid} = Worker.start_link({config, self})
 
     ev = %Event{address: "1", port: 1, value: 15}
@@ -43,7 +42,7 @@ defmodule DtCore.Test.Sensor.Worker do
     part = %PartitionModel{name: "part1", armed: @arm_armed}
     config = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [part], enabled: true, address: "1", port: 1}
-    {:ok, ppid} = Partition.start_link({part, self})
+    {:ok, _ppid} = Partition.start_link({part, self})
     {:ok, pid} = Worker.start_link({config, self})
 
     ev = %Event{address: "1", port: 1, value: 15}
@@ -63,7 +62,7 @@ defmodule DtCore.Test.Sensor.Worker do
       partitions: [part],
       enabled: true
     }
-    {:ok, ppid} = Partition.start_link({part, self})
+    {:ok, _ppid} = Partition.start_link({part, self})
     {:ok, pid} = Worker.start_link({config, self})
 
     ev = %Event{address: "1", port: 1, value: 45}
@@ -108,7 +107,7 @@ defmodule DtCore.Test.Sensor.Worker do
       partitions: [part],
       enabled: true
     }
-    {:ok, ppid} = Partition.start_link({part, self})
+    {:ok, _ppid} = Partition.start_link({part, self})
     {:ok, pid} = Worker.start_link({config, self})
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
@@ -132,8 +131,8 @@ defmodule DtCore.Test.Sensor.Worker do
       partitions: [part1, part2],
       enabled: true
     }
-    {:ok, ppid1} = Partition.start_link({part1, self})
-    {:ok, ppid2} = Partition.start_link({part2, self})
+    {:ok, _ppid1} = Partition.start_link({part1, self})
+    {:ok, _ppid2} = Partition.start_link({part2, self})
     {:ok, pid} = Worker.start_link({config, self})
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
@@ -173,7 +172,7 @@ defmodule DtCore.Test.Sensor.Worker do
 
     GenServer.stop(ppid)
     part = %PartitionModel{part | armed: @arm_disarmed}
-    {:ok, ppid} = Partition.start_link({part, self})
+    {:ok, _ppid} = Partition.start_link({part, self})
 
     [%SensorEv{type: :reading, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
