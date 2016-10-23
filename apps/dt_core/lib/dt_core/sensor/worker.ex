@@ -13,7 +13,6 @@ defmodule DtCore.Sensor.Worker do
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event, as: Event
   alias DtCore.SensorEv
-  alias DtWeb.Repo
 
   #
   # Client APIs
@@ -39,7 +38,7 @@ defmodule DtCore.Sensor.Worker do
 
   def handle_info(:start, state) do
     parts_alive? = state.config.partitions
-    |> Enum.reduce(true, fn(part, acc) ->
+    |> Enum.reduce(true, fn(part, _acc) ->
       case Partition.alive?(part) do
         true -> true
         _ -> false
@@ -115,7 +114,7 @@ defmodule DtCore.Sensor.Worker do
     |> Enum.at(0)
     |> Partition.entry?
 
-    delay = case is_entry do
+    case is_entry do
       true ->
         state
         |> zone_entry_delay(entry_delay)
@@ -156,7 +155,7 @@ defmodule DtCore.Sensor.Worker do
   @doc false
   defp build_events(ev = %Event{}, state) do
     parts = state.config.partitions
-    events = parts
+    parts
     |> Enum.reduce([], fn(partition, acc) ->
       armed = partition
       |> Partition.arming_status
@@ -176,7 +175,7 @@ defmodule DtCore.Sensor.Worker do
     end)
   end
 
-  defp process_indisarm(ev, partition, state) do
+  defp process_indisarm(ev, _partition, state) do
     sensor_ev = process_event(ev, state)
     %SensorEv{sensor_ev | type: :reading}
 
@@ -199,7 +198,7 @@ defmodule DtCore.Sensor.Worker do
     end
   end
 
-  defp process_event(%Event{address: a, port: p, value: v}, state) when is_nil(a) or is_nil(p) or is_nil(v) do
+  defp process_event(%Event{address: a, port: p, value: v}, _state) when is_nil(a) or is_nil(p) or is_nil(v) do
     :error
   end
 

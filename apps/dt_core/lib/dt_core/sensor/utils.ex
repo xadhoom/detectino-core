@@ -7,7 +7,7 @@ defmodule DtCore.Sensor.Utils do
 
   require Logger
 
-  def partition_server_name(part = %PartitionModel{name: nil}) do
+  def partition_server_name(_part = %PartitionModel{name: nil}) do
     {:error, :name}
   end
 
@@ -24,15 +24,15 @@ defmodule DtCore.Sensor.Utils do
     :global.whereis_name name
   end
 
-  def sensor_server_name(sensor = %SensorModel{name: nil}) do
+  def sensor_server_name(_sensor = %SensorModel{name: nil}) do
     {:error, :name}
   end
 
-  def sensor_server_name(sensor = %SensorModel{address: nil}) do
+  def sensor_server_name(_sensor = %SensorModel{address: nil}) do
     {:error, :address}
   end
 
-  def sensor_server_name(sensor = %SensorModel{port: nil}) do
+  def sensor_server_name(_sensor = %SensorModel{port: nil}) do
     {:error, :port}
   end
 

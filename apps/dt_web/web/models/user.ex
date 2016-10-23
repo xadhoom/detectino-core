@@ -1,8 +1,6 @@
 defmodule DtWeb.User do
   use DtWeb.Web, :model
 
-  alias DtWeb.Repo
-
   schema "users" do
     field :name, :string
     field :username, :string

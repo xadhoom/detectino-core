@@ -46,7 +46,7 @@ defmodule DtWeb.Mixfile do
      {:poison, "~> 2.2"},
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
-     {:guardian, "~> 0.12"},
+     {:guardian, "~> 0.13"},
      {:comeonin, "~> 2.0"},
      {:uuid, "~> 1.1"},
      {:exprintf, "~> 0.1"},

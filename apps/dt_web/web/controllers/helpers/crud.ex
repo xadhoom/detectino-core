@@ -64,15 +64,16 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     if total > (page * per_page) do
       next_p = page + 1
-      link = %ExLinkHeader{link | next: %ExLinkHeaderEntry{
+      %ExLinkHeader{link | next: %ExLinkHeaderEntry{
           scheme: conn.scheme,
           host: conn.host,
           path: conn.request_path,
           params: %{per_page: per_page, page: next_p}
-        }}
+      }}
+    else
+      link
     end
-
-    ExLinkHeader.build(link)
+    |> ExLinkHeader.build
 
   end
 

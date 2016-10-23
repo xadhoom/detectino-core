@@ -84,7 +84,7 @@ defmodule DtBus.Can do
     Logger.debug "Pinging node #{node_id}"
 
     msgid = Canhelper.build_msgid(0, node_id, :ping, :unsolicited)
-    payload = :crypto.rand_bytes(8)
+    payload = :crypto.strong_rand_bytes(8)
 
     {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
 
@@ -146,7 +146,7 @@ defmodule DtBus.Can do
   def handle_info(what, state) do
     Logger.debug "Got info message #{inspect what}"
 
-    case what do
+    {:ok, state} = case what do
       {:can_frame, _msgid, _len, _data, _intf, _ts} -> 
         {:ok, state} = handle_canframe(what, state)
       default ->
@@ -164,7 +164,7 @@ defmodule DtBus.Can do
   end
 
   defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
-    case Canhelper.decode_msgid(msgid) do
+    {:ok, state} = case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
         Logger.info "Got command:#{command}, " <>
         "subcommand:#{subcommand} " <>
@@ -191,12 +191,14 @@ defmodule DtBus.Can do
               sendmessage(state, %Event{address: src_node_id, 
                 type: :sensor, subtype: subtype, 
                 port: port, value: value})
+              {:ok, state}
             default ->
               Logger.warn "Unhandled command #{inspect default}"
+              {:ok, state}
           end
         end
 
-      _v -> nil
+      _v -> {:ok, state}
     end
     {:ok, state}
   end
