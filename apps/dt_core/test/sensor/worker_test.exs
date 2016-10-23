@@ -24,7 +24,7 @@ defmodule DtCore.Test.Sensor.Worker do
     balance: "TEOL", th1: 10, th2: 20, th3: 30, th4: 40, partitions: [],
     enabled: true}
 
-  test "no alarm but simple events if partion if not armed" do
+  test "no alarm but simple events if partion is not armed" do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed}
     config = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [part], enabled: true, address: "1", port: 1}
