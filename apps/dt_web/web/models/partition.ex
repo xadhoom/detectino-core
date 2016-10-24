@@ -7,7 +7,6 @@ defmodule DtWeb.Partition do
     field :entry_delay, :integer
     field :exit_delay, :integer
     field :armed, :string
-    field :last_armed, :string
 
     timestamps()
 
@@ -16,7 +15,7 @@ defmodule DtWeb.Partition do
   end
 
   @required_fields ~w(name entry_delay exit_delay)
-  @optional_fields ~w(armed last_armed)
+  @optional_fields ~w(armed)
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @valid_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE", "DISARM"]
 

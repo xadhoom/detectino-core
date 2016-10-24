@@ -4,6 +4,7 @@ defmodule DtCore.Test.Sensor.Server do
   alias DtCore.Sensor.Sup
   alias DtCore.Sensor.Server
   alias DtWeb.Sensor, as: SensorModel
+  alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Test.TimerHelper
 
   alias DtBus.Event, as: BusEvent
@@ -20,70 +21,62 @@ defmodule DtCore.Test.Sensor.Server do
     :ok
   end
 
-  test "One sensor starts one worker" do
-    %SensorModel{name: "a", enabled: true, address: "one", port: 123}
+  test "One partition starts one worker" do
+    %PartitionModel{name: "a"}
     |> Repo.insert!
 
     assert :ok == Server.reload
   
     TimerHelper.wait_until fn ->
-      assert {:ok, 1} == Server.workers
+      assert {:ok, 1} == Server.partitions
     end
   end
 
-  test "Many sensors starts many workers" do
-    [%SensorModel{name: "a", address: "one", port: 1},
-     %SensorModel{name: "b", address: "one", port: 2},
-     %SensorModel{name: "c", address: "one", port: 3}]
-    |> Enum.each(fn(sensor) ->
-      sensor
+  test "Many partitions starts many workers" do
+    [%PartitionModel{name: "a"},
+     %PartitionModel{name: "b"},
+     %PartitionModel{name: "c"}]
+    |> Enum.each(fn(part) ->
+      part
       |> Repo.insert!
     end)
 
     assert :ok == Server.reload
   
     TimerHelper.wait_until fn ->
-      assert {:ok, 3} == Server.workers
+      assert {:ok, 3} == Server.partitions
     end
   end
 
   test "event from unk sensor gets cached into state" do
-    assert {:ok, 0} == Server.workers
+    assert {:ok, 0} == Server.sensors
   
     ev = %BusEvent{address: "one", port: 1}
     :sensor_server
     |> send({:event, ev})
 
     assert Server.known_sensor?(ev) == true
+
+    assert {:ok, 1} == Server.sensors
   end
 
   test "not sent event is not in cache" do
-    assert {:ok, 0} == Server.workers
+    assert {:ok, 0} == Server.sensors
   
     ev = %BusEvent{address: "one", port: 1}
 
     assert Server.known_sensor?(ev) == false
   end
 
-  test "event from unk sensor starts new worker" do
-    assert {:ok, 0} == Server.workers
-  
-    ev = %BusEvent{address: "one", port: 1}
-    :sensor_server
-    |> send({:event, ev})
-
-    TimerHelper.wait_until fn ->
-      assert {:ok, 1} == Server.workers
-    end
-  end
-
   test "event from unk sensor goes into repo" do
-    assert {:ok, 0} == Server.workers
+    assert {:ok, 0} == Server.sensors
     assert Repo.one(SensorModel) == nil
   
     ev = %BusEvent{address: "one", port: 1}
     :sensor_server
     |> send({:event, ev})
+
+    assert {:ok, 1} == Server.sensors
 
     TimerHelper.wait_until fn ->
       assert %{address: "one", port: 1} = Repo.one(SensorModel)
@@ -91,7 +84,7 @@ defmodule DtCore.Test.Sensor.Server do
   end
 
   test "many events create many record and are cached" do
-    assert {:ok, 0} == Server.workers
+    assert {:ok, 0} == Server.sensors
     assert Repo.one(SensorModel) == nil
   
     [%BusEvent{address: "one", port: 1},
@@ -105,7 +98,7 @@ defmodule DtCore.Test.Sensor.Server do
     end)
 
     TimerHelper.wait_until fn ->
-      assert {:ok, 3} == Server.workers
+      assert {:ok, 3} == Server.sensors
     end
 
   end

@@ -95,7 +95,8 @@ defmodule DtCore.Test.Sensor.Worker do
     part = %PartitionModel{
       name: "part1",
       armed: @arm_armed,
-      entry_delay: 1
+      entry_delay: 1,
+      exit_delay: 10
       }
     config = %SensorModel{
       name: "sense2",
@@ -111,6 +112,7 @@ defmodule DtCore.Test.Sensor.Worker do
     {:ok, pid} = Worker.start_link({config, self})
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
+    
     [%SensorEv{type: :alarm, address: "1", port: 1, delayed: true}]
     |> assert_receive(5000)
 
@@ -176,6 +178,34 @@ defmodule DtCore.Test.Sensor.Worker do
 
     [%SensorEv{type: :reading, address: "1", port: 1, delayed: false}]
     |> assert_receive(5000)
+  end 
+
+  test "delayed alarm on exit" do
+    part = %PartitionModel{
+      name: "part1",
+      armed: @arm_armed,
+      entry_delay: 30,
+      exit_delay: 1
+      }
+    config = %SensorModel{
+      name: "sense1",
+      balance: "NC",
+      th1: 10,
+      entry_delay: true,
+      partitions: [part],
+      address: "1", port: 1,
+      enabled: true
+    }
+    {:ok, _ppid} = Partition.start_link({part, self})
+    {:ok, pid} = Worker.start_link({config, self})
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+
+    [%SensorEv{type: :alarm, address: "1", port: 1, delayed: true}]
+    |> assert_receive(5000)
+
+    [%SensorEv{type: :reading, address: "1", port: 1, delayed: false}]
+    |> assert_receive(2000)
   end 
 
   test "standby values should fail if no data" do

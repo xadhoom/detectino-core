@@ -10,7 +10,6 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
       add :entry_delay, :integer
       add :exit_delay, :integer
       add :armed, :string
-      add :last_armed, :string
 
       timestamps()
     end

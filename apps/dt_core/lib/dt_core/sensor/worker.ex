@@ -17,40 +17,23 @@ defmodule DtCore.Sensor.Worker do
   #
   # Client APIs
   #
-  def start_link({config = %SensorModel{}, pid}) do
-    {:ok, name} = Utils.sensor_server_name(config)
-    GenServer.start_link(__MODULE__, {config, pid}, name: name)
+  def start_link({config = %SensorModel{}, partition = %PartitionModel{},
+    part_server}) do
+    {:ok, name} = Utils.sensor_server_name(config, partition)
+    GenServer.start_link(__MODULE__, {config, part_server}, name: name)
   end
 
   #
   # GenServer callbacks
   #
-  def init({config, pid}) do
+  def init({config, part_server}) do
     Logger.info "Starting Sensor Worker with addr #{config.address} " <>
       "and port #{config.port}"
     state = %{
       config: config,
-      receiver: pid
+      server: part_server
     }
-    send self(), :start
     {:ok, state}
-  end
-
-  def handle_info(:start, state) do
-    parts_alive? = state.config.partitions
-    |> Enum.reduce(true, fn(part, _acc) ->
-      case Partition.alive?(part) do
-        true -> true
-        _ -> false
-      end
-    end)
-    case parts_alive? do
-      true ->
-        :ok = process_delays(state)
-        {:noreply, state}
-      _ ->
-        {:stop, :dead_partitions, state}
-    end
   end
 
   def handle_info({:event, ev = %Event{}}, state) do
@@ -58,7 +41,7 @@ defmodule DtCore.Sensor.Worker do
       false -> Logger.debug("Ignoring event from server  cause I'm not online")
       true ->
         Logger.debug("Got event from server")
-        events = build_events(ev, state)
+        events = do_recevie_event(ev, state)
         :ok = Process.send(state.receiver, events, [])
       _ -> Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
     end
@@ -80,36 +63,12 @@ defmodule DtCore.Sensor.Worker do
   end
 
   defp process_delays(state) do
-    tmp = case Enum.empty?(state.config.partitions) do
-      true -> 0
-      false ->
-        state.config.partitions
-        |> Enum.min_by(fn(item) ->
-          item.entry_delay
-        end)
-    end
-    entry_delay = case tmp do
-      %PartitionModel{entry_delay: v} -> v
-      _ -> 0
-    end
+    entry_delay = state.server
+    |> Partition.call(:entry_delay?)
 
-    tmp = case Enum.empty?(state.config.partitions) do
-      true -> 0
-      false ->
-        state.config.partitions
-        |> Enum.min_by(fn(item) ->
-          item.exit_delay
-        end)
-    end
-    exit_delay = case tmp do
-      %PartitionModel{exit_delay: v} -> v
-      _ -> 0
-    end
+    exit_delay = state.server
+    |> Partition.call(:exit_delay?)
 
-    # if we have many partitions, one may been just armed
-    # while the other is disarmed, depending on the scenario
-    # so just get the first and we'll use it to determine
-    # if we need to use entry or exit delay
     is_entry = state.config.partitions
     |> Enum.at(0)
     |> Partition.entry?
@@ -153,7 +112,7 @@ defmodule DtCore.Sensor.Worker do
   end
 
   @doc false
-  defp build_events(ev = %Event{}, state) do
+  defp do_recevie_event(ev = %Event{}, state) do
     parts = state.config.partitions
     parts
     |> Enum.reduce([], fn(partition, acc) ->

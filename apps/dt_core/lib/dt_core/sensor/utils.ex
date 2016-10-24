@@ -24,21 +24,22 @@ defmodule DtCore.Sensor.Utils do
     :global.whereis_name name
   end
 
-  def sensor_server_name(_sensor = %SensorModel{name: nil}) do
+  def sensor_server_name(_sensor = %SensorModel{name: nil}, _partition) do
     {:error, :name}
   end
 
-  def sensor_server_name(_sensor = %SensorModel{address: nil}) do
+  def sensor_server_name(_sensor = %SensorModel{address: nil}, _partition) do
     {:error, :address}
   end
 
-  def sensor_server_name(_sensor = %SensorModel{port: nil}) do
+  def sensor_server_name(_sensor = %SensorModel{port: nil}, _partition) do
     {:error, :port}
   end
 
-  def sensor_server_name(sensor = %SensorModel{}) do
+  def sensor_server_name(sensor = %SensorModel{}, partition = %PartitionModel{}) do
     name = {
       :sensor,
+      partition: partition.name,
       name: sensor.name,
       address: sensor.address,
       port: sensor.port
@@ -46,8 +47,8 @@ defmodule DtCore.Sensor.Utils do
     {:ok, {:global, name}}
   end
 
-  def sensor_server_pid(sensor = %SensorModel{}) do
-    {:ok, {:global, name}} = sensor_server_name(sensor)
+  def sensor_server_pid(sensor = %SensorModel{}, partition) do
+    {:ok, {:global, name}} = sensor_server_name(sensor, partition)
     :global.whereis_name name
   end
 end
