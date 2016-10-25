@@ -97,7 +97,7 @@ defmodule DtCore.Sensor.Partition do
   def handle_info({:event, ev = %SensorEv{}}, state) do
     Logger.debug "Received event #{inspect ev} from one of our sensors"
 
-    send state.receiver, {:event, ev}
+    send state.receiver, {:event, ev, state.config}
 
     {:noreply, state}
   end
@@ -108,7 +108,7 @@ defmodule DtCore.Sensor.Partition do
     res = case mode do
       "ARM" ->
         Logger.info("Arming")
-        arm_all(state.sensors)
+        arm_all(state.sensors, state.config)
       x ->
         Logger.error("This should not happen, invalid arming #{inspect x}")
         :error
@@ -154,11 +154,11 @@ defmodule DtCore.Sensor.Partition do
     {:reply, res, state}
   end
 
-  defp arm_all(sensors) do
+  defp arm_all(sensors, partition) do
     sensors
     |> Enum.each(fn(sensor) ->
       sensor
-      |> GenServer.call({:arm})
+      |> GenServer.call({:arm, partition.exit_delay})
     end)
   end
 

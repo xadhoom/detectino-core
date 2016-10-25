@@ -18,30 +18,32 @@ defmodule DtCore.Sensor.Worker do
   # Client APIs
   #
   def start_link({config = %SensorModel{}, partition = %PartitionModel{},
-    part_server}) do
+    receiver}) do
     {:ok, name} = Utils.sensor_server_name(config, partition)
-    GenServer.start_link(__MODULE__, {config, part_server}, name: name)
+    GenServer.start_link(__MODULE__, {config, receiver}, name: name)
   end
 
   #
   # GenServer callbacks
   #
-  def init({config, part_server}) do
+  def init({config, receiver}) do
     Logger.info "Starting Sensor Worker with addr #{config.address} " <>
       "and port #{config.port}"
     state = %{
       config: config,
-      server: part_server
+      receiver: receiver,
+      armed: false
+      #server: part_server
     }
     {:ok, state}
   end
 
-  def handle_info({:event, ev = %Event{}}, state) do
+  def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
     case state.config.enabled do
       false -> Logger.debug("Ignoring event from server  cause I'm not online")
       true ->
         Logger.debug("Got event from server")
-        events = do_recevie_event(ev, state)
+        events = do_receive_event(ev, partition, state)
         :ok = Process.send(state.receiver, events, [])
       _ -> Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
     end
@@ -62,33 +64,28 @@ defmodule DtCore.Sensor.Worker do
     {:noreply, state}
   end
 
-  defp process_delays(state) do
-    entry_delay = state.server
-    |> Partition.call(:entry_delay?)
+  def handle_call({:arm, delay}, _from, state) do
+    Logger.debug("Arming sensor")
+    state
+    |> zone_exit_delay(delay)
+    |> will_reset_delay(:exit)
 
-    exit_delay = state.server
-    |> Partition.call(:exit_delay?)
+    {:reply, :ok, %{state | armed: true}}
+  end
 
-    is_entry = state.config.partitions
-    |> Enum.at(0)
-    |> Partition.entry?
-
-    case is_entry do
-      true ->
-        state
-        |> zone_entry_delay(entry_delay)
-        |> will_reset_delay(:entry)
-      false ->
-        state
-        |> zone_exit_delay(exit_delay)
-        |> will_reset_delay(:exit)
-      nil -> Logger.debug("Partition delay not set")
-        will_reset_delay(0, :entry)
-    end
-    :ok
+  def handle_call({:disarm}, _from, state) do
+    Logger.debug("Disarming sensor")
+    {:reply, :ok, %{state | armed: false}}
   end
 
   defp will_reset_delay(delay, delay_t) do
+    delay = case delay do
+      nil -> 0
+      v when is_integer v  -> v
+      unk -> 
+        Logger.error "Got invalid delay value #{inspect unk}"
+        0
+    end 
     case delay_t do
       :entry ->
         Process.send_after(self, {:reset_entry}, delay * 1000)
@@ -112,26 +109,18 @@ defmodule DtCore.Sensor.Worker do
   end
 
   @doc false
-  defp do_recevie_event(ev = %Event{}, state) do
-    parts = state.config.partitions
-    parts
-    |> Enum.reduce([], fn(partition, acc) ->
-      armed = partition
-      |> Partition.arming_status
-
-      ret = case armed do
-        "DISARM" ->
-          case state.config.full24h do
-            true ->
-              process_inarm(ev, partition, state)
-            _ ->
-              process_indisarm(ev, partition, state)
-          end
-        "ARM" ->
-          process_inarm(ev, partition, state)
-      end
-      Enum.concat(acc, [ret])
-    end)
+  defp do_receive_event(ev = %Event{}, partition = %PartitionModel{}, state) do
+    ret = case state.armed do
+      v when v == "DISARM" or v == false ->
+        case state.config.full24h do
+          true ->
+            process_inarm(ev, partition, state)
+          _ ->
+            process_indisarm(ev, partition, state)
+        end
+      v when v == "ARM" or v == true ->
+        process_inarm(ev, partition, state)
+    end
   end
 
   defp process_indisarm(ev, _partition, state) do
@@ -146,14 +135,58 @@ defmodule DtCore.Sensor.Worker do
   end
 
   defp process_inarm(ev, partition, state) do
+    p_entry = case partition.entry_delay do
+      d when is_integer(d) -> d
+      _ -> 0
+    end
+
+    p_exit = case partition.exit_delay do
+      d when is_integer(d) -> d
+      _ -> 0
+    end
+
     sensor_ev = process_event(ev, state)
-    case state.config.entry_delay do
-      false -> sensor_ev
+
+    exit_delay = case ev.delayed do
+      false ->
+        state.config.exit_delay
       true ->
-        delay = partition.entry_delay * 1000
-        _timer = Process.send_after(self, {:event, ev},
-          delay + 1000)
+        nil
+    end
+
+    case exit_delay do
+      false ->
+        delay = p_entry * 1000
+        case delay do
+          0 ->
+            %SensorEv{sensor_ev | delayed: false}
+          _ ->
+            ev = %Event{ev | delayed: true}
+            _timer = Process.send_after(self, {:event, ev, partition},
+              delay)
+            maybe_start_entry_timer(state, p_entry)
+            %SensorEv{sensor_ev | delayed: true}
+        end
+      true ->
+        Logger.debug "scheduling delayed exit alarm"
+        delay = p_exit * 1000
+        ev = %Event{ev | delayed: true}
+        _timer = Process.send_after(self, {:event, ev, partition},
+          delay)
         %SensorEv{sensor_ev | delayed: true}
+      _ ->
+        %SensorEv{sensor_ev | delayed: false}
+    end
+  end
+
+  def maybe_start_entry_timer(state, entry_delay) do
+    case state.config.exit_delay do
+      true ->
+        Logger.info "Still in exit delay, not resetting entry"
+      v when is_nil(v) or v == false ->
+        state
+        |> zone_entry_delay(entry_delay)
+        |> will_reset_delay(:entry)
     end
   end
 

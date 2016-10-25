@@ -7,7 +7,8 @@ defmodule DtCore.Event do
     port: nil,
     type: nil,
     subtype: nil,
-    value: nil
+    value: nil,
+    delayed: false
 
 end
 

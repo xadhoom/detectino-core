@@ -1,12 +1,9 @@
-defmodule DtCore.Test.Sensor.Worker do
+defmodule DtCore.Test.Sensor.Partition do
   use DtCore.EctoCase
 
-  alias DtCore.Sensor.Worker
   alias DtCore.Sensor.Partition
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
-  alias DtCore.Event, as: Event
-  alias DtCore.SensorEv
 
   @arm_disarmed "DISARM"
   @arm_armed "ARM"
@@ -21,7 +18,7 @@ defmodule DtCore.Test.Sensor.Worker do
       sensors: [s1, s2]
     }
 
-    {:ok, ppid} = Partition.start_link({part, self})
+    {:ok, _ppid} = Partition.start_link({part, self})
     workers = Partition.count_sensors(part)
 
     assert 2 = workers
