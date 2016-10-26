@@ -209,8 +209,8 @@ defmodule DtCore.Sensor.Server do
     case Repo.one(q) do
       nil -> add_on_repo({ev, state})
       _record ->
-        sensors = [%{address: ev.address, port: ev.port} | state.sensors]
-        {ev, %{state | sensors: sensors}}
+        ss = [%{address: ev.address, port: ev.port} | state.sensors]
+        {ev, %{state | sensors: ss}}
     end
   end
 
@@ -221,8 +221,8 @@ defmodule DtCore.Sensor.Server do
       address: ev.address, port: ev.port, name: "AUTO"
     })
     |> Repo.insert!
-    sensors = [%{address: ev.address, port: ev.port} | state.sensors]
-    {ev, %{state | sensors: sensors}}
+    ss = [%{address: ev.address, port: ev.port} | state.sensors]
+    {ev, %{state | sensors: ss}}
   end
 
   defp start_partitions(state) do

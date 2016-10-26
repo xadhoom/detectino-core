@@ -8,7 +8,6 @@ defmodule DtCore.Sensor.Worker do
 
   require Logger
   alias DtCore.Sensor.Utils
-  alias DtCore.Sensor.Partition
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event, as: Event
@@ -39,10 +38,11 @@ defmodule DtCore.Sensor.Worker do
   end
 
   def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
-    case state.config.enabled do
+    config = state.config
+    case config.enabled do
       false -> Logger.debug("Ignoring event from server  cause I'm not online")
       true ->
-        if ev.address == state.config.address and ev.port == state.config.port do
+        if ev.address == config.address and ev.port == config.port do
           Logger.debug("Got event from server")
           event = do_receive_event(ev, partition, state)
           :ok = Process.send(state.receiver, {:event, event}, [])
@@ -84,10 +84,10 @@ defmodule DtCore.Sensor.Worker do
     delay = case delay do
       nil -> 0
       v when is_integer v  -> v
-      unk -> 
+      unk ->
         Logger.error "Got invalid delay value #{inspect unk}"
         0
-    end 
+    end
     case delay_t do
       :entry ->
         Process.send_after(self, {:reset_entry}, delay * 1000)
@@ -112,7 +112,7 @@ defmodule DtCore.Sensor.Worker do
 
   @doc false
   defp do_receive_event(ev = %Event{}, partition = %PartitionModel{}, state) do
-    ret = case state.armed do
+    case state.armed do
       v when v == "DISARM" or v == false ->
         case state.config.full24h do
           true ->
@@ -137,57 +137,76 @@ defmodule DtCore.Sensor.Worker do
   end
 
   defp process_inarm(ev, partition, state) do
-    p_entry = case partition.entry_delay do
-      d when is_integer(d) -> d
-      _ -> 0
-    end
-
-    p_exit = case partition.exit_delay do
-      d when is_integer(d) -> d
-      _ -> 0
-    end
+    urgent = urgent?(state.config)
+    p_entry = compute_entry_delay(partition, urgent)
+    p_exit = compute_exit_delay(partition, urgent)
 
     sensor_ev = process_event(ev, state)
 
-    exit_delay = case ev.delayed do
+    case exit_delay?(ev, urgent, state) do
       false ->
-        state.config.exit_delay
+        inarm_nodelay({ev, sensor_ev, partition, p_entry, urgent, state})
       true ->
-        nil
-    end
-
-    urgent = case state.config.full24h do
-      true ->
-        exit_delay = false
-        p_exit = 0
-        p_entry = 0
-        true
+        inarm_delay({ev, sensor_ev, partition, p_exit})
       _ ->
-        false
+        %SensorEv{sensor_ev | delayed: false, urgent: urgent}
     end
+  end
 
-    case exit_delay do
-      false ->
-        delay = p_entry * 1000
-        case delay do
-          0 ->
-            %SensorEv{sensor_ev | delayed: false, urgent: urgent}
-          _ ->
-            ev = %Event{ev | delayed: true}
-            _timer = Process.send_after(self, {:event, ev, partition},
-              delay)
-            maybe_start_entry_timer(state, p_entry)
-            %SensorEv{sensor_ev | delayed: true}
-        end
-      true ->
-        Logger.debug "scheduling delayed exit alarm"
-        delay = p_exit * 1000
+  defp compute_exit_delay(partition, urgent) do
+    case partition.exit_delay do
+      d when is_integer(d) and not urgent -> d
+      _ -> 0
+    end
+  end
+
+  defp compute_entry_delay(partition, urgent) do
+    case partition.entry_delay do
+      d when is_integer(d) and not urgent -> d
+      _ -> 0
+    end
+  end
+
+  def inarm_delay({ev, sensor_ev, partition, p_exit}) do
+    Logger.debug "scheduling delayed exit alarm"
+    delay = p_exit * 1000
+    ev = %Event{ev | delayed: true}
+    _timer = Process.send_after(self, {:event, ev, partition},
+      delay)
+    %SensorEv{sensor_ev | delayed: true}
+  end
+
+  def inarm_nodelay({ev, sensor_ev, partition, p_entry, urgent, state}) do
+    delay = p_entry * 1000
+    case delay do
+      0 ->
+        %SensorEv{sensor_ev | delayed: false, urgent: urgent}
+      _ ->
         ev = %Event{ev | delayed: true}
         _timer = Process.send_after(self, {:event, ev, partition},
           delay)
+        maybe_start_entry_timer(state, p_entry)
         %SensorEv{sensor_ev | delayed: true}
+    end
+  end
+
+  defp exit_delay?(ev, urgent, state) do
+    case ev.delayed do
+      false when not urgent ->
+        state.config.exit_delay
+      false when urgent ->
+        false
+      true ->
+        nil
+    end
+  end
+
+  defp urgent?(sensor) do
+    case sensor.full24h do
+      true ->
+        true
       _ ->
-        %SensorEv{sensor_ev | delayed: false, urgent: urgent}
+        false
     end
   end
 

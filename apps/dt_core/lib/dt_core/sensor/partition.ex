@@ -167,11 +167,11 @@ defmodule DtCore.Sensor.Partition do
     end
   end
 
-  defp generate_part_ev?(ev = %SensorEv{urgent: true}, state) do
+  defp generate_part_ev?(_ev = %SensorEv{urgent: true}, _state) do
     true
   end
 
-  defp generate_part_ev?(ev = %SensorEv{urgent: false}, state) do
+  defp generate_part_ev?(_ev = %SensorEv{urgent: false}, state) do
     case state.config.armed in @arm_modes do
       true -> true
       _ -> false
