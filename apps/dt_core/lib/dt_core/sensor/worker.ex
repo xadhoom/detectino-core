@@ -156,12 +156,22 @@ defmodule DtCore.Sensor.Worker do
         nil
     end
 
+    urgent = case state.config.full24h do
+      true ->
+        exit_delay = false
+        p_exit = 0
+        p_entry = 0
+        true
+      _ ->
+        false
+    end
+
     case exit_delay do
       false ->
         delay = p_entry * 1000
         case delay do
           0 ->
-            %SensorEv{sensor_ev | delayed: false}
+            %SensorEv{sensor_ev | delayed: false, urgent: urgent}
           _ ->
             ev = %Event{ev | delayed: true}
             _timer = Process.send_after(self, {:event, ev, partition},
@@ -177,7 +187,7 @@ defmodule DtCore.Sensor.Worker do
           delay)
         %SensorEv{sensor_ev | delayed: true}
       _ ->
-        %SensorEv{sensor_ev | delayed: false}
+        %SensorEv{sensor_ev | delayed: false, urgent: urgent}
     end
   end
 

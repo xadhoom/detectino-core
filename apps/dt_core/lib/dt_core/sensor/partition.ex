@@ -119,13 +119,15 @@ defmodule DtCore.Sensor.Partition do
   end
 
   def handle_call({:disarm, mode}, _from, state) do
-    res = case mode do
+    {res, state} = case mode do
       "DISARM" ->
         Logger.info("Disarming")
         disarm_all(state.sensors)
+        config = %PartitionModel{state.config | armed: "DISARM"}
+        {:ok, %{state | config: config}}
       x ->
         Logger.error("This should not happen, invalid disarm #{inspect x}")
-        :error
+        {:error, state}
     end
     {:reply, res, state}
   end
@@ -157,11 +159,22 @@ defmodule DtCore.Sensor.Partition do
   end
 
   defp maybe_partition_alarm(ev = %SensorEv{}, state) do
-    case state.config.armed in @arm_modes do
+    case generate_part_ev?(ev, state) do
       true ->
-        ev = %PartitionEv{type: :alarm, name: state.config.name}
+        ev = %PartitionEv{type: ev.type, name: state.config.name}
         Process.send(state.receiver, ev, [])
       _ -> nil
+    end
+  end
+
+  defp generate_part_ev?(ev = %SensorEv{urgent: true}, state) do
+    true
+  end
+
+  defp generate_part_ev?(ev = %SensorEv{urgent: false}, state) do
+    case state.config.armed in @arm_modes do
+      true -> true
+      _ -> false
     end
   end
 

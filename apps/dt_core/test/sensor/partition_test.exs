@@ -40,6 +40,8 @@ defmodule DtCore.Test.Sensor.Partition do
 
     %SensorEv{type: :reading, address: "1", port: 1}
     |> assert_receive(5000)
+    %PartitionEv{}
+    |> refute_receive(1000)
   end
 
   test "triggers alarm on immediate sensor" do
@@ -75,6 +77,94 @@ defmodule DtCore.Test.Sensor.Partition do
     :ok = Process.send(pid, {:event, ev}, [])
 
     %SensorEv{}
+    |> refute_receive(1000)
+  end
+
+  test "triggers partition alarms when partition is not armed and sensor is a 24h" do
+    sensor = %SensorModel{
+      name: "sense1",
+      full24h: true,
+      address: "1", port: 1,
+      balance: "DEOL", th1: 10, th2: 20, th3: 30,
+      partitions: [],
+      enabled: true
+    }
+    part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
+
+    {:ok, pid} = Partition.start_link({part, self})
+    # not really needed, but well
+    :ok = Partition.disarm(part, "DISARM")
+
+    ev = %Event{address: "1", port: 1, value: 35}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+     %PartitionEv{type: :tamper, name: "part1"}
+    |> assert_receive(5000)
+
+    ev = %Event{address: "1", port: 1, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+    %PartitionEv{type: :alarm, name: "part1"}
+    |> assert_receive(5000)
+
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :standby, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+    %PartitionEv{type: :standby, name: "part1"}
+    |> assert_receive(5000)
+
+    ev = %Event{address: "1", port: 1, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :short, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+    %PartitionEv{type: :short, name: "part1"}
+    |> assert_receive(5000)
+  end
+
+  test "does not trigger partition alarms when partition is not armed and sensor isn't 24h" do
+    sensor = %SensorModel{
+      name: "sense1",
+      full24h: false,
+      address: "1", port: 1,
+      balance: "DEOL", th1: 10, th2: 20, th3: 30,
+      partitions: [],
+      enabled: true
+    }
+    part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
+
+    {:ok, pid} = Partition.start_link({part, self})
+    # not really needed, but well
+    :ok = Partition.disarm(part, "DISARM")
+
+    ev = %Event{address: "1", port: 1, value: 35}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+    %PartitionEv{}
+    |> refute_receive(1000)
+
+    ev = %Event{address: "1", port: 1, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :reading, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+    %PartitionEv{}
+    |> refute_receive(1000)
+
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :standby, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+    %PartitionEv{}
+    |> refute_receive(1000)
+
+    ev = %Event{address: "1", port: 1, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    %SensorEv{type: :short, address: "1", port: 1, delayed: false}
+    |> assert_receive(5000)
+    %PartitionEv{}
     |> refute_receive(1000)
   end
 

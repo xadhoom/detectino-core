@@ -25,7 +25,8 @@ defmodule DtCore.SensorEv do
   defstruct type: nil,
     delayed: false,
     address: nil,
-    port: nil
+    port: nil,
+    urgent: false
 end
 
 defmodule DtCore.PartitionEv do
