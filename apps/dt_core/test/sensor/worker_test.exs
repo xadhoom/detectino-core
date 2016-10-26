@@ -32,7 +32,7 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    %SensorEv{type: :reading, address: "1", port: 1}
+    {:event, %SensorEv{type: :reading, address: "1", port: 1}}
     |> assert_receive(5000)
   end
 
@@ -48,7 +48,7 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
   end
 
@@ -66,27 +66,27 @@ defmodule DtCore.Test.Sensor.Worker do
 
     ev = %Event{address: "1", port: 1, value: 45}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 35}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    %SensorEv{type: :fault, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :fault, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 25}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    %SensorEv{type: :standby, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :standby, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 5}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    %SensorEv{type: :short, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :short, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
   end
 
@@ -115,10 +115,10 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
     
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}
+    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
     |> assert_receive(5000)
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
   end
 
@@ -144,13 +144,13 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}
+    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
     |> assert_receive(5000)
 
     disarm_cmd = {:disarm}
     :ok = GenServer.call(pid, disarm_cmd)
 
-    %SensorEv{type: :reading, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
   end 
 
@@ -179,10 +179,10 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}
+    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
     |> assert_receive(5000)
 
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
   end 
 
