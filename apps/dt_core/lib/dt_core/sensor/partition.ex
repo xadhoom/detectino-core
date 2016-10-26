@@ -10,6 +10,7 @@ defmodule DtCore.Sensor.Partition do
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event
   alias DtCore.SensorEv
+  alias DtCore.PartitionEv
 
   @arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
   @disarm_modes ["DISARM"]
@@ -88,7 +89,7 @@ defmodule DtCore.Sensor.Partition do
     state.sensors
     |> Enum.each(fn(pid) ->
       Logger.debug "Sending event #{inspect ev} to sensor #{inspect pid}"
-      send pid, {:event, ev}
+      send pid, {:event, ev, state.config}
     end)
 
     {:noreply, state}
@@ -96,22 +97,23 @@ defmodule DtCore.Sensor.Partition do
 
   def handle_info({:event, ev = %SensorEv{}}, state) do
     Logger.debug "Received event #{inspect ev} from one of our sensors"
-
-    send state.receiver, {:event, ev, state.config}
-
+    send state.receiver, ev
+    maybe_partition_alarm(ev, state)
     {:noreply, state}
   end
 
   def handle_call({:arm, mode}, _from, state) do
     #@arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
     #@disarm_modes ["DISARM"]
-    res = case mode do
+    {res, state} = case mode do
       "ARM" ->
         Logger.info("Arming")
         arm_all(state.sensors, state.config)
+        config = %PartitionModel{state.config | armed: "ARM"}
+        {:ok, %{state | config: config}}
       x ->
         Logger.error("This should not happen, invalid arming #{inspect x}")
-        :error
+        {:error, state}
     end
     {:reply, res, state}
   end
@@ -152,6 +154,15 @@ defmodule DtCore.Sensor.Partition do
       v -> v
     end
     {:reply, res, state}
+  end
+
+  defp maybe_partition_alarm(ev = %SensorEv{}, state) do
+    case state.config.armed in @arm_modes do
+      true ->
+        ev = %PartitionEv{type: :alarm, name: state.config.name}
+        Process.send(state.receiver, ev, [])
+      _ -> nil
+    end
   end
 
   defp arm_all(sensors, partition) do

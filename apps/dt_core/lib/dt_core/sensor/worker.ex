@@ -42,9 +42,11 @@ defmodule DtCore.Sensor.Worker do
     case state.config.enabled do
       false -> Logger.debug("Ignoring event from server  cause I'm not online")
       true ->
-        Logger.debug("Got event from server")
-        events = do_receive_event(ev, partition, state)
-        :ok = Process.send(state.receiver, events, [])
+        if ev.address == state.config.address and ev.port == state.config.port do
+          Logger.debug("Got event from server")
+          event = do_receive_event(ev, partition, state)
+          :ok = Process.send(state.receiver, {:event, event}, [])
+        end
       _ -> Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
     end
     {:noreply, state}
