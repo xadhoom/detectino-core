@@ -4,7 +4,7 @@ defmodule DtCore.Output.Server do
   """
   use GenServer
   require Logger
-  
+
   #
   # Client APIs
   #
@@ -12,7 +12,7 @@ defmodule DtCore.Output.Server do
     GenServer.start_link(__MODULE__, sup, [name: :output_server])
   end
 
-    #
+  #
   # GenServer callbacks
   #
   def init(sup) do
