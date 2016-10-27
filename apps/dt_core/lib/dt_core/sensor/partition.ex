@@ -15,9 +15,9 @@ defmodule DtCore.Sensor.Partition do
   @arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
   @disarm_modes ["DISARM"]
 
-  def start_link({config = %PartitionModel{}, receiver}) do
+  def start_link({config = %PartitionModel{}, cache, receiver}) do
     {:ok, name} = Utils.partition_server_name(config)
-    GenServer.start_link(__MODULE__, {config, receiver}, name: name)
+    GenServer.start_link(__MODULE__, {config, cache, receiver}, name: name)
   end
 
   def arming_status(config = %PartitionModel{}) do
@@ -33,6 +33,11 @@ defmodule DtCore.Sensor.Partition do
       :undefined -> false
       pid -> pid |> Process.alive?
     end
+  end
+
+  def get_pid(config = %PartitionModel{}) do
+    pid = config
+    |> Utils.partition_server_pid
   end
 
   def count_sensors(config = %PartitionModel{}) do
@@ -56,16 +61,32 @@ defmodule DtCore.Sensor.Partition do
   #
   # GenServer Callbacks
   #
-  def init({config, receiver}) do
+  def init({config, cache, receiver}) do
     Logger.debug("Starting partition worker with " <>
       "#{inspect config} config")
     state = %{
       config: config,
       receiver: receiver,
-      sensors: []
+      sensors: [],
+      cache: cache
     }
+    state = reload_cache(state)
     send self(), {:start}
     {:ok, state}
+  end
+
+  defp reload_cache(state) do
+    {:ok, name} = Utils.partition_server_name(state.config)
+    state = case :ets.lookup(state.cache, name) do
+      [{_key, value}] ->
+        Logger.info "Reloaded cached state"
+        %{state | config: value}
+      _ ->
+        Logger.info "No state to reload"
+        state
+    end
+    true = save_state(state)
+    state
   end
 
   def handle_info({:start}, state) do
@@ -80,7 +101,9 @@ defmodule DtCore.Sensor.Partition do
           acc
       end
     end)
-    {:noreply, %{state | sensors: sensors_pids}}
+    state = %{state | sensors: sensors_pids}
+    {_, state} = do_arm(state, state.config.armed)
+    {:noreply, state}
   end
 
   def handle_info({:event, ev = %Event{}}, state) do
@@ -105,16 +128,8 @@ defmodule DtCore.Sensor.Partition do
   def handle_call({:arm, mode}, _from, state) do
     #@arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
     #@disarm_modes ["DISARM"]
-    {res, state} = case mode do
-      "ARM" ->
-        Logger.info("Arming")
-        arm_all(state.sensors, state.config)
-        config = %PartitionModel{state.config | armed: "ARM"}
-        {:ok, %{state | config: config}}
-      x ->
-        Logger.error("This should not happen, invalid arming #{inspect x}")
-        {:error, state}
-    end
+    {res, state} = do_arm(state, mode)
+    true = save_state(state)
     {:reply, res, state}
   end
 
@@ -129,6 +144,7 @@ defmodule DtCore.Sensor.Partition do
         Logger.error("This should not happen, invalid disarm #{inspect x}")
         {:error, state}
     end
+    true = save_state(state)
     {:reply, res, state}
   end
 
@@ -156,6 +172,28 @@ defmodule DtCore.Sensor.Partition do
       v -> v
     end
     {:reply, res, state}
+  end
+
+  defp save_state(state) do
+    {:ok, name} = Utils.partition_server_name(state.config)
+    true = :ets.insert(state.cache, {name, state.config})
+  end
+
+  defp do_arm(state, mode) do
+    {res, state} = case mode do
+      "ARM" ->
+        Logger.info("Arming")
+        arm_all(state.sensors, state.config)
+        config = %PartitionModel{state.config | armed: "ARM"}
+        {:ok, %{state | config: config}}
+      "DISARM" ->
+        {:ok, state}
+      nil ->
+        {:ok, state}
+      x ->
+        Logger.error("This should not happen, invalid arming #{inspect x}")
+        {:error, state}
+    end
   end
 
   defp maybe_partition_alarm(ev = %SensorEv{}, state) do

@@ -2,16 +2,23 @@ defmodule DtCore.Test.Sensor.Partition do
   use DtCore.EctoCase
 
   alias DtCore.Sensor.Partition
+  alias DtCore.Sensor.PartitionSup
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event, as: Event
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
+  alias DtCore.Test.TimerHelper
 
   @arm_disarmed "DISARM"
   @arm_armed "ARM"
 
-  test "starts all sensors servers" do
+  setup do
+    cache = :ets.new(:part_state_cache, [:set, :public])
+    {:ok, [cache: cache]}
+  end
+
+  test "starts all sensors servers", ctx do
     s1 = %SensorModel{name: "NC_1", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
     s2 = %SensorModel{name: "NC_2", balance: "NC", th1: 10,
@@ -21,19 +28,19 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: [s1, s2]
     }
 
-    {:ok, _ppid} = Partition.start_link({part, self})
+    {:ok, _ppid} = Partition.start_link({part, ctx[:cache], self})
     workers = Partition.count_sensors(part)
 
     assert 2 = workers
   end
 
-  test "no alarm but simple events if partion is not armed" do
+  test "no alarm but simple events if partion is not armed", ctx do
     sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, self})
+    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
@@ -44,13 +51,13 @@ defmodule DtCore.Test.Sensor.Partition do
     |> refute_receive(1000)
   end
 
-  test "triggers alarm on immediate sensor" do
+  test "triggers alarm on immediate sensor", ctx do
     sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, self})
+    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
 
     :ok = Partition.arm(part, "ARM")
 
@@ -64,13 +71,13 @@ defmodule DtCore.Test.Sensor.Partition do
     |> assert_receive(5000)
   end
 
-  test "ignore event if not for my sensors" do
+  test "ignore event if not for my sensors", ctx do
     sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, self})
+    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
     :ok = Partition.arm(part, "ARM")
 
     ev = %Event{address: "1", port: 2, value: 15}
@@ -80,7 +87,7 @@ defmodule DtCore.Test.Sensor.Partition do
     |> refute_receive(1000)
   end
 
-  test "triggers partition alarms when partition is not armed and sensor is a 24h" do
+  test "triggers partition alarms when partition is not armed and sensor is a 24h", ctx do
     sensor = %SensorModel{
       name: "sense1",
       full24h: true,
@@ -91,7 +98,7 @@ defmodule DtCore.Test.Sensor.Partition do
     }
     part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, self})
+    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
     # not really needed, but well
     :ok = Partition.disarm(part, "DISARM")
 
@@ -124,7 +131,7 @@ defmodule DtCore.Test.Sensor.Partition do
     |> assert_receive(5000)
   end
 
-  test "does not trigger partition alarms when partition is not armed and sensor isn't 24h" do
+  test "does not trigger partition alarms when partition is not armed and sensor isn't 24h", ctx do
     sensor = %SensorModel{
       name: "sense1",
       full24h: false,
@@ -135,7 +142,7 @@ defmodule DtCore.Test.Sensor.Partition do
     }
     part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, self})
+    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
     # not really needed, but well
     :ok = Partition.disarm(part, "DISARM")
 
@@ -168,4 +175,35 @@ defmodule DtCore.Test.Sensor.Partition do
     |> refute_receive(1000)
   end
 
+  test "dead process will resume correctly", ctx do
+    sensor = %SensorModel{name: "NO", balance: "NO", th1: 10,
+      partitions: [], enabled: true, address: "1", port: 1}
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      sensors: [sensor]}
+
+    {:ok, suppid} = PartitionSup.start_link
+
+    {:ok, pid} = Supervisor.start_child(suppid,
+      Supervisor.Spec.worker(Partition, [{part, ctx[:cache], self}],
+        restart: :transient, id: part.name))
+
+    :ok = Partition.arm(part, "ARM")
+    Process.exit(pid, :kill)
+    refute Process.alive?(pid)
+
+    TimerHelper.wait_until fn() ->
+      assert Partition.alive?(part)
+    end
+
+    pid = Partition.get_pid(part)
+
+    ev = %Event{address: "1", port: 1, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+
+    %SensorEv{type: :alarm, address: "1", port: 1}
+    |> assert_receive(5000)
+
+    %PartitionEv{type: :alarm, name: "prot"}
+    |> assert_receive(5000)
+  end
 end
