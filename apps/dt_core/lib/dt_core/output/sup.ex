@@ -1,6 +1,6 @@
-defmodule DtCore.Sup do
+defmodule DtCore.Output.Sup do
   @moduledoc """
-  Root Supervisor for DtCore supervision tree.
+  Supervisor responsibile of all Outputs related stuff.
   """
   use Supervisor
 
@@ -10,8 +10,7 @@ defmodule DtCore.Sup do
 
   def init(_) do
     children = [
-      supervisor(DtCore.Sensor.Sup, [], restart: :permanent),
-      supervisor(DtCore.Output.Sup, [], restart: :permanent)
+      worker(DtCore.Output.Server, [self()], restart: :permanent)
     ]
     supervise(children, strategy: :one_for_all)
   end
