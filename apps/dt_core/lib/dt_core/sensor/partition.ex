@@ -11,13 +11,14 @@ defmodule DtCore.Sensor.Partition do
   alias DtCore.Event
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
+  alias DtCore.EvRegistry
 
   @arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
   @disarm_modes ["DISARM"]
 
-  def start_link({config = %PartitionModel{}, cache, receiver}) do
+  def start_link({config = %PartitionModel{}, cache}) do
     {:ok, name} = Utils.partition_server_name(config)
-    GenServer.start_link(__MODULE__, {config, cache, receiver}, name: name)
+    GenServer.start_link(__MODULE__, {config, cache}, name: name)
   end
 
   def arming_status(config = %PartitionModel{}) do
@@ -36,7 +37,7 @@ defmodule DtCore.Sensor.Partition do
   end
 
   def get_pid(config = %PartitionModel{}) do
-    pid = config
+    config
     |> Utils.partition_server_pid
   end
 
@@ -61,12 +62,11 @@ defmodule DtCore.Sensor.Partition do
   #
   # GenServer Callbacks
   #
-  def init({config, cache, receiver}) do
+  def init({config, cache}) do
     Logger.debug("Starting partition worker with " <>
       "#{inspect config} config")
     state = %{
       config: config,
-      receiver: receiver,
       sensors: [],
       cache: cache
     }
@@ -120,7 +120,7 @@ defmodule DtCore.Sensor.Partition do
 
   def handle_info({:event, ev = %SensorEv{}}, state) do
     Logger.debug "Received event #{inspect ev} from one of our sensors"
-    send state.receiver, ev
+    ev |> dispatch
     maybe_partition_alarm(ev, state)
     {:noreply, state}
   end
@@ -180,7 +180,7 @@ defmodule DtCore.Sensor.Partition do
   end
 
   defp do_arm(state, mode) do
-    {res, state} = case mode do
+    case mode do
       "ARM" ->
         Logger.info("Arming")
         arm_all(state.sensors, state.config)
@@ -196,11 +196,25 @@ defmodule DtCore.Sensor.Partition do
     end
   end
 
+  defp dispatch(ev = %SensorEv{}) do
+    key = %{source: :sensor, address: ev.address, port: ev.port, type: ev.type}
+    Registry.dispatch(EvRegistry.registry, key, fn listeners ->
+      for {pid, _} <- listeners, do: send(pid, ev)
+    end)
+  end
+
+  defp dispatch(ev = %PartitionEv{}) do
+    key = %{source: :partition, name: ev.name, type: ev.type}
+    Registry.dispatch(EvRegistry.registry, key, fn listeners ->
+      for {pid, _} <- listeners, do: send(pid, ev)
+    end)
+  end
+
   defp maybe_partition_alarm(ev = %SensorEv{}, state) do
     case generate_part_ev?(ev, state) do
       true ->
         ev = %PartitionEv{type: ev.type, name: state.config.name}
-        Process.send(state.receiver, ev, [])
+        |> dispatch
       _ -> nil
     end
   end

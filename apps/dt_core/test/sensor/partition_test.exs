@@ -14,6 +14,7 @@ defmodule DtCore.Test.Sensor.Partition do
   @arm_armed "ARM"
 
   setup do
+    {:ok, _} = Registry.start_link(:duplicate, DtCore.EvRegistry.registry)
     cache = :ets.new(:part_state_cache, [:set, :public])
     {:ok, [cache: cache]}
   end
@@ -28,7 +29,7 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: [s1, s2]
     }
 
-    {:ok, _ppid} = Partition.start_link({part, ctx[:cache], self})
+    {:ok, _ppid} = Partition.start_link({part, ctx[:cache]})
     workers = Partition.count_sensors(part)
 
     assert 2 = workers
@@ -40,7 +41,12 @@ defmodule DtCore.Test.Sensor.Partition do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
+    key = %{source: :sensor, address: "1", port: 1, type: :reading}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "prot", type: :reading}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
@@ -57,7 +63,12 @@ defmodule DtCore.Test.Sensor.Partition do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "prot", type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
 
     :ok = Partition.arm(part, "ARM")
 
@@ -77,7 +88,12 @@ defmodule DtCore.Test.Sensor.Partition do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "prot", type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     :ok = Partition.arm(part, "ARM")
 
     ev = %Event{address: "1", port: 2, value: 15}
@@ -98,7 +114,9 @@ defmodule DtCore.Test.Sensor.Partition do
     }
     part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
+    :ok = register_deol_listeners
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     # not really needed, but well
     :ok = Partition.disarm(part, "DISARM")
 
@@ -131,6 +149,30 @@ defmodule DtCore.Test.Sensor.Partition do
     |> assert_receive(5000)
   end
 
+  defp register_deol_listeners do
+    key = %{source: :sensor, address: "1", port: 1, type: :reading}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :tamper}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :standby}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :short}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    key = %{source: :partition, name: "part1", type: :tamper}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "part1", type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "part1", type: :standby}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "part1", type: :short}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    :ok
+  end
+
   test "does not trigger partition alarms when partition is not armed and sensor isn't 24h", ctx do
     sensor = %SensorModel{
       name: "sense1",
@@ -142,7 +184,9 @@ defmodule DtCore.Test.Sensor.Partition do
     }
     part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
 
-    {:ok, pid} = Partition.start_link({part, ctx[:cache], self})
+    :ok = register_deol_listeners
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     # not really needed, but well
     :ok = Partition.disarm(part, "DISARM")
 
@@ -181,10 +225,16 @@ defmodule DtCore.Test.Sensor.Partition do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: [sensor]}
 
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    key = %{source: :partition, name: "prot", type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
     {:ok, suppid} = PartitionSup.start_link
 
     {:ok, pid} = Supervisor.start_child(suppid,
-      Supervisor.Spec.worker(Partition, [{part, ctx[:cache], self}],
+      Supervisor.Spec.worker(Partition, [{part, ctx[:cache]}],
         restart: :transient, id: part.name))
 
     :ok = Partition.arm(part, "ARM")

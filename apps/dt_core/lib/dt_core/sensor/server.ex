@@ -240,7 +240,7 @@ defmodule DtCore.Sensor.Server do
     id = partition.name
     # XXX self will be updated with real receiver of partition events
     case Supervisor.start_child(state.partition_sup,
-          worker(Partition, [{partition, state.part_state_cache, state.receiver}],
+          worker(Partition,[{partition, state.part_state_cache}],
             restart: :transient, id: id)) do
       {:ok, pid} ->
         Logger.info "Started partition worker with pid #{inspect pid}"

@@ -1,3 +1,10 @@
+defmodule DtCore.EvRegistry do
+  @moduledoc false
+  def registry do
+    :registry_events
+  end
+end
+
 defmodule DtCore.Event do
   @moduledoc """
   Event struct for DtCore events (from bus)

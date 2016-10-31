@@ -50,6 +50,7 @@ defmodule DtCore.Mixfile do
   defp deps do
     [
       {:ecto, "~> 2.0"},
+      {:registry, git: "https://github.com/elixir-lang/registry"},
       {:dt_bus, in_umbrella: true},
       {:dt_web, in_umbrella: true},
       {:credo, "~> 0.4", only: [:dev, :test]}
