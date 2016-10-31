@@ -238,7 +238,6 @@ defmodule DtCore.Sensor.Server do
 
   defp start_partition(partition, state) do
     id = partition.name
-    # XXX self will be updated with real receiver of partition events
     case Supervisor.start_child(state.partition_sup,
           worker(Partition,[{partition, state.part_state_cache}],
             restart: :transient, id: id)) do
