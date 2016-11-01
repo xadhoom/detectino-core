@@ -19,11 +19,13 @@ defmodule DtWeb.Sensor do
 
     timestamps()
 
-    many_to_many :partitions, DtWeb.Partition, join_through: DtWeb.PartitionSensor, on_replace: :delete
+    many_to_many :partitions, DtWeb.Partition,
+      join_through: DtWeb.PartitionSensor, on_replace: :delete
   end
 
   @required_fields ~w(name address port)
-  @optional_fields ~w(enabled balance th1 th2 th3 th4 full24h tamp24h entry_delay exit_delay)
+  @optional_fields ~w(enabled balance th1 th2 th3 th4
+    full24h tamp24h entry_delay exit_delay)
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @balance_types ["NC", "NO", "EOL", "DEOL", "TEOL"]
 

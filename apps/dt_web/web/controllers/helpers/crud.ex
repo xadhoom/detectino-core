@@ -1,21 +1,28 @@
 defmodule DtWeb.CtrlHelpers.Crud do
+  @moduledoc """
+  Reusable helpers for creating CRUD apis
+  """
   use Phoenix.Controller
 
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 
   #
-  # XXX implement filtering (scoping) by relations id also in delete, show, update...
+  # XXX implement filtering (scoping) by relations id
+  # also in delete, show, update...
   #
 
   def all(conn, params, repo, model, assocs \\ []) do
-    filter = model.__schema__(:fields)
+    filter = :fields
+    |> model.__schema__
     |> build_filter(params)
 
-    page = Map.get(params, "page", "1")
+    page = params
+    |> Map.get("page", "1")
     |> String.to_integer
 
-    per_page = Map.get(params, "per_page", "10")
+    per_page = params
+    |> Map.get("per_page", "10")
     |> String.to_integer
 
     q = from m in model,
@@ -37,14 +44,15 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     links = links(conn, page, per_page, total)
     conn = put_resp_header(conn, "link", links)
-  
+
     {:ok, conn, items}
   end
 
   def links(conn, page, per_page, total) do
     next_p = nil
 
-    last_p = Float.ceil(total / per_page)
+    last_p = (total / per_page)
+    |> Float.ceil
     |> trunc
 
     link = %ExLinkHeader{
@@ -101,15 +109,16 @@ defmodule DtWeb.CtrlHelpers.Crud do
       record -> {:ok, conn, record}
     end
   end
-  
+
   def update(conn, params, repo, model) do
     case Map.get(params, "id") do
       :nil -> {:error, conn, 400}
-      id -> 
+      id ->
         case repo.get(model, id) do
           nil -> {:error, conn, 404}
           record ->
-            model.update_changeset(record, params)
+            record
+            |> model.update_changeset(params)
             |> perform_update(repo, conn)
         end
     end

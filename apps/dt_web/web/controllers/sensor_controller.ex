@@ -74,7 +74,8 @@ defmodule DtWeb.SensorController do
 
     assocs
     |> Enum.each(fn(assoc) ->
-      PartitionSensor.changeset(%PartitionSensor{}, %{partition_id: assoc["id"], sensor_id: id})
+      %PartitionSensor{}
+      |> PartitionSensor.changeset(%{partition_id: assoc["id"], sensor_id: id})
       |> Repo.insert!
     end)
   end
