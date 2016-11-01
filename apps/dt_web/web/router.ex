@@ -38,6 +38,8 @@ defmodule DtWeb.Router do
     resources "/sensors", SensorController, only: @api_methods do
       resources "/partitions_sensors", PartitionSensorController, only: @api_methods
     end
+    resources "/outputs", OutputController, only: @api_methods
+    resources "/events", EventController, only: @api_methods
     resources "/users", UserController, only: @api_methods
 
   end
