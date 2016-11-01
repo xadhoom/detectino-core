@@ -8,16 +8,19 @@ import { AuthConfig, AuthHttp } from 'angular2-jwt';
 
 import { ENV_PROVIDERS } from './environment';
 import { ROUTES } from './app.routes';
-import { AppComponent }   from './app.component';
+import { AppComponent } from './app.component';
 
-import { ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
+import {
+  ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
   DialogModule, InputTextModule, DropdownModule, PasswordModule,
   DataTableModule, SpinnerModule, CheckboxModule, PickListModule
-  } from 'primeng/primeng';
+} from 'primeng/primeng';
 
-import { AuthService, NotificationService,
+import {
+  AuthService, NotificationService,
   UserService, SensorService, ScenarioService, PartitionService,
-  PartitionScenarioService } from './services';
+  PartitionScenarioService, OutputService, EventService
+} from './services';
 import { AuthGuard } from './services/auth.guard';
 
 import { Home } from './home';
@@ -27,6 +30,8 @@ import { Sensors } from './sensors';
 import { Scenarios } from './scenarios';
 import { Partitions } from './partitions';
 import { PartitionsScenarios } from './scenarios';
+import { Outputs } from './outputs';
+import { Events } from './events';
 
 // Application wide providers
 const APP_PROVIDERS = [
@@ -41,15 +46,18 @@ const APP_PROVIDERS = [
   ScenarioService,
   PartitionService,
   PartitionScenarioService,
+  OutputService,
+  EventService,
   AuthGuard,
-  { provide: AuthHttp,
+  {
+    provide: AuthHttp,
     useFactory: (http) => {
       return new AuthHttp(new AuthConfig({
         tokenName: 'id_token',
         noTokenScheme: true,
         globalHeaders: [
-          {'Accept': 'application/json'},
-          {'Content-Type': 'application/json'}
+          { 'Accept': 'application/json' },
+          { 'Content-Type': 'application/json' }
         ],
         noJwtError: false
       }), http);
@@ -67,9 +75,11 @@ const APP_PROVIDERS = [
     Sensors,
     Scenarios,
     Partitions,
-    PartitionsScenarios
+    PartitionsScenarios,
+    Outputs,
+    Events
   ],
-  imports: [ BrowserModule,
+  imports: [BrowserModule,
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
     DialogModule, InputTextModule, DropdownModule, PasswordModule,
     DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
@@ -82,7 +92,7 @@ const APP_PROVIDERS = [
     ENV_PROVIDERS,
     APP_PROVIDERS
   ],
-  bootstrap: [ AppComponent ]
+  bootstrap: [AppComponent]
 })
 
 export class AppModule {

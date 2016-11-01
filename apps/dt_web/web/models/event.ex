@@ -13,6 +13,7 @@ end
 defmodule DtWeb.Event do
   use DtWeb.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :name, :description, :source]}
   schema "events" do
     field :name, :string
     field :description, :string
@@ -24,8 +25,8 @@ defmodule DtWeb.Event do
     many_to_many :outputs, DtWeb.Output, join_through: DtWeb.EventOutput
   end
 
-  @required_fields ~w(name)
-  @optional_fields ~w()
+  @required_fields ~w(name source)
+  @optional_fields ~w(description source_config)
 
   def create_changeset(model, params \\ :empty) do
     model

@@ -1,6 +1,7 @@
 defmodule DtWeb.Output do
   use DtWeb.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :name, :type, :enabled]}
   schema "outputs" do
     field :name, :string
     field :type, :string

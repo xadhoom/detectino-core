@@ -1,73 +1,86 @@
-<div class="layout-wrapper"><!-- layout-compact"-->
-  <div class="layout-container">
-    <div class="topbar clearfix">
-      <!--div class="topbar-left">
+<div class="layout-wrapper">
+	<!-- layout-compact"-->
+	<div class="layout-container">
+		<div class="topbar clearfix">
+			<!--div class="topbar-left">
         <div class="logo"></div>
       </div-->
-      <div class="topbar-right">
-        <!--
+			<div class="topbar-right">
+				<!--
         <a id="menu-button" href="#">
           <i></i>
         </a>
         -->
 
-        <a id="topbar-menu-button" href="#">
-          <i class="material-icons">menu</i>
-        </a>
+				<a id="topbar-menu-button" href="#">
+					<i class="material-icons">menu</i>
+				</a>
 
-        <ul class="topbar-items fadeInDown animated">
-          <li>
-            <a href="#">
-              <i class="topbar-icon material-icons">settings</i>
-              <span class="topbar-item-name">Settings</span>
-            </a>
-            <ul class="ultima-menu animated">
-              <li role="menuitem" *ngIf="auth.authenticated()">
-                <a (click)="router.navigate(['/users'])">
-                  <i class="material-icons">face</i>
-                  <span>Users</span>
-                </a>
-              </li>
-              <li role="menuitem" *ngIf="auth.authenticated()">
-                <a (click)="router.navigate(['/sensors'])">
-                  <i class="material-icons">settings</i>
-                  <span>Sensors</span>
-                </a>
-              </li>
-              <li role="menuitem" *ngIf="auth.authenticated()">
-                <a (click)="router.navigate(['/scenarios'])">
-                  <i class="material-icons">settings</i>
-                  <span>Scenarios</span>
-                </a>
-              </li>
-              <li role="menuitem" *ngIf="auth.authenticated()">
-                <a (click)="router.navigate(['/partitions'])">
-                  <i class="material-icons">settings</i>
-                  <span>Partitions</span>
-                </a>
-              </li>
-              <li role="menuitem" *ngIf="!auth.authenticated()">
-                <a (click)="router.navigate(['/login'])">
-                  <i class="material-icons Red">lock</i>
-                  <span>Login</span>
-                </a>
-              </li>
-              <li role="menuitem" *ngIf="auth.authenticated()">
-                <a (click)="auth.logout()">
-                  <i class="material-icons Red">lock</i>
-                  <span>Logout</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
+				<ul class="topbar-items fadeInDown animated">
+					<li>
+						<a href="#">
+							<i class="topbar-icon material-icons">settings</i>
+							<span class="topbar-item-name">Settings</span>
+						</a>
+						<ul class="ultima-menu animated">
+							<li role="menuitem" *ngIf="auth.authenticated()">
+								<a (click)="router.navigate(['/users'])">
+									<i class="material-icons">face</i>
+									<span>Users</span>
+								</a>
+							</li>
+							<li role="menuitem" *ngIf="auth.authenticated()">
+								<a (click)="router.navigate(['/sensors'])">
+									<i class="material-icons">settings</i>
+									<span>Sensors</span>
+								</a>
+							</li>
+							<li role="menuitem" *ngIf="auth.authenticated()">
+								<a (click)="router.navigate(['/scenarios'])">
+									<i class="material-icons">settings</i>
+									<span>Scenarios</span>
+								</a>
+							</li>
+							<li role="menuitem" *ngIf="auth.authenticated()">
+								<a (click)="router.navigate(['/partitions'])">
+									<i class="material-icons">settings</i>
+									<span>Partitions</span>
+								</a>
+							</li>
+							<li role="menuitem" *ngIf="auth.authenticated()">
+								<a (click)="router.navigate(['/outputs'])">
+									<i class="material-icons">settings</i>
+									<span>Outputs</span>
+								</a>
+							</li>
+							<li role="menuitem" *ngIf="auth.authenticated()">
+								<a (click)="router.navigate(['/events'])">
+									<i class="material-icons">settings</i>
+									<span>Events</span>
+								</a>
+							</li>
+							<li role="menuitem" *ngIf="!auth.authenticated()">
+								<a (click)="router.navigate(['/login'])">
+									<i class="material-icons Red">lock</i>
+									<span>Login</span>
+								</a>
+							</li>
+							<li role="menuitem" *ngIf="auth.authenticated()">
+								<a (click)="auth.logout()">
+									<i class="material-icons Red">lock</i>
+									<span>Logout</span>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
 
-    <div class="layout-main">
-      <p-messages [value]="notifications"></p-messages>
-      <router-outlet></router-outlet>
-    </div>
+		<div class="layout-main">
+			<p-messages [value]="notifications"></p-messages>
+			<router-outlet></router-outlet>
+		</div>
 
-  </div>
+	</div>
 </div>

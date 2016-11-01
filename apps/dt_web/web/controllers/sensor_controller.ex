@@ -9,6 +9,7 @@ defmodule DtWeb.SensorController do
   alias DtWeb.CtrlHelpers.Crud
   alias DtWeb.SessionController
   alias DtWeb.StatusCodes
+  alias DtWeb.Controllers.Helpers.Utils
 
   alias Guardian.Plug.EnsureAuthenticated
 
@@ -58,7 +59,7 @@ defmodule DtWeb.SensorController do
               record
               |> Repo.preload(:partitions)
               |> Sensor.update_changeset(params)
-              |> apply_update(conn)
+              |> Utils.apply_update(conn)
           end
         end) do
           {:ok, value} -> value
@@ -82,17 +83,6 @@ defmodule DtWeb.SensorController do
       |> PartitionSensor.changeset(%{partition_id: assoc["id"], sensor_id: id})
       |> Repo.insert!
     end)
-  end
-
-  defp apply_update(changeset, conn) do
-    case Repo.update(changeset) do
-      {:ok, record} ->
-        conn = put_status(conn, 200)
-        {:ok, conn, record}
-      {:error, changeset} ->
-        Logger.error "Got error in update changeset: #{inspect changeset}"
-        {:error, conn, 400}
-    end
   end
 
 end

@@ -1,0 +1,65 @@
+<div class="ui-g ui-g-fluid">
+
+	<div class="ui-g-12" *ngIf="!displayDialog">
+		<div class="card card-w-title">
+			<p-dataTable [value]="outputs" [rows]="10" [paginator]="true" selectionMode="single" [(selection)]="selectedOutput" (onRowSelect)="onRowSelect($event)"
+				[responsive]="true">
+				<header>Outputs</header>
+				<p-column field="name" header="Name" [sortable]="true"></p-column>
+				<p-column field="description" header="Description" [sortable]="false"></p-column>
+				<footer>
+					<div class="ui-helper-clearfix" style="width:100%">
+						<button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
+            </button>
+					</div>
+				</footer>
+			</p-dataTable>
+		</div>
+	</div>
+
+	<div class="ui-g-12" *ngIf="displayDialog">
+		<div class="card card-w-title">
+			<div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+				<div class="ui-grid-row">
+					<button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Output"></button>
+				</div>
+			</div>
+
+			<div class="ui-g form-group">
+				<div class="ui-g-12">
+					<label for="acName">Name</label>
+				</div>
+				<div class="ui-g-12">
+					<input pInputText id="acName" [(ngModel)]="output.name" />
+				</div>
+
+				<div class="ui-g-12">
+					<label for="acDesc">Description</label>
+				</div>
+				<div class="ui-g-12">
+					<input pInputText id="acDesc" [(ngModel)]="output.description" />
+				</div>
+
+				<div class="ui-g-12">
+          <label for="acType">Type</label>
+          </div>
+				<div class="ui-g-12">
+					<p-dropdown [(ngModel)]="output.type" [options]="types" [autoWidth]="true">
+					</p-dropdown>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="card card-w-title">
+			<div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-6"><button type="button" pButton icon="fa-check" (click)="save()" label="Save" class="GreenButton"></button></div>
+					<div class="ui-grid-col-6"><button type="button" pButton icon="fa-close" (click)="destroy()" label="Delete" class="RedButton"></button></div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</div>

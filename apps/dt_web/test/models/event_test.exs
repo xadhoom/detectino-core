@@ -3,7 +3,7 @@ defmodule DtWeb.EventTest do
 
   alias DtWeb.Event
 
-  @valid_attrs %{name: "some content"}
+  @valid_attrs %{name: "some content", source: "EMAIL"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
