@@ -9,6 +9,7 @@ defmodule DtCore.Output.Worker do
   require Logger
   alias DtCore.Output.Utils
   alias DtWeb.Output, as: OutputModel
+  alias DtWeb.Event, as: EventModel
   alias DtWeb.Event.SensorEvConf
   alias DtWeb.Event.PartitionEvConf
   alias DtCore.EvRegistry
@@ -33,7 +34,12 @@ defmodule DtCore.Output.Worker do
     {:ok, state}
   end
 
-  defp subscribe(event) do
+  defp subscribe(_ = %EventModel{source: s, source_config: sc})
+    when is_nil(s) or is_nil(sc) do
+    Logger.error("Incomplete source config, not subscribing to any event")
+  end
+
+  defp subscribe(event = %EventModel{}) do
     key = case event.source do
       "sensor" ->
         event.source_config
@@ -43,8 +49,15 @@ defmodule DtCore.Output.Worker do
         event.source_config
         |> Poison.decode!(as: %PartitionEvConf{})
         |> get_sub_key
+      _ -> nil
     end
-    Registry.register(EvRegistry.registry, key, [])
+
+    case key do
+      nil ->
+        Logger.error("Empty key, not subscribing to any event")
+      v when is_map v ->
+        Registry.register(EvRegistry.registry, v, [])
+    end
   end
 
   defp get_sub_key(conf = %SensorEvConf{}) do

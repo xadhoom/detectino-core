@@ -31,11 +31,11 @@ defmodule DtCore.Test.Output.Server do
   end
 
   test "One event with one output starts one worker" do
-    evm = %EventModel{name: "a"}
+    evm = %EventModel{name: "a", source: "sensor"}
     |> Repo.insert!
     |> Repo.preload(:outputs)
 
-    outm = %OutputModel{name: "im an output"}
+    %OutputModel{name: "im an output"}
     |> Repo.insert!
     |> Repo.preload(:events)
     |> Ecto.Changeset.change
