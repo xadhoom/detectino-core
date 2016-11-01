@@ -10,8 +10,10 @@ defmodule DtWeb.Partition do
 
     timestamps()
 
-    many_to_many :sensors, DtWeb.Sensor, join_through: DtWeb.PartitionSensor
-    many_to_many :scenarios, DtWeb.Scenario, join_through: DtWeb.PartitionScenario
+    many_to_many :sensors,
+      DtWeb.Sensor, join_through: DtWeb.PartitionSensor
+    many_to_many :scenarios,
+      DtWeb.Scenario, join_through: DtWeb.PartitionScenario
   end
 
   @required_fields ~w(name entry_delay exit_delay)

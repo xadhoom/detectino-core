@@ -8,8 +8,11 @@ defmodule DtWeb.Endpoint do
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
   plug Plug.Static,
-    at: "/", from: {:dt_web, "priv/static/" <> Atom.to_string(Mix.env)}, gzip: false
-    ##only: ~w(app.html  app.js  components  index.html  init.js  lib  services  styles)
+    at: "/",
+    from: {:dt_web, "priv/static/" <> Atom.to_string(Mix.env)},
+    gzip: false
+    #only:
+    # ~w(app.html app.js components index.html init.js lib services styles)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

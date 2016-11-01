@@ -16,8 +16,10 @@ defmodule DtWeb.SensorController do
 
   def index(conn, params) do
     case Crud.all(conn, params, Repo, Sensor, [:partitions]) do
-      {:ok, conn, items} -> render(conn, items: items)
-      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+      {:ok, conn, items} ->
+        render(conn, items: items)
+      {:error, conn, code} ->
+        send_resp(conn, code, StatusCodes.status_code(code))
     end
   end
 
@@ -35,11 +37,12 @@ defmodule DtWeb.SensorController do
 
   def update(conn, params) do
     case do_update(conn, params) do
-      {:ok, conn, item} -> 
+      {:ok, conn, item} ->
         item = item
         |> Repo.preload(:partitions)
         render(conn, item: item)
-      {:error, conn, code} -> send_resp(conn, code, StatusCodes.status_code(code))
+      {:error, conn, code} ->
+        send_resp(conn, code, StatusCodes.status_code(code))
     end
   end
 
@@ -56,7 +59,7 @@ defmodule DtWeb.SensorController do
               |> Repo.preload(:partitions)
               |> Sensor.update_changeset(params)
               |> apply_update(conn)
-          end 
+          end
         end) do
           {:ok, value} -> value
           {:error, what} ->
@@ -70,7 +73,8 @@ defmodule DtWeb.SensorController do
   end
 
   defp redo_assocs(id, assocs) do
-    from(p in PartitionSensor, where: p.sensor_id == ^id) |> Repo.delete_all
+    q = from(p in PartitionSensor, where: p.sensor_id == ^id)
+    Repo.delete_all(q)
 
     assocs
     |> Enum.each(fn(assoc) ->

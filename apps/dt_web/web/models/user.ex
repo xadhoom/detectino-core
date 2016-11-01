@@ -58,7 +58,11 @@ defmodule DtWeb.User do
 
   defp validate_password(changeset, crypted) do
     password = Ecto.Changeset.get_change(changeset, :password)
-    if valid_password?(password, crypted), do: changeset, else: password_incorrect_error(changeset)
+    if valid_password?(password, crypted) do
+      changeset
+    else
+      password_incorrect_error(changeset)
+    end
   end
 
   defp password_incorrect_error(changeset), do: Ecto.Changeset.add_error(changeset, :password, "is incorrect")

@@ -10,7 +10,8 @@ defmodule DtWeb.Scenario do
     timestamps
 
     has_many :partitions_scenarios, DtWeb.PartitionScenario
-    many_to_many :partitions, DtWeb.Partition, join_through: DtWeb.PartitionScenario
+    many_to_many :partitions,
+      DtWeb.Partition, join_through: DtWeb.PartitionScenario
   end
 
   @required_fields ~w(name enabled)
