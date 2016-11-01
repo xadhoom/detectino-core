@@ -1,8 +1,23 @@
+defmodule DtWeb.Event.PartitionEvConf do
+  defstruct name: nil,
+    type: nil
+end
+
+defmodule DtWeb.Event.SensorEvConf do
+  defstruct name: nil,
+    address: nil,
+    port: nil,
+    type: nil
+end
+
 defmodule DtWeb.Event do
   use DtWeb.Web, :model
 
   schema "events" do
     field :name, :string
+    field :description, :string
+    field :source, :string
+    field :source_config, :string
 
     timestamps
 

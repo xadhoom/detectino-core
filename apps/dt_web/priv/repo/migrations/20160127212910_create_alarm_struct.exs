@@ -79,6 +79,8 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
     create table(:events) do
       add :name, :string
       add :description, :string
+      add :source, :string
+      add :source_config, :string
 
       timestamps()
     end
