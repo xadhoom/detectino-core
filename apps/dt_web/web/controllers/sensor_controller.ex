@@ -1,4 +1,9 @@
 defmodule DtWeb.SensorController do
+  @moduledoc """
+  Controller for manipulating sensors.
+
+  XXX: check if some funs can be merged with event_controller
+  """
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, [repo: Repo, model: DtWeb.Sensor]
 
