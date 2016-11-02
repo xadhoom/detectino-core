@@ -30,7 +30,7 @@ defmodule DtWeb.SensorController do
   end
 
   def create(conn, params) do
-    case Crud.create(conn, params, @model, @repo, :user_path, [:partitions]) do
+    case Crud.create(conn, params, Sensor, Repo, :user_path, [:partitions]) do
       {:ok, conn, item} ->
         redo_assocs(item.id, params["partitions"])
         render(conn, item: item)

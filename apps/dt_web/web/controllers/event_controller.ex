@@ -30,7 +30,7 @@ defmodule DtWeb.EventController do
   end
 
   def create(conn, params) do
-    case Crud.create(conn, params, @model, @repo, :user_path, [:outputs]) do
+    case Crud.create(conn, params, Event, Repo, :user_path, [:outputs]) do
       {:ok, conn, item} ->
         redo_assocs(item.id, params["outputs"])
         render(conn, item: item)
