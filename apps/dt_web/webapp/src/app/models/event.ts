@@ -1,4 +1,4 @@
-import { Output } from "./output";
+import { Output } from './output';
 
 export class Event {
   id: number;
