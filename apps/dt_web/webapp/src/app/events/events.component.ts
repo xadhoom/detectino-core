@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { EventService, NotificationService, OutputService } from '../services';
 
 import { Event } from '../models/event';
 import { Output } from '../models/output';
+import { SensorConfig } from './sensorconfig.component';
 
 import { SelectItem } from 'primeng/primeng';
 
@@ -14,6 +15,9 @@ import { SelectItem } from 'primeng/primeng';
 })
 
 export class Events implements OnInit {
+
+  @ViewChild('sensorconfig')
+  sensorconfig: SensorConfig;
 
   event: Event;
 
@@ -26,6 +30,7 @@ export class Events implements OnInit {
   outputs: Output[];
 
   displayDialog: boolean;
+  showSensorConfig: boolean;
 
   newEvent: boolean;
 

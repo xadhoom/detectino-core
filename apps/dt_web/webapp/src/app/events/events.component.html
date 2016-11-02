@@ -49,6 +49,11 @@
 					</p-dropdown>
 				</div>
 
+				<div class="ui-g-12" [ngSwitch]="event.source">
+					<dt-eventsensorconfig *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig>
+					</dt-eventsensorconfig>
+				</div>
+
 			</div>
 		</div>
 

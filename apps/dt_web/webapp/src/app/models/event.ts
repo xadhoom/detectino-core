@@ -10,3 +10,14 @@ export class Event {
 
   constructor() { };
 }
+
+export class EventSensorConfig {
+  address: string;
+  port: number;
+  type: string;
+}
+
+export class EventPartitionConfig {
+  name: string;
+  type: string;
+}
