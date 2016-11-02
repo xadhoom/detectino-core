@@ -7,7 +7,7 @@ config :dt_web, DtWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :debug
+config :logger, level: :warn
 
 # Configure your database
 config :dt_web, DtWeb.Repo,
