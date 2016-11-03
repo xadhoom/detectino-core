@@ -72,9 +72,9 @@ export class Events implements OnInit {
   };
 
   save() {
-    if (this.event.source == 'sensor') {
+    if (this.event.source === 'sensor') {
       this.event.source_config = this.sensorconfig.get();
-    } else if (this.event.source == 'partition') {
+    } else if (this.event.source === 'partition') {
       this.event.source_config = this.partitionconfig.get();
     } else {
       this.event.source_config = null;
