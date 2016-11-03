@@ -50,7 +50,7 @@ defmodule DtWeb.Event do
   end
 
   defp check_config(changeset) do
-    case fetch_change(changeset, :source_config) do
+    case fetch_field(changeset, :source_config) do
       {:ok, change} ->
         cast_config(changeset, change)
       :error ->
@@ -59,7 +59,7 @@ defmodule DtWeb.Event do
   end
 
   defp cast_config(changeset, change) do
-    case fetch_change(changeset, :source) do
+    case fetch_field(changeset, :source) do
       {:ok, "sensor"} ->
         ret = Poison.decode(change, as: %SensorEvConf{})
         validate_config(changeset, ret)
