@@ -51,19 +51,25 @@ defmodule DtWeb.Event do
 
   defp check_config(changeset) do
     case fetch_field(changeset, :source_config) do
-      {:ok, change} ->
-        cast_config(changeset, change)
       :error ->
+        add_error(changeset, :source_config, "invalid")
+      {_, field} when is_nil(field) ->
+        add_error(changeset, :source_config, "invalid")
+      {_, field} ->
+        cast_config(changeset, field)
+      _ ->
         add_error(changeset, :source_config, "invalid")
     end
   end
 
   defp cast_config(changeset, change) do
     case fetch_field(changeset, :source) do
-      {:ok, "sensor"} ->
+      :error ->
+        add_error(changeset, :source, "invalid")
+      {_, "sensor"} ->
         ret = Poison.decode(change, as: %SensorEvConf{})
         validate_config(changeset, ret)
-      {:ok, "partition"} ->
+      {_, "partition"} ->
         ret = Poison.decode(change, as: %PartitionEvConf{})
         validate_config(changeset, ret)
       _ ->
