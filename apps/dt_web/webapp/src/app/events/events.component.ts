@@ -5,6 +5,7 @@ import { EventService, NotificationService, OutputService } from '../services';
 import { Event } from '../models/event';
 import { Output } from '../models/output';
 import { SensorConfig } from './sensorconfig.component';
+import { PartitionConfig } from './partitionconfig.component';
 
 import { SelectItem } from 'primeng/primeng';
 
@@ -15,9 +16,11 @@ import { SelectItem } from 'primeng/primeng';
 })
 
 export class Events implements OnInit {
-
   @ViewChild('sensorconfig')
   sensorconfig: SensorConfig;
+
+  @ViewChild('partitionconfig')
+  partitionconfig: PartitionConfig;
 
   event: Event;
 
@@ -31,6 +34,7 @@ export class Events implements OnInit {
 
   displayDialog: boolean;
   showSensorConfig: boolean;
+  showPartitionConfig: boolean;
 
   newEvent: boolean;
 
@@ -68,6 +72,13 @@ export class Events implements OnInit {
   };
 
   save() {
+    if (this.event.source == 'sensor') {
+      this.event.source_config = this.sensorconfig.get();
+    } else if (this.event.source == 'partition') {
+      this.event.source_config = this.partitionconfig.get();
+    } else {
+      this.event.source_config = null;
+    }
     this.event.outputs = this.selectedOutputs;
     this.eventService.save(this.event).
       subscribe(
