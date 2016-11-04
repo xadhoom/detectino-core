@@ -18,7 +18,7 @@ defmodule DtWeb.OutputTest do
     refute changeset.valid?
   end
 
-  test "changeset with wront enabled field" do
+  test "changeset with wrong enabled field" do
     attrs = %{name: "some content", type: "email", enabled: "wrong"}
     changeset = Output.create_changeset(%Output{}, attrs)
     refute changeset.valid?
