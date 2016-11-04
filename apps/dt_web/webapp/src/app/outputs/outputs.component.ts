@@ -32,8 +32,8 @@ export class Outputs implements OnInit {
 
   ngOnInit() {
     this.types = [{ label: 'Select a type', value: null }];
-    this.types.push({ label: 'Email', value: 'EMAIL' });
-    this.types.push({ label: 'Bus', value: 'BUS' });
+    this.types.push({ label: 'Email', value: 'email' });
+    this.types.push({ label: 'Bus', value: 'bus' });
     this.all();
   };
 

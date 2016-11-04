@@ -13,6 +13,8 @@ defmodule DtCore.Output.Worker do
   alias DtWeb.Event.SensorEvConf
   alias DtWeb.Event.PartitionEvConf
   alias DtCore.EvRegistry
+  alias DtCore.SensorEv
+  alias DtCore.PartitionEv
 
   #
   # Client APIs
@@ -32,6 +34,14 @@ defmodule DtCore.Output.Worker do
     end
     state = %{config: config}
     {:ok, state}
+  end
+
+  def handle_info({ev = %SensorEv{}}, state) do
+    {:noreply, state}
+  end
+
+  def handle_info({ev = %PartitionEv{}}, state) do
+    {:noreply, state}
   end
 
   defp subscribe(_ = %EventModel{source: s, source_config: sc})

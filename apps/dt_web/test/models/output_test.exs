@@ -6,13 +6,16 @@ defmodule DtWeb.OutputTest do
   @valid_attrs %{name: "some content", type: "type"}
   @invalid_attrs %{}
 
-  test "changeset with valid attributes" do
-    changeset = Output.create_changeset(%Output{}, @valid_attrs)
-    assert changeset.valid?
-  end
-
-  test "changeset with invalid attributes" do
-    changeset = Output.create_changeset(%Output{}, @invalid_attrs)
+  test "changeset with invalid type" do
+    attrs = %{name: "some content", type: "type", enabled: true}
+    changeset = Output.create_changeset(%Output{}, attrs)
     refute changeset.valid?
   end
+
+  test "changeset with missing enabled field" do
+    attrs = %{name: "some content", type: "email"}
+    changeset = Output.create_changeset(%Output{}, attrs)
+    refute changeset.valid?
+  end
+
 end
