@@ -21,6 +21,29 @@ defmodule DtCore.Test.Output.Worker do
     :ok
   end
 
+  test "disabled worker does not listens to associated events" do
+    events = [
+      %EventModel{
+        source: "partition",
+        source_config: Poison.encode!(%{
+          name: "area one", type: "alarm"
+        })
+      },
+      %EventModel{
+        source: "sensor",
+        source_config: Poison.encode!(%{
+          address: "10", port: 5, type: "alarm"
+        })
+      }
+    ]
+    output = %OutputModel{name: "another output", events: events, enabled: false}
+
+    {:ok, pid} = Worker.start_link({output})
+    
+    listeners = Registry.keys(EvRegistry.registry, pid)
+    assert Enum.count(listeners) == 0
+  end
+
   test "worker listens to associated events" do
     events = [
       %EventModel{
@@ -36,7 +59,7 @@ defmodule DtCore.Test.Output.Worker do
         })
       }
     ]
-    output = %OutputModel{name: "an output", events: events}
+    output = %OutputModel{name: "an output", events: events, enabled: true}
 
     {:ok, pid} = Worker.start_link({output})
     

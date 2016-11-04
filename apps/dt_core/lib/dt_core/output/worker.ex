@@ -29,9 +29,7 @@ defmodule DtCore.Output.Worker do
   #
   def init({config}) do
     Logger.info "Starting Output Worker #{config.name}"
-    for event <- config.events do
-      subscribe(event)
-    end
+    run_subscribe(config)
     state = %{config: config}
     {:ok, state}
   end
@@ -42,6 +40,18 @@ defmodule DtCore.Output.Worker do
 
   def handle_info({ev = %PartitionEv{}}, state) do
     {:noreply, state}
+  end
+
+  defp run_subscribe(config) do
+    case config.enabled do
+      true ->
+        for event <- config.events do
+          subscribe(event)
+        end
+      _ ->
+        nil  
+    end
+    :ok
   end
 
   defp subscribe(_ = %EventModel{source: s, source_config: sc})
