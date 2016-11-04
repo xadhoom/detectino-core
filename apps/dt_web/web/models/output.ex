@@ -23,7 +23,6 @@ defmodule DtWeb.Output do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_required(@validate_required)
-    |> validate_inclusion(:enabled, [true, false])
     |> validate_inclusion(:type, @valid_types)
   end
 
@@ -31,7 +30,6 @@ defmodule DtWeb.Output do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_required(@validate_required)
-    |> validate_inclusion(:enabled, [true, false])
     |> validate_inclusion(:type, @valid_types)
   end
 
