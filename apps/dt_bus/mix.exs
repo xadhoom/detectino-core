@@ -40,7 +40,7 @@ defmodule DtBus.Mixfile do
   defp deps do
     [
       {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},
-      {:lager, git: "git://github.com/Feuerlabs/lager.git", override: true},
+      {:lager, git: "https://github.com/basho/lager.git", override: true},
       {:lager_logger, "~> 1.0"},
       {:credo, "~> 0.4", only: [:dev, :test]}
     ]
