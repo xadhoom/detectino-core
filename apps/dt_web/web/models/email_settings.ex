@@ -2,12 +2,12 @@ defmodule DtWeb.EmailSettings do
   use DtWeb.Web, :model
 
   embedded_schema do
-    field :sender
-    field :address
+    field :from
+    field :to
     field :body
   end
 
-  @required_fields ~w(sender, address, body)
+  @required_fields ~w(from, to, body)
   @optional_fields ~w()
 
   def changeset(model, params \\ :empty) do

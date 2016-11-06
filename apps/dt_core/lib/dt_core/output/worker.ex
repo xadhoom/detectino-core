@@ -15,6 +15,8 @@ defmodule DtCore.Output.Worker do
   alias DtCore.EvRegistry
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
+  alias DtCore.Output.Actions.Bus
+  alias DtCore.Output.Actions.Email
 
   #
   # Client APIs
@@ -34,12 +36,23 @@ defmodule DtCore.Output.Worker do
     {:ok, state}
   end
 
-  def handle_info({ev = %SensorEv{}}, state) do
+  def handle_info(ev = %SensorEv{}, state) do
+    run_action(ev, state)
     {:noreply, state}
   end
 
-  def handle_info({ev = %PartitionEv{}}, state) do
+  def handle_info(ev = %PartitionEv{}, state) do
+    run_action(ev, state)
     {:noreply, state}
+  end
+
+  defp run_action(ev, state) do
+    case state.config.type do
+      "email" ->
+        Email.trigger(ev, state.config.email_settings)
+      "bus" ->
+        Bus.trigger(ev, state.config.email_settings)
+    end
   end
 
   defp run_subscribe(config) do
@@ -49,7 +62,7 @@ defmodule DtCore.Output.Worker do
           subscribe(event)
         end
       _ ->
-        nil  
+        nil
     end
     :ok
   end
