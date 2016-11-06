@@ -23,10 +23,8 @@ export class NotificationService {
 
   error(body: string) {
     let msg = {severity: 'error', summary: 'Error Message', detail: body};
-    console.log(this.messages);
     this.messages.push(msg);
     this._messages$.next(this.messages);
-    console.log(this.messages);
   }
 
 }
