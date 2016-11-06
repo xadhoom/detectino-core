@@ -13,11 +13,9 @@ export class NotificationService {
   constructor() {
     this.messages = [];
     this._messages$ = <Subject<Message[]>>new Subject();
-    // this._messages$.next(this.messages);
   }
 
   get messages$() {
-    console.log('getting an observable....');
     return this._messages$.asObservable();
   }
 
