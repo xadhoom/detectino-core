@@ -2,9 +2,9 @@ defmodule DtWeb.EmailSettings do
   use DtWeb.Web, :model
 
   embedded_schema do
-    field :from
-    field :to
-    field :body
+    field :from, :string
+    field :to, :string
+    field :body, :string
   end
 
   @required_fields ~w(from to)

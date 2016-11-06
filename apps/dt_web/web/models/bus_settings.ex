@@ -2,8 +2,9 @@ defmodule DtWeb.BusSettings do
   use DtWeb.Web, :model
 
   embedded_schema do
-    field :address
-    field :port
+    field :address, :string
+    field :port, :integer
+    field :type, :string
     field :payload # I do not know what I really need here
   end
 
