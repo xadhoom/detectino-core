@@ -41,6 +41,8 @@ defmodule DtWeb.Output do
         changeset |> cast_embed(:email_settings, [:required])
       "bus" ->
         changeset |> cast_embed(:bus_settings, [:required])
+      _ ->
+        changeset
       end
   end
 
