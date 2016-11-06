@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { OutputService, NotificationService } from '../services';
 
-import { Output } from '../models/output';
+import { Output, OutputEmailConfig, OutputBusConfig } from '../models/output';
 
 import { SelectItem } from 'primeng/primeng';
 
@@ -13,7 +13,6 @@ import { SelectItem } from 'primeng/primeng';
 })
 
 export class Outputs implements OnInit {
-
   output: Output;
 
   outputs: Output[];
@@ -22,6 +21,8 @@ export class Outputs implements OnInit {
   selectedOutput: Output;
 
   displayDialog: boolean;
+  showEmailConfig: boolean;
+  showBusConfig: boolean;
 
   newOutput: boolean;
 
@@ -74,13 +75,24 @@ export class Outputs implements OnInit {
   showDialogToAdd() {
     this.newOutput = true;
     this.output = new Output();
+    this.checkConfigs();
     this.displayDialog = true;
   }
 
   onRowSelect(event) {
     this.newOutput = false;
     this.output = this.cloneOutput(event.data);
+    this.checkConfigs();
     this.displayDialog = true;
+  };
+
+  checkConfigs() {
+    if (!this.output.email_settings) {
+      this.output.email_settings = new OutputEmailConfig();
+    }
+    if (!this.output.bus_settings) {
+      this.output.bus_settings = new OutputBusConfig();
+    }
   };
 
   cloneOutput(s: Output): Output {

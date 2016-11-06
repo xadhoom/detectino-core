@@ -1,7 +1,7 @@
 defmodule DtWeb.Output do
   use DtWeb.Web, :model
 
-  @derive {Poison.Encoder, only: [:id, :name, :type, :enabled]}
+  @derive {Poison.Encoder, only: [:id, :name, :type, :enabled, :bus_settings, :email_settings]}
   schema "outputs" do
     field :name, :string
     field :type, :string
@@ -22,6 +22,7 @@ defmodule DtWeb.Output do
   def create_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> cast_embeds
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @valid_types)
   end
@@ -29,8 +30,18 @@ defmodule DtWeb.Output do
   def update_changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> cast_embeds
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @valid_types)
+  end
+
+  defp cast_embeds(changeset) do
+    case get_field(changeset, :type) do
+      "email" ->
+        changeset |> cast_embed(:email_settings, [:required])
+      "bus" ->
+        changeset |> cast_embed(:bus_settings, [:required])
+      end
   end
 
 end
