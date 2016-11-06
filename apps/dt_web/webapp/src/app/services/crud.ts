@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Rx';
 
 export class Crud {
 
-  constructor (protected http: AuthHttp) {
+  constructor(protected http: AuthHttp) {
     this.http = http;
   }
 
@@ -61,9 +61,12 @@ export class Crud {
   };
 
   protected handleError(error: any) {
+    let errTxt = error.text();
     let errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-    console.error(errMsg);
+    if (errTxt && errTxt !== error.statusText) {
+      errMsg = `${errMsg}: ${error.text()}`;
+    }
     return Observable.throw(new Error(errMsg));
   };
 
