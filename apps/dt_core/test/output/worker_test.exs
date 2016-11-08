@@ -13,13 +13,13 @@ defmodule DtCore.Test.Output.Worker do
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
 
-
   setup do
     {:ok, _pid} = Sup.start_link
     
     on_exit fn ->
       TimerHelper.wait_until fn ->
         assert Process.whereis(:output_server) == nil
+        assert Process.whereis(Sup) == nil
       end
     end
 
