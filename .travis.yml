@@ -6,11 +6,9 @@ sudo: false
 language: elixir
 
 elixir:
-        - 1.3.2
         - 1.3.4
 
 otp_release:
-        - 18.3
         - 19.1
 
 addons:
@@ -33,7 +31,6 @@ cache:
         directories:
                 - apps/dt_web/webapp/node_modules
                 - deps
-                - _build
 
 script:
         - "pushd apps/dt_web/webapp; npm install; npm run build; npm run test; popd"
