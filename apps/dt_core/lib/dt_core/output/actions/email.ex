@@ -16,8 +16,8 @@ defmodule DtCore.Output.Actions.Email do
   alias DtCore.PartitionEv
   alias DtCore.Output.Actions.Email.Mailer
 
-  def trigger(ev, config) do
-    subject = build_subject(ev)
+  def recover(ev, config) do
+    subject = build_subject({:off, ev})
     msg = build_msg(ev)
     email = new
       |> to(config.to)
@@ -27,12 +27,31 @@ defmodule DtCore.Output.Actions.Email do
       |> Mailer.deliver
   end
 
-  def build_subject(ev = %SensorEv{}) do
-    "Sensor Alarm"
+  def trigger(ev, config) do
+    subject = build_subject({:on, ev})
+    msg = build_msg(ev)
+    email = new
+      |> to(config.to)
+      |> from(config.from)
+      |> subject(subject)
+      |> text_body(msg)
+      |> Mailer.deliver
   end
 
-  def build_subject(ev = %PartitionEv{}) do
-    "Partition Alarm"
+  def build_subject({:on, ev = %SensorEv{}}) do
+    "Sensor Alarm started"
+  end
+
+  def build_subject({:on, ev = %PartitionEv{}}) do
+    "Partition Alarm started"
+  end
+
+  def build_subject({:off, ev = %SensorEv{}}) do
+    "Sensor Alarm recovered"
+  end
+
+  def build_subject({:off, ev = %PartitionEv{}}) do
+    "Partition Alarm recovered"
   end
 
   def build_msg(ev = %SensorEv{}) do

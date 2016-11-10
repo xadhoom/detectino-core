@@ -26,32 +26,79 @@ defmodule DtCore.Output.Worker do
     GenServer.start_link(__MODULE__, {config}, name: name)
   end
 
+  def timer_expiry({t, config = %OutputModel{}}) when is_atom(t) do
+    {:ok, name} = Utils.output_server_name(config)
+    GenServer.call(name, {:timer_expiry, t})
+  end
+
   #
   # GenServer callbacks
   #
   def init({config}) do
     Logger.info "Starting Output Worker #{config.name}"
+    {:ok, _pid} = :chronos.start_link(config.name)
     run_subscribe(config)
-    state = %{config: config}
+    state = %{
+      config: config,
+      t_off_running: false
+    }
     {:ok, state}
   end
 
-  def handle_info(ev = %SensorEv{}, state) do
-    run_action(ev, state)
+  def handle_call({:timer_expiry, :mono_expiry}, _from, state) do
+    state = case state.config.type do
+      "email" ->
+        Logger.error("Should not have timer expiry with email outputs")
+        state
+      "bus" ->
+        :ok = Bus.recover(state)
+        t_off_running = Bus.off_timer(state)
+        %{state | t_off_running: t_off_running}
+    end
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:timer_expiry, :mono_off_expiry}, _from, state) do
+    Logger.info "Off timer expired"
+    state = %{state | t_off_running: false}
+    {:reply, :ok, state}
+  end
+
+  def handle_info({:on, ev = %SensorEv{}}, state) do
+    run_on_action(ev, state)
     {:noreply, state}
   end
 
-  def handle_info(ev = %PartitionEv{}, state) do
-    run_action(ev, state)
+  def handle_info({:on, ev = %PartitionEv{}}, state) do
+    run_on_action(ev, state)
     {:noreply, state}
   end
 
-  defp run_action(ev, state) do
+  def handle_info({:off, ev = %SensorEv{}}, state) do
+    run_recover_action(ev, state)
+    {:noreply, state}
+  end
+
+  def handle_info({:off, ev = %PartitionEv{}}, state) do
+    run_recover_action(ev, state)
+    {:noreply, state}
+  end
+
+  defp run_recover_action(ev, state) do
+    case state.config.type do
+      "email" ->
+        Email.recover(ev, state.config.email_settings)
+      "bus" ->
+        :ok = Bus.recover(state)
+    end
+  end
+
+  defp run_on_action(ev, state) do
     case state.config.type do
       "email" ->
         Email.trigger(ev, state.config.email_settings)
       "bus" ->
-        Bus.trigger(ev, state.config.email_settings)
+        :ok = Bus.trigger(state)
     end
   end
 
