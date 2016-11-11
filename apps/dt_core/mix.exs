@@ -24,8 +24,8 @@ defmodule DtCore.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     case Mix.env do
-      :test -> [applications: [:logger, :swoosh, :gproc]]
-      _ -> [applications: [:logger, :swoosh, :gen_smtp, :gproc],
+      :test -> [applications: [:logger, :swoosh, :gproc, :chronos]]
+      _ -> [applications: [:logger, :swoosh, :gen_smtp, :gproc, :chronos],
         mod: {DtCore, []}
       ]
     end
