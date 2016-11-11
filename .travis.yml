@@ -34,4 +34,4 @@ cache:
 
 script:
         - "pushd apps/dt_web/webapp; npm install; npm run build; npm run test; popd"
-        - "MIX_ENV=test; mix deps.get && mix deps.compile && mix coveralls.travis --umbrella"
+        - "MIX_ENV=test mix do deps.get, deps.compile, coveralls.travis --umbrella"
