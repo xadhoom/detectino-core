@@ -251,9 +251,9 @@ defmodule DtCore.Test.Sensor.Partition do
     :ok = Process.send(pid, {:event, ev}, [])
 
     %SensorEv{type: :alarm, address: "1", port: 1}
-    |> assert_receive(10_000)
+    |> assert_receive(5000)
 
     %PartitionEv{type: :alarm, name: "prot"}
-    |> assert_receive(10_000)
+    |> assert_receive(5000)
   end
 end
