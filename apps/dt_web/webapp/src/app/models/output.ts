@@ -19,5 +19,7 @@ export class OutputEmailConfig {
 export class OutputBusConfig {
   address: string;
   port: number;
-  payload: string;
+  type: string;
+  mono_ontime: number; // tslint:disable-line
+  mono_offtime: number; // tslint:disable-line
 }
