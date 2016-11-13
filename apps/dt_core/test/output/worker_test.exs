@@ -15,8 +15,8 @@ defmodule DtCore.Test.Output.Worker do
   alias DtCore.PartitionEv
 
   setup_all do
-    :meck.new(:chronos, [:passthrough])
-    :meck.expect(:chronos, :start_timer,
+    :meck.new(Etimer, [:passthrough])
+    :meck.expect(Etimer, :start_timer,
       fn(_ ,_ ,_ ,_ ) ->
         0
       end)    
@@ -161,7 +161,7 @@ defmodule DtCore.Test.Output.Worker do
       }
     }
     {:ok, pid} = Worker.start_link({output})
-    assert :meck.called(:chronos, :start_link, :_)
+    assert :meck.called(Etimer, :start_link, :_)
 
     DtBus.ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
@@ -177,7 +177,7 @@ defmodule DtCore.Test.Output.Worker do
     
     TimerHelper.wait_until fn ->
       assert :meck.called(
-        :chronos, :start_timer, 
+        Etimer, :start_timer, 
         [:_, :_, 30000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
@@ -213,7 +213,7 @@ defmodule DtCore.Test.Output.Worker do
       }
     }
     {:ok, pid} = Worker.start_link({output})
-    assert :meck.called(:chronos, :start_link, :_)
+    assert :meck.called(Etimer, :start_link, :_)
 
     DtBus.ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
@@ -229,7 +229,7 @@ defmodule DtCore.Test.Output.Worker do
     
     TimerHelper.wait_until fn ->
       assert :meck.called(
-        :chronos, :start_timer, 
+        Etimer, :start_timer, 
         [:_, :_, 30000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
@@ -243,7 +243,7 @@ defmodule DtCore.Test.Output.Worker do
 
     TimerHelper.wait_until fn ->
       assert :meck.called(
-        :chronos, :start_timer, 
+        Etimer, :start_timer, 
         [:_, :_, 120000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
     end
 
@@ -283,7 +283,7 @@ defmodule DtCore.Test.Output.Worker do
       }
     }
     {:ok, pid} = Worker.start_link({output})
-    assert :meck.called(:chronos, :start_link, :_)
+    assert :meck.called(Etimer, :start_link, :_)
 
     DtBus.ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
@@ -299,7 +299,7 @@ defmodule DtCore.Test.Output.Worker do
     
     TimerHelper.wait_until fn ->
       refute :meck.called(
-        :chronos, :start_timer, 
+        Etimer, :start_timer, 
         [:_, :_, 1000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
@@ -311,7 +311,7 @@ defmodule DtCore.Test.Output.Worker do
 
     TimerHelper.wait_until fn ->
       refute :meck.called(
-        :chronos, :start_timer, 
+        Etimer, :start_timer, 
         [:_, :_, 120000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
     end
 

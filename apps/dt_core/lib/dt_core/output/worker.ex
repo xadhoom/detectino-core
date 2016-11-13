@@ -36,7 +36,7 @@ defmodule DtCore.Output.Worker do
   #
   def init({config}) do
     Logger.info "Starting Output Worker #{config.name}"
-    {:ok, _pid} = :chronos.start_link(config.name)
+    {:ok, _pid} = Etimer.start_link(config.name)
     run_subscribe(config)
     state = %{
       config: config,

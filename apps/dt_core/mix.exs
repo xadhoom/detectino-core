@@ -24,8 +24,8 @@ defmodule DtCore.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     case Mix.env do
-      :test -> [applications: [:logger, :swoosh, :gproc]]
-      _ -> [applications: [:logger, :swoosh, :gen_smtp, :gproc],
+      :test -> [applications: [:logger, :swoosh, :etimer]]
+      _ -> [applications: [:logger, :swoosh, :gen_smtp, :etimer],
         mod: {DtCore, []}
       ]
     end
@@ -51,8 +51,7 @@ defmodule DtCore.Mixfile do
     [
       {:ecto, "~> 2.0"},
       {:registry, git: "https://github.com/elixir-lang/registry"},
-      {:chronos, git: "https://github.com/lehoff/chronos.git", tag: "0.1.3"},
-      {:gproc, "~> 0.6"},
+      {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.0"},
       {:swoosh, "~> 0.5.0"},
       {:gen_smtp, "~> 0.11.0"},
       {:dt_bus, in_umbrella: true},

@@ -50,7 +50,7 @@ defmodule DtCore.Output.Actions.Bus do
       x when x > 0 and is_integer(x) ->
         config = state.config.bus_settings
         delay = config.mono_offtime * 1_000
-        :chronos.start_timer(
+        Etimer.start_timer(
           state.config.name,
           :mono_expiry, delay,
           {Worker, :timer_expiry, [:mono_off_expiry, state.config]}
@@ -65,7 +65,7 @@ defmodule DtCore.Output.Actions.Bus do
   defp schedule_off(state) do
     config = state.config.bus_settings
     delay = config.mono_ontime * 1_000
-    :chronos.start_timer(
+    Etimer.start_timer(
       state.config.name,
       :mono_expiry, delay,
       {Worker, :timer_expiry, [:mono_expiry, state.config]}
