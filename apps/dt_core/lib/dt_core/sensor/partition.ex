@@ -70,8 +70,9 @@ defmodule DtCore.Sensor.Partition do
       sensors: [],
       cache: cache
     }
-    state = reload_cache(state)
-    send self(), {:start}
+    state = state 
+    |> reload_cache
+    |> dostart 
     {:ok, state}
   end
 
@@ -89,7 +90,7 @@ defmodule DtCore.Sensor.Partition do
     state
   end
 
-  def handle_info({:start}, state) do
+  defp dostart(state) do
     sensors_pids = state.config.sensors
     |> Enum.reduce([], fn(sensor, acc) ->
       case Worker.start_link({sensor, state.config, self}) do
@@ -103,7 +104,7 @@ defmodule DtCore.Sensor.Partition do
     end)
     state = %{state | sensors: sensors_pids}
     {_, state} = do_arm(state, state.config.armed)
-    {:noreply, state}
+    state
   end
 
   def handle_info({:event, ev = %Event{}}, state) do
