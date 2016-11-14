@@ -17,6 +17,7 @@ export class Outputs implements OnInit {
 
   outputs: Output[];
   types: SelectItem[];
+  busTypes: SelectItem[];
 
   selectedOutput: Output;
 
@@ -35,6 +36,11 @@ export class Outputs implements OnInit {
     this.types = [{ label: 'Select a type', value: null }];
     this.types.push({ label: 'Email', value: 'email' });
     this.types.push({ label: 'Bus', value: 'bus' });
+
+    this.busTypes = [{ label: 'Select a type', value: null }];
+    this.busTypes.push({ label: 'Monostable', value: 'monostable' });
+    this.busTypes.push({ label: 'Bistable', value: 'bistable' });
+
     this.all();
   };
 

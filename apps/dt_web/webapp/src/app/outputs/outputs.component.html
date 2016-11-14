@@ -52,7 +52,7 @@
           <label for="acEnabled">Enabled</label>
         </div>
         <div class="ui-g-12">
-          <p-checkbox id="acEnabled" [(ngModel)]="output.enabled" binary="true"></p-checkbox>
+          <p-inputSwitch id="acEnabled" [(ngModel)]="output.enabled"></p-inputSwitch>
         </div>
 
         <div class="ui-g-12" [ngSwitch]="output.type">
@@ -69,6 +69,42 @@
           </div>
           <div class="ui-g-12" *ngSwitchCase="'email'">
             <input pInputText id="acTo" [(ngModel)]="output.email_settings.to" />
+          </div>
+
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <label for="acBusType">Type</label>
+          </div>
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <p-dropdown [(ngModel)]="output.bus_settings.type" [options]="busTypes" [autoWidth]="true">
+            </p-dropdown>
+          </div>
+
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <label for="acBusAddress">Address</label>
+          </div>
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <input pInputText id="acBusAddress" [(ngModel)]="output.bus_settings.address" />
+          </div>
+
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <label for="acBusPort">Port</label>
+          </div>
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <p-spinner id="acBusPort" [(ngModel)]="output.bus_settings.port" min="1"></p-spinner>
+          </div>
+
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <label for="acBusMonoOn">Monostable ON Time</label>
+          </div>
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <p-spinner id="acBusMonoOn" [(ngModel)]="output.bus_settings.mono_ontime" min="1" max="3600"></p-spinner>
+          </div>
+
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <label for="acBusMonoOff">Monostable OFF Time</label>
+          </div>
+          <div class="ui-g-12" *ngSwitchCase="'bus'">
+            <p-spinner id="acBusMonoOff" [(ngModel)]="output.bus_settings.mono_offtime" min="1" max="3600"></p-spinner>
           </div>
 
         </div>

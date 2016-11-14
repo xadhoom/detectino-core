@@ -13,7 +13,8 @@ import { AppComponent } from './app.component';
 import {
   ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
   DialogModule, InputTextModule, DropdownModule, PasswordModule,
-  DataTableModule, SpinnerModule, CheckboxModule, PickListModule
+  DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
+  InputSwitchModule
 } from 'primeng/primeng';
 
 import {
@@ -83,7 +84,7 @@ const APP_PROVIDERS = [
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
     DialogModule, InputTextModule, DropdownModule, PasswordModule,
     DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
-    FormsModule,
+    FormsModule, InputSwitchModule,
     HttpModule,
     JsonpModule,
     RouterModule.forRoot(ROUTES)
