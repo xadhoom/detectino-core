@@ -149,30 +149,6 @@ defmodule DtCore.Test.Sensor.Partition do
     |> assert_receive(5000)
   end
 
-  defp register_deol_listeners do
-    key = %{source: :sensor, address: "1", port: 1, type: :reading}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-    key = %{source: :sensor, address: "1", port: 1, type: :tamper}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-    key = %{source: :sensor, address: "1", port: 1, type: :standby}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-    key = %{source: :sensor, address: "1", port: 1, type: :short}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-
-    key = %{source: :partition, name: "part1", type: :tamper}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-    key = %{source: :partition, name: "part1", type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-    key = %{source: :partition, name: "part1", type: :standby}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-    key = %{source: :partition, name: "part1", type: :short}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
-
-    :ok
-  end
-
   test "does not trigger partition alarms when partition is not armed and sensor isn't 24h", ctx do
     sensor = %SensorModel{
       name: "sense1",
@@ -255,5 +231,29 @@ defmodule DtCore.Test.Sensor.Partition do
 
     %PartitionEv{type: :alarm, name: "prot"}
     |> assert_receive(5000)
+  end
+
+  defp register_deol_listeners do
+    key = %{source: :sensor, address: "1", port: 1, type: :reading}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :tamper}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :standby}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "1", port: 1, type: :short}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    key = %{source: :partition, name: "part1", type: :tamper}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "part1", type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "part1", type: :standby}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "part1", type: :short}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    :ok
   end
 end
