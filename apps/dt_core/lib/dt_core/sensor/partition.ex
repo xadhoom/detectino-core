@@ -76,37 +76,6 @@ defmodule DtCore.Sensor.Partition do
     {:ok, state}
   end
 
-  defp reload_cache(state) do
-    {:ok, name} = Utils.partition_server_name(state.config)
-    state = case :ets.lookup(state.cache, name) do
-      [{_key, value}] ->
-        Logger.info "Reloaded cached state"
-        %{state | config: value}
-      _ ->
-        Logger.info "No state to reload"
-        state
-    end
-    true = save_state(state)
-    state
-  end
-
-  defp dostart(state) do
-    sensors_pids = state.config.sensors
-    |> Enum.reduce([], fn(sensor, acc) ->
-      case Worker.start_link({sensor, state.config, self}) do
-        {:ok, pid} ->
-          Process.monitor pid
-          acc ++ [pid]
-        {:error, what} ->
-          Logger.error "Cannot start Sensor, #{inspect what}"
-          acc
-      end
-    end)
-    state = %{state | sensors: sensors_pids}
-    {_, state} = do_arm(state, state.config.armed)
-    state
-  end
-
   def handle_info({:event, ev = %Event{}}, state) do
     Logger.debug "Received event #{inspect ev} from server"
 
@@ -173,6 +142,37 @@ defmodule DtCore.Sensor.Partition do
       v -> v
     end
     {:reply, res, state}
+  end
+
+  defp reload_cache(state) do
+    {:ok, name} = Utils.partition_server_name(state.config)
+    state = case :ets.lookup(state.cache, name) do
+      [{_key, value}] ->
+        Logger.info "Reloaded cached state"
+        %{state | config: value}
+      _ ->
+        Logger.info "No state to reload"
+        state
+    end
+    true = save_state(state)
+    state
+  end
+
+  defp dostart(state) do
+    sensors_pids = state.config.sensors
+    |> Enum.reduce([], fn(sensor, acc) ->
+      case Worker.start_link({sensor, state.config, self}) do
+        {:ok, pid} ->
+          Process.monitor pid
+          acc ++ [pid]
+        {:error, what} ->
+          Logger.error "Cannot start Sensor, #{inspect what}"
+          acc
+      end
+    end)
+    state = %{state | sensors: sensors_pids}
+    {_, state} = do_arm(state, state.config.armed)
+    state
   end
 
   defp save_state(state) do
