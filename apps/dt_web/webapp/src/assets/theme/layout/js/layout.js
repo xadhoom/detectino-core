@@ -1,5 +1,5 @@
 /** 
- * PrimeFaces Ultima Layout
+ * PrimeNG Ultima Layout
  */
 Ultima = {
     
@@ -314,7 +314,9 @@ Ultima = {
     },
     
     disableModal: function() {
-        this.modal.remove();
+        if(this.modal) {
+            this.modal.remove();
+        }
     },
         
     isHorizontal: function() {
