@@ -30,5 +30,5 @@ engines:
 
 exclude_paths:
 - config
-- apps/**/test
+- apps/**/test/*
 - apps/dt_web/webapp/src/assets
