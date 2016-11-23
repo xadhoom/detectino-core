@@ -1,0 +1,34 @@
+
+styleguide: plataformatec/linters
+
+subapps:
+  - name: "dt_web"
+    path: apps/dt_web
+
+  - name: "dt_core"
+    path: apps/dt_core
+
+  - name: "dt_can"
+    path: apps/dt_can
+
+  - name: "web frontend"
+    path: apps/dt_web/webapp
+
+engines:
+  credo:
+    enabled: true
+  fixme:
+    enabled: true
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  shellcheck:
+    enabled: true
+  remark-lint:
+    enabled: true
+
+exclude_paths:
+- config
+- apps/**/test
+- apps/dt_web/webapp/src/assets
