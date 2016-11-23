@@ -11,9 +11,6 @@ subapps:
   - name: "dt_can"
     path: apps/dt_can
 
-  - name: "web frontend"
-    path: apps/dt_web/webapp
-
 engines:
   credo:
     enabled: true
