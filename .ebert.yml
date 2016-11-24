@@ -1,16 +1,6 @@
 
 styleguide: plataformatec/linters
 
-subapps:
-  - name: "Web interface"
-    path: apps/dt_web
-
-  - name: "Alarm core"
-    path: apps/dt_core
-
-  - name: "CAN bus interface"
-    path: apps/dt_bus
-
 engines:
   credo:
     enabled: true
@@ -27,6 +17,7 @@ engines:
 
 exclude_paths:
 - config
-- apps/**/config/*
-- apps/**/test/*
-- apps/dt_web/webapp/src/assets/*
+- apps/**/config
+- apps/**/test
+- apps/dt_web/webapp/config
+- apps/dt_web/webapp/src/assets
