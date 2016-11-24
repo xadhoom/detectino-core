@@ -19,5 +19,6 @@ exclude_paths:
 - config
 - apps/**/config
 - apps/**/test
+- apps/dt_web/webapp/*.js
 - apps/dt_web/webapp/config
 - apps/dt_web/webapp/src/assets
