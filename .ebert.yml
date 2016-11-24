@@ -2,14 +2,14 @@
 styleguide: plataformatec/linters
 
 subapps:
-  - name: "dt_web"
+  - name: "Web interface"
     path: apps/dt_web
 
-  - name: "dt_core"
+  - name: "Alarm core"
     path: apps/dt_core
 
-  - name: "dt_can"
-    path: apps/dt_can
+  - name: "CAN bus interface"
+    path: apps/dt_bus
 
 engines:
   credo:
