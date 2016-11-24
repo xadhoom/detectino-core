@@ -27,5 +27,6 @@ engines:
 
 exclude_paths:
 - config
+- apps/**/config/*
 - apps/**/test/*
-- apps/dt_web/webapp/src/assets
+- apps/dt_web/webapp/src/assets/*
