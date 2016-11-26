@@ -51,9 +51,9 @@ defmodule DtCore.Test.Sensor.Partition do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
 
-    %SensorEv{type: :reading, address: "1", port: 1}
+    {:start, %SensorEv{type: :reading, address: "1", port: 1}}
     |> assert_receive(5000)
-    %PartitionEv{}
+    _msg
     |> refute_receive(1000)
   end
 
@@ -75,10 +75,10 @@ defmodule DtCore.Test.Sensor.Partition do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
 
-    %SensorEv{type: :alarm, address: "1", port: 1}
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1}}
     |> assert_receive(5000)
 
-    %PartitionEv{type: :alarm, name: "prot"}
+    {:start, %PartitionEv{type: :alarm, name: "prot"}}
     |> assert_receive(5000)
   end
 
@@ -99,7 +99,7 @@ defmodule DtCore.Test.Sensor.Partition do
     ev = %Event{address: "1", port: 2, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
 
-    %SensorEv{}
+    _msg
     |> refute_receive(1000)
   end
 
@@ -122,30 +122,35 @@ defmodule DtCore.Test.Sensor.Partition do
 
     ev = %Event{address: "1", port: 1, value: 35}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}
+    {:start, %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-     %PartitionEv{type: :tamper, name: "part1"}
+    {:start, %PartitionEv{type: :tamper, name: "part1"}}
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 25}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}
+    {:stop, %PartitionEv{type: :tamper, name: "part1"}}
     |> assert_receive(5000)
-    %PartitionEv{type: :alarm, name: "part1"}
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    {:start, %PartitionEv{type: :alarm, name: "part1"}}
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :standby, address: "1", port: 1, delayed: false}
+    {:start, %SensorEv{type: :standby, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    %PartitionEv{type: :standby, name: "part1"}
+    {:start, %PartitionEv{type: :standby, name: "part1"}}
     |> assert_receive(5000)
 
     ev = %Event{address: "1", port: 1, value: 5}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :short, address: "1", port: 1, delayed: false}
+    {:start, %SensorEv{type: :short, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    %PartitionEv{type: :short, name: "part1"}
+
+    {:stop, %PartitionEv{type: :standby, name: "part1"}}
+    |> assert_receive(5000)
+    {:start, %PartitionEv{type: :short, name: "part1"}}
     |> assert_receive(5000)
   end
 
@@ -168,30 +173,30 @@ defmodule DtCore.Test.Sensor.Partition do
 
     ev = %Event{address: "1", port: 1, value: 35}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}
+    {:start, %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    %PartitionEv{}
+    {_op, %PartitionEv{}}
     |> refute_receive(1000)
 
     ev = %Event{address: "1", port: 1, value: 25}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :reading, address: "1", port: 1, delayed: false}
+    {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    %PartitionEv{}
+    {_op, %PartitionEv{}}
     |> refute_receive(1000)
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :standby, address: "1", port: 1, delayed: false}
+    {:start, %SensorEv{type: :standby, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    %PartitionEv{}
+    {_op, %PartitionEv{}}
     |> refute_receive(1000)
 
     ev = %Event{address: "1", port: 1, value: 5}
     :ok = Process.send(pid, {:event, ev}, [])
-    %SensorEv{type: :short, address: "1", port: 1, delayed: false}
+    {:start, %SensorEv{type: :short, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    %PartitionEv{}
+    {_op, %PartitionEv{}}
     |> refute_receive(1000)
   end
 
@@ -226,10 +231,97 @@ defmodule DtCore.Test.Sensor.Partition do
     ev = %Event{address: "1", port: 1, value: 5}
     :ok = Process.send(pid, {:event, ev}, [])
 
-    %SensorEv{type: :alarm, address: "1", port: 1}
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1}}
     |> assert_receive(5000)
 
-    %PartitionEv{type: :alarm, name: "prot"}
+    {:start, %PartitionEv{type: :alarm, name: "prot"}}
+    |> assert_receive(5000)
+  end
+
+  test "partion alarm is stopped when all sensors are idle", ctx do
+    sensors = [
+      %SensorModel{name: "A", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "1", port: 1},
+      %SensorModel{name: "B", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "2", port: 1}
+      ]
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      sensors: sensors}
+
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "2", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "prot", type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
+
+    :ok = Partition.arm(part, "ARM")
+
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    ev = %Event{address: "2", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "2", port: 1}}
+    |> assert_receive(5000)
+
+    {:start, %PartitionEv{type: :alarm, name: "prot"}}
+    |> assert_receive(5000)
+
+    ev = %Event{address: "2", port: 1, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    {:stop, %SensorEv{type: :alarm, address: "2", port: 1}}
+    |> assert_receive(5000)
+
+    {_op,  %PartitionEv{}}
+    |> refute_receive(1000)
+
+    ev = %Event{address: "1", port: 1, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    {:stop, %PartitionEv{type: :alarm, name: "prot"}}
+    |> assert_receive(5000)
+  end
+
+  test "partition alarm is stopped on disarm", ctx do
+    sensors = [
+      %SensorModel{name: "A", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "1", port: 1},
+      %SensorModel{name: "B", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "2", port: 1}
+      ]
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      sensors: sensors}
+
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :sensor, address: "2", port: 1, type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+    key = %{source: :partition, name: "prot", type: :alarm}
+    Registry.register(DtCore.EvRegistry.registry, key, [])
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
+
+    :ok = Partition.arm(part, "ARM")
+
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    ev = %Event{address: "2", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "2", port: 1}}
+    |> assert_receive(5000)
+
+    {:start, %PartitionEv{type: :alarm, name: "prot"}}
+    |> assert_receive(5000)
+
+    :ok = Partition.disarm(part, "DISARM")
+    {:stop, %PartitionEv{type: :alarm, name: "prot"}}
     |> assert_receive(5000)
   end
 

@@ -15,6 +15,7 @@ defmodule DtCore.Sensor.Partition do
 
   @arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
   @disarm_modes ["DISARM"]
+  @statuses [:standby, :alarm, :tamper]
 
   def start_link({config = %PartitionModel{}, cache}) do
     {:ok, name} = Utils.partition_server_name(config)
@@ -68,11 +69,13 @@ defmodule DtCore.Sensor.Partition do
     state = %{
       config: config,
       sensors: [],
-      cache: cache
+      cache: cache,
+      status: :standby,
+      last: nil
     }
-    state = state 
+    state = state
     |> reload_cache
-    |> dostart 
+    |> dostart
     {:ok, state}
   end
 
@@ -88,16 +91,22 @@ defmodule DtCore.Sensor.Partition do
     {:noreply, state}
   end
 
-  def handle_info({:event, ev = %SensorEv{}}, state) do
-    Logger.debug "Received event #{inspect ev} from one of our sensors"
-    ev |> dispatch
-    maybe_partition_alarm(ev, state)
-    {:noreply, state}
+  def handle_info(msg = {op, _ev = %SensorEv{}}, state) when op == :start
+    or op == :stop do
+    Logger.debug "Received event #{inspect msg} from one of our sensors"
+    msg |> dispatch
+
+    last = case maybe_partition_alarm(msg, state) do
+      {:start, ev} -> {:start, ev}
+      {:stop, ev} -> {:stop, ev}
+      _ -> state.last
+    end
+
+    status = query_alarm_status(state.sensors)
+    {:noreply, %{state | status: status, last: last}}
   end
 
   def handle_call({:arm, mode}, _from, state) do
-    #@arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
-    #@disarm_modes ["DISARM"]
     {res, state} = do_arm(state, mode)
     true = save_state(state)
     {:reply, res, state}
@@ -108,6 +117,13 @@ defmodule DtCore.Sensor.Partition do
       "DISARM" ->
         Logger.info("Disarming")
         disarm_all(state.sensors)
+
+        case state.last do
+          {_, ev = %PartitionEv{}} ->
+            dispatch({:stop, ev})
+          _ -> nil
+        end
+
         config = %PartitionModel{state.config | armed: "DISARM"}
         {:ok, %{state | config: config}}
       x ->
@@ -197,26 +213,58 @@ defmodule DtCore.Sensor.Partition do
     end
   end
 
-  defp dispatch(ev = %SensorEv{}) do
+  defp dispatch(msg = {_op, ev = %SensorEv{}}) do
     key = %{source: :sensor, address: ev.address, port: ev.port, type: ev.type}
     Registry.dispatch(EvRegistry.registry, key, fn listeners ->
-      for {pid, _} <- listeners, do: send(pid, ev)
+      for {pid, _} <- listeners, do: send(pid, msg)
     end)
   end
 
-  defp dispatch(ev = %PartitionEv{}) do
+  defp dispatch(msg = {_op, ev = %PartitionEv{}}) do
     key = %{source: :partition, name: ev.name, type: ev.type}
     Registry.dispatch(EvRegistry.registry, key, fn listeners ->
-      for {pid, _} <- listeners, do: send(pid, ev)
+      for {pid, _} <- listeners, do: send(pid, msg)
     end)
   end
 
-  defp maybe_partition_alarm(ev = %SensorEv{}, state) do
+  # partition alarm must start on single sensor event,
+  # but stop only if all sensors are idle
+  defp maybe_partition_alarm({op, ev = %SensorEv{}}, state) do
     case generate_part_ev?(ev, state) do
       true ->
-        ev = %PartitionEv{type: ev.type, name: state.config.name}
-        |> dispatch
+        p_ev = build_part_ev({op, ev}, state)
+        case p_ev do
+          nil -> nil
+          ev ->
+            if ev == state.last do
+              Logger.debug("skipping already sent partition ev")
+            else
+              ev |> dispatch
+            end
+            ev
+        end
       _ -> nil
+    end
+  end
+
+  defp build_part_ev({op, ev = %SensorEv{}}, state) do
+    status = state.status
+    case op do
+      :start ->
+        {op, %PartitionEv{type: ev.type, name: state.config.name}}
+      :stop ->
+        case query_alarm_status(state.sensors) do
+          :standby ->
+            {op, %PartitionEv{type: ev.type, name: state.config.name}}
+          x when x in @statuses and x != status ->
+            {op, %PartitionEv{type: ev.type, name: state.config.name}}
+          x ->
+            Logger.info("Not stopping partition alarm due to others: #{x}")
+            nil
+        end
+      x ->
+        Logger.error("Unhandled operation #{inspect x})")
+        nil
     end
   end
 
@@ -244,6 +292,21 @@ defmodule DtCore.Sensor.Partition do
     |> Enum.each(fn(sensor) ->
       sensor
       |> GenServer.call({:disarm})
+    end)
+  end
+
+  #check if all of our sensors are idle or not
+  defp query_alarm_status(sensors) do
+    sensors
+    |> Enum.reduce_while(:standby, fn(s, _acc) ->
+      case GenServer.call(s, {:alarm_status?}) do
+        :standby -> {:cont, :standby}
+        :alarm -> {:halt, :alarm}
+        :tamper -> {:halt, :tamper}
+        x ->
+          Logger.error("Unhandled status #{inspect x}")
+          {:halt, :tamper}
+      end
     end)
   end
 

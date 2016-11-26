@@ -22,6 +22,11 @@ defmodule DtCore.Sensor.Worker do
     GenServer.start_link(__MODULE__, {config, receiver}, name: name)
   end
 
+  def alarm_status({config = %SensorModel{}, partition = %PartitionModel{}}) do
+    {:ok, name} = Utils.sensor_server_name(config, partition)
+    GenServer.call(name, {:alarm_status?})
+  end
+
   #
   # GenServer callbacks
   #
@@ -31,25 +36,36 @@ defmodule DtCore.Sensor.Worker do
     state = %{
       config: config,
       receiver: receiver,
-      armed: false
-      #server: part_server
+      armed: false,
+      cur_ev: %SensorEv{
+        type: :standby, address: config.address, port: config.port
+      },
+      status: :standby
     }
     {:ok, state}
   end
 
   def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
     config = state.config
-    case config.enabled do
-      false -> Logger.debug("Ignoring event from server  cause I'm not online")
+    newstate = case config.enabled do
+      false ->
+        Logger.debug("Ignoring event from server  cause I'm not online")
+        state
       true ->
         if ev.address == config.address and ev.port == config.port do
           Logger.debug("Got event from server")
           event = do_receive_event(ev, partition, state)
-          :ok = Process.send(state.receiver, {:event, event}, [])
+          state = sensor_state(event, state)
+          :ok = Process.send(state.receiver, {:start, event}, [])
+          state
+        else
+          state
         end
-      _ -> Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
+      _ ->
+        Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
+        state
     end
-    {:noreply, state}
+    {:noreply, newstate}
   end
 
   def handle_info({:reset_entry}, state) do
@@ -66,6 +82,10 @@ defmodule DtCore.Sensor.Worker do
     {:noreply, state}
   end
 
+  def handle_call({:alarm_status?}, _from, state) do
+    {:reply, state.status, state}
+  end
+
   def handle_call({:arm, delay}, _from, state) do
     Logger.debug("Arming sensor")
     state
@@ -77,7 +97,25 @@ defmodule DtCore.Sensor.Worker do
 
   def handle_call({:disarm}, _from, state) do
     Logger.debug("Disarming sensor")
+    config = state.config
+
+    ev = build_ev_type(:standby, config.address, config.port)
+    state = sensor_state(ev, state)
+    :ok = Process.send(state.receiver, {:start, ev}, [])
     {:reply, :ok, %{state | armed: false}}
+  end
+
+  defp sensor_state(ev, state) do
+    status = case ev.type do
+      :reading -> :standby
+      :standby -> :standby
+      :tamper -> :tamper
+      :fault -> :tamper
+      :short -> :tamper
+      :alarm -> :alarm
+    end
+    :ok = Process.send(state.receiver, {:stop, state.cur_ev}, [])
+    %{state | cur_ev: ev, status: status}
   end
 
   defp will_reset_delay(delay, delay_t) do

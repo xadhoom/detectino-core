@@ -32,8 +32,12 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    {:event, %SensorEv{type: :reading, address: "1", port: 1}}
+    assert :standby == Worker.alarm_status({config, part})
+
+    {:start, %SensorEv{type: :reading, address: "1", port: 1}}
     |> assert_receive(5000)
+
+    assert :standby == Worker.alarm_status({config, part})
   end
 
   test "triggers alarm on immediate sensor" do
@@ -48,8 +52,10 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
+
+    assert :alarm == Worker.alarm_status({config, part})
   end
 
   test "triggers alarms when partition is not armed and sensor is a 24h" do
@@ -66,28 +72,44 @@ defmodule DtCore.Test.Sensor.Worker do
 
     ev = %Event{address: "1", port: 1, value: 45}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    {:event, %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :tamper, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :tamper == Worker.alarm_status({config, part})
 
+    # when event changes a stop of previous event is expected
     ev = %Event{address: "1", port: 1, value: 35}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    {:event, %SensorEv{type: :fault, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :tamper, address: "1", port: 1}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :fault, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :tamper == Worker.alarm_status({config, part})
 
     ev = %Event{address: "1", port: 1, value: 25}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :fault, address: "1", port: 1}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    {:event, %SensorEv{type: :standby, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :standby, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :standby == Worker.alarm_status({config, part})
 
     ev = %Event{address: "1", port: 1, value: 5}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    {:event, %SensorEv{type: :short, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :short, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :tamper == Worker.alarm_status({config, part})
   end
 
   test "alarm on entry is delayed by partion time if sensor is a delayed one" do
@@ -114,12 +136,16 @@ defmodule DtCore.Test.Sensor.Worker do
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
-    
-    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
-    |> assert_receive(5000)
 
-    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)    
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
     |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
+
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
   end
 
   test "delayed alarm on entry is cancelled if partition is unarmed in time" do
@@ -144,14 +170,20 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
 
     disarm_cmd = {:disarm}
     :ok = GenServer.call(pid, disarm_cmd)
 
-    {:event, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :standby == Worker.alarm_status({config, part})
   end 
 
   test "delayed alarm on exit" do
@@ -179,11 +211,17 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
 
-    {:event, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
     |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
   end 
 
 end
