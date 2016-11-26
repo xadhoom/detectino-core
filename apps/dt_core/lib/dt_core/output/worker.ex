@@ -64,22 +64,22 @@ defmodule DtCore.Output.Worker do
     {:reply, :ok, state}
   end
 
-  def handle_info({:on, ev = %SensorEv{}}, state) do
+  def handle_info({:start, ev = %SensorEv{}}, state) do
     run_on_action(ev, state)
     {:noreply, state}
   end
 
-  def handle_info({:on, ev = %PartitionEv{}}, state) do
+  def handle_info({:start, ev = %PartitionEv{}}, state) do
     run_on_action(ev, state)
     {:noreply, state}
   end
 
-  def handle_info({:off, ev = %SensorEv{}}, state) do
+  def handle_info({:stop, ev = %SensorEv{}}, state) do
     run_recover_action(ev, state)
     {:noreply, state}
   end
 
-  def handle_info({:off, ev = %PartitionEv{}}, state) do
+  def handle_info({:stop, ev = %PartitionEv{}}, state) do
     run_recover_action(ev, state)
     {:noreply, state}
   end

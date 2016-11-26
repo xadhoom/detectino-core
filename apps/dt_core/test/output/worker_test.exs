@@ -124,19 +124,21 @@ defmodule DtCore.Test.Output.Worker do
     # emails to the current process
     {:ok, state} = Worker.init({output})
     
-    s_ev = %SensorEv{type: :alarm, address: "10", port: 5}
-    p_ev = %PartitionEv{type: :alarm, name: "area one"}
+    s_ev = {:start, %SensorEv{type: :alarm, address: "10", port: 5}}
+    p_ev = {:start, %PartitionEv{type: :alarm, name: "area one"}}
+    s_ev_end = {:stop, %SensorEv{type: :alarm, address: "10", port: 5}}
+    p_ev_end = {:stop, %PartitionEv{type: :alarm, name: "area one"}}
 
-    Worker.handle_info({:on, s_ev}, state)
+    Worker.handle_info(s_ev, state)
     assert_email_sent subject: "Sensor Alarm started"
 
-    Worker.handle_info({:on, p_ev}, state)
+    Worker.handle_info(p_ev, state)
     assert_email_sent subject: "Partition Alarm started"
 
-    Worker.handle_info({:off, s_ev}, state)
+    Worker.handle_info(s_ev_end, state)
     assert_email_sent subject: "Sensor Alarm recovered"
 
-    Worker.handle_info({:off, p_ev}, state)
+    Worker.handle_info(p_ev_end, state)
     assert_email_sent subject: "Partition Alarm recovered"
   end
 
@@ -166,8 +168,8 @@ defmodule DtCore.Test.Output.Worker do
     DtBus.ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
 
-    ev = %SensorEv{type: :alarm, address: "10", port: 5}
-    Process.send(pid, {:on, ev}, [])
+    ev = {:start, %SensorEv{type: :alarm, address: "10", port: 5}}
+    Process.send(pid, ev, [])
 
     %DtBus.OutputAction{
       command: :on,
@@ -218,8 +220,8 @@ defmodule DtCore.Test.Output.Worker do
     DtBus.ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
 
-    ev = %SensorEv{type: :alarm, address: "10", port: 5}
-    Process.send(pid, {:on, ev}, [])
+    ev = {:start, %SensorEv{type: :alarm, address: "10", port: 5}}
+    Process.send(pid, ev, [])
 
     %DtBus.OutputAction{
       command: :on,
@@ -248,15 +250,15 @@ defmodule DtCore.Test.Output.Worker do
     end
 
     # now another event should not run because we're in offtime
-    ev = %SensorEv{type: :alarm, address: "10", port: 5}
-    Process.send(pid, {:on, ev}, [])
+    ev = {:start, %SensorEv{type: :alarm, address: "10", port: 5}}
+    Process.send(pid, ev, [])
     %DtBus.OutputAction{}
     |> refute_receive(1000)
 
     Worker.timer_expiry({:mono_off_expiry, output})
 
-    ev = %SensorEv{type: :alarm, address: "10", port: 5}
-    Process.send(pid, {:on, ev}, [])
+    ev = {:start, %SensorEv{type: :alarm, address: "10", port: 5}}
+    Process.send(pid, ev, [])
     %DtBus.OutputAction{}
     |> assert_receive(1000)
   end
@@ -288,8 +290,8 @@ defmodule DtCore.Test.Output.Worker do
     DtBus.ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
 
-    ev = %SensorEv{type: :alarm, address: "10", port: 5}
-    Process.send(pid, {:on, ev}, [])
+    ev = {:start, %SensorEv{type: :alarm, address: "10", port: 5}}
+    Process.send(pid, ev, [])
 
     %DtBus.OutputAction{
       command: :on,
@@ -315,8 +317,8 @@ defmodule DtCore.Test.Output.Worker do
         [:_, :_, 120000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
     end
 
-    ev = %SensorEv{type: :alarm, address: "10", port: 5}
-    Process.send(pid, {:off, ev}, [])
+    ev = {:stop, %SensorEv{type: :alarm, address: "10", port: 5}}
+    Process.send(pid, ev, [])
 
     %DtBus.OutputAction{
       command: :off,
