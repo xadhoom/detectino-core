@@ -183,6 +183,11 @@ defmodule DtCore.Test.Output.Worker do
         [:_, :_, 30000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
+    # a stop event should do nothing
+    ev = {:stop, %SensorEv{type: :alarm, address: "10", port: 5}}
+    Process.send(pid, ev, [])
+    _msg |> refute_receive(1000)
+
     Worker.timer_expiry({:mono_expiry, output})
 
     %DtBus.OutputAction{

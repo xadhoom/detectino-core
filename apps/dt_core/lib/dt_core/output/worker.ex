@@ -51,7 +51,7 @@ defmodule DtCore.Output.Worker do
         Logger.error("Should not have timer expiry with email outputs")
         state
       "bus" ->
-        :ok = Bus.recover(state)
+        :ok = Bus.recover(state, true)
         t_off_running = Bus.off_timer(state)
         %{state | t_off_running: t_off_running}
     end

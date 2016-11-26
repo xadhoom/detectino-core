@@ -8,16 +8,20 @@ defmodule DtCore.Output.Actions.Bus do
 
   require Logger
 
-  def recover(state) do
+  def recover(state, force \\ false) do
     bus = state.config.bus_settings
     msg = %OutputAction{
       address: bus.address,
       port: bus.port,
       command: :off
     }
-    Registry.dispatch(ActionRegistry.registry, :bus_commands, fn listeners ->
-      for {pid, _} <- listeners, do: send(pid, msg)
-    end)
+    if state.config.bus_settings.type == "monostable" and !force do
+      Logger.debug("Ignoring stop event on monostable outputs")
+    else
+      Registry.dispatch(ActionRegistry.registry, :bus_commands, fn listeners ->
+        for {pid, _} <- listeners, do: send(pid, msg)
+      end)
+    end
     :ok
   end
 
