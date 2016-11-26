@@ -133,7 +133,7 @@ defmodule DtCore.Output.Server do
           worker(Worker,[{output}],
             restart: :transient, id: id)) do
       {:ok, pid} ->
-        Logger.info "Started outout worker with pid #{inspect pid}"
+        Logger.info "Started output worker with pid #{inspect pid}"
       {:error, err} ->
         Logger.error "Cannot start output worker: " <>
           "#{inspect err} #{inspect output}"
