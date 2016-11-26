@@ -232,18 +232,23 @@ defmodule DtCore.Sensor.Partition do
   defp maybe_partition_alarm({op, ev = %SensorEv{}}, state) do
     case generate_part_ev?(ev, state) do
       true ->
-        p_ev = build_part_ev({op, ev}, state)
-        case p_ev do
-          nil -> nil
-          ev ->
-            if ev == state.last do
-              Logger.debug("skipping already sent partition ev")
-            else
-              ev |> dispatch
-            end
-            ev
-        end
+        {op, ev}
+        |> build_part_ev(state)
+        |> maybe_dispatch_pev(state)
       _ -> nil
+    end
+  end
+
+  defp maybe_dispatch_pev(p_ev, state) do
+    case p_ev do
+      nil -> nil
+      ev ->
+        if ev == state.last do
+          Logger.debug("skipping already sent partition ev")
+        else
+          ev |> dispatch
+        end
+        ev
     end
   end
 
