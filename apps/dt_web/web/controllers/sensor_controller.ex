@@ -15,10 +15,11 @@ defmodule DtWeb.SensorController do
   alias DtWeb.SessionController
   alias DtWeb.StatusCodes
   alias DtWeb.Controllers.Helpers.Utils
-
+  alias DtWeb.Plugs.CoreReloader
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug CoreReloader, nil when not action in [:index, :show]
 
   def index(conn, params) do
     case Crud.all(conn, params, Repo, Sensor, [:partitions]) do

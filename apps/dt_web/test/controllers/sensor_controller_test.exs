@@ -6,6 +6,12 @@ defmodule DtWeb.SensorControllerTest do
   alias DtWeb.PartitionSensor, as: PartitionSensorModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
+  setup_all do
+    DtWeb.ReloadRegistry.registry
+    |> Registry.register(DtWeb.ReloadRegistry.key, [])
+    :ok
+  end
+
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
@@ -22,6 +28,10 @@ defmodule DtWeb.SensorControllerTest do
     conn = post conn, sensor_path(conn, :create), %{name: "this is a test", address: "10", port: 10}
     json = json_response(conn, 201)
     assert json["name"] == "this is a test"
+
+    # check that a reload event is sent
+    {:reload}
+    |> assert_receive(5000)
 
     # check that the new record is there
     conn = newconn(conn)

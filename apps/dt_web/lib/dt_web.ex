@@ -1,6 +1,8 @@
 defmodule DtWeb do
   use Application
 
+  alias DtWeb.ReloadRegistry
+
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
@@ -11,6 +13,10 @@ defmodule DtWeb do
       supervisor(DtWeb.Endpoint, []),
       # Start the Ecto repository
       supervisor(DtWeb.Repo, []),
+      supervisor(Registry,
+        [:duplicate, ReloadRegistry.registry,
+          [partitions: System.schedulers_online]],
+        restart: :permanent),
       # Here you could define other workers and supervisors as children
       # worker(DtWeb.Worker, [arg1, arg2, arg3]),
     ]

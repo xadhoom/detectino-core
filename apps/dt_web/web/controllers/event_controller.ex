@@ -13,12 +13,13 @@ defmodule DtWeb.EventController do
   alias DtWeb.StatusCodes
   alias DtWeb.CtrlHelpers.Crud
   alias DtWeb.Controllers.Helpers.Utils
-
+  alias DtWeb.Plugs.CoreReloader
   alias Guardian.Plug.EnsureAuthenticated
 
   require Logger
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug CoreReloader, nil when not action in [:index, :show]
 
   def index(conn, params) do
     case Crud.all(conn, params, Repo, Event, [:outputs]) do

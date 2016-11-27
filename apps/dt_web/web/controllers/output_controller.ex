@@ -4,7 +4,9 @@ defmodule DtWeb.OutputController do
 
   alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
+  alias DtWeb.Plugs.CoreReloader
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug CoreReloader, nil when not action in [:index, :show]
 
 end
