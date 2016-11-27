@@ -1,6 +1,8 @@
-defmodule DtWeb.ScenarioControllerTest do
+defmodule DtWeb.EventControllerTest do
   use DtWeb.ConnCase
 
+  alias DtWeb.Event, as: EventModel
+  alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do
@@ -9,16 +11,19 @@ defmodule DtWeb.ScenarioControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  test "anon: get all scenarios", %{conn: conn} do
-    conn = get conn, scenario_path(conn, :index)
+  test "anon: get all events", %{conn: conn} do
+    conn = get conn, event_path(conn, :index)
     response(conn, 401)
   end
 
-  test "auth: get all scenarios", %{conn: conn} do
+  test "create an event", %{conn: conn} do
     conn = Helper.login(conn)
 
-    # create a scenario
-    conn = post conn, scenario_path(conn, :create), %{name: "this is a test"}
+    # create an event
+    sconf = %{name: "a name", type: "alarm"}
+    |> Poison.encode!
+    conn = post conn, event_path(conn, :create),
+      %{name: "this is a test", source: "partition", source_config: sconf}
     json = json_response(conn, 201)
     assert json["name"] == "this is a test"
 
@@ -28,7 +33,7 @@ defmodule DtWeb.ScenarioControllerTest do
 
     # check that the new record is there
     conn = Helper.newconn(conn)
-    |> get(scenario_path(conn, :index))
+    |> get(event_path(conn, :index))
     json = json_response(conn, 200)
 
     assert Enum.count(json) == 1
@@ -36,4 +41,5 @@ defmodule DtWeb.ScenarioControllerTest do
     total = Helper.get_total(conn)
     assert total == 1
   end
+
 end

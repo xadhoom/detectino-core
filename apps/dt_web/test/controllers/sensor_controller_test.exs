@@ -6,13 +6,9 @@ defmodule DtWeb.SensorControllerTest do
   alias DtWeb.PartitionSensor, as: PartitionSensorModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
-  setup_all do
+  setup %{conn: conn} do
     DtWeb.ReloadRegistry.registry
     |> Registry.register(DtWeb.ReloadRegistry.key, [])
-    :ok
-  end
-
-  setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
@@ -22,7 +18,7 @@ defmodule DtWeb.SensorControllerTest do
   end
 
   test "create a sensor", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
 
     # create a sensor
     conn = post conn, sensor_path(conn, :create), %{name: "this is a test", address: "10", port: 10}
@@ -34,7 +30,7 @@ defmodule DtWeb.SensorControllerTest do
     |> assert_receive(5000)
 
     # check that the new record is there
-    conn = newconn(conn)
+    conn = Helper.newconn(conn)
     |> get(sensor_path(conn, :index))
     json = json_response(conn, 200)
 
@@ -53,7 +49,7 @@ defmodule DtWeb.SensorControllerTest do
       |> Repo.insert!
     end)
 
-    conn = login(conn)
+    conn = Helper.login(conn)
     |> get(sensor_path(conn, :index))
     json = json_response(conn, 200)
 
@@ -64,21 +60,21 @@ defmodule DtWeb.SensorControllerTest do
   end
 
   test "add partitions to a sensor", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
 
     # create a sensor
     conn = post conn, sensor_path(conn, :create), %{name: "sensor", address: "10", port: 10}
     sensor = json_response(conn, 201)
 
     # create a partition
-    conn = newconn(conn)
+    conn = Helper.newconn(conn)
     |> post(partition_path(conn, :create), %{name: "area", exit_delay: 42, entry_delay: 42})
     partition = json_response(conn, 201)
 
     data = sensor
     |> Map.put("partitions", [partition])
 
-    conn = newconn(conn)
+    conn = Helper.newconn(conn)
     |> put(sensor_path(conn, :update, struct(SensorModel, %{id: sensor["id"]})), data)
     sensor = json_response(conn, 200)
 
@@ -88,23 +84,5 @@ defmodule DtWeb.SensorControllerTest do
     assert join.sensor_id == sensor["id"]
     assert join.partition_id == partition["id"]
 
-  end
-
-  defp login(conn) do
-    conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
-    json = json_response(conn, 200)
-
-    Phoenix.ConnTest.build_conn
-    |> put_req_header("accept", "application/json")
-    |> put_req_header("authorization", json["token"])
-  end
-
-  defp newconn(conn) do
-    token = get_req_header(conn, "authorization")
-    |> Enum.at(0)
-
-    Phoenix.ConnTest.build_conn
-    |> put_req_header("accept", "application/json")
-    |> put_req_header("authorization", token)
   end
 end
