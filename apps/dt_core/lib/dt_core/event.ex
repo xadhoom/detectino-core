@@ -1,5 +1,8 @@
 defmodule DtCore.EvRegistry do
-  @moduledoc false
+  @moduledoc """
+  Registry used to send event from sensors (via sensor server)
+  to output workers (each one subscribes to different keys)
+  """
   def registry do
     :registry_events
   end
