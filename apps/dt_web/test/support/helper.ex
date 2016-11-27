@@ -28,4 +28,9 @@ defmodule DtWeb.ControllerHelperTest do
     |> put_req_header("authorization", token)
   end
 
+  def newconn_anon do
+    Phoenix.ConnTest.build_conn
+    |> put_req_header("accept", "application/json")
+  end
+
 end
