@@ -20,6 +20,7 @@ defmodule DtCore.Sensor.Server do
   alias DtWeb.Repo
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
+  alias DtWeb.ReloadRegistry
 
   require Logger
 
@@ -92,14 +93,8 @@ defmodule DtCore.Sensor.Server do
 
   @doc false
   def handle_call({:reload}, _from, state) do
-    case Supervisor.stop(state.partition_sup, :normal) do
-      :ok ->
-        send self(), :start
-        {:reply, :ok, %{state | partition_sup: nil}}
-      any ->
-        Logger.error "Error stopping partition worker sup #{inspect any}"
-        {:reply, {:error, any}, state}
-      end
+    {res, state} = do_reload(state)
+    {:reply, res, state}
   end
 
   @doc false
@@ -121,11 +116,23 @@ defmodule DtCore.Sensor.Server do
         Process.monitor partpid
         state = %{state | partition_sup: partpid}
         start_partitions(state)
+        Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
         {:noreply, state}
       {:error, err} ->
         Logger.error "Error starting Partition Sup #{inspect err}"
         {:stop, err, state}
     end
+  end
+
+  @doc false
+  def handle_info({:reload}, state) do
+    {res, state} = do_reload(state)
+    case res do
+      {:error, any} ->
+        Logger.error("Got reload error #{inspect any}")
+      _ -> nil
+    end
+    {:noreply, state}
   end
 
   @doc """
@@ -169,6 +176,17 @@ defmodule DtCore.Sensor.Server do
     Logger.debug "Received event #{inspect ev} from bus"
     {:ok, state} = dispatch_event({ev, state})
     {:noreply, state}
+  end
+
+  defp do_reload(state) do
+    case Supervisor.stop(state.partition_sup, :normal) do
+      :ok ->
+        send self(), :start
+        {:ok, %{state | partition_sup: nil}}
+      any ->
+        Logger.error "Error stopping partition worker sup #{inspect any}"
+        {{:error, any}, state}
+      end
   end
 
   defp dispatch_event({ev = %BusEvent{}, state}) do

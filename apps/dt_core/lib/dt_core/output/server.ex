@@ -10,6 +10,7 @@ defmodule DtCore.Output.Server do
   alias DtCore.Output.Worker
   alias DtWeb.Repo
   alias DtWeb.Output, as: OutputModel
+  alias DtWeb.ReloadRegistry
 
   @name :output_server
 
@@ -46,14 +47,8 @@ defmodule DtCore.Output.Server do
   end
 
   def handle_call({:reload}, _from, state) do
-    case Supervisor.stop(state.output_sup, :normal) do
-      :ok ->
-        send self(), :start
-        {:reply, :ok, %{state | output_sup: nil}}
-      any ->
-        Logger.error "Error stopping outputs supervisor #{inspect any}"
-        {:reply, {:error, any}, state}
-      end
+    {res, state} = do_reload(state)
+    {:reply, res, state}
   end
 
   @doc false
@@ -78,11 +73,25 @@ defmodule DtCore.Output.Server do
         Process.monitor pid
         state = %{state | output_sup: pid}
         start_outputs(state)
+        Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
         {:noreply, state}
       {:error, err} ->
         Logger.error "Error starting Outputs Sup #{inspect err}"
         {:stop, err, state}
     end
+  end
+
+  @doc """
+  Handle reload request message
+  """
+  def handle_info({:reload}, state) do
+    {res, state} = do_reload(state)
+    case res do
+      {:error, any} ->
+        Logger.error("Got reload error #{inspect any}")
+      _ -> nil
+    end
+    {:noreply, state}
   end
 
   @doc """
@@ -113,6 +122,17 @@ defmodule DtCore.Output.Server do
           "but is not my outputs worker supervisor, ignoring...."
         {:noreply, state}
     end
+  end
+
+  defp do_reload(state) do
+    case Supervisor.stop(state.output_sup, :normal) do
+      :ok ->
+        send self(), :start
+        {:ok, %{state | output_sup: nil}}
+      any ->
+        Logger.error "Error stopping outputs supervisor #{inspect any}"
+        {{:error, any}, state}
+      end
   end
 
   defp start_outputs(state) do

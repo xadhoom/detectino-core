@@ -6,7 +6,7 @@ defmodule DtCore.Test.Sensor.Server do
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Test.TimerHelper
-
+  alias DtWeb.ReloadRegistry
   alias DtBus.Event, as: BusEvent
 
   setup do
@@ -21,11 +21,27 @@ defmodule DtCore.Test.Sensor.Server do
     :ok
   end
 
-  test "One partition starts one worker" do
+  test "One partition starts one worker (reload via client api)" do
     %PartitionModel{name: "a"}
     |> Repo.insert!
 
     assert :ok == Server.reload
+  
+    TimerHelper.wait_until fn ->
+      assert {:ok, 1} == Server.partitions
+    end
+  end
+
+  test "One partition starts one worker (reload via Registry msg)" do
+    assert {:ok, 0} == Server.partitions
+    
+    %PartitionModel{name: "a"}
+    |> Repo.insert!
+
+    Registry.dispatch(ReloadRegistry.registry, ReloadRegistry.key,
+      fn listeners ->
+        for {pid, _} <- listeners, do: send(pid, {:reload})
+      end)
   
     TimerHelper.wait_until fn ->
       assert {:ok, 1} == Server.partitions
@@ -101,6 +117,14 @@ defmodule DtCore.Test.Sensor.Server do
       assert {:ok, 3} == Server.sensors
     end
 
+  end
+
+  test "Server listens to reload event" do
+    pid = Process.whereis(:sensor_server)
+    TimerHelper.wait_until fn ->
+      listeners = Registry.keys(ReloadRegistry.registry, pid)
+      assert Enum.count(listeners) == 1
+    end
   end
 
 end
