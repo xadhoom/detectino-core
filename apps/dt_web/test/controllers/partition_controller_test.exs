@@ -1,7 +1,6 @@
 defmodule DtWeb.PartitionControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.Partition, as: PartitionModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do

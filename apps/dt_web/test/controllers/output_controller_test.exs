@@ -1,7 +1,6 @@
 defmodule DtWeb.OutputControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.Output, as: OutputModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do

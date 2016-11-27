@@ -1,8 +1,6 @@
 defmodule DtWeb.EventControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.Event, as: EventModel
-  alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do
