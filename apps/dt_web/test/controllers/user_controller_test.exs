@@ -24,7 +24,7 @@ defmodule DtWeb.UserControllerTest do
   end
 
   test "auth: get all users", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = get conn, user_path(conn, :index)
     json = json_response(conn, 200)
 
@@ -38,20 +38,20 @@ defmodule DtWeb.UserControllerTest do
   end
 
   test "auth: get one user", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = get conn, user_path(conn, :show, struct(User, %{"id": "1"}))
     json = json_response(conn, 200)
     assert json["username"] == "admin@local"
   end
 
   test "auth: get not existent user", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = get conn, user_path(conn, :show, struct(User, %{"id": "2"}))
     assert conn.status == 404
   end
 
   test "auth: save one user", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = post conn, user_path(conn, :create), @valid_attrs
     json = json_response(conn, 201)
     assert json["username"] == "test@local"
@@ -66,17 +66,17 @@ defmodule DtWeb.UserControllerTest do
     attrs = %{username: "admin@local", email: "some content",
       role: "some content", name: "some content",
       password: "some content"}
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = post conn, user_path(conn, :create), attrs
     json_response(conn, 400)
   end
 
   test "auth: save one invalid user", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = post conn, user_path(conn, :create), @invalid_attrs
     json_response(conn, 400)
 
-    conn = newconn(conn)
+    conn = Helper.newconn(conn)
     |> post(user_path(conn, :create), @missing_username)
     json_response(conn, 400)
   end
@@ -85,7 +85,7 @@ defmodule DtWeb.UserControllerTest do
     u = Repo.one!(User)
     assert u.username == "admin@local"
 
-    conn = login(conn)
+    conn = Helper.login(conn)
     params = Map.put(@valid_attrs, "id", "1")
     conn = put conn, user_path(conn, :update, struct(User, %{"id": "1"})), params
     json = json_response(conn, 200)
@@ -103,7 +103,7 @@ defmodule DtWeb.UserControllerTest do
     u = Repo.one!(User)
     assert u.username == "admin@local"
 
-    conn = login(conn)
+    conn = Helper.login(conn)
     params = Map.put(@valid_attrs, "id", "2")
     conn = put conn, user_path(conn, :update, struct(User, %{"id": "2"})), params
     assert conn.status == 404
@@ -114,35 +114,18 @@ defmodule DtWeb.UserControllerTest do
   end
 
   test "auth: delete admin user", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = delete conn, user_path(conn, :delete, struct(User, %{"id": "1"}))
     assert conn.status == 403
   end
 
   test "auth: delete an user", %{conn: conn} do
-    conn = login(conn)
+    conn = Helper.login(conn)
     conn = post conn, user_path(conn, :create), @valid_attrs
     json = json_response(conn, 201)
-    conn = newconn(conn)
+    conn = Helper.newconn(conn)
     |> delete(user_path(conn, :delete, struct(User, %{"id": json["id"]})))
     assert conn.status == 204
   end
 
-  defp login(conn) do
-    conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
-    json = json_response(conn, 200)
-
-    Phoenix.ConnTest.build_conn
-    |> put_req_header("accept", "application/json")
-    |> put_req_header("authorization", json["token"])
-  end
-
-  defp newconn(conn) do
-    token = get_req_header(conn, "authorization")
-    |> Enum.at(0)
-
-    Phoenix.ConnTest.build_conn
-    |> put_req_header("accept", "application/json")
-    |> put_req_header("authorization", token)
-  end
 end
