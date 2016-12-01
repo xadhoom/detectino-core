@@ -51,7 +51,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
   def links(conn, page, per_page, total) do
     next_p = nil
 
-    last_p = (total / per_page)
+    float_p = (total / per_page)
+    last_p = float_p
     |> Float.ceil
     |> trunc
 
@@ -70,7 +71,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
       }
     }
 
-    if total > (page * per_page) do
+    lh = if total > (page * per_page) do
       next_p = page + 1
       %ExLinkHeader{link | next: %ExLinkHeaderEntry{
           scheme: conn.scheme,
@@ -81,6 +82,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
     else
       link
     end
+    lh
     |> ExLinkHeader.build
 
   end

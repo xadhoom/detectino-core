@@ -16,8 +16,9 @@ defmodule DtWeb.ScenarioController do
     [handler: SessionController] when not action in [:get_available, :arm]
   plug CoreReloader, nil when not action in [:index, :show]
 
-  def get_available(conn, params) do
-    scenarios = Repo.all(Scenario)
+  def get_available(conn, _params) do
+    scenarios = Scenario
+    |> Repo.all
     |> Repo.preload(:partitions)
     |> Enum.filter(fn scenario ->
       case Enum.count(scenario.partitions) do
@@ -28,19 +29,20 @@ defmodule DtWeb.ScenarioController do
     render(conn, items: scenarios)
   end
 
-  def arm(conn, params = %{"id" => id, "pin" => pin}) do
+  def arm(conn, %{"id" => id, "pin" => pin}) do
     code = case Repo.get(Scenario, id) do
       nil -> 404
       record ->
-        check_user(record, pin)
+        record
+        |> check_user(pin)
         |> do_arm
     end
     send_resp(conn, code, StatusCodes.status_code(code))
   end
 
   defp check_user(scenario, pin) do
-    u = from(u in User, where: u.pin == ^pin)
-    |> Repo.one
+    q = from(u in User, where: u.pin == ^pin)
+    u = Repo.one(q)
 
     case u do
       nil -> nil

@@ -82,7 +82,8 @@ defmodule DtWeb.Event do
   end
 
   defp validate_config(changeset, {:ok, %SensorEvConf{address: nil}}) do
-    add_error(changeset, :source_config, "invalid sensor config format: address")
+    add_error(changeset, :source_config,
+      "invalid sensor config format: address")
   end
 
   defp validate_config(changeset, {:ok,  %SensorEvConf{port: nil}}) do
@@ -98,11 +99,13 @@ defmodule DtWeb.Event do
   end
 
   defp validate_config(changeset, {:ok, %PartitionEvConf{name: nil}}) do
-    add_error(changeset, :source_config, "invalid partition config format: name")
+    add_error(changeset, :source_config,
+      "invalid partition config format: name")
   end
 
   defp validate_config(changeset, {:ok, %PartitionEvConf{type: nil}}) do
-    add_error(changeset, :source_config, "invalid partition config format: type")
+    add_error(changeset, :source_config,
+      "invalid partition config format: type")
   end
 
   defp validate_config(changeset, {:ok, %PartitionEvConf{}}) do

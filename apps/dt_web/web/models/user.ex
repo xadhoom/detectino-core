@@ -1,6 +1,9 @@
 defmodule DtWeb.User do
   use DtWeb.Web, :model
 
+  alias Ecto.Changeset
+  alias Comeonin.Bcrypt
+
   schema "users" do
     field :name, :string
     field :username, :string
@@ -46,18 +49,18 @@ defmodule DtWeb.User do
   def valid_password?(_, nil), do: false
 
   def valid_password?(password, crypted) do
-    Comeonin.Bcrypt.checkpw(password, crypted)
+    Bcrypt.checkpw(password, crypted)
   end
 
   defp validate_password(changeset) do
-    case Ecto.Changeset.get_field(changeset, :encrypted_password) do
+    case Changeset.get_field(changeset, :encrypted_password) do
       nil -> password_incorrect_error(changeset)
       crypted -> validate_password(changeset, crypted)
     end
   end
 
   defp validate_password(changeset, crypted) do
-    password = Ecto.Changeset.get_change(changeset, :password)
+    password = Changeset.get_change(changeset, :password)
     if valid_password?(password, crypted) do
       changeset
     else
@@ -65,14 +68,17 @@ defmodule DtWeb.User do
     end
   end
 
-  defp password_incorrect_error(changeset), do: Ecto.Changeset.add_error(changeset, :password, "is incorrect")
+  defp password_incorrect_error(changeset) do
+    Changeset.add_error(changeset, :password, "is incorrect")
+  end
 
   defp maybe_update_password(changeset) do
-    case Ecto.Changeset.fetch_change(changeset, :password) do
+    case Changeset.fetch_change(changeset, :password) do
       {:ok, password} ->
         changeset
-        |> Ecto.Changeset.put_change(:encrypted_password, Comeonin.Bcrypt.hashpwsalt(password))
-        |> Ecto.Changeset.put_change(:password, nil)
+        |> Changeset.put_change(:encrypted_password,
+          Bcrypt.hashpwsalt(password))
+        |> Changeset.put_change(:password, nil)
       :error -> changeset
     end
   end

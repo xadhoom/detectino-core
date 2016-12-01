@@ -4,6 +4,7 @@ defmodule DtWeb.SessionController do
   alias DtWeb.User
   alias DtWeb.UserQuery
   alias DtWeb.StatusCodes
+  alias Guardian.Claims
 
   def unauthenticated(conn, _params) do
     send_resp(conn, 401, StatusCodes.status_code(401))
@@ -14,10 +15,11 @@ defmodule DtWeb.SessionController do
     if user do
       changeset = User.login_changeset(user, params["user"])
       if changeset.valid? do
-        claims = Guardian.Claims.app_claims
+        claims = Claims.app_claims
         |> Map.put("role", user.role)
-        |> Guardian.Claims.ttl({1, :hours})
-        {:ok, jwt, full_claims} = Guardian.encode_and_sign(user, :token, claims)
+        |> Claims.ttl({1, :hours})
+        {:ok, jwt, _full_claims} = user
+        |> Guardian.encode_and_sign(:token, claims)
         conn
         |> render(:logged_in, token: jwt)
       else

@@ -8,5 +8,5 @@ defmodule DtWeb.PartitionScenarioController do
 
   plug EnsureAuthenticated, [handler: SessionController]
   plug CoreReloader, nil when not action in [:index, :show]
-  
+
 end
