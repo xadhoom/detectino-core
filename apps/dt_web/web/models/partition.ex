@@ -42,4 +42,9 @@ defmodule DtWeb.Partition do
     |> unique_constraint(:name)
   end
 
+  def arm(struct) do
+    struct
+    |> cast(%{armed: "ARM"}, [:armed])
+  end
+
 end

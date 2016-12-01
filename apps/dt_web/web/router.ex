@@ -33,6 +33,7 @@ defmodule DtWeb.Router do
 
     resources "/partitions", PartitionController, only: @api_methods
 
+    post "/scenarios/:id/arm", ScenarioController, :arm
     get "/scenarios/get_available", ScenarioController, :get_available
     resources "/scenarios", ScenarioController, only: @api_methods do
       resources "/partitions_scenarios",
