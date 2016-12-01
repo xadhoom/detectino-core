@@ -47,6 +47,18 @@ defmodule DtWeb.ScenarioControllerTest do
     assert Enum.count(json) == 1
   end
 
+  test "cannot arm a scenario without partitions", %{conn: conn} do
+    scenario = %ScenarioModel{name: "scenario"}
+    |> Repo.insert!
+
+    %UserModel{username: "test@local", pin: "230477"}
+    |> Repo.insert!
+    
+    conn
+    |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
+    |> response(403)
+  end
+
   test "arm a scenario", %{conn: conn} do
     scenario = %ScenarioModel{name: "scenario"}
     |> Repo.insert!

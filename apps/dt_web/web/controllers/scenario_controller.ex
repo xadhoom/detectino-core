@@ -52,27 +52,36 @@ defmodule DtWeb.ScenarioController do
     case scenario do
       nil -> 401
       x ->
-        {ret, _any} = Repo.transaction(fn ->
-          x.partitions
-          |> Enum.all?(fn(partition) ->
-            {ret, struct_or_cset} = partition
-            |> Partition.arm
-            |> Repo.update
+        case Enum.count(x.partitions) do
+          0 -> 403
+          _ ->
+            {ret, _any} = x.partitions
+            |> arm_in_txn
             case ret do
-              :ok ->
-                true
-              :error ->
-                Logger.error("Cannot update: #{inspect struct_or_cset}")
-                Repo.rollback(:cannot_arm_partition)
-                false
+              :ok -> 204
+              _ -> 500
             end
-          end)
-        end)
-        case ret do
-          :ok -> 204
-          _ -> 500
         end
     end
+  end
+
+  defp arm_in_txn(partitions) do
+    Repo.transaction(fn ->
+      partitions
+      |> Enum.all?(fn(partition) ->
+        {ret, struct_or_cset} = partition
+        |> Partition.arm
+        |> Repo.update
+        case ret do
+          :ok ->
+            true
+          :error ->
+            Logger.error("Cannot update: #{inspect struct_or_cset}")
+            Repo.rollback(:cannot_arm_partition)
+            false
+        end
+      end)
+    end)
   end
 
 end
