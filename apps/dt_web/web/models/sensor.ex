@@ -16,6 +16,7 @@ defmodule DtWeb.Sensor do
     field :full24h, :boolean, default: false
     field :entry_delay, :boolean, default: false
     field :exit_delay, :boolean, default: false
+    field :internal, :boolean, default: false
 
     timestamps()
 
@@ -25,7 +26,7 @@ defmodule DtWeb.Sensor do
 
   @required_fields ~w(name address port)
   @optional_fields ~w(enabled balance th1 th2 th3 th4
-    full24h tamp24h entry_delay exit_delay)
+    full24h tamp24h entry_delay exit_delay internal)
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @balance_types ["NC", "NO", "EOL", "DEOL", "TEOL"]
 

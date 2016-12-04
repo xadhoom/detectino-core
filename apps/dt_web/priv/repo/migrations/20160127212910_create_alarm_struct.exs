@@ -32,6 +32,7 @@ defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
       add :tamp24h, :boolean, default: false
       add :entry_delay, :boolean, default: false
       add :exit_delay, :boolean, default: false
+      add :internal, :boolean, default: false
 
       timestamps()
     end

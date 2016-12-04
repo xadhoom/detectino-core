@@ -39,6 +39,16 @@ defmodule DtWeb.SensorTest do
     assert {:error, _changeset} = Repo.insert(sensor2)
   end
 
+  test "internal sensor" do
+    changeset = Sensor.create_changeset(%Sensor{}, %{
+      address: "some content", port: 1234, name: "mandatory", internal: true})
+    assert changeset.valid?
+
+    changeset = Sensor.create_changeset(%Sensor{}, %{
+      address: "some content", port: 1234, name: "mandatory", internal: false})
+    assert changeset.valid?
+  end
+
   test "valid balance types" do
     ["NC", "NO", "EOL", "DEOL", "TEOL"]
     |> Enum.each(fn(type) ->
