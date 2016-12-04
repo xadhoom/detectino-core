@@ -14,13 +14,20 @@ export class ScenarioService extends Crud {
 
   private baseurl = 'api/scenarios';
 
-  constructor(protected http: AuthHttp) {
+  constructor(protected http: AuthHttp, protected anonHttp: Http) {
     super(http);
   }
 
   all(): Observable<Scenario[]> {
     return this._read(this.baseurl);
   };
+
+  get_available(): Observable<Scenario[]> {
+    let url = this.baseurl + '/get_available';
+    return this.anonHttp.get(url).
+      map(this.parseResponse).
+      catch(this.handleError);
+  }
 
   destroy(s: Scenario): Observable<Scenario> {
     return this._destroy(s, this.baseurl);
