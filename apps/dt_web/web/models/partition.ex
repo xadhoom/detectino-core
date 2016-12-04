@@ -42,9 +42,10 @@ defmodule DtWeb.Partition do
     |> unique_constraint(:name)
   end
 
-  def arm(struct) do
+  def arm(struct, mode) do
     struct
-    |> cast(%{armed: "ARM"}, [:armed])
+    |> cast(%{armed: mode}, [:armed])
+    |> validate_inclusion(:armed, @valid_modes)
   end
 
   def disarm(struct) do

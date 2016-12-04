@@ -59,7 +59,10 @@ defmodule DtWeb.ScenarioController do
 
     case u do
       nil -> nil
-      _ -> scenario |> Repo.preload(:partitions)
+      _ ->
+        scenario
+        #|> Repo.preload(:partitions)
+        |> Repo.preload(:partitions_scenarios)
     end
   end
 
@@ -67,10 +70,10 @@ defmodule DtWeb.ScenarioController do
     case scenario do
       nil -> 401
       x ->
-        case Enum.count(x.partitions) do
+        case Enum.count(x.partitions_scenarios) do
           0 -> 403
           _ ->
-            {ret, _any} = x.partitions
+            {ret, _any} = x.partitions_scenarios
             |> arm_disarm_in_txn(what)
             case ret do
               :ok -> 204
@@ -80,11 +83,11 @@ defmodule DtWeb.ScenarioController do
     end
   end
 
-  defp arm_disarm_in_txn(partitions, what) do
+  defp arm_disarm_in_txn(partitions_scenarios, what) do
     Repo.transaction(fn ->
-      partitions
-      |> Enum.all?(fn(partition) ->
-        {ret, struct_or_cset} = partition
+      partitions_scenarios
+      |> Enum.all?(fn(partition_scenario) ->
+        {ret, struct_or_cset} = partition_scenario
         |> run_arm_disarm_op(what)
         |> Repo.update
         case ret do
@@ -99,9 +102,11 @@ defmodule DtWeb.ScenarioController do
     end)
   end
 
-  defp run_arm_disarm_op(partition, op) do
+  defp run_arm_disarm_op(partition_scenario, op) do
+    mode = partition_scenario.mode
+    partition = Repo.get(Partition, partition_scenario.partition_id)
     case op do
-      :arm -> partition |> Partition.arm
+      :arm -> partition |> Partition.arm(mode)
       :disarm -> partition |> Partition.disarm
     end
   end

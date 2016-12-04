@@ -65,7 +65,8 @@ defmodule DtWeb.ScenarioControllerTest do
     partition = %PartitionModel{name: "partition", armed: "DISARM"}
     |> Repo.insert!
     %PartitionScenarioModel{
-      partition_id: partition.id, scenario_id: scenario.id
+      partition_id: partition.id, scenario_id: scenario.id,
+      mode: "ARM"
     }
     |> Repo.insert!
 
@@ -85,6 +86,60 @@ defmodule DtWeb.ScenarioControllerTest do
 
     record = Repo.one(PartitionModel)
     assert record.armed == "ARM"
+
+    # check that a reload event is sent
+    {:reload}
+    |> assert_receive(5000)
+  end
+
+  test "arm a scenario with partial modes", %{conn: conn} do
+    scenario = %ScenarioModel{name: "scenario"}
+    |> Repo.insert!
+    partition = %PartitionModel{name: "partition", armed: "DISARM"}
+    |> Repo.insert!
+
+    %PartitionScenarioModel{
+      partition_id: partition.id, scenario_id: scenario.id,
+      mode: "ARMSTAY"
+    }
+    |> Repo.insert!
+
+    %UserModel{username: "test@local", pin: "230477"}
+    |> Repo.insert!
+
+    Helper.newconn_anon
+    |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
+    |> response(204)
+
+    record = Repo.one(PartitionModel)
+    assert record.armed == "ARMSTAY"
+
+    # check that a reload event is sent
+    {:reload}
+    |> assert_receive(5000)
+  end
+
+  test "arm a scenario with partial modes, but immediate", %{conn: conn} do
+    scenario = %ScenarioModel{name: "scenario"}
+    |> Repo.insert!
+    partition = %PartitionModel{name: "partition", armed: "DISARM"}
+    |> Repo.insert!
+
+    %PartitionScenarioModel{
+      partition_id: partition.id, scenario_id: scenario.id,
+      mode: "ARMSTAYIMMEDIATE"
+    }
+    |> Repo.insert!
+
+    %UserModel{username: "test@local", pin: "230477"}
+    |> Repo.insert!
+
+    Helper.newconn_anon
+    |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
+    |> response(204)
+
+    record = Repo.one(PartitionModel)
+    assert record.armed == "ARMSTAYIMMEDIATE"
 
     # check that a reload event is sent
     {:reload}
