@@ -27,6 +27,11 @@ defmodule DtCore.Sensor.Worker do
     GenServer.call(name, {:alarm_status?})
   end
 
+  def armed?({config = %SensorModel{}, partition = %PartitionModel{}}) do
+    {:ok, name} = Utils.sensor_server_name(config, partition)
+    GenServer.call(name, {:armed?})
+  end
+
   #
   # GenServer callbacks
   #
@@ -80,6 +85,14 @@ defmodule DtCore.Sensor.Worker do
     config = %SensorModel{state.config | exit_delay: false}
     state = %{state | config: config}
     {:noreply, state}
+  end
+
+  def handle_call({:internal?}, _from, state) do
+    {:reply, state.config.internal, state}
+  end
+
+  def handle_call({:armed?}, _from, state) do
+    {:reply, state.armed, state}
   end
 
   def handle_call({:alarm_status?}, _from, state) do

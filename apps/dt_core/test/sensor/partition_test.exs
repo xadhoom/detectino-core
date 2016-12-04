@@ -1,6 +1,7 @@
 defmodule DtCore.Test.Sensor.Partition do
   use DtCore.EctoCase
 
+  alias DtCore.Sensor.Worker
   alias DtCore.Sensor.Partition
   alias DtCore.Sensor.PartitionSup
   alias DtWeb.Sensor, as: SensorModel
@@ -80,6 +81,42 @@ defmodule DtCore.Test.Sensor.Partition do
 
     {:start, %PartitionEv{type: :alarm, name: "prot"}}
     |> assert_receive(5000)
+  end
+
+  test "arm partial sensor", ctx do
+    s_int = %SensorModel{name: "INT", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "1", port: 1, internal: true}
+    s_ext = %SensorModel{name: "EXT", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "1", port: 2, internal: false}
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      sensors: [s_int, s_ext]}
+
+    {:ok, _pid} = Partition.start_link({part, ctx[:cache]})
+
+    :ok = Partition.arm(part, "ARMSTAY")
+
+    assert Worker.armed?({s_int, part}) == false
+    assert Worker.armed?({s_ext, part}) == true
+
+    # TODO: find a way to check that arming respected the entry delay
+  end
+
+  test "arm partial sensor immediately", ctx do
+    s_int = %SensorModel{name: "INT", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "1", port: 1, internal: true}
+    s_ext = %SensorModel{name: "EXT", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "1", port: 2, internal: false}
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      sensors: [s_int, s_ext]}
+
+    {:ok, _pid} = Partition.start_link({part, ctx[:cache]})
+
+    :ok = Partition.arm(part, "ARMSTAYIMMEDIATE")
+
+    assert Worker.armed?({s_int, part}) == false
+    assert Worker.armed?({s_ext, part}) == true
+
+    # TODO: find a way to check that arming zeroed the entry delay
   end
 
   test "ignore event if not for my sensors", ctx do

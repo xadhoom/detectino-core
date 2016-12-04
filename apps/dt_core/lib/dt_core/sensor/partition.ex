@@ -203,6 +203,16 @@ defmodule DtCore.Sensor.Partition do
         arm_all(state.sensors, state.config)
         config = %PartitionModel{state.config | armed: "ARM"}
         {:ok, %{state | config: config}}
+      "ARMSTAY" ->
+        Logger.info("Partial Arming")
+        arm_partial(state.sensors, state.config, false)
+        config = %PartitionModel{state.config | armed: "ARMSTAY"}
+        {:ok, %{state | config: config}}
+      "ARMSTAYIMMEDIATE" ->
+        Logger.info("Partial Arming, immediate mode")
+        arm_partial(state.sensors, state.config, true)
+        config = %PartitionModel{state.config | armed: "ARMSTAYIMMEDIATE"}
+        {:ok, %{state | config: config}}
       "DISARM" ->
         {:ok, state}
       nil ->
@@ -281,6 +291,28 @@ defmodule DtCore.Sensor.Partition do
     case state.config.armed in @arm_modes do
       true -> true
       _ -> false
+    end
+  end
+
+  defp arm_partial(sensors, partition, immediate) do
+    sensors
+    |> Enum.each(fn(sensor) ->
+      internal? = sensor |> GenServer.call({:internal?})
+      case internal? do
+        true ->
+          Logger.info("Skip arming sensor #{inspect sensor} because internal")
+        _ ->
+          sensor |> arm_partial_run(partition, immediate)
+      end
+    end)    
+  end
+
+  defp arm_partial_run(sensor, partition, immediate) do
+    case immediate do
+      true ->
+        sensor |> GenServer.call({:arm, partition.exit_delay})
+      false ->
+        sensor |> GenServer.call({:arm, 0})
     end
   end
 
