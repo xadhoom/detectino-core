@@ -61,7 +61,6 @@ defmodule DtWeb.ScenarioController do
       nil -> nil
       _ ->
         scenario
-        #|> Repo.preload(:partitions)
         |> Repo.preload(:partitions_scenarios)
     end
   end

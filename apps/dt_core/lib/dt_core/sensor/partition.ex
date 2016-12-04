@@ -304,7 +304,7 @@ defmodule DtCore.Sensor.Partition do
         _ ->
           sensor |> arm_partial_run(partition, immediate)
       end
-    end)    
+    end)
   end
 
   defp arm_partial_run(sensor, partition, immediate) do
