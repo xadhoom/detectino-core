@@ -19,6 +19,17 @@ defmodule DtWeb.BusSettings do
     |> cast(params, @required_fields, @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @types)
+    |> validate_timers
+  end
+
+  defp validate_timers(changeset) do
+    case get_field(changeset, :type) do
+      "bistable" -> changeset
+      "monostable" ->
+        validate_required(changeset, [:mono_ontime])
+      _ ->
+        add_error(changeset, :mono_ontime, "Can't be blank")
+    end
   end
 
 end
