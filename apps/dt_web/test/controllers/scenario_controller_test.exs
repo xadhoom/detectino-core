@@ -91,6 +91,38 @@ defmodule DtWeb.ScenarioControllerTest do
     |> assert_receive(5000)
   end
 
+  test "disarm a scenario", %{conn: conn} do
+    scenario = %ScenarioModel{name: "scenario"}
+    |> Repo.insert!
+    partition = %PartitionModel{name: "partition", armed: "ARM"}
+    |> Repo.insert!
+    %PartitionScenarioModel{
+      partition_id: partition.id, scenario_id: scenario.id
+    }
+    |> Repo.insert!
+
+    conn = post conn, scenario_path(conn, :disarm, scenario), %{pin: "230477"}
+    response(conn, 401)
+
+    %UserModel{username: "test@local", pin: "230477"}
+    |> Repo.insert!
+
+    Helper.newconn_anon
+    |> post(scenario_path(conn, :disarm, scenario), %{pin: "123456"})
+    |> response(401)
+    
+    Helper.newconn_anon
+    |> post(scenario_path(conn, :disarm, scenario), %{pin: "230477"})
+    |> response(204)
+
+    record = Repo.one(PartitionModel)
+    assert record.armed == "DISARM"
+
+    # check that a reload event is sent
+    {:reload}
+    |> assert_receive(5000)
+  end
+
   test "auth: get all scenarios", %{conn: conn} do
     conn = Helper.login(conn)
 

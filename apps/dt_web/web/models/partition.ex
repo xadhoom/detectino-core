@@ -47,4 +47,9 @@ defmodule DtWeb.Partition do
     |> cast(%{armed: "ARM"}, [:armed])
   end
 
+  def disarm(struct) do
+    struct
+    |> cast(%{armed: "DISARM"}, [:armed])
+  end
+
 end

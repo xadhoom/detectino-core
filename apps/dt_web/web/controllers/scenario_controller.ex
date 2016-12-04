@@ -13,7 +13,9 @@ defmodule DtWeb.ScenarioController do
   require Logger
 
   plug EnsureAuthenticated,
-    [handler: SessionController] when not action in [:get_available, :arm]
+    [handler: SessionController] when not action in [
+      :get_available, :arm, :disarm
+    ]
   plug CoreReloader, nil when not action in [:index, :show]
 
   def get_available(conn, _params) do
@@ -35,7 +37,18 @@ defmodule DtWeb.ScenarioController do
       record ->
         record
         |> check_user(pin)
-        |> do_arm
+        |> do_arm_disarm(:arm)
+    end
+    send_resp(conn, code, StatusCodes.status_code(code))
+  end
+
+  def disarm(conn, %{"id" => id, "pin" => pin}) do
+    code = case Repo.get(Scenario, id) do
+      nil -> 404
+      record ->
+        record
+        |> check_user(pin)
+        |> do_arm_disarm(:disarm)
     end
     send_resp(conn, code, StatusCodes.status_code(code))
   end
@@ -50,7 +63,7 @@ defmodule DtWeb.ScenarioController do
     end
   end
 
-  defp do_arm(scenario) do
+  defp do_arm_disarm(scenario, what) do
     case scenario do
       nil -> 401
       x ->
@@ -58,7 +71,7 @@ defmodule DtWeb.ScenarioController do
           0 -> 403
           _ ->
             {ret, _any} = x.partitions
-            |> arm_in_txn
+            |> arm_disarm_in_txn(what)
             case ret do
               :ok -> 204
               _ -> 500
@@ -67,12 +80,12 @@ defmodule DtWeb.ScenarioController do
     end
   end
 
-  defp arm_in_txn(partitions) do
+  defp arm_disarm_in_txn(partitions, what) do
     Repo.transaction(fn ->
       partitions
       |> Enum.all?(fn(partition) ->
         {ret, struct_or_cset} = partition
-        |> Partition.arm
+        |> run_arm_disarm_op(what)
         |> Repo.update
         case ret do
           :ok ->
@@ -84,6 +97,13 @@ defmodule DtWeb.ScenarioController do
         end
       end)
     end)
+  end
+
+  defp run_arm_disarm_op(partition, op) do
+    case op do
+      :arm -> partition |> Partition.arm
+      :disarm -> partition |> Partition.disarm
+    end
   end
 
 end
