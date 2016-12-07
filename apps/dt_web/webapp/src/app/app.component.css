@@ -23,3 +23,30 @@ body {
   color:#404C51
 }
 
+.topbar-left {
+  width: auto !important;
+}
+
+.topbar-left i {
+  font-size: 36px;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.topbar-center {
+  float: left;
+  padding-top: 30px;
+  padding-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.topbar-center .time {
+  display: inline-block;
+  color: white;
+  font-size: 20px;
+  line-height: 1;
+}
+

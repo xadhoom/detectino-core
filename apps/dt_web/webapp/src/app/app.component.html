@@ -2,9 +2,14 @@
   <!-- layout-compact"-->
   <div class="layout-container">
     <div class="topbar clearfix">
-      <!--div class="topbar-left">
-        <div class="logo"></div>
-      </div-->
+      <div class="topbar-left">
+        <a (click)="router.navigate(['/home'])">
+          <i class="material-icons">home</i>
+        </a>
+      </div>
+      <div class="topbar-center">
+        <div class="time">{{time}}</div>
+      </div>
       <div class="topbar-right">
         <!--
         <a id="menu-button" href="#">

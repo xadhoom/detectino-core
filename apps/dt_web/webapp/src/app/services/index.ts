@@ -7,5 +7,6 @@ export * from './sensor.service';
 export * from './user.service';
 export * from './output.service';
 export * from './event.service';
+export * from './phoenixchannel.service';
 
 

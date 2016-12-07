@@ -5,11 +5,11 @@ import { Component, ViewEncapsulation, ElementRef, AfterViewInit } from '@angula
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import { Subscription }   from 'rxjs/Subscription';
+import { Subscription } from 'rxjs/Subscription';
 
 import { AuthService } from './services';
 
-import { NotificationService } from './services';
+import { NotificationService, PhoenixChannelService } from './services';
 
 import { Message } from 'primeng/primeng';
 
@@ -40,15 +40,36 @@ export class AppComponent implements AfterViewInit {
 
   notifications: Message[] = [];
 
-  constructor(private el: ElementRef, private router: Router, private auth: AuthService,
-              private notificationService: NotificationService) {
+  private time: MessageEvent;
 
-                this.subscription = notificationService.messages$.subscribe(
-                  messages => { this.notifications = messages; console.log(messages); }
-                );
+  constructor(private el: ElementRef, private router: Router, private auth: AuthService,
+    private notificationService: NotificationService,
+    private socket: PhoenixChannelService) {
+
+    this.subscription = notificationService.messages$.subscribe(
+      messages => { this.notifications = messages; console.log(messages); }
+    );
   }
 
   ngAfterViewInit() {
     Ultima.init(this.el.nativeElement);
+    this.startWebSock();
+  }
+
+  startWebSock() {
+    let socket = this.socket.run();
+    socket.subscribe(
+      time => this.updateTime(time),
+      error => this.onError(error)
+    );
+  }
+
+  onError(error) {
+    console.log(error);
+    this.startWebSock();
+  }
+
+  updateTime(time) {
+    this.time = time.time;
   }
 }

@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="">
+
 <head>
 
-  <title><%= webpackConfig.metadata.title %></title>
+  <title>
+    <%= webpackConfig.metadata.title %>
+  </title>
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,7 +23,7 @@
   <link rel="apple-touch-icon" sizes="144x144" href="/assets/icon/apple-icon-144x144.png">
   <link rel="apple-touch-icon" sizes="152x152" href="/assets/icon/apple-icon-152x152.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icon/apple-icon-180x180.png">
-  <link rel="icon" type="image/png" sizes="192x192"  href="/assets/icon/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon/android-icon-192x192.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="96x96" href="/assets/icon/favicon-96x96.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/icon/favicon-16x16.png">
@@ -37,6 +40,10 @@
   <!-- PrimeNG CSS -->
   <link rel="stylesheet" type="text/css" href="/assets/css/primeui-ng-all.min.css" />
 
+  <!-- JS libraries -->
+  <!-- Phoenix Socket -->
+  <script src="/assets/js/phoenix.js"></script>
+
   <!-- base url -->
   <base href="<%= webpackConfig.metadata.baseUrl %>">
 
@@ -45,24 +52,25 @@
 <body>
 
   <app>
-          <div class="splash-screen">
-              <div class="splash-container">
-                  <div class="logo"></div>
-                  <div class="load-bar">
-                      <div class="bar"></div>
-                      <div class="bar"></div>
-                      <div class="bar"></div>
-                  </div>
-              </div>
-          </div>
+    <div class="splash-screen">
+      <div class="splash-container">
+        <div class="logo"></div>
+        <div class="load-bar">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+      </div>
+    </div>
 
   </app>
 
   <% if (webpackConfig.metadata.ENV === 'development') { %>
-  <!-- Webpack Dev Server reload \-\-\>
+    <!-- Webpack Dev Server reload \-\-\>
   <script src="/webpack-dev-server.js"></script>
   <% } %>
   -->
 
 </body>
+
 </html>
