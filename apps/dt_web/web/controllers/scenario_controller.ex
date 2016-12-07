@@ -19,7 +19,8 @@ defmodule DtWeb.ScenarioController do
   plug CoreReloader, nil when not action in [:index, :show, :get_available]
 
   def get_available(conn, _params) do
-    scenarios = Scenario
+    q = from s in Scenario, where: s.enabled == true
+    scenarios = q
     |> Repo.all
     |> Repo.preload(:partitions)
     |> Enum.filter(fn scenario ->

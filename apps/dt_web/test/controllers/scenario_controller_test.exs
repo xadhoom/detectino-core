@@ -44,6 +44,20 @@ defmodule DtWeb.ScenarioControllerTest do
     conn = Helper.newconn_anon
     |> get(scenario_path(conn, :get_available))
     json = json_response(conn, 200)
+    assert Enum.count(json) == 0
+
+    scenario = %ScenarioModel{name: "scenario3", enabled: true}
+    |> Repo.insert!
+    partition = %PartitionModel{name: "partition2"}
+    |> Repo.insert!
+    %PartitionScenarioModel{
+      partition_id: partition.id, scenario_id: scenario.id
+    }
+    |> Repo.insert!
+
+    conn = Helper.newconn_anon
+    |> get(scenario_path(conn, :get_available))
+    json = json_response(conn, 200)
     assert Enum.count(json) == 1
   end
 
@@ -53,7 +67,7 @@ defmodule DtWeb.ScenarioControllerTest do
 
     %UserModel{username: "test@local", pin: "230477"}
     |> Repo.insert!
-    
+
     conn
     |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
     |> response(403)
@@ -79,7 +93,7 @@ defmodule DtWeb.ScenarioControllerTest do
     Helper.newconn_anon
     |> post(scenario_path(conn, :arm, scenario), %{pin: "123456"})
     |> response(401)
-    
+
     Helper.newconn_anon
     |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
     |> response(204)
@@ -165,7 +179,7 @@ defmodule DtWeb.ScenarioControllerTest do
     Helper.newconn_anon
     |> post(scenario_path(conn, :disarm, scenario), %{pin: "123456"})
     |> response(401)
-    
+
     Helper.newconn_anon
     |> post(scenario_path(conn, :disarm, scenario), %{pin: "230477"})
     |> response(204)
