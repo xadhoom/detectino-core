@@ -28,9 +28,8 @@ import { Home } from './home';
 import { Login } from './login';
 import { Users } from './users';
 import { Sensors } from './sensors';
-import { Scenarios } from './scenarios';
+import { Scenarios, Scenariolist, PartitionsScenarios } from './scenarios';
 import { Partitions } from './partitions';
-import { PartitionsScenarios } from './scenarios';
 import { Outputs } from './outputs';
 import { Events, SensorConfig, PartitionConfig } from './events';
 
@@ -74,7 +73,7 @@ const APP_PROVIDERS = [
     Login,
     Users,
     Sensors,
-    Scenarios,
+    Scenarios, Scenariolist,
     Partitions,
     PartitionsScenarios,
     Outputs,

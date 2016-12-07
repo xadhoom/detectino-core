@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { ScenarioService, NotificationService } from '../services';
 
 import { Scenario } from '../models/scenario';
+import { Scenariolist } from '../scenarios/scenariolist.component';
 
 @Component({
   selector: 'home',
@@ -11,7 +12,6 @@ import { Scenario } from '../models/scenario';
 })
 
 export class Home implements OnInit {
-
   scenarios: Scenario[];
 
   errorMessage: string;
@@ -20,7 +20,6 @@ export class Home implements OnInit {
     private notificationService: NotificationService) { };
 
   ngOnInit() {
-    console.log('hello `Home` component');
     this.scenarios = [];
     this.scenarioService.get_available().subscribe(
       scenarios => this.setScenarios(scenarios),
