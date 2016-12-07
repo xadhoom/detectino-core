@@ -16,7 +16,7 @@ defmodule DtWeb.Mixfile do
      aliases: aliases,
      deps: deps,
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, 
+     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test,
        "coveralls.post": :test, "coveralls.travis": :test]
    ]
   end
@@ -27,7 +27,7 @@ defmodule DtWeb.Mixfile do
   def application do
     [mod: {DtWeb, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex]]
+                    :phoenix_ecto, :postgrex, :timex]]
   end
 
   # Specifies which paths to compile per environment.
@@ -51,6 +51,7 @@ defmodule DtWeb.Mixfile do
      {:uuid, "~> 1.1"},
      {:exprintf, "~> 0.1"},
      {:ex_link_header, "~> 0.0.5"},
+     {:timex, "~> 3.1"},
      # remove registry when elixir 1.4 is released
      {:registry, git: "https://github.com/elixir-lang/registry"},
      {:credo, "~> 0.4", only: [:dev, :test]}

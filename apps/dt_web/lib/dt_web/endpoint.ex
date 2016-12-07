@@ -1,7 +1,7 @@
 defmodule DtWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :dt_web
 
-  # socket "/socket", DtWeb.UserSocket
+  socket "/socket", DtWeb.Sockets.Socket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
