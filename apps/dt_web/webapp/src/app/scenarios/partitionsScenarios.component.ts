@@ -11,8 +11,8 @@ import { Observable } from 'rxjs/Rx';
 
 @Component({
     selector: 'dt-partitionsscenarios',
-    template: require('./partitionsScenarios.component.html'),
-    styles: [ require('./partitionsScenarios.component.css') ]
+    templateUrl: './partitionsScenarios.component.html',
+    styleUrls: ['./partitionsScenarios.component.css']
 })
 
 export class PartitionsScenarios implements OnInit {

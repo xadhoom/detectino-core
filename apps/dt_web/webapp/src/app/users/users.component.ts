@@ -8,8 +8,8 @@ import { SelectItem } from 'primeng/primeng';
 
 @Component({
     selector: 'users',
-    template: require('./users.component.html'),
-    styles: [ require('./users.component.css') ]
+    templateUrl: './users.component.html',
+    styleUrls: [ './users.component.css' ]
 })
 
 export class Users implements OnInit {

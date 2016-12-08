@@ -6,8 +6,8 @@ import { EventSensorConfig } from '../models/event';
 
 @Component({
   selector: 'dt-eventsensorconfig',
-  template: require('./sensorconfig.component.html'),
-  styles: [require('./sensorconfig.component.css')]
+  templateUrl: './sensorconfig.component.html',
+  styleUrls: ['./sensorconfig.component.css']
 })
 
 export class SensorConfig implements OnInit {

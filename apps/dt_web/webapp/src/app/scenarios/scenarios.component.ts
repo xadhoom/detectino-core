@@ -12,8 +12,8 @@ import 'rxjs/operator/concatAll';
 
 @Component({
     selector: 'scenarios',
-    template: require('./scenarios.component.html'),
-    styles: [ require('./scenarios.component.css') ]
+    templateUrl: './scenarios.component.html',
+    styleUrls: [ './scenarios.component.css' ]
 })
 
 export class Scenarios implements OnInit {

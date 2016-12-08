@@ -8,8 +8,8 @@ import { Partition } from '../models/partition';
 
 @Component({
     selector: 'sensors',
-    template: require('./sensors.component.html'),
-    styles: [ require('./sensors.component.css') ],
+    templateUrl: './sensors.component.html',
+    styleUrls: [ './sensors.component.css' ],
     encapsulation: ViewEncapsulation.None
 })
 

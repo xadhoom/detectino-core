@@ -7,8 +7,8 @@ import { Scenariolist } from '../scenarios/scenariolist.component';
 
 @Component({
   selector: 'home',
-  styles: [require('./home.component.css')],
-  template: require('./home.component.html')
+  styleUrls: ['./home.component.css'],
+  templateUrl: './home.component.html'
 })
 
 export class Home implements OnInit {

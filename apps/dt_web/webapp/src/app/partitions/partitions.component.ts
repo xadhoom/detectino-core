@@ -8,8 +8,8 @@ import { SelectItem } from 'primeng/primeng';
 
 @Component({
     selector: 'partitions',
-    template: require('./partitions.component.html'),
-    styles: [ require('./partitions.component.css') ]
+    templateUrl: './partitions.component.html',
+    styleUrls: ['./partitions.component.css']
 })
 
 export class Partitions implements OnInit {

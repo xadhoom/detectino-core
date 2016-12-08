@@ -25,10 +25,8 @@ declare var Ultima: any;
 @Component({
   selector: 'app',
   encapsulation: ViewEncapsulation.None,
-  styles: [
-    require('./app.component.css')
-  ],
-  template: require('./app.component.html')
+  styleUrls: ['./app.component.css'],
+  templateUrl: './app.component.html'
 })
 
 export class AppComponent implements AfterViewInit {

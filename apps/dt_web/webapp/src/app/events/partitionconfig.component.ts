@@ -6,8 +6,8 @@ import { EventPartitionConfig } from '../models/event';
 
 @Component({
   selector: 'dt-eventpartitionconfig',
-  template: require('./partitionconfig.component.html'),
-  styles: [require('./partitionconfig.component.css')]
+  templateUrl: './partitionconfig.component.html',
+  styleUrls: ['./partitionconfig.component.css']
 })
 
 export class PartitionConfig implements OnInit {

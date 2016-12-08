@@ -11,8 +11,8 @@ import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'events',
-  template: require('./events.component.html'),
-  styles: [require('./events.component.css')]
+  templateUrl: './events.component.html',
+  styleUrls: ['./events.component.css']
 })
 
 export class Events implements OnInit {
