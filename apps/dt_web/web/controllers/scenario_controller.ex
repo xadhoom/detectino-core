@@ -12,10 +12,7 @@ defmodule DtWeb.ScenarioController do
 
   require Logger
 
-  plug EnsureAuthenticated,
-    [handler: SessionController] when not action in [
-      :get_available, :arm, :disarm
-    ]
+  plug EnsureAuthenticated, [handler: SessionController]
   plug CoreReloader, nil when not action in [:index, :show, :get_available]
 
   def get_available(conn, _params) do
