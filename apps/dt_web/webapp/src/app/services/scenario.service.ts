@@ -14,7 +14,7 @@ export class ScenarioService extends Crud {
 
   private baseurl = 'api/scenarios';
 
-  constructor(protected http: AuthHttp, protected anonHttp: Http) {
+  constructor(protected http: AuthHttp) {
     super(http);
   }
 
@@ -24,7 +24,7 @@ export class ScenarioService extends Crud {
 
   get_available(): Observable<Scenario[]> {
     let url = this.baseurl + '/get_available';
-    return this.anonHttp.get(url).
+    return this.http.get(url).
       map(this.parseResponse).
       catch(this.handleError);
   }

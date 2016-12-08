@@ -8,36 +8,37 @@ declare var Phoenix: any;
 
 @Injectable()
 export class PhoenixChannelService {
-  socket: any;
-  channel: any;
+  private socket: any;
+  private channel: any;
 
   private subject: Subject<MessageEvent>;
 
-  constructor() {
+  public disconnect() {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = undefined;
+    }
+  }
+
+  public connect(token) {
+    if (this.socket && this.socket.isConnected()) { return; }
+
     this.socket = new Phoenix.Socket('ws://localhost:4000/socket', {
       // logger: ((kind, msg, data) => { console.log(`${kind}: ${msg}`, data); }),
-      transport: WebSocket
+      transport: WebSocket,
+      params: { guardian_token: token },
     });
-
     this.socket.connect();
   }
 
-  public run(): Subject<MessageEvent> {
-    if (!this.subject) {
-      this.subject = this.create();
-    }
-    return this.subject;
-  }
-
-  private create(): Subject<MessageEvent> {
-    this.channel = this.socket.channel('event:time', {});
-    this.channel.join();
-
+  public subscribe(topic: string, key: string): Subject<MessageEvent> {
     let observable = Observable.create(
       (obs: Observer<MessageEvent>) => {
-        this.channel.on('time', obs.next.bind(obs));
-        this.channel.onError(obs.error.bind(obs));
-        this.channel.onClose(obs.complete.bind(obs));
+        let channel = this.socket.channel(topic + ':' + key, {});
+        channel.join();
+        channel.on(key, obs.next.bind(obs));
+        channel.onError(obs.error.bind(obs));
+        channel.onClose(obs.complete.bind(obs));
       });
 
     let observer = {

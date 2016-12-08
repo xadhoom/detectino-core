@@ -1,7 +1,10 @@
 /*
  * Angular 2 decorators and services
  */
-import { Component, ViewEncapsulation, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component, ViewEncapsulation, ElementRef,
+  AfterViewInit
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -54,19 +57,23 @@ export class AppComponent implements AfterViewInit {
   }
 
   startWebSock() {
-    let socket = this.socket.run();
-    socket.subscribe(
+    let channel = this.socket.subscribe('event', 'time');
+    channel.subscribe(
       time => this.updateTime(time),
-      error => this.onError(error)
+      error => this.onChanError(error)
     );
-  }
-
-  onError(error) {
-    console.log(error);
-    this.startWebSock();
   }
 
   updateTime(time) {
     this.time = time.time;
+  }
+
+  logout() {
+    this.auth.logout();
+  }
+
+  private onChanError(error) {
+    console.log('Channel Error', error);
+    this.startWebSock();
   }
 }

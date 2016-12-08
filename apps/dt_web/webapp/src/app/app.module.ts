@@ -38,7 +38,7 @@ const APP_PROVIDERS = [
   {
     provide: AuthService,
     useClass: AuthService,
-    deps: [Http, Router]
+    deps: [Http, Router, PhoenixChannelService]
   },
   NotificationService,
   UserService,

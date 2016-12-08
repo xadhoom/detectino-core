@@ -6,7 +6,7 @@ import { tokenNotExpired } from 'angular2-jwt';
 
 @Injectable()
 export class AuthGuard {
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   canActivate(): Observable<boolean> {
     let res = false;
@@ -14,7 +14,7 @@ export class AuthGuard {
     if (tokenNotExpired()) {
       res = true;
     } else {
-      this.router.navigate(['home']);
+      this.router.navigateByUrl('/login');
     }
 
     return Observable.create((observer) => {

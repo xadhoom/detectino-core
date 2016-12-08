@@ -12,9 +12,9 @@ import { Outputs } from './outputs';
 import { Events } from './events';
 
 export const ROUTES: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: 'home', component: Home },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: Login },
+  { path: 'home', component: Home, canActivate: [AuthGuard] },
   { path: 'users', component: Users, canActivate: [AuthGuard] },
   { path: 'sensors', component: Sensors, canActivate: [AuthGuard] },
   { path: 'scenarios', component: Scenarios, canActivate: [AuthGuard] },

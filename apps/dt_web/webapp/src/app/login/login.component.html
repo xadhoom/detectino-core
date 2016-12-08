@@ -1,19 +1,19 @@
 <div class="card login-panel ui-fluid">
-    <div class="ui-g">
-        <div class="ui-g-12">
-            <span class="md-inputfield">
+  <div class="ui-g">
+    <div class="ui-g-12">
+      <span class="md-inputfield">
 								<input pInputText #username autocomplete="off"/>
                 <label>Username</label>
             </span>
-        </div>
-        <div class="ui-g-12">
-            <span class="md-inputfield">
+    </div>
+    <div class="ui-g-12">
+      <span class="md-inputfield">
 								<input type="password" pInputText #password autocomplete="off"/>
                 <label>Password</label>
             </span>
-        </div>
-        <div class="ui-g-12">
-            <button type="button" pButton label="Sign In" icon="ui-icon-person" (click)="login($event, username.value, password.value)"></button>
-        </div>
     </div>
+    <div class="ui-g-12">
+      <button type="button" pButton label="Sign In" icon="ui-icon-person" (click)="login($event, username.value, password.value)"></button>
+    </div>
+  </div>
 </div>

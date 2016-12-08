@@ -1,3 +1,18 @@
 <div class="ui-g dashboard">
+
+  <div class="ui-g">
+    <div class="ui-g-12 ui-md-6 ui-lg-4" *ngFor="let link of links">
+      <div class="ui-g card colorbox colorbox-1" (click)="openLink(link.path)">
+        <div class="ui-g-4">
+          <i class="material-icons">settings</i>
+        </div>
+        <div class="ui-g-8">
+          <!--span class="colorbox-name"></span-->
+          <span class="fullname">{{link.path}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <dt-scenariolist class="ui-g-12" [scenarios]="scenarios" #scenariolist></dt-scenariolist>
 </div>

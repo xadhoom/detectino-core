@@ -4,6 +4,7 @@ import {
 } from '@angular/core/testing';
 import { MockBackend } from '@angular/http/testing';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { BaseRequestOptions, Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
@@ -13,6 +14,10 @@ import {
 
 // Load the implementations that should be tested
 import { Home } from './';
+
+class MockRouter {
+  navigate = jasmine.createSpy('navigate');
+}
 
 class MockScenarioService {
   public get_available() {
@@ -35,6 +40,12 @@ describe('Home', () => {
           return new Http(backend, defaultOptions);
         },
         deps: [MockBackend, BaseRequestOptions]
+      },
+      {
+        provide: Router,
+        useFactory: function () {
+          return new MockRouter();
+        }
       },
       {
         provide: ScenarioService,
