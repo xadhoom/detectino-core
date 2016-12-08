@@ -1,5 +1,6 @@
 defmodule DtWeb.Sockets.Socket do
   use Phoenix.Socket
+  use Guardian.Phoenix.Socket
 
   ## Channels
   channel "event:time", DtWeb.Channels.TimeEvent
@@ -19,8 +20,8 @@ defmodule DtWeb.Sockets.Socket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(_params, _socket) do
+    :error
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:
