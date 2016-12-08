@@ -30,7 +30,6 @@ declare var Ultima: any;
 })
 
 export class AppComponent implements AfterViewInit {
-  angularclassLogo = 'assets/img/angularclass-avatar.png';
   loading = false;
   name = 'Detectino';
 
