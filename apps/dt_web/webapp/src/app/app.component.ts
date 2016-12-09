@@ -57,11 +57,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   startWebSock() {
-    let channel = this.socket.subscribe('event', 'time');
-    channel.subscribe(
-      time => this.updateTime(time),
-      error => this.onChanError(error)
-    );
+    this.socket.subscribe('event', 'time', (time) => this.updateTime(time));
   }
 
   updateTime(time) {

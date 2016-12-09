@@ -10,8 +10,12 @@ declare var Phoenix: any;
 export class PhoenixChannelService {
   private socket: any;
   private channel: any;
-
+  private feeds: { [key: string]: Array<any> };
   private subject: Subject<MessageEvent>;
+
+  constructor() {
+    this.feeds = {};
+  }
 
   public disconnect() {
     if (this.socket) {
@@ -31,22 +35,29 @@ export class PhoenixChannelService {
     this.socket.connect();
   }
 
-  public subscribe(topic: string, key: string): Subject<MessageEvent> {
-    let observable = Observable.create(
-      (obs: Observer<MessageEvent>) => {
-        let channel = this.socket.channel(topic + ':' + key, {});
-        channel.join();
-        channel.on(key, obs.next.bind(obs));
-        channel.onError(obs.error.bind(obs));
-        channel.onClose(obs.complete.bind(obs));
-      });
+  public subscribe(topic: string, key: string, cb: Function) {
+    let chankey = topic + ':' + key;
+    if (!this.feeds[chankey]) {
+      this._subscribe(topic, key, cb);
+    } else {
+      this.feeds[chankey].push(cb);
+    }
+  }
 
-    let observer = {
-      next: (data: Object) => {
-        // this.channel.send(JSON.stringify(data));
-        console.log('Will send data:', data);
-      },
-    };
-    return Subject.create(observer, observable);
+  private _subscribe(topic: string, key: string, cb: Function) {
+    let chankey = topic + ':' + key;
+
+    this.feeds[chankey] = [];
+    this.feeds[chankey].push(cb);
+
+    let channel = this.socket.channel(chankey, {});
+    channel.join();
+    channel.on(key, (msg) => {
+      this.feeds[chankey].forEach((cb) => {
+        let ret = cb(msg);
+      });
+    });
+    channel.onError((error) => console.log('Error from channel', error));
+    channel.onClose(() => console.log('Channel closed', chankey));
   }
 }
