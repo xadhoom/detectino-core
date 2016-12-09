@@ -54,8 +54,8 @@ export class PhoenixChannelService {
     let channel = this.socket.channel(chankey, {});
     channel.join();
     channel.on(key, (msg) => {
-      this.feeds[chankey].forEach((cb) => {
-        let ret = cb(msg);
+      this.feeds[chankey].forEach((callback) => {
+        let ret = callback(msg);
       });
     });
     channel.onError((error) => console.log('Error from channel', error));
@@ -64,10 +64,12 @@ export class PhoenixChannelService {
 
   private reopen_channels() {
     for (let chankey in this.feeds) {
-      this.feeds[chankey].forEach((cb) => {
-        let topickey = chankey.split(':', 2);
-        this._subscribe(topickey[0], topickey[1], cb);
-      });
+      if (this.feeds.hasOwnProperty(chankey)) {
+        this.feeds[chankey].forEach((cb) => {
+          let topickey = chankey.split(':', 2);
+          this._subscribe(topickey[0], topickey[1], cb);
+        });
+      }
     }
   }
 }
