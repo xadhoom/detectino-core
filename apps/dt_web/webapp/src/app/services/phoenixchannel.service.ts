@@ -33,6 +33,7 @@ export class PhoenixChannelService {
       params: { guardian_token: token },
     });
     this.socket.connect();
+    this.reopen_channels();
   }
 
   public subscribe(topic: string, key: string, cb: Function) {
@@ -59,5 +60,14 @@ export class PhoenixChannelService {
     });
     channel.onError((error) => console.log('Error from channel', error));
     channel.onClose(() => console.log('Channel closed', chankey));
+  }
+
+  private reopen_channels() {
+    for (let chankey in this.feeds) {
+      this.feeds[chankey].forEach((cb) => {
+        let topickey = chankey.split(':', 2);
+        this._subscribe(topickey[0], topickey[1], cb);
+      });
+    }
   }
 }
