@@ -51,6 +51,11 @@ export class PhoenixChannelService {
     this.feeds[chankey] = [];
     this.feeds[chankey].push(cb);
 
+    if (!this.socket) {
+      // delay channel creation, will get recreated on connect via refresh
+      return;
+    }
+
     let channel = this.socket.channel(chankey, {});
     channel.join();
     channel.on(key, (msg) => {
