@@ -24,7 +24,12 @@ export class AuthService {
 
   public authenticated() {
     // Check if there's an unexpired JWT
-    return tokenNotExpired();
+    let expired = !tokenNotExpired();
+    if (expired) {
+      this.router.navigateByUrl('/');
+      return false;
+    }
+    return true;
   }
 
   public login(username: string, password: string) {
