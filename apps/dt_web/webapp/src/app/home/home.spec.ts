@@ -9,7 +9,7 @@ import { BaseRequestOptions, Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import {
-  ScenarioService, NotificationService
+  NotificationService
 } from '../services';
 
 // Load the implementations that should be tested
@@ -18,15 +18,6 @@ import { Home } from './';
 class MockRouter {
   navigate = jasmine.createSpy('navigate');
 }
-
-class MockScenarioService {
-  public get_available() {
-    return Observable.create(function (observer) {
-      observer.next([]);
-      observer.complete();
-    });
-  }
-};
 
 describe('Home', () => {
   // provide our implementations or mocks to the dependency injector
@@ -47,21 +38,15 @@ describe('Home', () => {
           return new MockRouter();
         }
       },
-      {
-        provide: ScenarioService,
-        useFactory: function () {
-          return new MockScenarioService();
-        }
-      },
       NotificationService,
       Home
     ]
   }));
 
-  it('should load scenarios', inject([Home], (home) => {
-    expect(home.scenarios).toBe(undefined);
-    home.ngOnInit();
-    expect(home.scenarios).toEqual([]);
+  it('should toggle settings', inject([Home], (home) => {
+    expect(home.displaySettings).toBe(false);
+    home.toggleSettings();
+    expect(home.displaySettings).toBe(true);
   }));
 
 });

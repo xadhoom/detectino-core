@@ -20,6 +20,7 @@ export class Home implements OnInit {
 
   constructor(private router: Router,
     private notificationService: NotificationService) {
+    this.displaySettings = false;
     this.links = [
       { path: 'users' },
       { path: 'sensors' },
