@@ -16,13 +16,14 @@ export class Home implements OnInit {
 
   errorMessage: string;
 
+  displaySettings: boolean;
+
   constructor(private router: Router,
     private notificationService: NotificationService) {
     this.links = [
       { path: 'users' },
       { path: 'sensors' },
       { path: 'scenarios' },
-      { path: 'scenarioslist' },
       { path: 'partitions' },
       { path: 'outputs' },
       { path: 'events' }
@@ -38,5 +39,13 @@ export class Home implements OnInit {
 
   openLink(path: string) {
     this.router.navigateByUrl('/' + path);
+  }
+
+  openScenarios() {
+    this.openLink('/scenarioslist');
+  }
+
+  toggleSettings() {
+    this.displaySettings = !this.displaySettings;
   }
 }
