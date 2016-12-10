@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core'
+import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 
 import { ScenarioService, NotificationService } from '../services';
 import { Scenario } from '../models/scenario';
