@@ -18,8 +18,16 @@ defmodule DtWeb.OutputControllerTest do
     conn = Helper.login(conn)
 
     # create an output
-    conn = post conn, output_path(conn, :create),
-      %{name: "this is a test", type: "bus", enabled: false}
+    conn = conn
+    |> post(output_path(conn, :create),
+      %{name: "this is a test", type: "bus", enabled: false})
+    conn |> response(401)
+
+    conn = conn
+    |> Helper.newconn
+    |> put_req_header("p-dt-pin", "666666")
+    |> post(output_path(conn, :create),
+      %{name: "this is a test", type: "bus", enabled: false})
     json = json_response(conn, 201)
     assert json["name"] == "this is a test"
 
@@ -29,6 +37,11 @@ defmodule DtWeb.OutputControllerTest do
 
     # check that the new record is there
     conn = Helper.newconn(conn)
+    |> get(output_path(conn, :index))
+    response(conn, 401)
+
+    conn = Helper.newconn(conn)
+    |> put_req_header("p-dt-pin", "666666")
     |> get(output_path(conn, :index))
     json = json_response(conn, 200)
 

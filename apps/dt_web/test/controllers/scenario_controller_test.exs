@@ -72,8 +72,14 @@ defmodule DtWeb.ScenarioControllerTest do
     %UserModel{username: "test@local", pin: "230477"}
     |> Repo.insert!
 
+    conn = conn
+    |> post(scenario_path(conn, :arm, scenario))
+    response(conn, 401)
+
     conn
-    |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
+    |> Helper.newconn
+    |> put_req_header("p-dt-pin", "230477")
+    |> post(scenario_path(conn, :arm, scenario))
     |> response(403)
   end
 
@@ -90,17 +96,21 @@ defmodule DtWeb.ScenarioControllerTest do
     }
     |> Repo.insert!
 
-    conn = post conn, scenario_path(conn, :arm, scenario), %{pin: "230477"}
+    conn = conn
+    |> put_req_header("p-dt-pin", "230477")
+    |> post(scenario_path(conn, :arm, scenario))
     response(conn, 401)
 
     %UserModel{username: "test@local", pin: "230477"}
     |> Repo.insert!
 
     conn |> Helper.newconn
-    |> post(scenario_path(conn, :arm, scenario), %{pin: "123456"})
+    |> put_req_header("p-dt-pin", "123456")
+    |> post(scenario_path(conn, :arm, scenario))
     |> response(401)
 
     conn |> Helper.newconn
+    |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
     |> response(204)
 
@@ -130,7 +140,8 @@ defmodule DtWeb.ScenarioControllerTest do
     |> Repo.insert!
 
     conn |> Helper.newconn
-    |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
+    |> put_req_header("p-dt-pin", "230477")
+    |> post(scenario_path(conn, :arm, scenario))
     |> response(204)
 
     record = Repo.one(PartitionModel)
@@ -159,7 +170,8 @@ defmodule DtWeb.ScenarioControllerTest do
     |> Repo.insert!
 
     conn |> Helper.newconn
-    |> post(scenario_path(conn, :arm, scenario), %{pin: "230477"})
+    |> put_req_header("p-dt-pin", "230477")
+    |> post(scenario_path(conn, :arm, scenario))
     |> response(204)
 
     record = Repo.one(PartitionModel)
@@ -182,17 +194,21 @@ defmodule DtWeb.ScenarioControllerTest do
     }
     |> Repo.insert!
 
-    conn = post conn, scenario_path(conn, :disarm, scenario), %{pin: "230477"}
+    conn = conn
+    |> put_req_header("p-dt-pin", "230477")
+    |> post(scenario_path(conn, :disarm, scenario))
     response(conn, 401)
 
     %UserModel{username: "test@local", pin: "230477"}
     |> Repo.insert!
 
     conn |> Helper.newconn
+    |> put_req_header("p-dt-pin", "123456")
     |> post(scenario_path(conn, :disarm, scenario), %{pin: "123456"})
     |> response(401)
 
     conn |> Helper.newconn
+    |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :disarm, scenario), %{pin: "230477"})
     |> response(204)
 
@@ -208,7 +224,13 @@ defmodule DtWeb.ScenarioControllerTest do
     conn = Helper.login(conn)
 
     # create a scenario
-    conn = post conn, scenario_path(conn, :create), %{name: "this is a test"}
+    conn
+    |> post(scenario_path(conn, :create), %{name: "this is a test"})
+    |> response(401)
+
+    conn = Helper.newconn(conn)
+    |> put_req_header("p-dt-pin", "666666")
+    |> post(scenario_path(conn, :create), %{name: "this is a test"})
     json = json_response(conn, 201)
     assert json["name"] == "this is a test"
 
@@ -218,6 +240,11 @@ defmodule DtWeb.ScenarioControllerTest do
 
     # check that the new record is there
     conn = Helper.newconn(conn)
+    |> get(scenario_path(conn, :index))
+    response(conn, 401)
+
+    conn = Helper.newconn(conn)
+    |> put_req_header("p-dt-pin", "666666")
     |> get(scenario_path(conn, :index))
     json = json_response(conn, 200)
 

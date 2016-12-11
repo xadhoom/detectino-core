@@ -4,10 +4,12 @@ defmodule DtWeb.UserController do
 
   alias DtWeb.SessionController
   alias DtWeb.StatusCodes
+  alias DtWeb.Plugs.PinAuthorize
 
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug PinAuthorize
 
   def delete(conn, %{"id" => "1"}) do
     send_resp(conn, 403, StatusCodes.status_code(403))

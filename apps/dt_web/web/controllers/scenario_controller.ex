@@ -4,6 +4,7 @@ defmodule DtWeb.ScenarioController do
 
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
+  alias DtWeb.Plugs.PinAuthorize
   alias DtWeb.StatusCodes
   alias DtWeb.Scenario
   alias DtWeb.User
@@ -13,6 +14,7 @@ defmodule DtWeb.ScenarioController do
   require Logger
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug PinAuthorize when not action in [:get_available]
   plug CoreReloader, nil when not action in [:index, :show, :get_available]
 
   def get_available(conn, _params) do
@@ -29,7 +31,8 @@ defmodule DtWeb.ScenarioController do
     render(conn, items: scenarios)
   end
 
-  def arm(conn, %{"id" => id, "pin" => pin}) do
+  def arm(conn, %{"id" => id}) do
+    pin = conn |> get_req_header("p-dt-pin") |> Enum.at(0, nil)
     code = case Repo.get(Scenario, id) do
       nil -> 404
       record ->
@@ -40,7 +43,8 @@ defmodule DtWeb.ScenarioController do
     send_resp(conn, code, StatusCodes.status_code(code))
   end
 
-  def disarm(conn, %{"id" => id, "pin" => pin}) do
+  def disarm(conn, %{"id" => id}) do
+    pin = conn |> get_req_header("p-dt-pin") |> Enum.at(0, nil)
     code = case Repo.get(Scenario, id) do
       nil -> 404
       record ->

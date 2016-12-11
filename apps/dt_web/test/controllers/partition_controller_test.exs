@@ -18,7 +18,15 @@ defmodule DtWeb.PartitionControllerTest do
     conn = Helper.login(conn)
 
     # create a partition
-    conn = post conn, partition_path(conn, :create), %{entry_delay: 42, exit_delay: 42, name: "some content"}
+    conn = post conn, partition_path(conn, :create),
+      %{entry_delay: 42, exit_delay: 42, name: "some content"}
+    response(conn, 401)
+
+    conn = conn
+    |> Helper.newconn
+    |> put_req_header("p-dt-pin", "666666")
+    |> post(partition_path(conn, :create),
+      %{entry_delay: 42, exit_delay: 42, name: "some content"})
     json = json_response(conn, 201)
     assert json["name"] == "some content"
 
@@ -28,6 +36,11 @@ defmodule DtWeb.PartitionControllerTest do
 
     # check that the new record is there
     conn = Helper.newconn(conn)
+    |> get(partition_path(conn, :index))
+    response(conn, 401)
+
+    conn = Helper.newconn(conn)
+    |> put_req_header("p-dt-pin", "666666")
     |> get(partition_path(conn, :index))
     json = json_response(conn, 200)
 

@@ -16,9 +16,11 @@ defmodule DtWeb.SensorController do
   alias DtWeb.StatusCodes
   alias DtWeb.Controllers.Helpers.Utils
   alias DtWeb.Plugs.CoreReloader
+  alias DtWeb.Plugs.PinAuthorize
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug PinAuthorize
   plug CoreReloader, nil when not action in [:index, :show]
 
   def index(conn, params) do
