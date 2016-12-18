@@ -8,14 +8,15 @@ import 'rxjs/add/operator/catch';
 
 import { Output } from '../models/output';
 import { Crud } from './crud';
+import { PinService } from './pin.service';
 
 @Injectable()
 export class OutputService extends Crud {
 
   private baseurl = 'api/outputs';
 
-  constructor(protected http: AuthHttp) {
-    super(http);
+  constructor(protected http: AuthHttp, protected pinSrv: PinService) {
+    super(http, pinSrv);
   }
 
   all(): Observable<Output[]> {

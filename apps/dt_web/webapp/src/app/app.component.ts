@@ -12,7 +12,10 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { AuthService } from './services';
 
-import { NotificationService, PhoenixChannelService } from './services';
+import {
+  NotificationService,
+  PhoenixChannelService, PinService
+} from './services';
 
 import { Message } from 'primeng/primeng';
 
@@ -42,8 +45,10 @@ export class AppComponent implements AfterViewInit {
 
   private time: MessageEvent;
 
-  constructor(private el: ElementRef, private router: Router, private auth: AuthService,
+  constructor(private el: ElementRef, private router: Router,
+    private auth: AuthService,
     private notificationService: NotificationService,
+    private pinSrv: PinService,
     private socket: PhoenixChannelService) {
 
     this.subscription = notificationService.messages$.subscribe(
@@ -65,6 +70,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   logout() {
+    this.pinSrv.resetPin();
     this.auth.logout();
   }
 

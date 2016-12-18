@@ -9,7 +9,7 @@ import { BaseRequestOptions, Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import {
-  NotificationService
+  NotificationService, PinService
 } from '../services';
 
 // Load the implementations that should be tested
@@ -18,6 +18,8 @@ import { Home } from './';
 class MockRouter {
   navigate = jasmine.createSpy('navigate');
 }
+
+class MockPinService { }
 
 describe('Home', () => {
   // provide our implementations or mocks to the dependency injector
@@ -36,6 +38,12 @@ describe('Home', () => {
         provide: Router,
         useFactory: function () {
           return new MockRouter();
+        }
+      },
+      {
+        provide: PinService,
+        useFactory: function () {
+          return new MockPinService();
         }
       },
       NotificationService,

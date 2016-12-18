@@ -1,20 +1,25 @@
-import { Http, Response, Request, RequestMethod, Headers } from '@angular/http';
+import {
+  Http, Response, Request, RequestMethod,
+  RequestOptions, Headers
+} from '@angular/http';
 import { AuthHttp } from 'angular2-jwt';
 import { Observable } from 'rxjs/Rx';
+import { PinService } from './pin.service';
+
+export class CrudSettings { }
 
 export class Crud {
 
-  constructor(protected http: AuthHttp) {
-    this.http = http;
-  }
+  constructor(protected http: AuthHttp, protected pinSrv: PinService) { }
 
-  _read(url: string): Observable<any[]> {
+  _read(url: string, options?: CrudSettings): Observable<any[]> {
+    // let rqOpts = this.buildOptions(options);
     return this.http.get(url).
       map(this.parseResponse).
       catch(this.handleError);
   };
 
-  _save(obj: any, url: string): Observable<any> {
+  _save(obj: any, url: string, options?: CrudSettings): Observable<any> {
     let rq = new Request({
       url: url,
       method: RequestMethod.Post,
@@ -34,7 +39,7 @@ export class Crud {
       catch(this.handleError);
   };
 
-  _destroy(obj: any, url: string): Observable<any> {
+  _destroy(obj: any, url: string, options?: CrudSettings): Observable<any> {
     console.log('deleting id ' + obj.id);
 
     if (!obj.id) {
@@ -69,5 +74,18 @@ export class Crud {
     }
     return Observable.throw(new Error(errMsg));
   };
+
+  private buildOptions(options: CrudSettings): RequestOptions {
+    if (!options) {
+      return new RequestOptions();
+    }
+
+    let pin = this.pinSrv.getPin();
+    let headers = new Headers();
+    if (pin) {
+      headers.append('p-dt-pin', pin);
+    }
+    return new RequestOptions({ headers: headers });
+  }
 
 }

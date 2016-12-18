@@ -8,14 +8,15 @@ import 'rxjs/add/operator/catch';
 
 import { Partition } from '../models/partition';
 import { Crud } from './crud';
+import { PinService } from './pin.service';
 
 @Injectable()
 export class PartitionService extends Crud {
 
   private baseurl = 'api/partitions';
 
-  constructor(protected http: AuthHttp) {
-    super(http);
+  constructor(protected http: AuthHttp, protected pinSrv: PinService) {
+    super(http, pinSrv);
   }
 
   all(): Observable<Partition[]> {

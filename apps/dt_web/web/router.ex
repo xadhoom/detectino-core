@@ -50,6 +50,7 @@ defmodule DtWeb.Router do
 
     resources "/events", EventController, only: @api_methods
 
+    post "/users/check_pin", UserController, :check_pin
     resources "/users", UserController, only: @api_methods
 
   end

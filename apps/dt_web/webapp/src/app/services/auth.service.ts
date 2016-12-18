@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 import { PhoenixChannelService } from './phoenixchannel.service';
+import { PinService } from './pin.service';
 
 @Injectable()
 export class AuthService {

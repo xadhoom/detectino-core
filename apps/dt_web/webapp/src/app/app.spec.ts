@@ -10,7 +10,7 @@ import { ElementRef } from '@angular/core';
 // Load the implementations that should be tested
 import { AppComponent } from './app.component';
 import {
-  AuthService, NotificationService, PhoenixChannelService
+  AuthService, NotificationService, PhoenixChannelService, PinService
 } from './services';
 
 class MockRouter {
@@ -21,8 +21,9 @@ class MockElementRef implements ElementRef {
   nativeElement = {};
 }
 
-class MockPhoenixService {
-}
+class MockPinService { }
+
+class MockPhoenixService { }
 
 describe('App', () => {
   // provide our implementations or mocks to the dependency injector
@@ -46,6 +47,12 @@ describe('App', () => {
         provide: PhoenixChannelService,
         useFactory: function () {
           return new MockPhoenixService();
+        }
+      },
+      {
+        provide: PinService,
+        useFactory: function () {
+          return new MockPinService();
         }
       },
       NotificationService,

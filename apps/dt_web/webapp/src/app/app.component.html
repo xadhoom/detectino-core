@@ -11,11 +11,12 @@
         <div class="time">{{time}}</div>
       </div>
       <div class="topbar-right">
-
-        <a id="topbar-menu-button" (click)="auth.logout()">
-          <i class="material-icons">lock_open</i>
+        <a (click)="logout()">
+          <i class="material-icons dt-topbar-icons">lock_open</i>
         </a>
-
+        <a (click)="pinSrv.resetPin()" *ngIf="pinSrv.getPin()">
+          <i class="material-icons dt-topbar-icons">warning</i>
+        </a>
       </div>
     </div>
 

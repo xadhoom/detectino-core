@@ -8,14 +8,15 @@ import 'rxjs/add/operator/catch';
 
 import { Sensor } from '../models/sensor';
 import { Crud } from './crud';
+import { PinService } from './pin.service';
 
 @Injectable()
 export class SensorService extends Crud {
 
   private baseurl = 'api/sensors';
 
-  constructor(protected http: AuthHttp) {
-    super(http);
+  constructor(protected http: AuthHttp, protected pinSrv: PinService) {
+    super(http, pinSrv);
   }
 
   all(): Observable<Sensor[]> {

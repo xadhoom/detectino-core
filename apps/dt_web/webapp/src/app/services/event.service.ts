@@ -7,15 +7,16 @@ import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/catch';
 
 import { Event } from '../models/event';
-import { Crud } from './crud';
+import { Crud, CrudSettings } from './crud';
+import { PinService } from './pin.service';
 
 @Injectable()
 export class EventService extends Crud {
 
   private baseurl = 'api/events';
 
-  constructor(protected http: AuthHttp) {
-    super(http);
+  constructor(protected http: AuthHttp, protected pinSrv: PinService) {
+    super(http, pinSrv);
   }
 
   all(): Observable<Event[]> {

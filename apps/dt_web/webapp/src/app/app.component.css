@@ -67,3 +67,14 @@ body {
   text-transform: capitalize;
 }
 
+.topbar-right {
+  text-align: right;
+  padding: 20px !important;
+}
+
+.dt-topbar-icons {
+  color: #ffffff;
+  font-size: 36px;
+  height: 36px;
+  line-height: 1;
+}

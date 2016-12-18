@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     margin: 15px;
-    
+
     border: 2px dashed #FBC02D;
 }
 .sample-content{
@@ -11,4 +11,34 @@
 }
 .card-container md-card{
     margin: 5px;
+}
+
+.pin-text {
+  font-size: 72px;
+  line-height: 1;
+  letter-spacing: 8px;
+}
+
+.pin-label {
+  color: #999;
+  font-size: 32px;
+}
+
+.pin-container {
+  margin: auto;
+  width: 240px;
+  text-align: center;
+}
+
+.pin-key-container {
+  margin: auto;
+  text-align: center;
+  width: 240px;
+}
+
+.pin-button {
+  /* margin-bottom: 10px; */
+  width: 64px;
+  height: 64px;
+  font-size: 48px;
 }

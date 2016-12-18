@@ -20,7 +20,8 @@ import {
 import {
   AuthService, NotificationService,
   UserService, SensorService, ScenarioService, PartitionService,
-  PartitionScenarioService, OutputService, EventService, PhoenixChannelService
+  PartitionScenarioService, OutputService, EventService, PhoenixChannelService,
+  PinService
 } from './services';
 import { AuthGuard } from './services/auth.guard';
 
@@ -49,7 +50,7 @@ const APP_PROVIDERS = [
   OutputService,
   EventService,
   AuthGuard,
-  PhoenixChannelService,
+  PhoenixChannelService, PinService,
   {
     provide: AuthHttp,
     useFactory: (http) => {

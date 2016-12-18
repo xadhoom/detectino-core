@@ -6,7 +6,7 @@ defmodule DtWeb.UserControllerTest do
 
   @valid_attrs %{username: "test@local", email: "some content",
     role: "some content", name: "some content",
-    password: "some content"}
+    password: "some content", pin: "123456"}
 
   @missing_username %{email: "some content",
     encrypted_password: "some content",
@@ -157,4 +157,26 @@ defmodule DtWeb.UserControllerTest do
     |> response(204)
   end
 
+  test "pin is validated", %{conn: conn} do
+    conn = conn
+    |> post(user_path(conn, :check_pin), %{pin: "123456"})
+    response(conn, 401)
+
+    conn = Helper.newconn_anon
+    |> Helper.login
+    |> post(user_path(conn, :check_pin), %{pin: "123456"})
+    response(conn, 404)
+
+    conn = Helper.newconn(conn)
+    |> put_req_header("p-dt-pin", "666666")
+    |> post(user_path(conn, :create), @valid_attrs)
+
+    conn = Helper.newconn(conn)
+    |> post(user_path(conn, :check_pin), %{pin: "123456"})
+    response(conn, 200)
+
+    conn = Helper.newconn(conn)
+    |> post(user_path(conn, :check_pin), %{pin: "666666"})
+    response(conn, 200)
+  end
 end

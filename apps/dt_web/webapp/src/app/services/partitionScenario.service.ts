@@ -8,14 +8,15 @@ import 'rxjs/add/operator/catch';
 
 import { PartitionScenario } from '../models/partitionScenario';
 import { Crud } from './crud';
+import { PinService } from './pin.service';
 
 @Injectable()
 export class PartitionScenarioService extends Crud {
 
   private baseurl = 'api/scenarios';
 
-  constructor(protected http: AuthHttp) {
-    super(http);
+  constructor(protected http: AuthHttp, protected pinSrv: PinService) {
+    super(http, pinSrv);
   }
 
   getUrl(id: number) {
