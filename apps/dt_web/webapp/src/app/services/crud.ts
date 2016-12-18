@@ -6,27 +6,28 @@ import { AuthHttp } from 'angular2-jwt';
 import { Observable } from 'rxjs/Rx';
 import { PinService } from './pin.service';
 
-export class CrudSettings { }
+export class CrudSettings {
+  // for future
+}
 
 export class Crud {
 
   constructor(protected http: AuthHttp, protected pinSrv: PinService) { }
 
   _read(url: string, options?: CrudSettings): Observable<any[]> {
-    // let rqOpts = this.buildOptions(options);
-    return this.http.get(url).
+    let rqOpts = this.buildOptions(options);
+    return this.http.get(url, rqOpts).
       map(this.parseResponse).
       catch(this.handleError);
   };
 
   _save(obj: any, url: string, options?: CrudSettings): Observable<any> {
+    let rqOpts = this.buildOptions(options);
     let rq = new Request({
       url: url,
       method: RequestMethod.Post,
       body: JSON.stringify(obj),
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      })
+      headers: rqOpts.headers
     });
 
     if (obj.id) {
@@ -40,7 +41,7 @@ export class Crud {
   };
 
   _destroy(obj: any, url: string, options?: CrudSettings): Observable<any> {
-    console.log('deleting id ' + obj.id);
+    let rqOpts = this.buildOptions(options);
 
     if (!obj.id) {
       return Observable.throw('Missing Object id');
@@ -50,9 +51,7 @@ export class Crud {
       url: url + '/' + obj.id,
       method: RequestMethod.Delete,
       body: '',
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      })
+      headers: rqOpts.headers
     });
 
     return this.http.request(rq).
@@ -76,16 +75,15 @@ export class Crud {
   };
 
   private buildOptions(options: CrudSettings): RequestOptions {
-    if (!options) {
-      return new RequestOptions();
-    }
+    let reqOpts = new RequestOptions();
 
     let pin = this.pinSrv.getPin();
     let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
     if (pin) {
       headers.append('p-dt-pin', pin);
     }
-    return new RequestOptions({ headers: headers });
+    return reqOpts.merge({ headers: headers });
   }
 
 }
