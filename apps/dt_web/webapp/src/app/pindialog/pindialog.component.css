@@ -1,0 +1,29 @@
+.pin-text {
+  font-size: 72px;
+  line-height: 1;
+  letter-spacing: 8px;
+}
+
+.pin-label {
+  color: #999;
+  font-size: 32px;
+}
+
+.pin-container {
+  margin: auto;
+  width: 240px;
+  text-align: center;
+}
+
+.pin-key-container {
+  margin: auto;
+  text-align: center;
+  width: 240px;
+}
+
+.pin-button {
+  /* margin-bottom: 10px; */
+  width: 64px;
+  height: 64px;
+  font-size: 48px;
+}
