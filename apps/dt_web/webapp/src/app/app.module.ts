@@ -32,6 +32,7 @@ import { Sensors } from './sensors';
 import { Scenarios, Scenariolist, PartitionsScenarios } from './scenarios';
 import { Partitions } from './partitions';
 import { Outputs } from './outputs';
+import { Settings } from './settings';
 import { Events, SensorConfig, PartitionConfig } from './events';
 
 // Application wide providers
@@ -79,7 +80,7 @@ const APP_PROVIDERS = [
     Partitions,
     PartitionsScenarios,
     Outputs,
-    Events, SensorConfig, PartitionConfig
+    Events, SensorConfig, PartitionConfig, Settings
   ],
   imports: [BrowserModule,
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
