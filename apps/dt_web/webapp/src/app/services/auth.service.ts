@@ -45,7 +45,6 @@ export class AuthService {
       body, { headers: contentHeaders })
       .map(response => {
         let token = response.json().token;
-        console.log(this.jwtHelper.decodeToken(token));
         localStorage.setItem('id_token', token);
         this.socket.connect(token);
         return true;
