@@ -23,4 +23,6 @@ export class Home implements OnInit {
   openSettings() {
     this.openLink('/settings');
   }
+
+  emergency() { }
 }
