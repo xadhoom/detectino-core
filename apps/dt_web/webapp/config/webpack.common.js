@@ -42,7 +42,7 @@ module.exports = {
    *
    * See: http://webpack.github.io/docs/configuration.html#cache
    */
-   //cache: false,
+  //cache: false,
 
   /*
    * The entry point for the bundle
@@ -141,6 +141,18 @@ module.exports = {
         loader: 'raw-loader'
       },
 
+      /*
+       * Raw loader support for *.scss files
+       * Returns file content as string
+       *
+       * See: https://github.com/webpack/raw-loader
+       */
+      {
+        test: /\.scss$/,
+        exclude: /node_modules/,
+        loaders: ['raw-loader', 'sass-loader'] // sass-loader not scss-loader
+      },
+
       /* Raw loader support for *.html
        * Returns file content as string
        *
@@ -196,12 +208,12 @@ module.exports = {
      * See: https://www.npmjs.com/package/copy-webpack-plugin
      */
     new CopyWebpackPlugin([
-      {from: 'src/assets', to: 'assets'},
-      {from: 'node_modules/primeui/themes/omega/fonts', to: 'fonts'},
-      {from: 'node_modules/primeui/themes/omega/theme.css', to: 'assets/css'},
-      {from: 'node_modules/primeui/primeui-ng-all.min.css', to: 'assets/css'},
-      {from: 'node_modules/font-awesome/fonts', to: 'assets/fonts'},
-      {from: 'node_modules/font-awesome/css/font-awesome.min.css', to: 'assets/css'}
+      { from: 'src/assets', to: 'assets' },
+      { from: 'node_modules/primeui/themes/omega/fonts', to: 'fonts' },
+      { from: 'node_modules/primeui/themes/omega/theme.css', to: 'assets/css' },
+      { from: 'node_modules/primeui/primeui-ng-all.min.css', to: 'assets/css' },
+      { from: 'node_modules/font-awesome/fonts', to: 'assets/fonts' },
+      { from: 'node_modules/font-awesome/css/font-awesome.min.css', to: 'assets/css' }
     ]),
 
     /*
