@@ -8,7 +8,11 @@ import { Router } from '@angular/router';
 })
 
 export class Home implements OnInit {
-  constructor(private router: Router) { }
+  timerEmerg: any;
+
+  constructor(private router: Router) {
+    this.timerEmerg = null;
+  }
 
   ngOnInit() { }
 
@@ -24,5 +28,26 @@ export class Home implements OnInit {
     this.openLink('/settings');
   }
 
-  emergency() { }
+  stop_menu(e) {
+    e.preventDefault();
+    return false;
+  }
+
+  start_emerg(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.timerEmerg = setTimeout(() => this.run_emerg(), 3000);
+  }
+
+  stop_emerg() {
+    if (this.timerEmerg) {
+      clearTimeout(this.timerEmerg);
+      this.timerEmerg = null;
+    }
+  }
+
+  private run_emerg() {
+    this.timerEmerg = null;
+    console.log('EMERG!!!!');
+  }
 }
