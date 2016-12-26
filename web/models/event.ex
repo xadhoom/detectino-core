@@ -35,7 +35,7 @@ defmodule DtWeb.Event do
 
   def create_changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:source, @source_types)
     |> check_config
@@ -43,7 +43,7 @@ defmodule DtWeb.Event do
 
   def update_changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:source, @source_types)
     |> check_config

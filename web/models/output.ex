@@ -23,7 +23,7 @@ defmodule DtWeb.Output do
 
   def create_changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> cast_embeds
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @valid_types)
@@ -31,7 +31,7 @@ defmodule DtWeb.Output do
 
   def update_changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> cast_embeds
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @valid_types)

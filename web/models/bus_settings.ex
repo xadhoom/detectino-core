@@ -16,7 +16,7 @@ defmodule DtWeb.BusSettings do
 
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @types)
     |> validate_timers

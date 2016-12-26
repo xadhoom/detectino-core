@@ -26,7 +26,7 @@ defmodule DtWeb.Partition do
   """
   def create_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:armed, @valid_modes)
     |> unique_constraint(:name)
@@ -34,7 +34,7 @@ defmodule DtWeb.Partition do
 
   def update_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:armed, @valid_modes)
     |> unique_constraint(:name)

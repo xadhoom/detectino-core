@@ -38,7 +38,7 @@ defmodule DtWeb.Sensor do
   """
   def create_changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:balance, @balance_types)
     |> unique_constraint(:address, name: :sensors_address_port_index)
@@ -47,7 +47,7 @@ defmodule DtWeb.Sensor do
 
   def update_changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:balance, @balance_types)
     |> unique_constraint(:address, name: :sensors_address_port_index)

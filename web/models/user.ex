@@ -40,7 +40,8 @@ defmodule DtWeb.User do
 
   def login_changeset(model, params) do
     model
-    |> cast(params, ~w(username password), ~w())
+    |> cast(params, ~w(username password))
+    |> validate_required([:username, :password])
     |> validate_password
   end
 
