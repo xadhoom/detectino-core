@@ -26,14 +26,14 @@ before_install:
           #- sleep 1  # give server time to start
 
 after_script:
-          - cat /home/travis/build/xadhoom/detectino-core/apps/dt_web/webapp/npm-debug.log
+          - cat /home/travis/build/xadhoom/detectino-core/webapp/npm-debug.log
 
 cache:
         directories:
-                - apps/dt_web/webapp/node_modules
+                - webapp/node_modules
                 - deps
                 - _build
 
 script:
-        - "pushd apps/dt_web/webapp; npm install; npm run build; npm run test; popd"
-        - "MIX_ENV=test mix do deps.get, deps.compile, coveralls.travis --umbrella"
+        - "pushd webapp; npm install; npm run build; npm run test; popd"
+        - "MIX_ENV=test mix do deps.get, deps.compile, coveralls.travis"
