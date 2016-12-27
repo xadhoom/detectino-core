@@ -19,16 +19,16 @@ defmodule DtCore.Test.Output.Worker do
     :meck.expect(Etimer, :start_timer,
       fn(_ ,_ ,_ ,_ ) ->
         0
-      end)    
+      end)
   end
 
   setup do
     {:ok, _pid} = Sup.start_link
     {:ok, _} = Registry.start_link(
-      :duplicate, 
+      :duplicate,
       DtBus.ActionRegistry.registry
     )
-    
+
     on_exit fn ->
       TimerHelper.wait_until fn ->
         assert Process.whereis(:output_server) == nil
@@ -57,7 +57,7 @@ defmodule DtCore.Test.Output.Worker do
     output = %OutputModel{name: "another output", events: events, enabled: false}
 
     {:ok, pid} = Worker.start_link({output})
-    
+
     listeners = Registry.keys(EvRegistry.registry, pid)
     assert Enum.count(listeners) == 0
   end
@@ -80,7 +80,7 @@ defmodule DtCore.Test.Output.Worker do
     output = %OutputModel{name: "an output", events: events, enabled: true}
 
     {:ok, pid} = Worker.start_link({output})
-    
+
     listeners = Registry.keys(EvRegistry.registry, pid)
     assert Enum.count(listeners) == 2
 
@@ -119,11 +119,11 @@ defmodule DtCore.Test.Output.Worker do
       }
     }
 
-    # testing the server callbacks here 
+    # testing the server callbacks here
     # since the swoosh test adapter sends
     # emails to the current process
     {:ok, state} = Worker.init({output})
-    
+
     s_ev = {:start, %SensorEv{type: :alarm, address: "10", port: 5}}
     p_ev = {:start, %PartitionEv{type: :alarm, name: "area one"}}
     s_ev_end = {:stop, %SensorEv{type: :alarm, address: "10", port: 5}}
@@ -176,10 +176,10 @@ defmodule DtCore.Test.Output.Worker do
       address: "addr", port: 42
     }
     |> assert_receive(5000)
-    
+
     TimerHelper.wait_until fn ->
       assert :meck.called(
-        Etimer, :start_timer, 
+        Etimer, :start_timer,
         [:_, :_, 30000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
@@ -233,10 +233,10 @@ defmodule DtCore.Test.Output.Worker do
       address: "addr", port: 42
     }
     |> assert_receive(5000)
-    
+
     TimerHelper.wait_until fn ->
       assert :meck.called(
-        Etimer, :start_timer, 
+        Etimer, :start_timer,
         [:_, :_, 30000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
@@ -250,7 +250,7 @@ defmodule DtCore.Test.Output.Worker do
 
     TimerHelper.wait_until fn ->
       assert :meck.called(
-        Etimer, :start_timer, 
+        Etimer, :start_timer,
         [:_, :_, 120000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
     end
 
@@ -303,10 +303,10 @@ defmodule DtCore.Test.Output.Worker do
       address: "addr", port: 42
     }
     |> assert_receive(5000)
-    
+
     TimerHelper.wait_until fn ->
       refute :meck.called(
-        Etimer, :start_timer, 
+        Etimer, :start_timer,
         [:_, :_, 1000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
@@ -318,7 +318,7 @@ defmodule DtCore.Test.Output.Worker do
 
     TimerHelper.wait_until fn ->
       refute :meck.called(
-        Etimer, :start_timer, 
+        Etimer, :start_timer,
         [:_, :_, 120000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
     end
 
