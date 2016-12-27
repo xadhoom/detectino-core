@@ -3,7 +3,7 @@ defmodule DtWeb.Sockets.Socket do
   use Guardian.Phoenix.Socket
 
   ## Channels
-  channel "event:time", DtWeb.Channels.TimeEvent
+  channel "timer:*", DtWeb.Channels.Timer
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

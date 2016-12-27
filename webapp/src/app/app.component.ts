@@ -62,7 +62,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   startWebSock() {
-    this.socket.subscribe('event', 'time', (time) => this.updateTime(time));
+    this.socket.subscribe('timer', 'time', (time) => this.updateTime(time));
   }
 
   updateTime(time) {

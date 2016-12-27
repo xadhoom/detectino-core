@@ -1,9 +1,9 @@
-defmodule DtWeb.Channels.TimeEvent do
+defmodule DtWeb.Channels.Timer do
   use Phoenix.Channel
 
   require Logger
 
-  def join("event:time", _message, socket) do
+  def join("timer:time", _message, socket) do
     Logger.error("New channel connection !")
     send(self, :after_join)
     {:ok, socket}
