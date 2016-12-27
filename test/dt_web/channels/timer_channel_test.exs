@@ -20,6 +20,9 @@ defmodule DtWeb.TimerChannelTest do
 
     assert :meck.called(Etimer, :start_link, :_)
     assert :meck.called(Phoenix.Channel, :push, [:fake, :_, :_])
+
+    :meck.unload(Etimer)
+    :meck.unload(Phoenix.Channel)
   end
 
 end
