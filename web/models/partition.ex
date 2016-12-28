@@ -40,6 +40,15 @@ defmodule DtWeb.Partition do
     |> unique_constraint(:name)
   end
 
+  def arm_op_from_mode(mode) do
+    case mode do
+      "ARM" -> :arm
+      "ARMSTAY" -> :arm
+      "ARMSTAYIMMEDIATE" -> :arm
+      "DISARM" -> :disarm
+    end
+  end
+
   def arm(struct, mode) do
     struct
     |> cast(%{armed: mode}, [:armed])

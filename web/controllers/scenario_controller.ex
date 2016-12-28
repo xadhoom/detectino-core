@@ -31,26 +31,14 @@ defmodule DtWeb.ScenarioController do
     render(conn, items: scenarios)
   end
 
-  def arm(conn, %{"id" => id}) do
+  def run(conn, %{"id" => id}) do
     pin = conn |> get_req_header("p-dt-pin") |> Enum.at(0, nil)
     code = case Repo.get(Scenario, id) do
       nil -> 404
       record ->
         record
         |> check_user(pin)
-        |> do_arm_disarm(:arm)
-    end
-    send_resp(conn, code, StatusCodes.status_code(code))
-  end
-
-  def disarm(conn, %{"id" => id}) do
-    pin = conn |> get_req_header("p-dt-pin") |> Enum.at(0, nil)
-    code = case Repo.get(Scenario, id) do
-      nil -> 404
-      record ->
-        record
-        |> check_user(pin)
-        |> do_arm_disarm(:disarm)
+        |> run_scenario()
     end
     send_resp(conn, code, StatusCodes.status_code(code))
   end
@@ -67,7 +55,7 @@ defmodule DtWeb.ScenarioController do
     end
   end
 
-  defp do_arm_disarm(scenario, what) do
+  defp run_scenario(scenario) do
     case scenario do
       nil -> 401
       x ->
@@ -75,7 +63,7 @@ defmodule DtWeb.ScenarioController do
           0 -> 403
           _ ->
             {ret, _any} = x.partitions_scenarios
-            |> arm_disarm_in_txn(what)
+            |> run_scenario_in_txn()
             case ret do
               :ok -> 204
               _ -> 500
@@ -84,12 +72,12 @@ defmodule DtWeb.ScenarioController do
     end
   end
 
-  defp arm_disarm_in_txn(partitions_scenarios, what) do
+  defp run_scenario_in_txn(partitions_scenarios) do
     Repo.transaction(fn ->
       partitions_scenarios
       |> Enum.all?(fn(partition_scenario) ->
         {ret, struct_or_cset} = partition_scenario
-        |> run_arm_disarm_op(what)
+        |> run_arm_disarm_op()
         |> Repo.update
         case ret do
           :ok ->
@@ -103,10 +91,10 @@ defmodule DtWeb.ScenarioController do
     end)
   end
 
-  defp run_arm_disarm_op(partition_scenario, op) do
+  defp run_arm_disarm_op(partition_scenario) do
     mode = partition_scenario.mode
     partition = Repo.get(Partition, partition_scenario.partition_id)
-    case op do
+    case Partition.arm_op_from_mode(mode) do
       :arm -> partition |> Partition.arm(mode)
       :disarm -> partition |> Partition.disarm
     end
