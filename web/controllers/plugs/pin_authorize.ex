@@ -14,7 +14,7 @@ defmodule DtWeb.Plugs.PinAuthorize do
 
   def call(conn, _params) do
     pin = conn |> get_req_header("p-dt-pin") |> Enum.at(0, nil)
-    conn = if is_nil(pin) do
+    if is_nil(pin) do
       conn |> handle_error
     else
       q = from u in User, where: u.pin == ^pin
