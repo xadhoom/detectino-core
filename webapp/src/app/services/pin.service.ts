@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { AuthHttp } from 'angular2-jwt';
-import { Observable } from 'rxjs/Rx';
+import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { contentHeaders } from '../shared/utils/headers';
 
 @Injectable()
 export class PinService {
-  private pin: string;
+  private pin: BehaviorSubject<string>;
 
   constructor(private http: AuthHttp) {
-    this.pin = null;
+    this.pin = new BehaviorSubject<string>(null);
   }
 
   public setPin(pin: string) {
@@ -19,17 +19,21 @@ export class PinService {
     return this.http.post('/api/users/check_pin',
       body, { headers: contentHeaders })
       .map(response => {
-        this.pin = pin;
+        this.pin.next(pin);
       }).catch(this.handleError);
 
   }
 
-  public getPin(): string {
+  public observePin(): BehaviorSubject<string> {
     return this.pin;
   }
 
+  public getPin(): string {
+    return this.pin.getValue();
+  }
+
   public resetPin(): void {
-    this.pin = null;
+    this.pin.next(null);
   }
 
   private handleError(error: any) {

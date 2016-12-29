@@ -1,0 +1,23 @@
+<div class="dashboard">
+
+  <div class="card" *ngIf="!pinSrv.getPin()">
+    <dt-pindialog></dt-pindialog>
+  </div>
+
+  <div class="ui-g" *ngIf="pinSrv.getPin()">
+
+    <div class="ui-g-12 ui-sm-6 ui-md-4 ui-lg-3" *ngFor="let partition of partitions">
+      <div class="card colorbox colorbox-2">
+        <div>
+          <i class="material-icons">lock_open</i>
+        </div>
+        <div>
+          <!--span class="colorbox-name"></span-->
+          <span class="fullname">{{partition.name}}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

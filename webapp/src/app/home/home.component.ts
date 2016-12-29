@@ -28,6 +28,10 @@ export class Home implements OnInit {
     this.openLink('/settings');
   }
 
+  openIntrusion() {
+    this.openLink('/intrusion');
+  }
+
   stop_menu(e) {
     e.preventDefault();
     return false;

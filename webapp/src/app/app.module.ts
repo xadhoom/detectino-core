@@ -34,6 +34,7 @@ import { Partitions } from './partitions';
 import { Outputs } from './outputs';
 import { Settings } from './settings';
 import { Pindialog } from './pindialog';
+import { Intrusion } from './intrusion';
 import { Events, SensorConfig, PartitionConfig } from './events';
 
 // Application wide providers
@@ -80,7 +81,7 @@ const APP_PROVIDERS = [
     Scenarios, Scenariolist,
     Partitions,
     PartitionsScenarios,
-    Outputs, Pindialog,
+    Outputs, Pindialog, Intrusion,
     Events, SensorConfig, PartitionConfig, Settings
   ],
   imports: [BrowserModule,

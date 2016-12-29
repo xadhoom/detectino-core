@@ -11,6 +11,7 @@ import { Partitions } from './partitions';
 import { Outputs } from './outputs';
 import { Events } from './events';
 import { Settings } from './settings';
+import { Intrusion } from './intrusion';
 
 export const ROUTES: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -23,6 +24,7 @@ export const ROUTES: Routes = [
   { path: 'partitions', component: Partitions, canActivate: [AuthGuard] },
   { path: 'outputs', component: Outputs, canActivate: [AuthGuard] },
   { path: 'events', component: Events, canActivate: [AuthGuard] },
-  { path: 'settings', component: Settings, canActivate: [AuthGuard] }
+  { path: 'settings', component: Settings, canActivate: [AuthGuard] },
+  { path: 'intrusion', component: Intrusion, canActivate: [AuthGuard] },
 ];
 
