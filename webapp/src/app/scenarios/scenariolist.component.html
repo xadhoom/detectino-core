@@ -6,7 +6,7 @@
 
   <div class="ui-g" *ngIf="pinSrv.getPin()">
     <div class="ui-g-12 ui-md-6 ui-lg-4" *ngFor="let scenario of scenarios">
-      <div class="ui-g card colorbox colorbox-1">
+      <div class="ui-g card colorbox colorbox-1" (click)="run(scenario)">
         <div class="ui-g-4">
           <!--i class="material-icons">check_circle</i-->
           <span class="name">{{getInitials(scenario.name)}}</span>

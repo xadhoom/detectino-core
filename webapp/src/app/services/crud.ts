@@ -74,7 +74,7 @@ export class Crud {
     return Observable.throw(new Error(errMsg));
   };
 
-  private buildOptions(options: CrudSettings): RequestOptions {
+  protected buildOptions(options: CrudSettings): RequestOptions {
     let reqOpts = new RequestOptions();
 
     let pin = this.pinSrv.getPin();

@@ -29,6 +29,14 @@ export class Scenariolist implements OnInit {
     return name[0];
   }
 
+  run(s: Scenario) {
+    let runOp = this.scenarioService.run(s);
+    runOp.subscribe(
+      res => console.log(res),
+      error => this.onError(error)
+    );
+  }
+
   onError(error: any) {
     this.errorMessage = <any>error;
     this.notificationService.error(this.errorMessage);
