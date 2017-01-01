@@ -9,7 +9,11 @@
     <div class="ui-g-12 ui-sm-6 ui-md-4 ui-lg-3" *ngFor="let partition of partitions">
       <div class="card colorbox colorbox-2">
         <div>
-          <md-icon svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'ARMSTAY'" svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'ARMSTAYIMMEDIATE'" svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'ARMED'" svgSrc="assets/images/lock-outline.svg" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'DISARM'" svgSrc="assets/images/lock-open-outline.svg" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="!partition.armed" svgSrc="assets/images/lock-open-outline.svg" class="svg-material-icons"></md-icon>
         </div>
         <div>
           <!--span class="colorbox-name"></span-->
