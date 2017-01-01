@@ -31,6 +31,8 @@ defmodule DtWeb.Router do
 
     post "/login", SessionController, :create, as: :api_login
 
+    post "/partitions/:id/arm", PartitionController, :arm
+    post "/partitions/:id/disarm", PartitionController, :disarm
     resources "/partitions", PartitionController, only: @api_methods
 
     post "/scenarios/:id/run", ScenarioController, :run
