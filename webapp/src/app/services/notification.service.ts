@@ -19,8 +19,14 @@ export class NotificationService {
     return this._messages$.asObservable();
   }
 
+  success(body: string) {
+    let msg = { severity: 'success', summary: 'Success Message', detail: body };
+    this.messages.push(msg);
+    this._messages$.next(this.messages);
+  }
+
   error(body: string) {
-    let msg = {severity: 'error', summary: 'Error Message', detail: body};
+    let msg = { severity: 'error', summary: 'Error Message', detail: body };
     this.messages.push(msg);
     this._messages$.next(this.messages);
   }

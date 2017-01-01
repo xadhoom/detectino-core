@@ -32,7 +32,7 @@ export class Scenariolist implements OnInit {
   run(s: Scenario) {
     let runOp = this.scenarioService.run(s);
     runOp.subscribe(
-      res => console.log(res),
+      res => this.notificationService.success('Scenario started successfully'),
       error => this.onError(error)
     );
   }
