@@ -43,7 +43,6 @@ export class ScenarioService extends Crud {
     let url = this.baseurl + '/' + s.id + '/run';
     return this.http.get(url, rqOpts).
       map((res) => {
-        console.log(res);
         return true;
       }).
       catch(this.handleError);
