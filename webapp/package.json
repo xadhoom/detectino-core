@@ -56,6 +56,8 @@
     "@angular/platform-browser-dynamic": "2.2.4",
     "@angular/platform-server": "2.2.4",
     "@angular/router": "3.2.4",
+    "@angular2-material/core": "^2.0.0-alpha.8-2",
+    "@angular2-material/icon": "^2.0.0-alpha.8-2",
     "angular2-jwt": "^0.1.23",
     "core-js": "^2.4.1",
     "font-awesome": "^4.6.3",

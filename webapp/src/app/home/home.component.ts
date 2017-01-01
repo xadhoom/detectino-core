@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'home',
-  styleUrls: ['./home.component.scss'],
+  styleUrls: ['./home.component.scss', '../shared/common.scss'],
   templateUrl: './home.component.html'
 })
 

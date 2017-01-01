@@ -11,9 +11,9 @@ import { Observable } from 'rxjs/Rx';
 import 'rxjs/operator/concatAll';
 
 @Component({
-    selector: 'scenarios',
-    templateUrl: './scenarios.component.html',
-    styleUrls: [ './scenarios.component.css' ]
+  selector: 'scenarios',
+  templateUrl: './scenarios.component.html',
+  styleUrls: ['./scenarios.component.css', '../shared/common.scss']
 })
 
 export class Scenarios implements OnInit {
@@ -34,7 +34,7 @@ export class Scenarios implements OnInit {
   errorMessage: string;
 
   constructor(private scenarioService: ScenarioService,
-              private notificationService: NotificationService) {};
+    private notificationService: NotificationService) { };
 
   ngOnInit() {
     this.all();
@@ -43,13 +43,13 @@ export class Scenarios implements OnInit {
   all() {
     this.scenarioService.all().
       subscribe(
-        scenarios => this.scenarios = scenarios,
-        error => this.onError(error)
-    );
+      scenarios => this.scenarios = scenarios,
+      error => this.onError(error)
+      );
   };
 
   save() {
-    let s2: Observable<any> =  null;
+    let s2: Observable<any> = null;
     let s1 = this.scenarioService.save(this.scenario);
     s2 = this.partitionsscenarios ? this.partitionsscenarios.saveAll() : null;
     let s3 = null;
@@ -61,17 +61,17 @@ export class Scenarios implements OnInit {
     }
     s3.
       subscribe(
-        success => this.refresh(),
-        error => this.onError(error)
-    );
+      success => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   destroy() {
     this.scenarioService.destroy(this.scenario).
       subscribe(
-        success => this.refresh(),
-        error => this.onError(error)
-    );
+      success => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   onError(error: any) {

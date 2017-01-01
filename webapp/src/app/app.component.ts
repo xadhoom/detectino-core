@@ -30,8 +30,7 @@ declare var Ultima: any;
  */
 @Component({
   selector: 'app',
-  encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.css', './shared/common.scss'],
   templateUrl: './app.component.html'
 })
 

@@ -5,7 +5,7 @@ import { Scenario } from '../models/scenario';
 
 @Component({
   selector: 'dt-scenariolist',
-  styleUrls: ['./scenariolist.component.css'],
+  styleUrls: ['./scenariolist.component.css', '../shared/common.scss'],
   templateUrl: './scenariolist.component.html'
 })
 

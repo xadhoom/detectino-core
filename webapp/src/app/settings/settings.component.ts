@@ -8,7 +8,7 @@ import { PinService } from '../services';
 
 @Component({
   selector: 'settings',
-  styleUrls: ['./settings.component.css'],
+  styleUrls: ['./settings.component.css', '../shared/common.scss'],
   templateUrl: './settings.component.html'
 })
 

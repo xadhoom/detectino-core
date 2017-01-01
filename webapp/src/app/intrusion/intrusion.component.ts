@@ -5,7 +5,7 @@ import { Partition } from '../models/partition';
 
 @Component({
   selector: 'dt-intrusion',
-  styleUrls: ['./intrusion.component.scss'],
+  styleUrls: ['./intrusion.component.scss', '../shared/common.scss'],
   templateUrl: './intrusion.component.html'
 })
 

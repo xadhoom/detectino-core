@@ -17,6 +17,8 @@ import {
   InputSwitchModule
 } from 'primeng/primeng';
 
+import { MdIconModule, MdIconRegistry } from '@angular2-material/icon';
+
 import {
   AuthService, NotificationService,
   UserService, SensorService, ScenarioService, PartitionService,
@@ -44,6 +46,7 @@ const APP_PROVIDERS = [
     useClass: AuthService,
     deps: [Http, Router, PhoenixChannelService]
   },
+  MdIconRegistry,
   NotificationService,
   UserService,
   SensorService,
@@ -90,7 +93,7 @@ const APP_PROVIDERS = [
     DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
     FormsModule, InputSwitchModule,
     HttpModule,
-    JsonpModule,
+    JsonpModule, MdIconModule,
     RouterModule.forRoot(ROUTES)
   ],
   providers: [
