@@ -79,6 +79,7 @@ defmodule Detectino.Mixfile do
     ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "ecto.migrate": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo"],
+     "phoenix.routes": ["phoenix.routes DtWeb.Router"],
      "test": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo", "test"]]
   end
 
