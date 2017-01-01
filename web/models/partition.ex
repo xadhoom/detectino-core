@@ -1,7 +1,9 @@
 defmodule DtWeb.Partition do
   use DtWeb.Web, :model
 
-  @derive {Poison.Encoder, only: [:id, :name, :entry_delay, :exit_delay]}
+  @derive {Poison.Encoder, only: [
+    :id, :name, :entry_delay, :exit_delay, :armed
+  ]}
   schema "partitions" do
     field :name, :string
     field :entry_delay, :integer
