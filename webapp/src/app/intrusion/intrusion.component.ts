@@ -59,16 +59,20 @@ export class Intrusion implements OnInit {
   private isArmed(partition: Partition) {
     let armed = false;
     switch (partition.armed) {
-      case "ARM":
+      case 'ARM':
         armed = true; break;
-      case "ARMSTAY":
+      case 'ARMSTAY':
         armed = true; break;
-      case "ARMSTAYIMMEDIATE":
+      case 'ARMSTAYIMMEDIATE':
         armed = true; break;
-      case "DISARM":
+      case 'DISARM':
         armed = false; break;
       case null:
         armed = false; break;
+      default:
+        armed = false;
+        console.error('unhandled arming status: ', partition);
+        break;
     }
     return armed;
   }
