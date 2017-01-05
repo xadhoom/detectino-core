@@ -2,6 +2,7 @@ defmodule DtWeb.SessionControllerTest do
   use DtWeb.ConnCase
 
   alias DtWeb.User
+  alias DtWeb.TokenServer
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -38,16 +39,19 @@ defmodule DtWeb.SessionControllerTest do
     conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
     json = json_response(conn, 200)
     jwt_1 = Guardian.decode_and_verify!(json["token"])
+    {:ok, _} = TokenServer.get(json["token"])
 
     conn = Phoenix.ConnTest.build_conn
     |> put_req_header("accept", "application/json")
     |> put_req_header("authorization", json["token"])
     |> post(api_login_path(conn, :refresh))
 
-    json = json_response(conn, 200)
-    jwt_2 = Guardian.decode_and_verify!(json["token"])
+    json2 = json_response(conn, 200)
+    jwt_2 = Guardian.decode_and_verify!(json2["token"])
 
     assert jwt_1["exp"] < jwt_2["exp"]
+    # refreshing will revoke the token
+    {:error, _} = TokenServer.get(json["token"])
   end
 
   test "cannot refresh if reauth is flagged", %{conn: conn} do
