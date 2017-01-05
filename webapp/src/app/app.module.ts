@@ -44,7 +44,7 @@ const APP_PROVIDERS = [
   {
     provide: AuthService,
     useClass: AuthService,
-    deps: [Http, Router, PhoenixChannelService]
+    deps: [Http, AuthHttp, Router, PhoenixChannelService]
   },
   MdIconRegistry,
   NotificationService,

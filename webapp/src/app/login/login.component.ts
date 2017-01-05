@@ -27,6 +27,6 @@ export class Login implements OnInit {
         } else {
           console.log('ayee cannot login');
         }
-      }, error => console.log('ayeee error in login'));
+      }, error => console.log('ayeee error in login:', error));
   }
 }
