@@ -42,7 +42,8 @@ export class AppComponent implements AfterViewInit {
 
   notifications: Message[] = [];
 
-  private time: MessageEvent;
+  private time: string;
+  private date: string;
 
   constructor(private el: ElementRef, private router: Router,
     private auth: AuthService,
@@ -65,7 +66,14 @@ export class AppComponent implements AfterViewInit {
   }
 
   updateTime(time) {
-    this.time = time.time;
+    let options = {};
+    let date = new Date(time.time);
+
+    options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    this.date = date.toLocaleString([], options);
+
+    options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    this.time = date.toLocaleString([], options);
   }
 
   logout() {

@@ -1,5 +1,3 @@
-
-
 .topbar-left {
   width: auto !important;
 }
@@ -12,9 +10,17 @@
 
 .topbar-center {
   float: left;
-  padding: 30px 20px 20px;
+  padding: 20px 20px 20px;
   height: 100%;
   box-sizing: border-box;
+}
+
+.topbar-center .date {
+  display: block;
+  color: white;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
 }
 
 .topbar-center .time {
@@ -22,6 +28,17 @@
   color: white;
   font-size: 20px;
   line-height: 1;
+  text-align: center;
+}
+
+@media screen and (max-width: 320px) {
+  .topbar-center .time {
+    display: none;
+  }
+
+  .topbar-center .date {
+    display: none;
+  }
 }
 
 .topbar-right {
