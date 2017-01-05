@@ -11,20 +11,20 @@ defmodule DtWeb.TokenServer do
     GenServer.start_link(__MODULE__, {}, name: name)
   end
 
-  def put(token) do
-    GenServer.call(__MODULE__, {:put, token})
+  def put(token, server \\ __MODULE__) do
+    GenServer.call(server, {:put, token})
   end
 
-  def get(token) do
-    GenServer.call(__MODULE__, {:get, token})
+  def get(token, server \\ __MODULE__) do
+    GenServer.call(server, {:get, token})
   end
 
-  def delete(token) do
-    GenServer.call(__MODULE__, {:delete, token})
+  def delete(token, server \\ __MODULE__) do
+    GenServer.call(server, {:delete, token})
   end
 
-  def all() do
-    GenServer.call(__MODULE__, {:all})
+  def all(server \\ __MODULE__) do
+    GenServer.call(server, {:all})
   end
 
   # GenServer callbacks
