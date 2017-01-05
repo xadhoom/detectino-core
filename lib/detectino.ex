@@ -19,6 +19,7 @@ defmodule Detectino do
         [:duplicate, ReloadRegistry.registry,
           [partitions: System.schedulers_online]],
         restart: :permanent),
+      worker(DtWeb.TokenServer, [], restart: :permanent)
     ]
 
     children = case Mix.env do

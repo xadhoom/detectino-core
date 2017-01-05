@@ -49,7 +49,7 @@ defmodule Detectino.Mixfile do
      {:poison, "~> 2.2"},
      {:gettext, "~> 0.9"},
      {:cowboy, "~> 1.0"},
-     {:guardian, "~> 0.13"},
+     {:guardian, "~> 0.14"},
      {:comeonin, "~> 2.0"},
      {:uuid, "~> 1.1"},
      {:ex_link_header, "~> 0.0.5"},
