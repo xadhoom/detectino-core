@@ -27,6 +27,7 @@ defmodule DtWeb.TokenServerTest do
   test "get a not existent token" do
     {:ok, _pid} = TokenServer.start_link(:d)
     {:error, :not_found} = TokenServer.get("token", :d)
+    assert :not_running == Etimer.stop_timer(:d, "token")
   end
 
   test "deletes a token" do
@@ -37,6 +38,7 @@ defmodule DtWeb.TokenServerTest do
     tokens = TokenServer.all(:e)
 
     assert Enum.count(tokens) == 0
+    assert :not_running == Etimer.stop_timer(:e, "token")
   end
 
   test "expires a token" do
@@ -55,6 +57,6 @@ defmodule DtWeb.TokenServerTest do
 
     tokens = TokenServer.all(:f)
     assert Enum.count(tokens) == 0
-
   end
+
 end

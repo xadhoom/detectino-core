@@ -33,17 +33,18 @@ defmodule DtWeb.TokenServer do
 
   # GenServer callbacks
   def init({name}) do
-    Etimer.start_link(self())
     state = %{
       tokens: %{},
-      server_name: name
+      server_name: name,
+      timer_server: name
     }
+    Etimer.start_link(state.timer_server)
     {:ok, state}
   end
 
   def handle_call({:expire_token, token}, _from, state) do
-    tokens = Map.delete(state.tokens, token)
-    {:reply, :ok, %{state | tokens: tokens}}
+    state = remove_token(state, token)
+    {:reply, :ok, state}
   end
 
   def handle_call({:all}, _from, state) do
@@ -51,7 +52,7 @@ defmodule DtWeb.TokenServer do
   end
 
   def handle_call({:put, token, expiry}, _from, state) do
-    Etimer.start_timer(self(), token, expiry * 1000,
+    Etimer.start_timer(state.timer_server, token, expiry * 1000,
       {__MODULE__, :expire, [{:token, token}, state.server_name]})
 
     tokens = Map.put(state.tokens, token, expiry)
@@ -67,7 +68,13 @@ defmodule DtWeb.TokenServer do
   end
 
   def handle_call({:delete, token}, _from, state) do
+    state = remove_token(state, token)
+    {:reply, :ok, state}
+  end
+
+  defp remove_token(state, token) do
+    Etimer.stop_timer(state.timer_server, token)
     tokens = Map.delete(state.tokens, token)
-    {:reply, :ok, %{state | tokens: tokens}}
+    %{state | tokens: tokens}
   end
 end
