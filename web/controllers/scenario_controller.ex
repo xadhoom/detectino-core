@@ -1,6 +1,8 @@
 defmodule DtWeb.ScenarioController do
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtWeb.Scenario]
+  use DtWeb.CrudMacros, [
+    repo: DtWeb.Repo, model: DtWeb.Scenario, orderby: [:name]
+  ]
 
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
