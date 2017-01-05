@@ -28,7 +28,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
     order_by = case orderby do
       nil -> []
       x when is_list(x) -> x
-      invalid -> []
+      _invalid -> []
     end
 
     q = from m in model,
