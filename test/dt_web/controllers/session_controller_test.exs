@@ -54,6 +54,23 @@ defmodule DtWeb.SessionControllerTest do
     {:error, _} = TokenServer.get(json["token"])
   end
 
+  test "cannot refresh if token is forcefully expired", %{conn: conn} do
+    conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
+    json = json_response(conn, 200)
+
+    # forcefully expire the token
+    :ok = TokenServer.expire({:token, json["token"]})
+
+    Phoenix.ConnTest.build_conn
+    |> put_req_header("accept", "application/json")
+    |> put_req_header("authorization", json["token"])
+    |> post(api_login_path(conn, :refresh))
+    |> response(401)
+
+    # 401 will revoke the token
+    {:error, _} = TokenServer.get(json["token"])
+  end
+
   test "cannot refresh if reauth is flagged", %{conn: conn} do
     user = User.create_changeset(%User{}, %{name: "test", username: "test",
       password: "mypass", role: "admin", pin: "1234"})

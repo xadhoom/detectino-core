@@ -3,6 +3,7 @@ defmodule DtWeb.SessionController do
 
   alias DtWeb.User
   alias DtWeb.UserQuery
+  alias DtWeb.TokenServer
   alias DtWeb.StatusCodes
   alias DtWeb.SessionController
   alias Guardian.Claims
@@ -11,6 +12,15 @@ defmodule DtWeb.SessionController do
   plug EnsureAuthenticated, [handler: SessionController] when action in [:refresh]
 
   def unauthenticated(conn, _params) do
+    token = conn
+    |> get_req_header("authorization")
+    |> Enum.at(0)
+
+    case token do
+      nil -> nil
+      v -> TokenServer.expire({:token, v})
+    end
+
     send_resp(conn, 401, StatusCodes.status_code(401))
   end
 
