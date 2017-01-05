@@ -16,7 +16,7 @@ defmodule DtWeb.Channels.Timer do
 
   def push_time(socket) do
     time = Timex.local
-    |> Timex.format!("%Y-%m-%d %HH:%MM:%SS", :strftime)
+    |> Timex.format!("%Y-%m-%d %H:%M:%S", :strftime)
 
     push socket, "time", %{time: time}
     Etimer.start_timer(socket, :time, 1000, {__MODULE__, :push_time, [socket]})
