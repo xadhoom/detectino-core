@@ -11,9 +11,10 @@ defmodule DtWeb.CrudMacros do
     quote do
       @repo unquote(opts) |> Keyword.get(:repo)
       @model unquote(opts) |> Keyword.get(:model)
+      @orderby unquote(opts) |> Keyword.get(:orderby)
 
       def index(conn, params) do
-        case Crud.all(conn, params, @repo, @model) do
+        case Crud.all(conn, params, {@repo, @model, @orderby}) do
           {:ok, conn, items} ->
             render(conn, items: items)
           {:error, conn, code} ->

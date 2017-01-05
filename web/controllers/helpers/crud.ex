@@ -12,7 +12,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
   # also in delete, show, update...
   #
 
-  def all(conn, params, repo, model, assocs \\ []) do
+  def all(conn, params, {repo, model, orderby}, assocs \\ []) do
     filter = :fields
     |> model.__schema__
     |> build_filter(params)
@@ -25,10 +25,17 @@ defmodule DtWeb.CtrlHelpers.Crud do
     |> Map.get("per_page", "10")
     |> String.to_integer
 
+    order_by = case orderby do
+      nil -> []
+      x when is_list(x) -> x
+      invalid -> []
+    end
+
     q = from m in model,
       where: ^filter,
       limit: ^per_page,
       offset: ^((page - 1) * per_page),
+      order_by: ^order_by,
       preload: ^assocs
     items = repo.all(q)
 

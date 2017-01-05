@@ -11,10 +11,26 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
 
   test "Get all" do
     conn = Phoenix.ConnTest.build_conn
-    {:ok, conn, _items} = Crud.all(conn, %{}, Repo, User)
+    {:ok, conn, _items} = Crud.all(conn, %{}, {Repo, User, nil})
     total_h = get_resp_header(conn, "x-total-count")
 
     assert total_h == ["1"]
+  end
+
+  test "Get all with ordering" do
+    Repo.insert!(@user3)
+    Repo.insert!(@user2)
+    Repo.insert!(@user1)
+
+    conn = Phoenix.ConnTest.build_conn
+
+    {:ok, _conn, items} = Crud.all(conn, %{}, {Repo, User, nil})
+    first = Enum.at(items, 0)
+    assert first.name == "admin"
+
+    {:ok, _conn, items} = Crud.all(conn, %{}, {Repo, User, [:name]})
+    first = Enum.at(items, 0)
+    assert first.name == "a"
   end
 
   test "link header" do
@@ -30,7 +46,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
 
     conn = Phoenix.ConnTest.build_conn
     params = %{"per_page" => "10"}
-    {:ok, conn, items} = Crud.all(conn, params, Repo, User)
+    {:ok, conn, items} = Crud.all(conn, params, {Repo, User, nil})
     total_h = get_resp_header(conn, "x-total-count")
 
     assert total_h == ["4"]
@@ -53,7 +69,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
 
     conn = Phoenix.ConnTest.build_conn
     params = %{"per_page" => "2"}
-    {:ok, conn, items} = Crud.all(conn, params, Repo, User)
+    {:ok, conn, items} = Crud.all(conn, params, {Repo, User, nil})
     total_h = get_resp_header(conn, "x-total-count")
 
     assert total_h == ["4"]

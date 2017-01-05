@@ -24,7 +24,8 @@ defmodule DtWeb.SensorController do
   plug CoreReloader, nil when not action in [:index, :show]
 
   def index(conn, params) do
-    case Crud.all(conn, params, Repo, Sensor, [:partitions]) do
+    order = [:name]
+    case Crud.all(conn, params, {Repo, Sensor, order}, [:partitions]) do
       {:ok, conn, items} ->
         render(conn, items: items)
       {:error, conn, code} ->

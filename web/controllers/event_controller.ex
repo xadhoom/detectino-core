@@ -24,7 +24,8 @@ defmodule DtWeb.EventController do
   plug CoreReloader, nil when not action in [:index, :show]
 
   def index(conn, params) do
-    case Crud.all(conn, params, Repo, Event, [:outputs]) do
+    order = [:name]
+    case Crud.all(conn, params, {Repo, Event, order}, [:outputs]) do
       {:ok, conn, items} ->
         render(conn, items: items)
       {:error, conn, code} ->
