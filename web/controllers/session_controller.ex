@@ -4,7 +4,11 @@ defmodule DtWeb.SessionController do
   alias DtWeb.User
   alias DtWeb.UserQuery
   alias DtWeb.StatusCodes
+  alias DtWeb.SessionController
   alias Guardian.Claims
+  alias Guardian.Plug.EnsureAuthenticated
+
+  plug EnsureAuthenticated, [handler: SessionController] when action in [:refresh]
 
   def unauthenticated(conn, _params) do
     send_resp(conn, 401, StatusCodes.status_code(401))
@@ -28,6 +32,16 @@ defmodule DtWeb.SessionController do
     else
       send_resp(conn, 401, StatusCodes.status_code(401))
     end
+  end
+
+  def refresh(conn, params = %{}) do
+    {:ok, jwt, claims} = conn
+    |> get_req_header("authorization")
+    |> Enum.at(0)
+    |> Guardian.refresh!
+
+    conn
+    |> render(:logged_in, token: jwt)
   end
 
 end

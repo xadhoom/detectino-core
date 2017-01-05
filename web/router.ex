@@ -30,6 +30,7 @@ defmodule DtWeb.Router do
     pipe_through :api
 
     post "/login", SessionController, :create, as: :api_login
+    post "/login/refresh", SessionController, :refresh, as: :api_login
 
     post "/partitions/:id/arm", PartitionController, :arm
     post "/partitions/:id/disarm", PartitionController, :disarm
