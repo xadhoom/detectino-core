@@ -5,13 +5,13 @@ defmodule DtWeb.TokenServerTest do
 
   test "inserts a token" do
     {:ok, _pid} = TokenServer.start_link(:a)
-    {:ok, "token"} = TokenServer.put("token", :a)
+    {:ok, "token"} = TokenServer.put("token", 3600, :a)
   end
 
   test "same token is inserted once" do
     {:ok, _pid} = TokenServer.start_link(:b)
-    {:ok, "token"} = TokenServer.put("token", :b)
-    {:ok, "token"} = TokenServer.put("token", :b)
+    {:ok, "token"} = TokenServer.put("token", 3600, :b)
+    {:ok, "token"} = TokenServer.put("token", 3600, :b)
     tokens = TokenServer.all(:b)
 
     assert Enum.count(tokens) == 1
@@ -20,7 +20,7 @@ defmodule DtWeb.TokenServerTest do
 
   test "get a token" do
     {:ok, _pid} = TokenServer.start_link(:c)
-    TokenServer.put("token", :c)
+    TokenServer.put("token", 3600, :c)
     {:ok, "token"} = TokenServer.get("token", :c)
   end
 
@@ -31,11 +31,30 @@ defmodule DtWeb.TokenServerTest do
 
   test "deletes a token" do
     {:ok, _pid} = TokenServer.start_link(:e)
-    TokenServer.put("token", :e)
+    TokenServer.put("token", 3600, :e)
     :ok = TokenServer.delete("token", :e)
 
     tokens = TokenServer.all(:e)
 
     assert Enum.count(tokens) == 0
+  end
+
+  test "expires a token" do
+    :meck.new(Etimer, [:passthrough])
+    :meck.expect(Etimer, :start_timer, fn(_, _, _, _) -> 42 end)
+
+    {:ok, _pid} = TokenServer.start_link(:f)
+    TokenServer.put("token", 3600, :f)
+    tokens = TokenServer.all(:f)
+    assert Enum.count(tokens) == 1
+
+    assert :meck.called(Etimer, :start_timer, [:_, "token", 3600*1000,
+      {:_, :expire, [{:token, "token"}, :f]}])
+
+    TokenServer.expire({:token, "token"}, :f)
+
+    tokens = TokenServer.all(:f)
+    assert Enum.count(tokens) == 0
+
   end
 end

@@ -18,7 +18,8 @@ defmodule DtWeb.GuardianHooks do
   end
 
   def after_encode_and_sign(resource, type, claims, jwt) do
-    case TokenServer.put(jwt) do
+    expiry = claims["exp"] - claims["iat"]
+    case TokenServer.put(jwt, expiry) do
       {:ok, _} ->
         {:ok, {resource, type, claims, jwt}}
       _ ->
