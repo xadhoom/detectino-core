@@ -11,6 +11,7 @@ defmodule DtWeb.User do
     field :password, :string
     field :role, :string
     field :pin, :string
+    field :re_auth, :boolean
 
     timestamps
   end
@@ -20,7 +21,7 @@ defmodule DtWeb.User do
 
   def create_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(name username password role pin))
+    |> cast(params, ~w(name username password role pin re_auth))
     |> validate_required([:name, :username, :password, :role])
     |> unique_constraint(:username)
     |> unique_constraint(:pin)
@@ -29,7 +30,7 @@ defmodule DtWeb.User do
 
   def update_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(id name username password role pin))
+    |> cast(params, ~w(id name username password role pin re_auth))
     |> validate_required([:id, :name, :username, :role])
     |> unique_constraint(:username)
     |> unique_constraint(:pin)
