@@ -3,26 +3,13 @@ defmodule DtWeb.TimerChannelTest do
 
   alias DtWeb.Channels.Timer
 
-  test "can join timer:time topic" do
-    assert {:ok, :fake} = Timer.join("timer:time", nil, :fake)
-    assert_received :after_join
-  end
+  test "channel pushes time" do
+    {:ok, _, _socket} = socket()
+    |> subscribe_and_join(Timer, "timer:time", %{})
 
-  test "time is sent over socket" do
-    :meck.new(Etimer, [:passthrough])
-    :meck.new(Phoenix.Channel)
-    :meck.expect(Phoenix.Channel, :push,
-      fn(_ , _, _) ->
-        :pushed
-      end)
+    assert_push "time", %{time: data}
 
-    {:noreply, :fake} = Timer.handle_info(:after_join, :fake)
-
-    assert :meck.called(Etimer, :start_link, :_)
-    assert :meck.called(Phoenix.Channel, :push, [:fake, :_, :_])
-
-    :meck.unload(Etimer)
-    :meck.unload(Phoenix.Channel)
+    assert {:ok, _} = data |> Timex.parse("%Y-%m-%d %H:%M:%S", :strftime)
   end
 
 end
