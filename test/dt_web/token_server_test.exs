@@ -52,6 +52,7 @@ defmodule DtWeb.TokenServerTest do
 
     assert :meck.called(Etimer, :start_timer, [:_, "token", 3600*1000,
       {:_, :expire, [{:token, "token"}, :f]}])
+    :meck.unload(Etimer)
 
     TokenServer.expire({:token, "token"}, :f)
 
