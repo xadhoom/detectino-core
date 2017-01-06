@@ -95,5 +95,14 @@ export class Users implements OnInit {
     return user;
   }
 
+  invalidateSession(obj: User) {
+    this.userService.invalidateSession(obj).subscribe(
+      res => {
+        this.notificationService.success('All Sessions Invalidated!');
+      },
+      error => this.onError(error)
+    );
+  }
+
 }
 

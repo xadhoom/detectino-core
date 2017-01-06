@@ -60,6 +60,9 @@
         <div class="ui-g-12">
           <input pPassword type="password" id="acPassword" [(ngModel)]="user.password" />
         </div>
+        <div class="ui-g-12" *ngIf="user.id">
+          <button type="button" pButton (click)="invalidateSession(user)" label="Invalidate Sessions" class="yellow-btn"></button>
+        </div>
       </div>
       <div class="ui-g">
         <div class="ui-g-12 ui-md-6">

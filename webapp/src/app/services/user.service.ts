@@ -31,5 +31,22 @@ export class UserService extends Crud {
     return this._save(u, this.baseurl);
   };
 
+  invalidateSession(obj: User): Observable<boolean> {
+    let rqOpts = this.buildOptions({});
+
+    let rq = new Request({
+      url: this.baseurl + '/' + obj.id + '/invalidate',
+      method: RequestMethod.Post,
+      headers: rqOpts.headers,
+      body: ''
+    });
+
+    return this.http.request(rq).
+      map(res => {
+        return true;
+      }).
+      catch(this.handleError);
+  }
+
 }
 
