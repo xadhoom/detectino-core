@@ -52,7 +52,7 @@ export class AppComponent implements AfterViewInit {
     private socket: PhoenixChannelService) {
 
     this.subscription = notificationService.messages$.subscribe(
-      messages => { this.notifications = messages; console.log(messages); }
+      messages => { this.notifications = messages; }
     );
   }
 
