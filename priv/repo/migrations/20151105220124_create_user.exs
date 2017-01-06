@@ -9,7 +9,6 @@ defmodule DtWeb.Repo.Migrations.CreateUser do
       add :encrypted_password, :string
       add :role, :string
       add :pin, :string
-      add :re_auth, :boolean, default: false
 
       timestamps
     end

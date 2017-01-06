@@ -71,9 +71,9 @@ defmodule DtWeb.SessionControllerTest do
     {:error, _} = TokenServer.get(json["token"])
   end
 
-  test "cannot refresh if reauth is flagged", %{conn: conn} do
-    user = User.create_changeset(%User{}, %{name: "test", username: "test",
-      password: "mypass", role: "admin", pin: "1234"})
+  test "non admin role cannot invalidate sessions", %{conn: conn} do
+    User.create_changeset(%User{}, %{name: "test", username: "test",
+      password: "mypass", role: "user", pin: "1234"})
     |> Repo.insert!
 
     conn = post conn, api_login_path(conn, :create), user: %{
@@ -81,27 +81,25 @@ defmodule DtWeb.SessionControllerTest do
     }
     json = json_response(conn, 200)
 
-    User.update_changeset(user, %{id: user.id, re_auth: true})
-    |> Repo.update!
-
     Phoenix.ConnTest.build_conn
     |> put_req_header("accept", "application/json")
     |> put_req_header("authorization", json["token"])
-    |> post(api_login_path(conn, :refresh))
+    |> post(api_login_path(conn, :invalidate, struct(User, %{"id": "1"})))
     |> response(403)
+  end
 
-    # check that we can refresh after a new login
-    Phoenix.ConnTest.build_conn
-    conn = post conn, api_login_path(conn, :create), user: %{
-      username: "test", password: "mypass"
-    }
+  test "admin role can invalidate sessions", %{conn: conn} do
+    conn = post conn, api_login_path(conn, :create), user: %{username: "admin@local", password: "password"}
     json = json_response(conn, 200)
+    {:ok, token} = TokenServer.get(json["token"])
 
     Phoenix.ConnTest.build_conn
     |> put_req_header("accept", "application/json")
     |> put_req_header("authorization", json["token"])
-    |> post(api_login_path(conn, :refresh))
-    |> json_response(200)
+    |> post(api_login_path(conn, :invalidate, struct(User, %{"id": "1"})))
+    |> response(204)
+
+    assert {:error, _} = TokenServer.get(token)
   end
 
 end

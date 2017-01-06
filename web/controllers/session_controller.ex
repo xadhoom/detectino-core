@@ -6,10 +6,14 @@ defmodule DtWeb.SessionController do
   alias DtWeb.TokenServer
   alias DtWeb.StatusCodes
   alias DtWeb.SessionController
+  alias DtWeb.Plugs.CheckPermissions
   alias Guardian.Claims
   alias Guardian.Plug.EnsureAuthenticated
 
-  plug EnsureAuthenticated, [handler: SessionController] when action in [:refresh]
+  plug EnsureAuthenticated, [handler: SessionController] when action in [
+    :refresh, :invalidate]
+
+  plug CheckPermissions, [roles: [:admin]] when action in [:invalidate]
 
   def unauthenticated(conn, _params) do
     token = conn
@@ -29,7 +33,6 @@ defmodule DtWeb.SessionController do
     if user do
       changeset = User.login_changeset(user, params["user"])
       if changeset.valid? do
-        reset_reauth_flag(user)
         claims = Claims.app_claims
         |> Map.put("dt_role", user.role)
         |> Map.put("dt_user_id", user.id)
@@ -55,29 +58,28 @@ defmodule DtWeb.SessionController do
     case Repo.get(User, claims["dt_user_id"]) do
       nil ->
         send_resp(conn, 404, StatusCodes.status_code(404))
-      user ->
-        validate_and_refresh(conn, token, user)
-    end
-  end
-
-  defp validate_and_refresh(conn, token, user) do
-    case user.re_auth do
-      true ->
-        send_resp(conn, 403, StatusCodes.status_code(403))
-      _ ->
+      _user ->
         {:ok, jwt, _claims} = Guardian.refresh!(token)
         conn |> render(:logged_in, token: jwt)
     end
   end
 
-  defp reset_reauth_flag(user) do
-    case user.re_auth do
-      true ->
-        User.update_changeset(user, %{id: user.id, re_auth: false})
-        |> Repo.update!
-      false ->
-        user
-    end
+  def invalidate(conn, %{"id" => id}) do
+    id = id |> String.to_integer()
+    get_tokens_for_id(id)
+    |> Enum.each(fn(token) ->
+      TokenServer.delete(token)
+    end)
+
+    send_resp(conn, 204, StatusCodes.status_code(204))
+  end
+
+  defp get_tokens_for_id(id) do
+    TokenServer.all()
+    |> Enum.filter(fn(token) ->
+      claims = Guardian.peek_claims(token)
+      id == claims["dt_user_id"]
+    end)
   end
 
 end
