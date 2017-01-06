@@ -4,15 +4,26 @@ import { Subject } from 'rxjs/Subject';
 
 import { Message } from 'primeng/primeng';
 
+import { UUID } from 'angular2-uuid';
+
+export interface DtMessage {
+  id: string;
+  severity?: string;
+  summary?: string;
+  detail?: string;
+}
+
 @Injectable()
 export class NotificationService {
 
-  private _messages$: Subject<Message[]>;
-  private messages: Message[];
+  private _messages$: Subject<DtMessage[]>;
+  private messages: DtMessage[];
+  private msgTimeout: number;
 
   constructor() {
     this.messages = [];
-    this._messages$ = <Subject<Message[]>>new Subject();
+    this._messages$ = <Subject<DtMessage[]>>new Subject();
+    this.msgTimeout = 5000;
   }
 
   get messages$() {
@@ -20,14 +31,29 @@ export class NotificationService {
   }
 
   success(body: string) {
-    let msg = { severity: 'success', summary: 'Success Message', detail: body };
+    let id = UUID.UUID();
+    let msg = {
+      id: id,
+      severity: 'success', summary: 'Success Message', detail: body
+    };
+    this.messages.push(msg);
+    this._messages$.next(this.messages);
+    setTimeout(() => { this.clearMessage(id); }, this.msgTimeout);
+  }
+
+  error(body: string) {
+    let msg = {
+      id: UUID.UUID(),
+      severity: 'error', summary: 'Error Message', detail: body
+    };
     this.messages.push(msg);
     this._messages$.next(this.messages);
   }
 
-  error(body: string) {
-    let msg = { severity: 'error', summary: 'Error Message', detail: body };
-    this.messages.push(msg);
+  private clearMessage(uuid: any) {
+    this.messages = this.messages.filter(msg => {
+      return msg.id !== uuid;
+    });
     this._messages$.next(this.messages);
   }
 
