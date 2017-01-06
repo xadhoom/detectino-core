@@ -9,7 +9,7 @@ import { SelectItem } from 'primeng/primeng';
 @Component({
   selector: 'outputs',
   templateUrl: './outputs.component.html',
-  styleUrls: ['./outputs.component.css']
+  styleUrls: ['./outputs.component.css', '../shared/common.scss']
 })
 
 export class Outputs implements OnInit {

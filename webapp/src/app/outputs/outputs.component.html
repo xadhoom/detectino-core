@@ -9,118 +9,117 @@
         <p-column field="description" header="Description" [sortable]="false"></p-column>
         <footer>
           <div class="ui-helper-clearfix" style="width:100%">
-            <button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
-            </button>
-          </div>
-        </footer>
-      </p-dataTable>
-    </div>
-  </div>
+<button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
+</button>
+</div>
+</footer>
+</p-dataTable>
+</div>
+</div>
 
-  <div class="ui-g-12" *ngIf="displayDialog">
-    <div class="card card-w-title">
-      <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
-        <div class="ui-grid-row">
-          <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Output"></button>
-        </div>
+<div class="ui-g-12" *ngIf="displayDialog">
+  <div class="card card-w-title">
+    <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+      <div class="ui-grid-row">
+        <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Output"></button>
+      </div>
+    </div>
+
+    <div class="ui-g form-group">
+      <div class="ui-g-12">
+        <label for="acName">Name</label>
+      </div>
+      <div class="ui-g-12">
+        <input pInputText id="acName" [(ngModel)]="output.name" />
       </div>
 
-      <div class="ui-g form-group">
-        <div class="ui-g-12">
-          <label for="acName">Name</label>
+      <div class="ui-g-12">
+        <label for="acDesc">Description</label>
+      </div>
+      <div class="ui-g-12">
+        <input pInputText id="acDesc" [(ngModel)]="output.description" />
+      </div>
+
+      <div class="ui-g-12">
+        <label for="acType">Type</label>
+      </div>
+      <div class="ui-g-12">
+        <p-dropdown [(ngModel)]="output.type" [options]="types" [autoWidth]="true">
+        </p-dropdown>
+      </div>
+
+      <div class="ui-g-12">
+        <label for="acEnabled">Enabled</label>
+      </div>
+      <div class="ui-g-12">
+        <p-inputSwitch id="acEnabled" [(ngModel)]="output.enabled"></p-inputSwitch>
+      </div>
+
+      <div class="ui-g-12" [ngSwitch]="output.type">
+
+        <div class="ui-g-12" *ngSwitchCase="'email'">
+          <label for="acFrom">Sender</label>
         </div>
-        <div class="ui-g-12">
-          <input pInputText id="acName" [(ngModel)]="output.name" />
+        <div class="ui-g-12" *ngSwitchCase="'email'">
+          <input pInputText id="acFrom" [(ngModel)]="output.email_settings.from" />
         </div>
 
-        <div class="ui-g-12">
-          <label for="acDesc">Description</label>
+        <div class="ui-g-12" *ngSwitchCase="'email'">
+          <label for="acTo">Recipient</label>
         </div>
-        <div class="ui-g-12">
-          <input pInputText id="acDesc" [(ngModel)]="output.description" />
+        <div class="ui-g-12" *ngSwitchCase="'email'">
+          <input pInputText id="acTo" [(ngModel)]="output.email_settings.to" />
         </div>
 
-        <div class="ui-g-12">
-          <label for="acType">Type</label>
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <label for="acBusType">Type</label>
         </div>
-        <div class="ui-g-12">
-          <p-dropdown [(ngModel)]="output.type" [options]="types" [autoWidth]="true">
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <p-dropdown [(ngModel)]="output.bus_settings.type" [options]="busTypes" [autoWidth]="true">
           </p-dropdown>
         </div>
 
-        <div class="ui-g-12">
-          <label for="acEnabled">Enabled</label>
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <label for="acBusAddress">Address</label>
         </div>
-        <div class="ui-g-12">
-          <p-inputSwitch id="acEnabled" [(ngModel)]="output.enabled"></p-inputSwitch>
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <input pInputText id="acBusAddress" [(ngModel)]="output.bus_settings.address" />
         </div>
 
-        <div class="ui-g-12" [ngSwitch]="output.type">
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <label for="acBusPort">Port</label>
+        </div>
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <p-spinner id="acBusPort" [(ngModel)]="output.bus_settings.port" min="1"></p-spinner>
+        </div>
 
-          <div class="ui-g-12" *ngSwitchCase="'email'">
-            <label for="acFrom">Sender</label>
-          </div>
-          <div class="ui-g-12" *ngSwitchCase="'email'">
-            <input pInputText id="acFrom" [(ngModel)]="output.email_settings.from" />
-          </div>
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <label for="acBusMonoOn">Monostable ON Time</label>
+        </div>
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <p-spinner id="acBusMonoOn" [(ngModel)]="output.bus_settings.mono_ontime" min="1" max="3600"></p-spinner>
+        </div>
 
-          <div class="ui-g-12" *ngSwitchCase="'email'">
-            <label for="acTo">Recipient</label>
-          </div>
-          <div class="ui-g-12" *ngSwitchCase="'email'">
-            <input pInputText id="acTo" [(ngModel)]="output.email_settings.to" />
-          </div>
-
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <label for="acBusType">Type</label>
-          </div>
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <p-dropdown [(ngModel)]="output.bus_settings.type" [options]="busTypes" [autoWidth]="true">
-            </p-dropdown>
-          </div>
-
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <label for="acBusAddress">Address</label>
-          </div>
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <input pInputText id="acBusAddress" [(ngModel)]="output.bus_settings.address" />
-          </div>
-
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <label for="acBusPort">Port</label>
-          </div>
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <p-spinner id="acBusPort" [(ngModel)]="output.bus_settings.port" min="1"></p-spinner>
-          </div>
-
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <label for="acBusMonoOn">Monostable ON Time</label>
-          </div>
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <p-spinner id="acBusMonoOn" [(ngModel)]="output.bus_settings.mono_ontime" min="1" max="3600"></p-spinner>
-          </div>
-
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <label for="acBusMonoOff">Monostable OFF Time</label>
-          </div>
-          <div class="ui-g-12" *ngSwitchCase="'bus'">
-            <p-spinner id="acBusMonoOff" [(ngModel)]="output.bus_settings.mono_offtime" min="1" max="3600"></p-spinner>
-          </div>
-
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <label for="acBusMonoOff">Monostable OFF Time</label>
+        </div>
+        <div class="ui-g-12" *ngSwitchCase="'bus'">
+          <p-spinner id="acBusMonoOff" [(ngModel)]="output.bus_settings.mono_offtime" min="1" max="3600"></p-spinner>
         </div>
 
       </div>
-    </div>
 
-    <div class="card card-w-title">
-      <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
-        <div class="ui-grid-row">
-          <div class="ui-grid-col-6"><button type="button" pButton icon="fa-check" (click)="save()" label="Save" class="GreenButton"></button></div>
-          <div class="ui-grid-col-6"><button type="button" pButton icon="fa-close" (click)="destroy()" label="Delete" class="RedButton"></button></div>
-        </div>
+    </div>
+    <div class="ui-g">
+      <div class="ui-g-12 ui-md-6">
+        <button type="button" pButton icon="ui-icon-check" (click)="save()" label="Save" class="full_button green-btn"></button>
+      </div>
+      <div class="ui-g-12 ui-md-6">
+        <button type="button" pButton icon="ui-icon-clear" (click)="destroy()" label="Delete" class="full_button red-btn"></button>
       </div>
     </div>
-
   </div>
+
+</div>
 
 </div>

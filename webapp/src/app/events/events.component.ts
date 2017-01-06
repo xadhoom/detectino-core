@@ -12,7 +12,7 @@ import { SelectItem } from 'primeng/primeng';
 @Component({
   selector: 'events',
   templateUrl: './events.component.html',
-  styleUrls: ['./events.component.css']
+  styleUrls: ['./events.component.css', '../shared/common.scss']
 })
 
 export class Events implements OnInit {

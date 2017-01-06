@@ -7,10 +7,9 @@ import { Partition } from '../models/partition';
 
 
 @Component({
-    selector: 'sensors',
-    templateUrl: './sensors.component.html',
-    styleUrls: [ './sensors.component.css' ],
-    encapsulation: ViewEncapsulation.None
+  selector: 'sensors',
+  templateUrl: './sensors.component.html',
+  styleUrls: ['./sensors.component.css', '../shared/common.scss']
 })
 
 export class Sensors implements OnInit {
@@ -31,8 +30,8 @@ export class Sensors implements OnInit {
   errorMessage: string;
 
   constructor(private sensorService: SensorService,
-              private partitionService: PartitionService,
-              private notificationService: NotificationService) {};
+    private partitionService: PartitionService,
+    private notificationService: NotificationService) { };
 
   ngOnInit() {
     this.all();
@@ -41,9 +40,9 @@ export class Sensors implements OnInit {
   allPartitions() {
     this.partitionService.all().
       subscribe(
-        items => this.partitions = items,
-        error => this.onError(error)
-    );
+      items => this.partitions = items,
+      error => this.onError(error)
+      );
   };
 
   all() {
@@ -53,26 +52,26 @@ export class Sensors implements OnInit {
 
     this.sensorService.all().
       subscribe(
-        items => this.sensors = items,
-        error => this.onError(error)
-    );
+      items => this.sensors = items,
+      error => this.onError(error)
+      );
   };
 
   save() {
     this.sensor.partitions = this.selectedPartitions;
     this.sensorService.save(this.sensor).
       subscribe(
-        sensor => this.refresh(),
-        error => this.onError(error)
-    );
+      sensor => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   destroy() {
     this.sensorService.destroy(this.sensor).
       subscribe(
-        success => this.refresh(),
-        error => this.onError(error)
-    );
+      success => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   onError(error: any) {

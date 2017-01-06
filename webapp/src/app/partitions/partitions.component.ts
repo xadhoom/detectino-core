@@ -7,9 +7,9 @@ import { Partition } from '../models/partition';
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
-    selector: 'partitions',
-    templateUrl: './partitions.component.html',
-    styleUrls: ['./partitions.component.css']
+  selector: 'partitions',
+  templateUrl: './partitions.component.html',
+  styleUrls: ['./partitions.component.css', '../shared/common.scss']
 })
 
 export class Partitions implements OnInit {
@@ -27,7 +27,7 @@ export class Partitions implements OnInit {
   errorMessage: string;
 
   constructor(private partitionService: PartitionService,
-              private notificationService: NotificationService) {};
+    private notificationService: NotificationService) { };
 
   ngOnInit() {
     this.all();
@@ -36,25 +36,25 @@ export class Partitions implements OnInit {
   all() {
     this.partitionService.all().
       subscribe(
-        partitions => this.partitions = partitions,
-        error => this.onError(error)
-    );
+      partitions => this.partitions = partitions,
+      error => this.onError(error)
+      );
   };
 
   save() {
     this.partitionService.save(this.partition).
       subscribe(
-        partition => this.refresh(),
-        error => this.onError(error)
-    );
+      partition => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   destroy() {
     this.partitionService.destroy(this.partition).
       subscribe(
-        success => this.refresh(),
-        error => this.onError(error)
-    );
+      success => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   onError(error: any) {

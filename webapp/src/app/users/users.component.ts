@@ -7,9 +7,9 @@ import { User } from '../models/user';
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
-    selector: 'users',
-    templateUrl: './users.component.html',
-    styleUrls: [ './users.component.css' ]
+  selector: 'users',
+  templateUrl: './users.component.html',
+  styleUrls: ['./users.component.css', '../shared/common.scss']
 })
 
 export class Users implements OnInit {
@@ -28,39 +28,39 @@ export class Users implements OnInit {
   errorMessage: string;
 
   constructor(private userService: UserService,
-              private notificationService: NotificationService) {};
+    private notificationService: NotificationService) { };
 
   ngOnInit() {
     this.roles = [];
     this.getUsers();
 
-    this.roles.push({label: 'Select Role', value: undefined});
-    this.roles.push({label: 'Admin', value: 'admin'});
-    this.roles.push({label: 'User', value: 'user'});
+    this.roles.push({ label: 'Select Role', value: undefined });
+    this.roles.push({ label: 'Admin', value: 'admin' });
+    this.roles.push({ label: 'User', value: 'user' });
   };
 
   getUsers() {
     this.userService.getUsers().
       subscribe(
-        users => this.users = users,
-        error => this.onError(error)
-    );
+      users => this.users = users,
+      error => this.onError(error)
+      );
   };
 
   save() {
     this.userService.save(this.user).
       subscribe(
-        user => this.refresh(),
-        error => this.onError(error)
-    );
+      user => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   destroy() {
     this.userService.destroy(this.user).
       subscribe(
-        success => this.refresh(),
-        error => this.onError(error)
-    );
+      success => this.refresh(),
+      error => this.onError(error)
+      );
   };
 
   onError(error: any) {
