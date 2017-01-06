@@ -6,9 +6,16 @@ import { contentHeaders } from '../shared/utils/headers';
 @Injectable()
 export class PinService {
   private pin: BehaviorSubject<string>;
+  private expireTimer: any;
+  private expireValue: number;
 
   constructor(private http: AuthHttp) {
+    this.expireTimer = null;
+    this.expireValue = 30000;
     this.pin = new BehaviorSubject<string>(null);
+
+    // very ugly, but future self will find a better way
+    document.addEventListener("click", () => this.restartExpireTimer());
   }
 
   public setPin(pin: string) {
@@ -19,6 +26,7 @@ export class PinService {
     return this.http.post('/api/users/check_pin',
       body, { headers: contentHeaders })
       .map(response => {
+        this.startExpireTimer();
         this.pin.next(pin);
       }).catch(this.handleError);
 
@@ -34,6 +42,21 @@ export class PinService {
 
   public resetPin(): void {
     this.pin.next(null);
+  }
+
+  private startExpireTimer(): void {
+    this.expireTimer = setTimeout(() => {
+      this.resetPin();
+      this.expireTimer = null;
+    }, this.expireValue);
+  }
+
+  private restartExpireTimer(): void {
+    if (this.expireTimer) {
+      console.log("resetting timer");
+      clearTimeout(this.expireTimer);
+      this.startExpireTimer();
+    }
   }
 
   private handleError(error: any) {
