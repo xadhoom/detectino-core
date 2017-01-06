@@ -29,6 +29,10 @@ export class AuthService {
   }
 
   public authenticated() {
+    let token = localStorage.getItem('id_token');
+    if (!token) {
+      return false;
+    }
     // Check if there's an unexpired JWT
     let expired = !tokenNotExpired();
     if (expired) {
@@ -72,6 +76,7 @@ export class AuthService {
       this.socket.disconnect();
     }
     this.router.navigateByUrl('/');
+    location.reload();
   }
 
   public refreshToken() {
