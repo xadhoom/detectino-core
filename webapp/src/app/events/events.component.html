@@ -9,59 +9,58 @@
         <p-column field="source" header="Source" [sortable]="true"></p-column>
         <p-column field="description" header="Description" [sortable]="false"></p-column>
         <footer>
-          <div class="ui-helper-clearfix" style="width:100%">
-<button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
-</button>
-</div>
-</footer>
-</p-dataTable>
-</div>
-</div>
-
-<div class="ui-g-12" *ngIf="displayDialog">
-  <div class="card card-w-title">
-    <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
-      <div class="ui-grid-row">
-        <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Event"></button>
-      </div>
-    </div>
-
-    <div class="ui-g form-group">
-      <div class="ui-g-12">
-        <label for="acName">Name</label>
-      </div>
-      <div class="ui-g-12">
-        <input pInputText id="acName" [(ngModel)]="event.name" />
-      </div>
-
-      <div class="ui-g-12">
-        <label for="acDesc">Description</label>
-      </div>
-      <div class="ui-g-12">
-        <input pInputText id="acDesc" [(ngModel)]="event.description" />
-      </div>
-
-      <div class="ui-g-12">
-        <label for="acType">Source</label>
-      </div>
-      <div class="ui-g-12">
-        <p-dropdown [(ngModel)]="event.source" [options]="sources" [autoWidth]="true">
-        </p-dropdown>
-      </div>
-
-      <div class="ui-g-12" [ngSwitch]="event.source">
-        <dt-eventsensorconfig *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig> </dt-eventsensorconfig>
-        <dt-eventpartitionconfig *ngSwitchCase="'partition'" [strconfig]="event.source_config" #partitionconfig> </dt-eventpartitionconfig>
-      </div>
-
+          <div class="ui-helper-clearfix">
+            <button type="button" pButton icon="ui-icon-add" class="float_left" (click)="showDialogToAdd()" label="Add"></button>
+          </div>
+        </footer>
+      </p-dataTable>
     </div>
   </div>
 
-  <div class="card card-w-title">
-    <h2 class="BigTopic">Associated Outputs</h2>
-    <p-pickList [source]="outputs" [target]="selectedOutputs" sourceHeader="Available" targetHeader="Selected" [responsive]="true">
-      <template let-item>
-        <li class="ui-picklist-item ui-helper-clearfix" style="padding:5px 5px !important;">
+  <div class="ui-g-12" *ngIf="displayDialog">
+    <div class="card card-w-title">
+      <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+        <div class="ui-grid-row">
+          <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Event"></button>
+        </div>
+      </div>
+
+      <div class="ui-g form-group">
+        <div class="ui-g-12">
+          <label for="acName">Name</label>
+        </div>
+        <div class="ui-g-12">
+          <input pInputText id="acName" [(ngModel)]="event.name" />
+        </div>
+
+        <div class="ui-g-12">
+          <label for="acDesc">Description</label>
+        </div>
+        <div class="ui-g-12">
+          <input pInputText id="acDesc" [(ngModel)]="event.description" />
+        </div>
+
+        <div class="ui-g-12">
+          <label for="acType">Source</label>
+        </div>
+        <div class="ui-g-12">
+          <p-dropdown [(ngModel)]="event.source" [options]="sources" [autoWidth]="true">
+          </p-dropdown>
+        </div>
+
+        <div class="ui-g-12" [ngSwitch]="event.source">
+          <dt-eventsensorconfig *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig> </dt-eventsensorconfig>
+          <dt-eventpartitionconfig *ngSwitchCase="'partition'" [strconfig]="event.source_config" #partitionconfig> </dt-eventpartitionconfig>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card card-w-title">
+      <h2 class="BigTopic">Associated Outputs</h2>
+      <p-pickList [source]="outputs" [target]="selectedOutputs" sourceHeader="Available" targetHeader="Selected" [responsive]="true">
+        <template let-item>
+          <li class="ui-picklist-item ui-helper-clearfix" style="padding:5px 5px !important;">
 <div style="font-size: 16px;">{{item.name}}</div>
 </li>
 </template>

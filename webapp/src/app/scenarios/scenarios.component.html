@@ -8,49 +8,48 @@
         <p-column field="name" header="Name" [sortable]="true"></p-column>
         <p-column field="configured" header="Configured" [sortable]="false"></p-column>
         <footer>
-          <div class="ui-helper-clearfix" style="width:100%">
-<button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add">
-</button>
-</div>
-</footer>
-</p-dataTable>
-</div>
-</div>
-
-<div class="ui-g-12" *ngIf="displayDialog">
-  <div class="card card-w-title">
-    <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
-      <div class="ui-grid-row">
-        <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Scenario"></button>
-      </div>
+          <div class="ui-helper-clearfix">
+            <button type="button" pButton icon="ui-icon-add" class="float_left" (click)="showDialogToAdd()" label="Add"></button>
+          </div>
+        </footer>
+      </p-dataTable>
     </div>
-    <div class="ui-g form-group">
-      <div class="ui-g-12">
-        <label for="acName">Name</label>
+  </div>
+
+  <div class="ui-g-12" *ngIf="displayDialog">
+    <div class="card card-w-title">
+      <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+        <div class="ui-grid-row">
+          <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Scenario"></button>
+        </div>
       </div>
-      <div class="ui-g-12">
-        <input pInputText id="acName" [(ngModel)]="scenario.name" />
+      <div class="ui-g form-group">
+        <div class="ui-g-12">
+          <label for="acName">Name</label>
+        </div>
+        <div class="ui-g-12">
+          <input pInputText id="acName" [(ngModel)]="scenario.name" />
+        </div>
+
+        <div class="ui-g-12">
+          <label for="acEnabled">Enabled</label>
+        </div>
+        <div class="ui-g-12">
+          <p-checkbox id="acEnabled" [(ngModel)]="scenario.enabled" binary="true"></p-checkbox>
+        </div>
+
+        <div class="ui-g-12" *ngIf="scenario.id">
+          <dt-partitionsscenarios [scenarioid]="scenario.id" #partitionsscenarios></dt-partitionsscenarios>
+        </div>
       </div>
 
-      <div class="ui-g-12">
-        <label for="acEnabled">Enabled</label>
-      </div>
-      <div class="ui-g-12">
-        <p-checkbox id="acEnabled" [(ngModel)]="scenario.enabled" binary="true"></p-checkbox>
-      </div>
-
-      <div class="ui-g-12" *ngIf="scenario.id">
-        <dt-partitionsscenarios [scenarioid]="scenario.id" #partitionsscenarios></dt-partitionsscenarios>
-      </div>
-    </div>
-
-    <div class="ui-g">
-      <div class="ui-g-12 ui-md-6">
-        <button type="button" pButton icon="ui-icon-check" (click)="save()" label="Save" class="full_button green-btn"></button>
-      </div>
-      <div class="ui-g-12 ui-md-6">
-        <button type="button" pButton icon="ui-icon-clear" (click)="destroy()" label="Delete" class="full_button red-btn"></button>
+      <div class="ui-g">
+        <div class="ui-g-12 ui-md-6">
+          <button type="button" pButton icon="ui-icon-check" (click)="save()" label="Save" class="full_button green-btn"></button>
+        </div>
+        <div class="ui-g-12 ui-md-6">
+          <button type="button" pButton icon="ui-icon-clear" (click)="destroy()" label="Delete" class="full_button red-btn"></button>
+        </div>
       </div>
     </div>
   </div>
-</div>
