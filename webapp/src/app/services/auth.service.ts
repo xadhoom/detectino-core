@@ -78,7 +78,6 @@ export class AuthService {
     return this.authHttp.post('/api/login/refresh',
       {}, { headers: contentHeaders })
       .map(response => {
-        console.log("Token refreshed");
         let token = response.json().token;
         localStorage.setItem('id_token', token);
       }).subscribe(
