@@ -15,7 +15,7 @@ export class PinService {
     this.pin = new BehaviorSubject<string>(null);
 
     // very ugly, but future self will find a better way
-    document.addEventListener("click", () => this.restartExpireTimer());
+    document.addEventListener('click', () => this.restartExpireTimer());
   }
 
   public setPin(pin: string) {
@@ -53,7 +53,6 @@ export class PinService {
 
   private restartExpireTimer(): void {
     if (this.expireTimer) {
-      console.log("resetting timer");
       clearTimeout(this.expireTimer);
       this.startExpireTimer();
     }
