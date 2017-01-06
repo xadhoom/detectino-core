@@ -209,11 +209,7 @@ module.exports = {
      */
     new CopyWebpackPlugin([
       { from: 'src/assets', to: 'assets' },
-      { from: 'node_modules/primeui/themes/omega/fonts', to: 'fonts' },
-      { from: 'node_modules/primeui/themes/omega/theme.css', to: 'assets/css' },
-      { from: 'node_modules/primeui/primeui-ng-all.min.css', to: 'assets/css' },
-      { from: 'node_modules/font-awesome/fonts', to: 'assets/fonts' },
-      { from: 'node_modules/font-awesome/css/font-awesome.min.css', to: 'assets/css' }
+      { from: 'node_modules/primeng/resources/primeng.min.css', to: 'assets/css' },
     ]),
 
     /*
