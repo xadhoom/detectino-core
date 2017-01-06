@@ -10,3 +10,43 @@
   text-align: center;
   max-width: 320px;
 }
+
+.colorbox-DISARM {
+  div:first-child {
+    background-color: #2E7D32;
+  }
+
+  div:last-child {
+    background-color: #4CAF50;
+  }
+}
+
+.colorbox-ARM {
+  div:first-child {
+    background-color: #993300;
+  }
+
+  div:last-child {
+    background-color: #cc3300;
+  }
+}
+
+.colorbox-ARMSTAY {
+  div:first-child {
+    background-color: #d66000;
+  }
+
+  div:last-child {
+    background-color: #ff7200;
+  }
+}
+
+.colorbox-ARMSTAYIMMEDIATE {
+  div:first-child {
+    background-color: #d66000;
+  }
+
+  div:last-child {
+    background-color: #ff7200;
+  }
+}

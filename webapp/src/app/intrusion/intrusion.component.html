@@ -77,7 +77,7 @@
   <div class="ui-g" *ngIf="!showArmDialog">
 
     <div class="ui-g-12 ui-sm-6 ui-md-4 ui-lg-3" *ngFor="let partition of partitions">
-      <div class="card colorbox colorbox-2">
+      <div class="card colorbox colorbox-{{partition.armed}}">
         <div (click)="armDisarmPartition(partition)">
           <md-icon *ngIf="partition.armed == 'ARMSTAY'" svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
           <md-icon *ngIf="partition.armed == 'ARMSTAYIMMEDIATE'" svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
