@@ -1,4 +1,5 @@
 use Mix.Config
+config :detectino, :environment, :dev
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -45,4 +46,4 @@ config :detectino, DtCore.Output.Actions.Email.Mailer,
   adapter: Swoosh.Adapters.Logger,
   level: :debug
 
-config :can, :interfaces, [{:can_sock, 0, [{:device, "vcan0"}]}]
+config :detectino, :can_interface, "vcan0"

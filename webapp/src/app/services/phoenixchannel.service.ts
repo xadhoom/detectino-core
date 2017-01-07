@@ -27,7 +27,7 @@ export class PhoenixChannelService {
   public connect(token) {
     if (this.socket && this.socket.isConnected()) { return; }
 
-    this.socket = new Phoenix.Socket('ws://localhost:4000/socket', {
+    this.socket = new Phoenix.Socket(this.getUrl() + '/socket', {
       // logger: ((kind, msg, data) => { console.log(`${kind}: ${msg}`, data); }),
       transport: WebSocket,
       params: { guardian_token: token },
@@ -43,6 +43,12 @@ export class PhoenixChannelService {
     } else {
       this.feeds[chankey].push(cb);
     }
+  }
+
+  private getUrl(): string {
+    let proto = location.protocol.match(/^https/) ? 'wss://' : 'ws://';
+    let host = location.host;
+    return proto + host;
   }
 
   private _subscribe(topic: string, key: string, cb: Function) {

@@ -73,9 +73,11 @@ defmodule DtBus.Can do
     Logger.info "Starting CanBus Interface"
     :can.start()
     :can_router.attach()
+    c_if = Application.get_env(:detectino, :can_interface)
+    :can_router.join({:can_sock, 0, [{:device, c_if}]})
     cur_ifs = :can_router.interfaces
     Logger.info "Started CanBus Interface #{inspect cur_ifs}"
-    {:ok, 
+    {:ok,
       %DtBus.Can{}
     }
   end
@@ -147,7 +149,7 @@ defmodule DtBus.Can do
     Logger.debug "Got info message #{inspect what}"
 
     {:ok, state} = case what do
-      {:can_frame, _msgid, _len, _data, _intf, _ts} -> 
+      {:can_frame, _msgid, _len, _data, _intf, _ts} ->
         {:ok, state} = handle_canframe(what, state)
       default ->
         Logger.warn "Got unknown message #{inspect default}"
@@ -173,12 +175,12 @@ defmodule DtBus.Can do
 
         if dst_node_id == 0 do
           case command do
-            :pong -> 
+            :pong ->
               {:ok, state} = handle_pong(data, state)
             :event ->
               << _, _, _, _, portd, porta, msb, lsb >> = data
               value = msb <<< 8 |> bor(lsb)
-              port = 
+              port =
                 case porta do
                   0 -> portd
                   _ -> porta
@@ -188,8 +190,8 @@ defmodule DtBus.Can do
                   0 -> :digital_read
                   _ -> :analog_read
                 end
-              sendmessage(state, %Event{address: src_node_id, 
-                type: :sensor, subtype: subtype, 
+              sendmessage(state, %Event{address: src_node_id,
+                type: :sensor, subtype: subtype,
                 port: port, value: value})
               {:ok, state}
             default ->

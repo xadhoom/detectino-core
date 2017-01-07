@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Angular2 stuff
+rm -fR priv/static/*
+pushd webapp
+npm install
+npm run build:prod
+popd
+
+# Elixir Stuff
+mix deps.get --only prod
+mix release.clean
+MIX_ENV=prod mix compile
+MIX_ENV=prod mix release

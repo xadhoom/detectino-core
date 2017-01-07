@@ -22,7 +22,7 @@ defmodule Detectino do
       worker(DtWeb.TokenServer, [], restart: :permanent)
     ]
 
-    children = case Mix.env do
+    children = case Application.get_env(:detectino, :environment) do
       :test -> children
       _ -> children ++ [supervisor(DtCore.Sup, [])]
     end
@@ -36,5 +36,10 @@ defmodule Detectino do
   def config_change(changed, _new, removed) do
     Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp run_migrations do
+    path = Application.app_dir(:detectino) <> "/priv/repo/migrations"
+    Ecto.Migrator.run(DtWeb.Repo, path, :up, [{:all, true}, {:log, :debug}])
   end
 end

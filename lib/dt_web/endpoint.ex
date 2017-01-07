@@ -9,7 +9,11 @@ defmodule DtWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: {:detectino, "priv/static/" <> Atom.to_string(Mix.env)},
+    from: {
+      :detectino,
+      "priv/static/" <> Atom.to_string(
+        Application.get_env(:detectino, :environment)
+      )},
     gzip: false
     #only:
     # ~w(app.html app.js components index.html init.js lib services styles)

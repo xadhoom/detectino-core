@@ -23,7 +23,9 @@ defmodule Detectino.Mixfile do
   def application do
     apps = [
       :phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-      :phoenix_ecto, :postgrex, :timex, :swoosh, :etimer
+      :phoenix_ecto, :postgrex, :timex, :swoosh, :etimer, :can, :guardian,
+      :lager_logger, :exjsx, :comeonin, :registry, :ex_link_header, :conform,
+      :conform_exrm
     ]
     prod_apps = apps ++ [:gen_smtp]
     case Mix.env do
@@ -57,15 +59,18 @@ defmodule Detectino.Mixfile do
      # remove registry when elixir 1.4 is released
      {:registry, git: "https://github.com/elixir-lang/registry"},
      {:credo, "~> 0.4", only: [:dev, :test]},
-     {:ecto, "~> 2.0"},
+     {:ecto, "~> 2.1"},
      {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.0"},
      {:swoosh, "~> 0.5.0"},
      {:gen_smtp, "~> 0.11.0"},
      {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},
      {:lager, git: "https://github.com/basho/lager.git", override: true},
      {:lager_logger, "~> 1.0"},
-     {:excoveralls, "~> 0.5"},
-     {:meck, "~> 0.8", only: [:test]}
+     {:excoveralls, "~> 0.5", only: [:dev, :test]},
+     {:meck, "~> 0.8", only: [:test]},
+     {:exrm, "~> 1.0"},
+     {:conform, "~> 2.1"},
+     {:conform_exrm, "~> 1.0"}
    ]
   end
 
