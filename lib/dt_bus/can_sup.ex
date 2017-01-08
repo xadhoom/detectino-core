@@ -12,7 +12,9 @@ defmodule DtBus.CanSup do
   def init(_) do
     children = [
       worker(DtBus.Can, []),
-      worker(DtBus.CanSim, [10])
+      worker(DtBus.CanSim, [10]),
+      supervisor(Registry, [:duplicate, DtBus.ActionRegistry.registry],
+        restart: :permanent),
     ]
     supervise(children, strategy: :one_for_one)
   end
