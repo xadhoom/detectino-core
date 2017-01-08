@@ -24,10 +24,6 @@ defmodule DtCore.Test.Output.Worker do
 
   setup do
     {:ok, _pid} = Sup.start_link
-    {:ok, _} = Registry.start_link(
-      :duplicate,
-      DtBus.ActionRegistry.registry
-    )
 
     on_exit fn ->
       TimerHelper.wait_until fn ->
