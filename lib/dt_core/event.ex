@@ -10,7 +10,8 @@ end
 
 defmodule DtCore.Event do
   @moduledoc """
-  Event struct for DtCore events (from bus)
+  Event struct for DtCore events (from bus).
+  DtBus.Event is normalize to DtCore.Event and forwarded to sensor workers
   """
 
   defstruct address: nil,
@@ -24,6 +25,9 @@ end
 
 defmodule DtCore.SensorEv do
   @moduledoc """
+    Used to format output from Sensor Workwers.
+    Is listened to by Partition Workers and via DtCore.EvRegistry.
+
     type values:
       :reading
       :alarm
@@ -41,6 +45,9 @@ end
 
 defmodule DtCore.PartitionEv do
   @moduledoc """
+    Used to format output from Partition Workers.
+    Is listened to via DtCore.EvRegistry.
+
     type values:
       :alarm
   """
