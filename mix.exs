@@ -70,7 +70,8 @@ defmodule Detectino.Mixfile do
      {:meck, "~> 0.8", only: [:test]},
      {:exrm, "~> 1.0"},
      {:conform, "~> 2.1"},
-     {:conform_exrm, "~> 1.0"}
+     {:conform_exrm, "~> 1.0"},
+     {:dialyxir, "~> 0.4", only: [:dev], runtime: false}
    ]
   end
 
