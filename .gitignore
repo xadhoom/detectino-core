@@ -30,3 +30,6 @@ false
 
 # release builds
 /rel
+
+# docs
+doc
