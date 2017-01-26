@@ -1,7 +1,7 @@
 defmodule DtWeb.Channels.Event do
   use Phoenix.Channel
 
-  alias DtCore.EvRegistry
+  #alias DtCore.EvRegistry
 
   require Logger
 
@@ -10,8 +10,8 @@ defmodule DtWeb.Channels.Event do
   end
 
   def join("event:alarm", _message, socket) do
-    Registry.register(EvRegistry.registry, %{}, [])
-    Registry.register(EvRegistry.registry, %{source: :sensor}, [])
+    #Registry.register(EvRegistry.registry, %{}, [])
+    #Registry.register(EvRegistry.registry, %{source: :sensor}, [])
     {:ok, socket}
   end
 

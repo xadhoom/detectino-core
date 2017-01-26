@@ -1,4 +1,4 @@
-defmodule DtCore.EvRegistry do
+defmodule DtCore.OutputsRegistry do
   @moduledoc """
   Registry used to send event from sensors (via sensor server)
   to output workers (each one subscribes to different keys)
@@ -26,7 +26,7 @@ end
 defmodule DtCore.SensorEv do
   @moduledoc """
     Used to format output from Sensor Workwers.
-    Is listened to by Partition Workers and via DtCore.EvRegistry.
+    Is listened to by Partition Workers and via DtCore.OutputsRegistry.
 
     type values:
       :reading
@@ -46,7 +46,7 @@ end
 defmodule DtCore.PartitionEv do
   @moduledoc """
     Used to format output from Partition Workers.
-    Is listened to via DtCore.EvRegistry.
+    Is listened to via DtCore.OutputsRegistry.
 
     type values:
       :alarm

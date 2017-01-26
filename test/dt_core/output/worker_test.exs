@@ -8,7 +8,7 @@ defmodule DtCore.Test.Output.Worker do
   alias DtWeb.Event, as: EventModel
   alias DtWeb.EmailSettings, as: EmailSettingsModel
   alias DtWeb.BusSettings, as: BusSettingsModel
-  alias DtCore.EvRegistry
+  alias DtCore.OutputsRegistry
   alias DtCore.Output.Worker
   alias DtCore.Test.TimerHelper
   alias DtCore.SensorEv
@@ -54,7 +54,7 @@ defmodule DtCore.Test.Output.Worker do
 
     {:ok, pid} = Worker.start_link({output})
 
-    listeners = Registry.keys(EvRegistry.registry, pid)
+    listeners = Registry.keys(OutputsRegistry.registry, pid)
     assert Enum.count(listeners) == 0
   end
 
@@ -77,15 +77,15 @@ defmodule DtCore.Test.Output.Worker do
 
     {:ok, pid} = Worker.start_link({output})
 
-    listeners = Registry.keys(EvRegistry.registry, pid)
+    listeners = Registry.keys(OutputsRegistry.registry, pid)
     assert Enum.count(listeners) == 2
 
     key = %{source: :partition, name: "area one", type: :alarm}
-    listeners = Registry.lookup(EvRegistry.registry, key)
+    listeners = Registry.lookup(OutputsRegistry.registry, key)
     assert Enum.count(listeners) == 1
 
     key = %{source: :sensor, address: "10", port: 5, type: :alarm}
-    listeners = Registry.lookup(EvRegistry.registry, key)
+    listeners = Registry.lookup(OutputsRegistry.registry, key)
     assert Enum.count(listeners) == 1
   end
 

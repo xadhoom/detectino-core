@@ -11,7 +11,7 @@ defmodule DtCore.Sensor.Partition do
   alias DtCore.Event
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
-  alias DtCore.EvRegistry
+  alias DtCore.EventBridge
 
   @arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
   @disarm_modes ["DISARM"]
@@ -225,16 +225,12 @@ defmodule DtCore.Sensor.Partition do
 
   defp dispatch(msg = {_op, ev = %SensorEv{}}) do
     key = %{source: :sensor, address: ev.address, port: ev.port, type: ev.type}
-    Registry.dispatch(EvRegistry.registry, key, fn listeners ->
-      for {pid, _} <- listeners, do: send(pid, msg)
-    end)
+    EventBridge.dispatch(key, msg)
   end
 
   defp dispatch(msg = {_op, ev = %PartitionEv{}}) do
     key = %{source: :partition, name: ev.name, type: ev.type}
-    Registry.dispatch(EvRegistry.registry, key, fn listeners ->
-      for {pid, _} <- listeners, do: send(pid, msg)
-    end)
+    EventBridge.dispatch(key, msg)
   end
 
   # partition alarm must start on single sensor event,

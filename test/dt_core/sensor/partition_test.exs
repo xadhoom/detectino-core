@@ -14,8 +14,13 @@ defmodule DtCore.Test.Sensor.Partition do
   @arm_disarmed "DISARM"
   @arm_armed "ARM"
 
+  setup_all do
+    {:ok, _} = DtCore.EventBridge.start_link()
+    :ok
+  end
+
   setup do
-    {:ok, _} = Registry.start_link(:duplicate, DtCore.EvRegistry.registry)
+    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
     cache = :ets.new(:part_state_cache, [:set, :public])
     {:ok, [cache: cache]}
   end
@@ -43,9 +48,9 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: [sensor]}
 
     key = %{source: :sensor, address: "1", port: 1, type: :reading}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "prot", type: :reading}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
 
@@ -65,9 +70,9 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: [sensor]}
 
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "prot", type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
 
@@ -126,9 +131,9 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: [sensor]}
 
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "prot", type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     :ok = Partition.arm(part, "ARM")
@@ -244,10 +249,10 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: [sensor]}
 
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     key = %{source: :partition, name: "prot", type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     {:ok, suppid} = PartitionSup.start_link
 
@@ -286,11 +291,11 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: sensors}
 
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "2", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "prot", type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
 
@@ -334,11 +339,11 @@ defmodule DtCore.Test.Sensor.Partition do
       sensors: sensors}
 
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "2", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "prot", type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
 
@@ -364,24 +369,24 @@ defmodule DtCore.Test.Sensor.Partition do
 
   defp register_deol_listeners do
     key = %{source: :sensor, address: "1", port: 1, type: :reading}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "1", port: 1, type: :tamper}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "1", port: 1, type: :standby}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "1", port: 1, type: :short}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     key = %{source: :partition, name: "part1", type: :tamper}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "part1", type: :alarm}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "part1", type: :standby}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "part1", type: :short}
-    Registry.register(DtCore.EvRegistry.registry, key, [])
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     :ok
   end

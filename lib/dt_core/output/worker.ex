@@ -12,7 +12,7 @@ defmodule DtCore.Output.Worker do
   alias DtWeb.Event, as: EventModel
   alias DtWeb.Event.SensorEvConf
   alias DtWeb.Event.PartitionEvConf
-  alias DtCore.EvRegistry
+  alias DtCore.OutputsRegistry
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
   alias DtCore.Output.Actions.Bus
@@ -136,7 +136,7 @@ defmodule DtCore.Output.Worker do
       nil ->
         Logger.error("Empty key, not subscribing to any event")
       v when is_map v ->
-        Registry.register(EvRegistry.registry, v, [])
+        Registry.register(OutputsRegistry.registry, v, [])
     end
   end
 
