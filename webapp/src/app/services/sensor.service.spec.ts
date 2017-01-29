@@ -2,11 +2,13 @@
 
 import { TestBed, async, inject } from '@angular/core/testing';
 import { SensorService } from './sensor.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AppModule } from '../app.module';
 
 describe('SensorService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SensorService]
+      imports: [AppModule, RouterTestingModule]
     });
   });
 

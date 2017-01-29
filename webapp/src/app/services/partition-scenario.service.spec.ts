@@ -2,11 +2,13 @@
 
 import { TestBed, async, inject } from '@angular/core/testing';
 import { PartitionScenarioService } from './partition-scenario.service';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AppModule } from '../app.module';
 
 describe('PartitionScenarioService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [PartitionScenarioService]
+      imports: [AppModule, RouterTestingModule]
     });
   });
 

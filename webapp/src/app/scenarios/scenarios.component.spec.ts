@@ -2,6 +2,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AppModule } from '../app.module';
 
 import { ScenariosComponent } from './scenarios.component';
 
@@ -11,9 +13,9 @@ describe('ScenariosComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ScenariosComponent ]
+      imports: [AppModule, RouterTestingModule]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
