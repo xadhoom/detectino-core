@@ -1,39 +1,40 @@
-env:
-        - REBAR_DEPS_DIR=$TRAVIS_BUILD_DIR/deps
+dist: trusty
+sudo: required
 
-sudo: false
+env:
+  global:
+    - REBAR_DEPS_DIR=$TRAVIS_BUILD_DIR/deps
+    - DBUS_SESSION_BUS_ADDRESS=/dev/null
+    - DISPLAY=:99.0
+    - CHROME_BIN=chromium-browser
 
 language: elixir
 
 elixir:
-        - 1.3.2
-        - 1.3.4
+  - 1.3.4
 
 otp_release:
-        - 19.1
+  - 19.1
 
 addons:
   postgresql: "9.4"
 
 before_install:
-        - . $HOME/.nvm/nvm.sh
-        - nvm install 4
-        - npm --version
-          #- export CHROME_BIN=chromium-browser
-          #- export DISPLAY=:99.0
-          #before_script:
-          #- sh -e /etc/init.d/xvfb start
-          #- sleep 1  # give server time to start
-
-after_script:
-          - cat /home/travis/build/xadhoom/detectino-core/webapp/npm-debug.log
+  - . $HOME/.nvm/nvm.sh
+  - nvm install 6
+  - npm --version
+  - npm config set spin false
+  - npm config set progress false
+  - npm install -g angular-cli
+  - sh -e /etc/init.d/xvfb start
+  - echo "--no-sandbox" > ~/.config/chromium-flags.conf;
 
 cache:
-        directories:
-                - webapp/node_modules
-                - deps
-                - _build
+  directories:
+    - webapp/node_modules
+    - deps
+    - _build
 
 script:
-        - "pushd webapp; npm install; npm run build; npm run test; popd"
-        - "MIX_ENV=test mix do deps.get, deps.compile, coveralls.travis"
+  - "pushd webapp; npm install; ng lint && ng build --progress false && ng test --single-run --progress false && popd"
+  - "MIX_ENV=test mix do deps.get, deps.compile, coveralls.travis"

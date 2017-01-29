@@ -1,18 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-
 import { OutputService, NotificationService } from '../services';
-
 import { Output, OutputEmailConfig, OutputBusConfig } from '../models/output';
-
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
-  selector: 'outputs',
+  selector: 'app-outputs',
   templateUrl: './outputs.component.html',
-  styleUrls: ['./outputs.component.css', '../shared/common.scss']
+  styleUrls: ['./outputs.component.scss']
 })
 
-export class Outputs implements OnInit {
+export class OutputsComponent implements OnInit {
   output: Output;
 
   outputs: Output[];
@@ -102,8 +99,8 @@ export class Outputs implements OnInit {
   };
 
   cloneOutput(s: Output): Output {
-    let output = new Output();
-    for (let prop in s) {
+    const output = new Output();
+    for (const prop in s) {
       if (prop) {
         output[prop] = s[prop];
       }
@@ -112,4 +109,5 @@ export class Outputs implements OnInit {
   }
 
 }
+
 

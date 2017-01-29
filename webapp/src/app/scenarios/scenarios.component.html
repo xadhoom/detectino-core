@@ -7,11 +7,11 @@
         <header>Scenarios</header>
         <p-column field="name" header="Name" [sortable]="true"></p-column>
         <p-column field="configured" header="Configured" [sortable]="false"></p-column>
-        <footer>
+        <p-footer>
           <div class="ui-helper-clearfix">
             <button type="button" pButton icon="ui-icon-add" class="float_left" (click)="showDialogToAdd()" label="Add"></button>
           </div>
-        </footer>
+        </p-footer>
       </p-dataTable>
     </div>
   </div>
@@ -39,7 +39,7 @@
         </div>
 
         <div class="ui-g-12" *ngIf="scenario.id">
-          <dt-partitionsscenarios [scenarioid]="scenario.id" #partitionsscenarios></dt-partitionsscenarios>
+          <app-partitions-scenarios [scenarioid]="scenario.id" #partitionsscenarios></app-partitions-scenarios>
         </div>
       </div>
 

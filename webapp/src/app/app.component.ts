@@ -1,54 +1,40 @@
-/*
- * Angular 2 decorators and services
- */
 import {
-  Component, ViewEncapsulation, ElementRef,
-  AfterViewInit
+  Component, AfterViewInit, ElementRef, Renderer,
+  ViewChild
 } from '@angular/core';
+
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { AuthService } from './services';
+import { Message } from 'primeng/primeng';
 
 import {
-  NotificationService,
+  NotificationService, AuthService,
   PhoenixChannelService, PinService
 } from './services';
 
-import { Message } from 'primeng/primeng';
-
-declare var Ultima: any;
-
-/*
- * App Component
- * Top Level Component
- *
- * XXX ElementRef is discouraged, check if we can avoid it
- *
- */
 @Component({
-  selector: 'app',
-  styleUrls: ['./app.component.css', './shared/common.scss'],
-  templateUrl: './app.component.html'
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
 
 export class AppComponent implements AfterViewInit {
-  loading = false;
   name = 'Detectino';
 
   subscription: Subscription;
 
   notifications: Message[] = [];
 
-  private time: string;
-  private date: string;
+  public time: string;
+  public date: string;
 
-  constructor(private el: ElementRef, private router: Router,
+  constructor(private el: ElementRef, public router: Router,
     private auth: AuthService,
     private notificationService: NotificationService,
-    private pinSrv: PinService,
+    public pinSrv: PinService,
     private socket: PhoenixChannelService) {
 
     this.subscription = notificationService.messages$.subscribe(
@@ -57,7 +43,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    Ultima.init(this.el.nativeElement);
     this.startWebSock();
   }
 
@@ -67,7 +52,7 @@ export class AppComponent implements AfterViewInit {
 
   updateTime(time) {
     let options = {};
-    let date = new Date(time.time);
+    const date = new Date(time.time);
 
     options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
     this.date = date.toLocaleString([], options);

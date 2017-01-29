@@ -1,25 +1,21 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
 import { ScenarioService, NotificationService } from '../services';
-
 import { Scenario } from '../models/scenario';
-import { PartitionsScenarios } from './partitionsScenarios.component';
-
+import { PartitionsScenariosComponent } from './partitions-scenarios/partitions-scenarios.component';
 import { SelectItem } from 'primeng/primeng';
-
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/operator/concatAll';
 
 @Component({
-  selector: 'scenarios',
+  selector: 'app-scenarios',
   templateUrl: './scenarios.component.html',
-  styleUrls: ['./scenarios.component.css', '../shared/common.scss']
+  styleUrls: ['./scenarios.component.scss']
 })
 
-export class Scenarios implements OnInit {
+export class ScenariosComponent implements OnInit {
 
   @ViewChild('partitionsscenarios')
-  partitionsscenarios: PartitionsScenarios;
+  partitionsscenarios: PartitionsScenariosComponent;
 
   scenario: Scenario;
 
@@ -50,7 +46,7 @@ export class Scenarios implements OnInit {
 
   save() {
     let s2: Observable<any> = null;
-    let s1 = this.scenarioService.save(this.scenario);
+    const s1 = this.scenarioService.save(this.scenario);
     s2 = this.partitionsscenarios ? this.partitionsscenarios.saveAll() : null;
     let s3 = null;
 
@@ -97,8 +93,8 @@ export class Scenarios implements OnInit {
   };
 
   cloneScenario(s: Scenario): Scenario {
-    let scenario = new Scenario();
-    for (let prop in s) {
+    const scenario = new Scenario();
+    for (const prop in s) {
       if (prop) {
         scenario[prop] = s[prop];
       }
@@ -107,4 +103,5 @@ export class Scenarios implements OnInit {
   }
 
 }
+
 

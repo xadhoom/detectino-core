@@ -1,19 +1,21 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
-
-import { PartitionService, NotificationService, PinService } from '../services';
+import { Component, OnInit } from '@angular/core';
+import {
+  PartitionService, NotificationService,
+  PinService
+} from '../services';
 import { Partition } from '../models/partition';
 
 @Component({
-  selector: 'dt-intrusion',
-  styleUrls: ['./intrusion.component.scss', '../shared/common.scss'],
-  templateUrl: './intrusion.component.html'
+  selector: 'app-intrusion',
+  templateUrl: './intrusion.component.html',
+  styleUrls: ['./intrusion.component.scss']
 })
 
-export class Intrusion implements OnInit {
+export class IntrusionComponent implements OnInit {
   partitions: Partition[];
   errorMessage: string;
 
-  private selectedPartition: Partition;
+  public selectedPartition: Partition;
   private showArmDialog: boolean;
 
   constructor(private partitionService: PartitionService,
@@ -31,7 +33,7 @@ export class Intrusion implements OnInit {
     );
   }
 
-  private doArm(part: Partition, mode: string) {
+  public doArm(part: Partition, mode: string) {
     this.partitionService.arm(part, mode).subscribe(
       res => {
         this.notificationService.success('Partition armed successfully');
@@ -41,7 +43,7 @@ export class Intrusion implements OnInit {
     );
   }
 
-  private doDisarm(part: Partition) {
+  public doDisarm(part: Partition) {
     this.partitionService.disarm(part).subscribe(
       res => {
         this.notificationService.success('Partition disarmed successfully');
@@ -51,7 +53,13 @@ export class Intrusion implements OnInit {
     );
   }
 
-  private armDisarmPartition(part: Partition) {
+  public cancelArming() {
+    this.reloadPartitions();
+    this.showArmDialog = false;
+    this.selectedPartition = null;
+  }
+
+  public armDisarmPartition(part: Partition) {
     this.showArmDialog = true;
     this.selectedPartition = part;
   }
@@ -75,12 +83,6 @@ export class Intrusion implements OnInit {
         break;
     }
     return armed;
-  }
-
-  private cancelArming() {
-    this.reloadPartitions();
-    this.showArmDialog = false;
-    this.selectedPartition = null;
   }
 
   private getInitials(name: string) {
@@ -109,3 +111,4 @@ export class Intrusion implements OnInit {
     this.reloadPartitions();
   }
 }
+

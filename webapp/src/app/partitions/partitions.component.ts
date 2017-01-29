@@ -1,18 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-
 import { PartitionService, NotificationService } from '../services';
-
 import { Partition } from '../models/partition';
-
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
-  selector: 'partitions',
+  selector: 'app-partitions',
   templateUrl: './partitions.component.html',
-  styleUrls: ['./partitions.component.css', '../shared/common.scss']
+  styleUrls: ['./partitions.component.scss']
 })
 
-export class Partitions implements OnInit {
+export class PartitionsComponent implements OnInit {
 
   partition: Partition;
 
@@ -80,8 +77,8 @@ export class Partitions implements OnInit {
   };
 
   clonePartition(s: Partition): Partition {
-    let partition = new Partition();
-    for (let prop in s) {
+    const partition = new Partition();
+    for (const prop in s) {
       if (prop) {
         partition[prop] = s[prop];
       }
@@ -90,4 +87,5 @@ export class Partitions implements OnInit {
   }
 
 }
+
 

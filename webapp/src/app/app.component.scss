@@ -1,0 +1,54 @@
+.topbar-left {
+  width: auto !important;
+}
+
+.topbar-left i {
+  font-size: 36px;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.topbar-center {
+  float: left;
+  padding: 20px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.topbar-center .date {
+  display: block;
+  color: white;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
+
+.topbar-center .time {
+  display: inline-block;
+  color: white;
+  font-size: 20px;
+  line-height: 1;
+  text-align: center;
+}
+@media screen and (max-width: 320px) {
+  .topbar-center .time {
+    display: none;
+  }
+
+  .topbar-center .date {
+    display: none;
+  }
+}
+
+.topbar-right {
+  text-align: right;
+  padding: 20px !important;
+  z-index: -9999;
+}
+
+.dt-topbar-icons {
+  color: #ffffff;
+  font-size: 36px;
+  height: 36px;
+  line-height: 1;
+}

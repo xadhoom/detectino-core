@@ -32,9 +32,9 @@ export class UserService extends Crud {
   };
 
   invalidateSession(obj: User): Observable<boolean> {
-    let rqOpts = this.buildOptions({});
+    const rqOpts = this.buildOptions({});
 
-    let rq = new Request({
+    const rq = new Request({
       url: this.baseurl + '/' + obj.id + '/invalidate',
       method: RequestMethod.Post,
       headers: rqOpts.headers,
@@ -49,4 +49,3 @@ export class UserService extends Crud {
   }
 
 }
-

@@ -15,15 +15,15 @@ export class Crud {
   constructor(protected http: AuthHttp, protected pinSrv: PinService) { }
 
   _read(url: string, options?: CrudSettings): Observable<any[]> {
-    let rqOpts = this.buildOptions(options);
+    const rqOpts = this.buildOptions(options);
     return this.http.get(url, rqOpts).
       map(this.parseResponse).
       catch(this.handleError);
   };
 
   _save(obj: any, url: string, options?: CrudSettings): Observable<any> {
-    let rqOpts = this.buildOptions(options);
-    let rq = new Request({
+    const rqOpts = this.buildOptions(options);
+    const rq = new Request({
       url: url,
       method: RequestMethod.Post,
       body: JSON.stringify(obj),
@@ -41,13 +41,13 @@ export class Crud {
   };
 
   _destroy(obj: any, url: string, options?: CrudSettings): Observable<any> {
-    let rqOpts = this.buildOptions(options);
+    const rqOpts = this.buildOptions(options);
 
     if (!obj.id) {
       return Observable.throw('Missing Object id');
     }
 
-    let rq = new Request({
+    const rq = new Request({
       url: url + '/' + obj.id,
       method: RequestMethod.Delete,
       body: '',
@@ -60,12 +60,12 @@ export class Crud {
   }
 
   protected parseResponse(res: Response) {
-    let body = res.json();
+    const body = res.json();
     return body || [];
   };
 
   protected handleError(error: any) {
-    let errTxt = error.text();
+    const errTxt = error.text();
     let errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
     if (errTxt && errTxt !== error.statusText) {
@@ -75,10 +75,10 @@ export class Crud {
   };
 
   protected buildOptions(options: CrudSettings): RequestOptions {
-    let reqOpts = new RequestOptions();
+    const reqOpts = new RequestOptions();
 
-    let pin = this.pinSrv.getPin();
-    let headers = new Headers();
+    const pin = this.pinSrv.getPin();
+    const headers = new Headers();
     headers.append('Content-Type', 'application/json');
     if (pin) {
       headers.append('p-dt-pin', pin);

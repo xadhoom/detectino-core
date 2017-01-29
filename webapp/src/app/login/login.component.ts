@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services';
 
 @Component({
-  selector: 'login',
+  selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.scss']
 })
 
-export class Login implements OnInit {
+export class LoginComponent implements OnInit {
   constructor(public auth: AuthService, private router: Router) {
   }
 
@@ -30,3 +30,4 @@ export class Login implements OnInit {
       }, error => console.log('ayeee error in login:', error));
   }
 }
+

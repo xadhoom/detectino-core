@@ -9,11 +9,11 @@
         <p-column field="port" header="Port" [sortable]="true"></p-column>
         <p-column field="name" header="Name" [sortable]="true"></p-column>
         <p-column field="enabled" header="Enabled" [sortable]="false"></p-column>
-        <footer>
+        <p-footer>
           <div class="ui-helper-clearfix">
             <button type="button" class="float_left" pButton icon="ui-icon-add" (click)="showDialogToAdd()" label="Add"></button>
           </div>
-        </footer>
+        </p-footer>
       </p-dataTable>
     </div>
   </div>
@@ -59,21 +59,21 @@
     <div class="card card-w-title">
       <h2 class="BigTopic">Associated Partitions</h2>
       <p-pickList [source]="partitions" [target]="selectedPartitions" sourceHeader="Available" targetHeader="Selected" [responsive]="true">
-        <template let-item>
-          <li class="ui-picklist-item ui-helper-clearfix" style="padding:5px 5px !important;">
-<div style="font-size: 16px;">{{item.name}}</div>
-</li>
-</template>
-</p-pickList>
-<div class="ui-g">
-  <div class="ui-g-12 ui-md-6">
-    <button type="button" pButton icon="ui-icon-check" (click)="save()" label="Save" class="full_button green-btn"></button>
-  </div>
-  <div class="ui-g-12 ui-md-6">
-    <button type="button" pButton icon="ui-icon-clear" (click)="destroy()" label="Delete" class="full_button red-btn"></button>
-  </div>
-</div>
-</div>
+        <template let-partition pTemplate="item">
+          <li class="ui-picklist-item ui-helper-clearfix picklist-entry">
+            <div class="picklist-text">{{partition.name}}</div>
+          </li>
+        </template>
+      </p-pickList>
+      <div class="ui-g">
+        <div class="ui-g-12 ui-md-6">
+          <button type="button" pButton icon="ui-icon-check" (click)="save()" label="Save" class="full_button green-btn"></button>
+        </div>
+        <div class="ui-g-12 ui-md-6">
+          <button type="button" pButton icon="ui-icon-clear" (click)="destroy()" label="Delete" class="full_button red-btn"></button>
+        </div>
+      </div>
+    </div>
 
-</div>
+  </div>
 </div>

@@ -32,4 +32,3 @@ export class SensorService extends Crud {
   };
 
 }
-

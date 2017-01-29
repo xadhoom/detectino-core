@@ -31,8 +31,8 @@ export class NotificationService {
   }
 
   success(body: string) {
-    let id = UUID.UUID();
-    let msg = {
+    const id = UUID.UUID();
+    const msg = {
       id: id,
       severity: 'success', summary: 'Success Message', detail: body
     };
@@ -42,7 +42,7 @@ export class NotificationService {
   }
 
   error(body: string) {
-    let msg = {
+    const msg = {
       id: UUID.UUID(),
       severity: 'error', summary: 'Error Message', detail: body
     };
@@ -58,4 +58,3 @@ export class NotificationService {
   }
 
 }
-

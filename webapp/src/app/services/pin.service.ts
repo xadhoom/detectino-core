@@ -19,7 +19,7 @@ export class PinService {
   }
 
   public setPin(pin: string) {
-    let body = JSON.stringify({
+    const body = JSON.stringify({
       'pin': pin
     });
 
@@ -59,7 +59,7 @@ export class PinService {
   }
 
   private handleError(error: any) {
-    let errTxt = error.text();
+    const errTxt = error.text();
     let errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
     if (errTxt && errTxt !== error.statusText) {

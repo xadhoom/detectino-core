@@ -32,8 +32,8 @@ export class PartitionService extends Crud {
   };
 
   public arm(p: Partition, mode: string): Observable<boolean> {
-    let rqOpts = this.buildOptions(new CrudSettings());
-    let url = this.baseurl + '/' + p.id + '/arm';
+    const rqOpts = this.buildOptions(new CrudSettings());
+    const url = this.baseurl + '/' + p.id + '/arm';
     return this.http.post(url, { mode: mode }, rqOpts).
       map((res) => {
         return true;
@@ -42,8 +42,8 @@ export class PartitionService extends Crud {
   }
 
   public disarm(p: Partition): Observable<boolean> {
-    let rqOpts = this.buildOptions(new CrudSettings());
-    let url = this.baseurl + '/' + p.id + '/disarm';
+    const rqOpts = this.buildOptions(new CrudSettings());
+    const url = this.baseurl + '/' + p.id + '/disarm';
     return this.http.post(url, null, rqOpts).
       map((res) => {
         return true;
@@ -52,4 +52,3 @@ export class PartitionService extends Crud {
   }
 
 }
-

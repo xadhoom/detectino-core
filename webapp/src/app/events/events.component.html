@@ -8,11 +8,11 @@
         <p-column field="name" header="Name" [sortable]="true"></p-column>
         <p-column field="source" header="Source" [sortable]="true"></p-column>
         <p-column field="description" header="Description" [sortable]="false"></p-column>
-        <footer>
+        <p-footer>
           <div class="ui-helper-clearfix">
             <button type="button" pButton icon="ui-icon-add" class="float_left" (click)="showDialogToAdd()" label="Add"></button>
           </div>
-        </footer>
+        </p-footer>
       </p-dataTable>
     </div>
   </div>
@@ -49,8 +49,8 @@
         </div>
 
         <div class="ui-g-12" [ngSwitch]="event.source">
-          <dt-eventsensorconfig *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig> </dt-eventsensorconfig>
-          <dt-eventpartitionconfig *ngSwitchCase="'partition'" [strconfig]="event.source_config" #partitionconfig> </dt-eventpartitionconfig>
+          <app-sensor-config *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig> </app-sensor-config>
+          <app-partition-config *ngSwitchCase="'partition'" [strconfig]="event.source_config" #partitionconfig> </app-partition-config>
         </div>
 
       </div>
@@ -59,22 +59,22 @@
     <div class="card card-w-title">
       <h2 class="BigTopic">Associated Outputs</h2>
       <p-pickList [source]="outputs" [target]="selectedOutputs" sourceHeader="Available" targetHeader="Selected" [responsive]="true">
-        <template let-item>
-          <li class="ui-picklist-item ui-helper-clearfix" style="padding:5px 5px !important;">
-<div style="font-size: 16px;">{{item.name}}</div>
-</li>
-</template>
-</p-pickList>
-<div class="ui-g">
-  <div class="ui-g-12 ui-md-6">
-    <button type="button" pButton icon="ui-icon-check" (click)="save()" label="Save" class="full_button green-btn"></button>
-  </div>
-  <div class="ui-g-12 ui-md-6">
-    <button type="button" pButton icon="ui-icon-clear" (click)="destroy()" label="Delete" class="full_button red-btn"></button>
-  </div>
-</div>
-</div>
+        <template let-output pTemplate="item">
+          <li class="ui-picklist-item ui-helper-clearfix picklist-entry">
+            <div class="picklist-text">{{output.name}}</div>
+          </li>
+        </template>
+      </p-pickList>
+      <div class="ui-g">
+        <div class="ui-g-12 ui-md-6">
+          <button type="button" pButton icon="ui-icon-check" (click)="save()" label="Save" class="full_button green-btn"></button>
+        </div>
+        <div class="ui-g-12 ui-md-6">
+          <button type="button" pButton icon="ui-icon-clear" (click)="destroy()" label="Delete" class="full_button red-btn"></button>
+        </div>
+      </div>
+    </div>
 
-</div>
+  </div>
 
 </div>

@@ -1,56 +1,24 @@
-<!DOCTYPE html>
-<html lang="">
+<!doctype html>
+<html>
 
 <head>
-
-  <title>
-    <%= webpackConfig.metadata.title %>
-  </title>
-
   <meta charset="utf-8">
+  <title>Detectino</title>
+  <base href="/">
+
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="description" content="<%= webpackConfig.metadata.title %>">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <!-- use http://www.favicon-generator.org/ to replace files in public/icon-->
-  <link rel="apple-touch-icon" sizes="57x57" href="/assets/icon/apple-icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="60x60" href="/assets/icon/apple-icon-60x60.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="/assets/icon/apple-icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="/assets/icon/apple-icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="/assets/icon/apple-icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="/assets/icon/apple-icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="/assets/icon/apple-icon-144x144.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/assets/icon/apple-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icon/apple-icon-180x180.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon/android-icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="/assets/icon/favicon-96x96.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icon/favicon-16x16.png">
-  <link rel="manifest" href="/assets/manifest.json">
-  <meta name="msapplication-TileColor" content="#00bcd4">
-  <meta name="msapplication-TileImage" content="/assets/icon/ms-icon-144x144.png">
-  <!-- end favicon -->
-
-  <!-- Ultima CSS -->
-  <link id="theme-css" rel="stylesheet" type="text/css" href="/assets/theme/theme-indigo.css">
-  <link id="layout-css" rel="stylesheet" type="text/css" href="/assets/theme/layout/css/layout-indigo.css">
-
-  <!-- PrimeNG CSS -->
-  <link rel="stylesheet" type="text/css" href="/assets/css/primeng.min.css" />
-
-  <!-- JS libraries -->
-  <!-- Phoenix Socket -->
-  <script src="/assets/js/phoenix.js"></script>
-
-  <!-- base url -->
-  <base href="<%= webpackConfig.metadata.baseUrl %>">
-
+  <!-- Layout CSS -->
+  <link id="theme-css" rel="stylesheet" type="text/css" href="assets/theme/theme-indigo.css">
+  <link id="layout-css" rel="stylesheet" type="text/css" href="assets/layout/css/layout-indigo.css">
 </head>
 
 <body>
-
-  <app>
+  <app-root>
     <div class="splash-screen">
       <div class="splash-container">
         <div class="logo"></div>
@@ -61,9 +29,7 @@
         </div>
       </div>
     </div>
-
-  </app>
-
+  </app-root>
 </body>
 
 </html>

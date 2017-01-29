@@ -1,3 +1,3 @@
 export * from './scenarios.component';
-export * from './scenariolist.component';
-export * from './partitionsScenarios.component';
+export * from './scenarioslist/scenarioslist.component';
+export * from './partitions-scenarios/partitions-scenarios.component';
