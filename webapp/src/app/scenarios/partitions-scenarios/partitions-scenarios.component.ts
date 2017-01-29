@@ -8,7 +8,7 @@ import { SelectItem } from 'primeng/primeng';
 import { Observable } from 'rxjs/Rx';
 
 @Component({
-  selector: 'dt-partitions-scenarios',
+  selector: 'app-partitions-scenarios',
   templateUrl: './partitions-scenarios.component.html',
   styleUrls: ['./partitions-scenarios.component.scss']
 })
@@ -39,7 +39,7 @@ export class PartitionsScenariosComponent implements OnInit {
     this.partitionService.all().
       subscribe(
       items => {
-        for (let item of items) {
+        for (const item of items) {
           this.partitions.push({ label: item.name, value: item.id });
         }
       },
@@ -67,7 +67,7 @@ export class PartitionsScenariosComponent implements OnInit {
 
   saveAll() {
     let s: Observable<any> = null;
-    for (let item of this.items) {
+    for (const item of this.items) {
       if (!item.mode || !item.partition_id) {
         continue;
       }
@@ -81,7 +81,7 @@ export class PartitionsScenariosComponent implements OnInit {
   };
 
   destroy(idx) {
-    let item = this.items[idx];
+    const item = this.items[idx];
     if (!item.id) {
       this.items.splice(idx, 1);
       return;

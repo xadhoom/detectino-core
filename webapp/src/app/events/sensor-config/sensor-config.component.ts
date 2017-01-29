@@ -3,7 +3,7 @@ import { SelectItem } from 'primeng/primeng';
 import { EventSensorConfig } from '../../models/event';
 
 @Component({
-  selector: 'dt-eventsensorconfig',
+  selector: 'app-sensor-config',
   templateUrl: './sensor-config.component.html',
   styleUrls: ['./sensor-config.component.scss']
 })

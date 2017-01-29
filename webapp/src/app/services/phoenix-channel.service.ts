@@ -37,7 +37,7 @@ export class PhoenixChannelService {
   }
 
   public subscribe(topic: string, key: string, cb: Function) {
-    let chankey = topic + ':' + key;
+    const chankey = topic + ':' + key;
     if (!this.feeds[chankey]) {
       this._subscribe(topic, key, cb);
     } else {
@@ -46,13 +46,13 @@ export class PhoenixChannelService {
   }
 
   private getUrl(): string {
-    let proto = location.protocol.match(/^https/) ? 'wss://' : 'ws://';
-    let host = location.host;
+    const proto = location.protocol.match(/^https/) ? 'wss://' : 'ws://';
+    const host = location.host;
     return proto + host;
   }
 
   private _subscribe(topic: string, key: string, cb: Function) {
-    let chankey = topic + ':' + key;
+    const chankey = topic + ':' + key;
 
     this.feeds[chankey] = [];
     this.feeds[chankey].push(cb);
@@ -62,11 +62,11 @@ export class PhoenixChannelService {
       return;
     }
 
-    let channel = this.socket.channel(chankey, {});
+    const channel = this.socket.channel(chankey, {});
     channel.join();
     channel.on(key, (msg) => {
       this.feeds[chankey].forEach((callback) => {
-        let ret = callback(msg);
+        const ret = callback(msg);
       });
     });
     channel.onError((error) => console.log('Error from channel', error));
@@ -74,10 +74,10 @@ export class PhoenixChannelService {
   }
 
   private reopen_channels() {
-    for (let chankey in this.feeds) {
+    for (const chankey in this.feeds) {
       if (this.feeds.hasOwnProperty(chankey)) {
         this.feeds[chankey].forEach((cb) => {
-          let topickey = chankey.split(':', 2);
+          const topickey = chankey.split(':', 2);
           this._subscribe(topickey[0], topickey[1], cb);
         });
       }

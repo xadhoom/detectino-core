@@ -21,7 +21,7 @@ export class AuthService {
     private router: Router, private socket: PhoenixChannelService) {
 
     if (this.authenticated()) {
-      let token = localStorage.getItem('id_token');
+      const token = localStorage.getItem('id_token');
       this.socket.connect(token);
       this.refreshTimer = setInterval(() => this.refreshToken(),
         this.refreshInt);
@@ -29,12 +29,12 @@ export class AuthService {
   }
 
   public authenticated() {
-    let token = localStorage.getItem('id_token');
+    const token = localStorage.getItem('id_token');
     if (!token) {
       return false;
     }
     // Check if there's an unexpired JWT
-    let expired = !tokenNotExpired();
+    const expired = !tokenNotExpired();
     if (expired) {
       this.logout();
       return false;
@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   public login(username: string, password: string) {
-    let body = JSON.stringify({
+    const body = JSON.stringify({
       'user': {
         'username': username,
         'password': password
@@ -53,7 +53,7 @@ export class AuthService {
     return this.http.post('/api/login',
       body, { headers: contentHeaders })
       .map(response => {
-        let token = response.json().token;
+        const token = response.json().token;
         localStorage.setItem('id_token', token);
 
         this.socket.connect(token);
@@ -83,7 +83,7 @@ export class AuthService {
     return this.authHttp.post('/api/login/refresh',
       {}, { headers: contentHeaders })
       .map(response => {
-        let token = response.json().token;
+        const token = response.json().token;
         localStorage.setItem('id_token', token);
       }).subscribe(
       res => { },

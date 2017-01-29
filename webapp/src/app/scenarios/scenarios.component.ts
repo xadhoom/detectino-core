@@ -46,7 +46,7 @@ export class ScenariosComponent implements OnInit {
 
   save() {
     let s2: Observable<any> = null;
-    let s1 = this.scenarioService.save(this.scenario);
+    const s1 = this.scenarioService.save(this.scenario);
     s2 = this.partitionsscenarios ? this.partitionsscenarios.saveAll() : null;
     let s3 = null;
 
@@ -93,8 +93,8 @@ export class ScenariosComponent implements OnInit {
   };
 
   cloneScenario(s: Scenario): Scenario {
-    let scenario = new Scenario();
-    for (let prop in s) {
+    const scenario = new Scenario();
+    for (const prop in s) {
       if (prop) {
         scenario[prop] = s[prop];
       }

@@ -99,8 +99,8 @@ export class OutputsComponent implements OnInit {
   };
 
   cloneOutput(s: Output): Output {
-    let output = new Output();
-    for (let prop in s) {
+    const output = new Output();
+    for (const prop in s) {
       if (prop) {
         output[prop] = s[prop];
       }

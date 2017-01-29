@@ -99,14 +99,14 @@ export class SensorsComponent implements OnInit {
   };
 
   availPartitions(avail: Array<any>, used: Array<any>): Array<any> {
-    let aIDs = avail.map(i => i.id);
-    let bIDs = used.map(i => i.id);
+    const aIDs = avail.map(i => i.id);
+    const bIDs = used.map(i => i.id);
     return avail.filter(i => bIDs.indexOf(i.id) < 0);
   };
 
   cloneSensor(s: Sensor): Sensor {
-    let sensor = new Sensor();
-    for (let prop in s) {
+    const sensor = new Sensor();
+    for (const prop in s) {
       if (prop) {
         sensor[prop] = s[prop];
       }

@@ -1,7 +1,7 @@
 <div class="dashboard">
 
   <div class="card" *ngIf="!pinSrv.getPin()">
-    <dt-pindialog></dt-pindialog>
+    <app-pindialog></app-pindialog>
   </div>
 
   <div class="ui-g" *ngIf="pinSrv.getPin()">

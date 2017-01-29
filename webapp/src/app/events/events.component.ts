@@ -117,14 +117,14 @@ export class EventsComponent implements OnInit {
   };
 
   availOutputs(avail: Array<any>, used: Array<any>): Array<any> {
-    let aIDs = avail.map(i => i.id);
-    let bIDs = used.map(i => i.id);
+    const aIDs = avail.map(i => i.id);
+    const bIDs = used.map(i => i.id);
     return avail.filter(i => bIDs.indexOf(i.id) < 0);
   };
 
   cloneEvent(s: Event): Event {
-    let event = new Event();
-    for (let prop in s) {
+    const event = new Event();
+    for (const prop in s) {
       if (prop) {
         event[prop] = s[prop];
       }

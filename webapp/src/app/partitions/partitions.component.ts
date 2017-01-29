@@ -77,8 +77,8 @@ export class PartitionsComponent implements OnInit {
   };
 
   clonePartition(s: Partition): Partition {
-    let partition = new Partition();
-    for (let prop in s) {
+    const partition = new Partition();
+    for (const prop in s) {
       if (prop) {
         partition[prop] = s[prop];
       }

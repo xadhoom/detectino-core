@@ -3,7 +3,7 @@ import { ScenarioService, NotificationService, PinService } from '../../services
 import { Scenario } from '../../models/scenario';
 
 @Component({
-  selector: 'dt-scenarioslist',
+  selector: 'app-scenarioslist',
   templateUrl: './scenarioslist.component.html',
   styleUrls: ['./scenarioslist.component.scss']
 })
@@ -29,7 +29,7 @@ export class ScenarioslistComponent implements OnInit {
   }
 
   run(s: Scenario) {
-    let runOp = this.scenarioService.run(s);
+    const runOp = this.scenarioService.run(s);
     runOp.subscribe(
       res => this.notificationService.success('Scenario started successfully'),
       error => this.onError(error)

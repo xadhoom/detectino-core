@@ -49,8 +49,8 @@
         </div>
 
         <div class="ui-g-12" [ngSwitch]="event.source">
-          <dt-eventsensorconfig *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig> </dt-eventsensorconfig>
-          <dt-eventpartitionconfig *ngSwitchCase="'partition'" [strconfig]="event.source_config" #partitionconfig> </dt-eventpartitionconfig>
+          <app-sensor-config *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig> </app-sensor-config>
+          <app-partition-config *ngSwitchCase="'partition'" [strconfig]="event.source_config" #partitionconfig> </app-partition-config>
         </div>
 
       </div>

@@ -24,7 +24,7 @@ export class ScenarioService extends Crud {
   };
 
   get_available(): Observable<Scenario[]> {
-    let url = this.baseurl + '/get_available';
+    const url = this.baseurl + '/get_available';
     return this.http.get(url).
       map(this.parseResponse).
       catch(this.handleError);
@@ -39,8 +39,8 @@ export class ScenarioService extends Crud {
   }
 
   public run(s: Scenario): Observable<boolean> {
-    let rqOpts = this.buildOptions(new CrudSettings());
-    let url = this.baseurl + '/' + s.id + '/run';
+    const rqOpts = this.buildOptions(new CrudSettings());
+    const url = this.baseurl + '/' + s.id + '/run';
     return this.http.post(url, null, rqOpts).
       map((res) => {
         return true;

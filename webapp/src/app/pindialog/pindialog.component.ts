@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { NotificationService, PinService } from '../services';
 
 @Component({
-  selector: 'dt-pindialog',
+  selector: 'app-pindialog',
   templateUrl: './pindialog.component.html',
   styleUrls: ['./pindialog.component.scss']
 })
@@ -29,7 +29,7 @@ export class PindialogComponent implements OnInit {
     this.router.navigateByUrl('/' + path);
   }
 
-  private pinKey(value: string) {
+  public pinKey(value: string) {
     if (this.realpin.length >= 6) { return; }
 
     if (this.realpin === '') {
@@ -40,13 +40,13 @@ export class PindialogComponent implements OnInit {
     this.pin = this.pin + '*';
   }
 
-  private resetPin() {
+  public resetPin() {
     this.pin = '';
     this.realpin = '';
     this.pinmsg = 'enter pin';
   }
 
-  private setPin() {
+  public setPin() {
     this.pinSrv.setPin(this.realpin).
       subscribe(
       success => { this.resetPin(); },

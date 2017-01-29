@@ -3,7 +3,7 @@ import { SelectItem } from 'primeng/primeng';
 import { EventPartitionConfig } from '../../models/event';
 
 @Component({
-  selector: 'dt-eventpartitionconfig',
+  selector: 'app-partition-config',
   templateUrl: './partition-config.component.html',
   styleUrls: ['./partition-config.component.scss']
 })

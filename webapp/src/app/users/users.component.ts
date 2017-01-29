@@ -83,8 +83,8 @@ export class UsersComponent implements OnInit {
   };
 
   cloneUser(u: User): User {
-    let user = new User();
-    for (let prop in u) {
+    const user = new User();
+    for (const prop in u) {
       if (prop) {
         user[prop] = u[prop];
       }

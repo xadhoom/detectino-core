@@ -6,7 +6,7 @@ import {
 import { Partition } from '../models/partition';
 
 @Component({
-  selector: 'dt-intrusion',
+  selector: 'app-intrusion',
   templateUrl: './intrusion.component.html',
   styleUrls: ['./intrusion.component.scss']
 })
@@ -15,7 +15,7 @@ export class IntrusionComponent implements OnInit {
   partitions: Partition[];
   errorMessage: string;
 
-  private selectedPartition: Partition;
+  public selectedPartition: Partition;
   private showArmDialog: boolean;
 
   constructor(private partitionService: PartitionService,
@@ -33,7 +33,7 @@ export class IntrusionComponent implements OnInit {
     );
   }
 
-  private doArm(part: Partition, mode: string) {
+  public doArm(part: Partition, mode: string) {
     this.partitionService.arm(part, mode).subscribe(
       res => {
         this.notificationService.success('Partition armed successfully');
@@ -43,7 +43,7 @@ export class IntrusionComponent implements OnInit {
     );
   }
 
-  private doDisarm(part: Partition) {
+  public doDisarm(part: Partition) {
     this.partitionService.disarm(part).subscribe(
       res => {
         this.notificationService.success('Partition disarmed successfully');
@@ -53,7 +53,13 @@ export class IntrusionComponent implements OnInit {
     );
   }
 
-  private armDisarmPartition(part: Partition) {
+  public cancelArming() {
+    this.reloadPartitions();
+    this.showArmDialog = false;
+    this.selectedPartition = null;
+  }
+
+  public armDisarmPartition(part: Partition) {
     this.showArmDialog = true;
     this.selectedPartition = part;
   }
@@ -77,12 +83,6 @@ export class IntrusionComponent implements OnInit {
         break;
     }
     return armed;
-  }
-
-  private cancelArming() {
-    this.reloadPartitions();
-    this.showArmDialog = false;
-    this.selectedPartition = null;
   }
 
   private getInitials(name: string) {
