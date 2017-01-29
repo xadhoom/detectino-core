@@ -1,13 +1,3 @@
-defmodule DtWeb.Endpoint.Utils do
-  def get_static_env do
-    case Application.get_env(:detectino, :environment) do
-      :test -> :dev
-      any -> any
-    end
-    |> Atom.to_string
-  end
-end
-
 defmodule DtWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :detectino
 
@@ -19,7 +9,7 @@ defmodule DtWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: {:detectino, "priv/static/" <> DtWeb.Endpoint.Utils.get_static_env()},
+    from: {:detectino, "priv/static/"},
     gzip: false
     #only:
     # ~w(app.html app.js components index.html init.js lib services styles)
