@@ -1,14 +1,17 @@
-import { NgModule, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule, JsonpModule, Http } from '@angular/http';
-import { RouterModule, Router } from '@angular/router';
+import { HttpModule, Http, JsonpModule, RequestOptions } from '@angular/http';
+import { Router } from '@angular/router';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
 
-import { AuthConfig, AuthHttp } from 'angular2-jwt';
-
-import { ENV_PROVIDERS } from './environment';
-import { ROUTES } from './app.routes';
-import { AppComponent } from './app.component';
+import {
+  AuthService, AuthGuardService, NotificationService,
+  UserService, SensorService, ScenarioService, PartitionService,
+  PartitionScenarioService, OutputService, EventService, PhoenixChannelService,
+  PinService
+} from './services';
 
 import {
   ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
@@ -19,90 +22,84 @@ import {
 
 import { MdIconModule, MdIconRegistry } from '@angular2-material/icon';
 
-import {
-  AuthService, NotificationService,
-  UserService, SensorService, ScenarioService, PartitionService,
-  PartitionScenarioService, OutputService, EventService, PhoenixChannelService,
-  PinService
-} from './services';
-import { AuthGuard } from './services/auth.guard';
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
+import { UsersComponent } from './users/users.component';
+import { SensorsComponent } from './sensors/sensors.component';
+import { ScenariosComponent } from './scenarios/scenarios.component';
+import { ScenarioslistComponent } from './scenarios/scenarioslist/scenarioslist.component';
+import { PartitionsComponent } from './partitions/partitions.component';
+import { OutputsComponent } from './outputs/outputs.component';
+import { EventsComponent } from './events/events.component';
+import { SettingsComponent } from './settings/settings.component';
+import { IntrusionComponent } from './intrusion/intrusion.component';
+import { PartitionConfigComponent } from './events/partition-config/partition-config.component';
+import { SensorConfigComponent } from './events/sensor-config/sensor-config.component';
+import { PartitionsScenariosComponent } from './scenarios/partitions-scenarios/partitions-scenarios.component';
+import { PindialogComponent } from './pindialog/pindialog.component';
 
-import { Home } from './home';
-import { Login } from './login';
-import { Users } from './users';
-import { Sensors } from './sensors';
-import { Scenarios, Scenariolist, PartitionsScenarios } from './scenarios';
-import { Partitions } from './partitions';
-import { Outputs } from './outputs';
-import { Settings } from './settings';
-import { Pindialog } from './pindialog';
-import { Intrusion } from './intrusion';
-import { Events, SensorConfig, PartitionConfig } from './events';
-
-// Application wide providers
-const APP_PROVIDERS = [
-  {
-    provide: AuthService,
-    useClass: AuthService,
-    deps: [Http, AuthHttp, Router, PhoenixChannelService]
-  },
-  MdIconRegistry,
-  NotificationService,
-  UserService,
-  SensorService,
-  ScenarioService,
-  PartitionService,
-  PartitionScenarioService,
-  OutputService,
-  EventService,
-  AuthGuard,
-  PhoenixChannelService, PinService,
-  {
-    provide: AuthHttp,
-    useFactory: (http) => {
-      return new AuthHttp(new AuthConfig({
-        tokenName: 'id_token',
-        noTokenScheme: true,
-        globalHeaders: [
-          { 'Accept': 'application/json' },
-          { 'Content-Type': 'application/json' }
-        ],
-        noJwtError: false
-      }), http);
-    },
-    deps: [Http]
-  }
-];
+export function authHttpServiceFactory(http: Http, options: RequestOptions) {
+  return new AuthHttp(new AuthConfig({
+    tokenName: 'id_token',
+    noTokenScheme: true,
+    globalHeaders: [
+      { 'Accept': 'application/json' },
+      { 'Content-Type': 'application/json' }
+    ],
+    noJwtError: false
+  }), http, options);
+}
 
 @NgModule({
   declarations: [
     AppComponent,
-    Home,
-    Login,
-    Users,
-    Sensors,
-    Scenarios, Scenariolist,
-    Partitions,
-    PartitionsScenarios,
-    Outputs, Pindialog, Intrusion,
-    Events, SensorConfig, PartitionConfig, Settings
+    HomeComponent,
+    LoginComponent,
+    UsersComponent,
+    SensorsComponent,
+    ScenariosComponent,
+    ScenarioslistComponent,
+    PartitionsComponent,
+    OutputsComponent,
+    EventsComponent,
+    SettingsComponent,
+    IntrusionComponent,
+    PartitionConfigComponent,
+    SensorConfigComponent,
+    ScenarioslistComponent,
+    PartitionsScenariosComponent,
+    PindialogComponent
   ],
-  imports: [BrowserModule,
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    AppRoutingModule,
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
     DialogModule, InputTextModule, DropdownModule, PasswordModule,
     DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
-    FormsModule, InputSwitchModule,
-    HttpModule,
-    JsonpModule, MdIconModule,
-    RouterModule.forRoot(ROUTES)
+    InputSwitchModule,
+    JsonpModule, MdIconModule
   ],
-  providers: [
-    ENV_PROVIDERS,
-    APP_PROVIDERS
-  ],
+  providers: [{
+    provide: AuthHttp,
+    useFactory: authHttpServiceFactory,
+    deps: [Http, RequestOptions]
+  }, {
+    provide: AuthService,
+    useClass: AuthService,
+    deps: [Http, AuthHttp, Router, PhoenixChannelService]
+  }, MdIconRegistry, NotificationService,
+    UserService,
+    SensorService,
+    ScenarioService,
+    PartitionService,
+    PartitionScenarioService,
+    OutputService,
+    EventService,
+    AuthGuardService,
+    PhoenixChannelService, PinService],
   bootstrap: [AppComponent]
 })
-
-export class AppModule {
-}
-
+export class AppModule { }

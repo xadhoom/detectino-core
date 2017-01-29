@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'home',
-  styleUrls: ['./home.component.scss', '../shared/common.scss'],
-  templateUrl: './home.component.html'
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss']
 })
 
-export class Home implements OnInit {
+export class HomeComponent implements OnInit {
   timerEmerg: any;
 
   constructor(private router: Router) {

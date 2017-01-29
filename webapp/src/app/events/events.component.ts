@@ -1,26 +1,23 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
 import { EventService, NotificationService, OutputService } from '../services';
-
 import { Event } from '../models/event';
 import { Output } from '../models/output';
-import { SensorConfig } from './sensorconfig.component';
-import { PartitionConfig } from './partitionconfig.component';
-
+import { SensorConfigComponent } from './sensor-config/sensor-config.component';
+import { PartitionConfigComponent } from './partition-config/partition-config.component';
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
-  selector: 'events',
+  selector: 'app-events',
   templateUrl: './events.component.html',
-  styleUrls: ['./events.component.css', '../shared/common.scss']
+  styleUrls: ['./events.component.scss']
 })
 
-export class Events implements OnInit {
+export class EventsComponent implements OnInit {
   @ViewChild('sensorconfig')
-  sensorconfig: SensorConfig;
+  sensorconfig: SensorConfigComponent;
 
   @ViewChild('partitionconfig')
-  partitionconfig: PartitionConfig;
+  partitionconfig: PartitionConfigComponent;
 
   event: Event;
 

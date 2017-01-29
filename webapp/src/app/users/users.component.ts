@@ -1,18 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-
 import { UserService, NotificationService } from '../services';
-
 import { User } from '../models/user';
-
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
-  selector: 'users',
+  selector: 'app-users',
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.css', '../shared/common.scss']
+  styleUrls: ['./users.component.scss']
 })
 
-export class Users implements OnInit {
+export class UsersComponent implements OnInit {
 
   user: User;
 
@@ -105,4 +102,3 @@ export class Users implements OnInit {
   }
 
 }
-

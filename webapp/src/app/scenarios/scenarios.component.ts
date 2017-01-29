@@ -1,25 +1,21 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
 import { ScenarioService, NotificationService } from '../services';
-
 import { Scenario } from '../models/scenario';
-import { PartitionsScenarios } from './partitionsScenarios.component';
-
+import { PartitionsScenariosComponent } from './partitions-scenarios/partitions-scenarios.component';
 import { SelectItem } from 'primeng/primeng';
-
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/operator/concatAll';
 
 @Component({
-  selector: 'scenarios',
+  selector: 'app-scenarios',
   templateUrl: './scenarios.component.html',
-  styleUrls: ['./scenarios.component.css', '../shared/common.scss']
+  styleUrls: ['./scenarios.component.scss']
 })
 
-export class Scenarios implements OnInit {
+export class ScenariosComponent implements OnInit {
 
   @ViewChild('partitionsscenarios')
-  partitionsscenarios: PartitionsScenarios;
+  partitionsscenarios: PartitionsScenariosComponent;
 
   scenario: Scenario;
 
@@ -107,4 +103,5 @@ export class Scenarios implements OnInit {
   }
 
 }
+
 

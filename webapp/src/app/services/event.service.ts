@@ -32,4 +32,3 @@ export class EventService extends Crud {
   };
 
 }
-

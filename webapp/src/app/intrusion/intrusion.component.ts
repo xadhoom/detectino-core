@@ -1,15 +1,17 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
-
-import { PartitionService, NotificationService, PinService } from '../services';
+import { Component, OnInit } from '@angular/core';
+import {
+  PartitionService, NotificationService,
+  PinService
+} from '../services';
 import { Partition } from '../models/partition';
 
 @Component({
   selector: 'dt-intrusion',
-  styleUrls: ['./intrusion.component.scss', '../shared/common.scss'],
-  templateUrl: './intrusion.component.html'
+  templateUrl: './intrusion.component.html',
+  styleUrls: ['./intrusion.component.scss']
 })
 
-export class Intrusion implements OnInit {
+export class IntrusionComponent implements OnInit {
   partitions: Partition[];
   errorMessage: string;
 
@@ -109,3 +111,4 @@ export class Intrusion implements OnInit {
     this.reloadPartitions();
   }
 }
+

@@ -1,15 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService, PinService } from '../services';
 
-
 @Component({
   selector: 'dt-pindialog',
-  styleUrls: ['./pindialog.component.css'],
-  templateUrl: './pindialog.component.html'
+  templateUrl: './pindialog.component.html',
+  styleUrls: ['./pindialog.component.scss']
 })
 
-export class Pindialog implements OnInit {
+export class PindialogComponent implements OnInit {
   errorMessage: string;
 
   private pin: string;
@@ -62,3 +61,4 @@ export class Pindialog implements OnInit {
   }
 
 }
+

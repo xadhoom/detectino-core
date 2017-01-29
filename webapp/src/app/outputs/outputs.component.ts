@@ -1,18 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-
 import { OutputService, NotificationService } from '../services';
-
 import { Output, OutputEmailConfig, OutputBusConfig } from '../models/output';
-
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
-  selector: 'outputs',
+  selector: 'app-outputs',
   templateUrl: './outputs.component.html',
-  styleUrls: ['./outputs.component.css', '../shared/common.scss']
+  styleUrls: ['./outputs.component.scss']
 })
 
-export class Outputs implements OnInit {
+export class OutputsComponent implements OnInit {
   output: Output;
 
   outputs: Output[];
@@ -112,4 +109,5 @@ export class Outputs implements OnInit {
   }
 
 }
+
 

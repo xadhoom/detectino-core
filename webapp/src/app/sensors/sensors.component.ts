@@ -1,18 +1,18 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-
-import { PartitionService, SensorService, NotificationService } from '../services';
-
+import { Component, OnInit } from '@angular/core';
+import {
+  PartitionService, SensorService,
+  NotificationService
+} from '../services';
 import { Sensor } from '../models/sensor';
 import { Partition } from '../models/partition';
 
-
 @Component({
-  selector: 'sensors',
+  selector: 'app-sensors',
   templateUrl: './sensors.component.html',
-  styleUrls: ['./sensors.component.css', '../shared/common.scss']
+  styleUrls: ['./sensors.component.scss']
 })
 
-export class Sensors implements OnInit {
+export class SensorsComponent implements OnInit {
 
   sensor: Sensor;
 
@@ -115,4 +115,3 @@ export class Sensors implements OnInit {
   }
 
 }
-
