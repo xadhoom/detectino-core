@@ -35,5 +35,5 @@ cache:
     - _build
 
 script:
-  - "pushd webapp; npm install; ng lint && ng build && ng test --single-run --progress false && popd"
+  - "pushd webapp; npm install; ng lint && ng build --progress false && ng test --single-run --progress false && popd"
   - "MIX_ENV=test mix do deps.get, deps.compile, coveralls.travis"
