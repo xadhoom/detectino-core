@@ -1,7 +1,12 @@
-env:
-  - REBAR_DEPS_DIR=$TRAVIS_BUILD_DIR/deps
+dist: trusty
+sudo: required
 
-sudo: false
+env:
+  global:
+    - REBAR_DEPS_DIR=$TRAVIS_BUILD_DIR/deps
+    - DBUS_SESSION_BUS_ADDRESS=/dev/null
+    - DISPLAY=:99.0
+    - CHROME_BIN=chromium-browser
 
 language: elixir
 
@@ -18,16 +23,11 @@ before_install:
   - . $HOME/.nvm/nvm.sh
   - nvm install 6
   - npm --version
-  - mkdir ~/.config && echo "--no-sandbox" > ~/.config/chromium-flags.conf;
   - npm config set spin false
   - npm config set progress false
-
-before_script:
   - npm install -g angular-cli
-  - export DISPLAY=:99.0
-  - export CHROME_BIN=chromium-browser
   - sh -e /etc/init.d/xvfb start
-  - sleep 3 # give xvfb some time to start
+  - echo "--no-sandbox" > ~/.config/chromium-flags.conf;
 
 cache:
   directories:
