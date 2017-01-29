@@ -17,14 +17,6 @@ defmodule DtWeb.Router do
     plug Guardian.Plug.LoadResource
   end
 
-  scope "/", DtWeb do
-    pipe_through [:browser] # Use the default browser stack
-    get "/", PageController, :index
-    get "/home", PageController, :index
-    get "/login", PageController, :index
-    get "/about", PageController, :index
-  end
-
   # Other scopes may use custom stacks.
   scope "/api", DtWeb do
     pipe_through :api
@@ -56,6 +48,14 @@ defmodule DtWeb.Router do
     post "/users/:id/invalidate", SessionController, :invalidate, as: :api_login
     resources "/users", UserController, only: @api_methods
 
+  end
+
+  scope "/", DtWeb do
+    pipe_through [:browser] # Use the default browser stack
+    get "/*path", PageController, :index
+    #get "/home", PageController, :index
+    #get "/login", PageController, :index
+    #get "/about", PageController, :index
   end
 
 end
