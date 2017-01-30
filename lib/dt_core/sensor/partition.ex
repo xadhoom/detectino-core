@@ -179,7 +179,8 @@ defmodule DtCore.Sensor.Partition do
     |> Enum.reduce([], fn(sensor, acc) ->
       case Worker.start_link({sensor, state.config, self}) do
         {:ok, pid} ->
-          Process.monitor pid
+          # TODO: should not be needed Process.monitor pid
+          # we restart the entire partition if one server crashes
           acc ++ [pid]
         {:error, what} ->
           Logger.error "Cannot start Sensor, #{inspect what}"
