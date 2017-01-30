@@ -5,12 +5,11 @@ defmodule DtCore.Test.EventBridgeTest do
 
   setup_all do
     {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
+    {:ok, _pid} = EventBridge.start_link()
     :ok
   end
 
   test "subscribe and receives a message" do
-    {:ok, _pid} = EventBridge.start_link()
-
     EventBridge.start_listening()
 
     key = %{"some" => "key"}
@@ -20,8 +19,6 @@ defmodule DtCore.Test.EventBridgeTest do
   end
 
   test "subscribe and receives a message, with filter" do
-    {:ok, _pid} = EventBridge.start_link()
-
     EventBridge.start_listening(fn({key, _payload}) ->
       case key do
         %{"passes" => true} ->
@@ -40,8 +37,13 @@ defmodule DtCore.Test.EventBridgeTest do
     assert_receive {:bridge_ev, ^key, 42}
   end
 
+  test "unsubscribe" do
+    EventBridge.start_listening()
+    {:ok, pid} = EventBridge.stop_listening()
+    assert pid == self()
+  end
+
   test "unsubscribe a not subscribed" do
-    {:ok, _pid} = EventBridge.start_link()
     {:ok, pid} = EventBridge.stop_listening()
     assert pid == self()
   end
