@@ -16,6 +16,7 @@ defmodule DtCore.Sup do
           [partitions: System.schedulers_online]],
         restart: :permanent),
       worker(DtCore.EventBridge, [], restart: :permanent),
+      worker(DtCore.StatusTracker, [], restart: :permanent),
       supervisor(DtCore.Sensor.Sup, [], restart: :permanent),
       supervisor(DtCore.Output.Sup, [], restart: :permanent)
     ]
