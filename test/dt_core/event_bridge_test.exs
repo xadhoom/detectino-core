@@ -1,5 +1,5 @@
 defmodule DtCore.Test.EventBridgeTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   alias DtCore.EventBridge
 
@@ -39,4 +39,11 @@ defmodule DtCore.Test.EventBridgeTest do
     EventBridge.dispatch(key, 42)
     assert_receive {:bridge_ev, ^key, 42}
   end
+
+  test "unsubscribe a not subscribed" do
+    {:ok, _pid} = EventBridge.start_link()
+    {:ok, pid} = EventBridge.stop_listening()
+    assert pid == self()
+  end
+
 end
