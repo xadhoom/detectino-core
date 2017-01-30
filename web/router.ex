@@ -48,6 +48,11 @@ defmodule DtWeb.Router do
     post "/users/:id/invalidate", SessionController, :invalidate, as: :api_login
     resources "/users", UserController, only: @api_methods
 
+    get "/*path", NotImplementedController, :not_impl
+    post "/*path", NotImplementedController, :not_impl
+    put "/*path", NotImplementedController, :not_impl
+    patch "/*path", NotImplementedController, :not_impl
+    delete "/*path", NotImplementedController, :not_impl
   end
 
   scope "/", DtWeb do

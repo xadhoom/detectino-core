@@ -8,9 +8,9 @@ defmodule DtWeb.SessionControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  test "login must not exist with GET", %{conn: conn} do
+  test "login must not be implemented with GET", %{conn: conn} do
     conn = get conn, api_login_path(conn, :create)
-    response(conn, 404)
+    response(conn, 501)
   end
 
   test "fail login with no params", %{conn: conn} do
