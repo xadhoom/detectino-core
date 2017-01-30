@@ -70,7 +70,7 @@ defmodule DtCore.EventBridge do
   defp dispatch_filtered(state, {key, payload}) do
     Enum.each state.listeners, fn({pid, v}) ->
       if v.filter.({key, payload}) do
-        send pid, {:bridge, key, payload}
+        send pid, {:bridge_ev, key, payload}
       end
     end
   end
