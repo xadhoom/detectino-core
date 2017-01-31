@@ -73,10 +73,10 @@ defmodule DtCore.Sensor.Partition do
       status: :standby,
       last: nil
     }
-    state = state
+    newstate = state
     |> reload_cache
     |> dostart
-    {:ok, state}
+    {:ok, newstate}
   end
 
   def handle_info({:event, ev = %Event{}}, state) do
@@ -188,8 +188,8 @@ defmodule DtCore.Sensor.Partition do
       end
     end)
     state = %{state | sensors: sensors_pids}
-    {_, state} = do_arm(state, state.config.armed)
-    state
+    {_, newstate} = do_arm(state, state.config.armed)
+    newstate
   end
 
   defp save_state(state) do

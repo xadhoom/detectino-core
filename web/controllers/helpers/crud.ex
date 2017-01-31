@@ -39,10 +39,10 @@ defmodule DtWeb.CtrlHelpers.Crud do
       preload: ^assocs
     items = repo.all(q)
 
-    q = from m in model,
+    qc = from m in model,
       select: count(m.id),
       where: ^filter
-    total = repo.one(q)
+    total = repo.one(qc)
 
     total_s = total
     |> Integer.to_string
@@ -50,9 +50,9 @@ defmodule DtWeb.CtrlHelpers.Crud do
     conn = put_resp_header(conn, "x-total-count", total_s)
 
     links = links(conn, page, per_page, total)
-    conn = put_resp_header(conn, "link", links)
+    newconn = put_resp_header(conn, "link", links)
 
-    {:ok, conn, items}
+    {:ok, newconn, items}
   end
 
   def links(conn, page, per_page, total) do

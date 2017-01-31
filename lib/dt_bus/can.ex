@@ -179,7 +179,7 @@ defmodule DtBus.Can do
               {:ok, _state} = handle_pong(data, state)
             :event ->
               << _, _, _, _, portd, porta, msb, lsb >> = data
-              value = msb <<< 8 |> bor(lsb)
+              value = bor(msb <<< 8, lsb)
               port =
                 case porta do
                   0 -> portd

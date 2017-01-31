@@ -9,7 +9,7 @@ defmodule Detectino do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    children = [
+    basic_children = [
       # Start the endpoint when the application starts
       supervisor(Endpoint, []),
       # Start the Ecto repository
@@ -23,8 +23,8 @@ defmodule Detectino do
     ]
 
     children = case Application.get_env(:detectino, :environment) do
-      :test -> children
-      _ -> children ++ [supervisor(DtCore.Sup, [])]
+      :test -> basic_children
+      _ -> basic_children ++ [supervisor(DtCore.Sup, [])]
     end
 
     opts = [strategy: :one_for_one, name: DtWeb.Supervisor]

@@ -66,7 +66,8 @@ defmodule DtWeb.SessionController do
 
   def invalidate(conn, %{"id" => id}) do
     id = id |> String.to_integer()
-    get_tokens_for_id(id)
+    id
+    |> get_tokens_for_id()
     |> Enum.each(fn(token) ->
       TokenServer.delete(token)
     end)
