@@ -16,7 +16,7 @@ defmodule DtWeb.Plugs.CoreReloader do
   defp callback(conn) do
     case Map.get(conn, :status) do
       x when is_integer(x) and x < 300 ->
-        do_reload
+        do_reload()
       _ ->
         nil
     end

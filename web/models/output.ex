@@ -11,7 +11,7 @@ defmodule DtWeb.Output do
     embeds_one :bus_settings, DtWeb.BusSettings
     embeds_one :email_settings, DtWeb.EmailSettings
 
-    timestamps
+    timestamps()
 
     many_to_many :events, DtWeb.Event, join_through: DtWeb.EventOutput
   end

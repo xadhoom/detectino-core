@@ -3,9 +3,6 @@ defmodule DtWeb.EventTest do
 
   alias DtWeb.Event
 
-  @valid_attrs %{name: "some content", source: ""}
-  @invalid_attrs %{}
-
   test "changeset with invalid source" do
     attrs = %{name: "a name", source: "whatever"}
     changeset = Event.create_changeset(%Event{}, attrs)

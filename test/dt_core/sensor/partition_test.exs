@@ -12,7 +12,6 @@ defmodule DtCore.Test.Sensor.Partition do
   alias DtCore.Test.TimerHelper
 
   @arm_disarmed "DISARM"
-  @arm_armed "ARM"
 
   setup_all do
     {:ok, _} = DtCore.EventBridge.start_link()
@@ -156,7 +155,7 @@ defmodule DtCore.Test.Sensor.Partition do
     }
     part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
 
-    :ok = register_deol_listeners
+    :ok = register_deol_listeners()
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     # not really needed, but well
@@ -207,7 +206,7 @@ defmodule DtCore.Test.Sensor.Partition do
     }
     part = %PartitionModel{name: "part1", armed: @arm_disarmed, sensors: [sensor]}
 
-    :ok = register_deol_listeners
+    :ok = register_deol_listeners()
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     # not really needed, but well

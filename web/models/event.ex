@@ -23,7 +23,7 @@ defmodule DtWeb.Event do
     field :source, :string
     field :source_config, :string
 
-    timestamps
+    timestamps()
 
     many_to_many :outputs, DtWeb.Output, join_through: DtWeb.EventOutput
   end

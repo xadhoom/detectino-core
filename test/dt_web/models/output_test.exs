@@ -3,9 +3,6 @@ defmodule DtWeb.OutputTest do
 
   alias DtWeb.Output
 
-  @valid_attrs %{name: "some content", type: "type"}
-  @invalid_attrs %{}
-
   test "changeset with invalid type" do
     attrs = %{name: "some content", type: "type", enabled: true}
     changeset = Output.create_changeset(%Output{}, attrs)
@@ -57,7 +54,7 @@ defmodule DtWeb.OutputTest do
     }
     changeset = Output.create_changeset(%Output{}, attrs)
     refute changeset.valid?
-    
+
     settings = %{address: "10", port: 1, type: "monostable",
       mono_ontime: 5}
     attrs = %{name: "some content", type: "bus", enabled: true,

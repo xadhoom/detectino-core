@@ -4,7 +4,7 @@ defmodule Detectino.Mixfile do
   def project do
     [app: :detectino,
      version: "0.0.1",
-     elixir: "~> 1.3",
+     elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -24,7 +24,7 @@ defmodule Detectino.Mixfile do
     apps = [
       :phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
       :phoenix_ecto, :postgrex, :timex, :swoosh, :etimer, :can, :guardian,
-      :lager_logger, :exjsx, :comeonin, :registry, :ex_link_header, :conform,
+      :lager_logger, :exjsx, :comeonin, :ex_link_header, :conform,
       :conform_exrm
     ]
     prod_apps = apps ++ [:gen_smtp]
@@ -56,11 +56,9 @@ defmodule Detectino.Mixfile do
      {:uuid, "~> 1.1"},
      {:ex_link_header, "~> 0.0.5"},
      {:timex, "~> 3.1"},
-     # remove registry when elixir 1.4 is released
-     {:registry, git: "https://github.com/elixir-lang/registry"},
-     {:credo, "~> 0.4", only: [:dev, :test]},
+     {:credo, "~> 0.6", only: [:dev, :test]},
      {:ecto, "~> 2.1"},
-     {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.0"},
+     {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.1"},
      {:swoosh, "~> 0.5.0"},
      {:gen_smtp, "~> 0.11.0"},
      {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},

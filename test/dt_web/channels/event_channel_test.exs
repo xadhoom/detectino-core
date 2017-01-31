@@ -2,7 +2,7 @@ defmodule DtWeb.EventChannelTest do
   use DtWeb.ChannelCase
 
   alias DtWeb.Channels.Event
-  alias DtCore.OutputsRegistry
+  # alias DtCore.OutputsRegistry
 
   test "can join arm topic" do
     assert {:ok, :state} = Event.join("event:arm", nil, :state)

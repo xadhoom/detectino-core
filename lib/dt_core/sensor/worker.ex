@@ -141,9 +141,9 @@ defmodule DtCore.Sensor.Worker do
     end
     case delay_t do
       :entry ->
-        Process.send_after(self, {:reset_entry}, delay * 1000)
+        Process.send_after(self(), {:reset_entry}, delay * 1000)
       :exit ->
-        Process.send_after(self, {:reset_exit}, delay * 1000)
+        Process.send_after(self(), {:reset_exit}, delay * 1000)
     end
   end
 
@@ -222,7 +222,7 @@ defmodule DtCore.Sensor.Worker do
     Logger.debug "scheduling delayed exit alarm"
     delay = p_exit * 1000
     ev = %Event{ev | delayed: true}
-    _timer = Process.send_after(self, {:event, ev, partition},
+    _timer = Process.send_after(self(), {:event, ev, partition},
       delay)
     %SensorEv{sensor_ev | delayed: true}
   end
@@ -234,7 +234,7 @@ defmodule DtCore.Sensor.Worker do
         %SensorEv{sensor_ev | delayed: false, urgent: urgent}
       _ ->
         ev = %Event{ev | delayed: true}
-        _timer = Process.send_after(self, {:event, ev, partition},
+        _timer = Process.send_after(self(), {:event, ev, partition},
           delay)
         maybe_start_entry_timer(state, p_entry)
         %SensorEv{sensor_ev | delayed: true}

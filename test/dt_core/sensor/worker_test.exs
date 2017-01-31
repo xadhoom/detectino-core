@@ -10,24 +10,24 @@ defmodule DtCore.Test.Sensor.Worker do
   @arm_disarmed "DISARM"
   @arm_armed "ARM"
 
-  @nc_model %SensorModel{name: "NC", address: "1", port: 1,
-    balance: "NC", th1: 10, partitions: [], enabled: true}
-  @no_model %SensorModel{name: "NO", address: "1", port: 1,
-    balance: "NO", th1: 10, partitions: [], enabled: true}
-  @eol_model %SensorModel{name: "EOL", address: "1", port: 1,
-    balance: "EOL", th1: 10, th2: 20, partitions: [], enabled: true}
-  @deol_model %SensorModel{name: "DEOL", address: "1", port: 1,
-    balance: "DEOL", th1: 10, th2: 20, th3: 30, partitions: [],
-    enabled: true}
-  @teol_model %SensorModel{name: "TEOL", address: "1", port: 1,
-    balance: "TEOL", th1: 10, th2: 20, th3: 30, th4: 40, partitions: [],
-    enabled: true}
+  # @nc_model %SensorModel{name: "NC", address: "1", port: 1,
+  #  balance: "NC", th1: 10, partitions: [], enabled: true}
+  # @no_model %SensorModel{name: "NO", address: "1", port: 1,
+  #  balance: "NO", th1: 10, partitions: [], enabled: true}
+  # @eol_model %SensorModel{name: "EOL", address: "1", port: 1,
+  #  balance: "EOL", th1: 10, th2: 20, partitions: [], enabled: true}
+  # @deol_model %SensorModel{name: "DEOL", address: "1", port: 1,
+  #  balance: "DEOL", th1: 10, th2: 20, th3: 30, partitions: [],
+  #  enabled: true}
+  # @teol_model %SensorModel{name: "TEOL", address: "1", port: 1,
+  #  balance: "TEOL", th1: 10, th2: 20, th3: 30, th4: 40, partitions: [],
+  #  enabled: true}
 
   test "no alarm but simple events if partion is not armed" do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed}
     config = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
-    {:ok, pid} = Worker.start_link({config, part, self})
+    {:ok, pid} = Worker.start_link({config, part, self()})
 
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
@@ -44,7 +44,7 @@ defmodule DtCore.Test.Sensor.Worker do
     part = %PartitionModel{name: "part1", armed: @arm_armed}
     config = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
-    {:ok, pid} = Worker.start_link({config, part, self})
+    {:ok, pid} = Worker.start_link({config, part, self()})
 
     arm_cmd = {:arm, part.exit_delay}
     :ok = GenServer.call(pid, arm_cmd)
@@ -68,7 +68,7 @@ defmodule DtCore.Test.Sensor.Worker do
       partitions: [],
       enabled: true
     }
-    {:ok, pid} = Worker.start_link({config, part, self})
+    {:ok, pid} = Worker.start_link({config, part, self()})
 
     ev = %Event{address: "1", port: 1, value: 45}
     :ok = Process.send(pid, {:event, ev, part}, [])
@@ -129,7 +129,7 @@ defmodule DtCore.Test.Sensor.Worker do
       partitions: [],
       enabled: true
     }
-    {:ok, pid} = Worker.start_link({config, part, self})
+    {:ok, pid} = Worker.start_link({config, part, self()})
 
     arm_cmd = {:arm, part.exit_delay}
     :ok = GenServer.call(pid, arm_cmd)
@@ -138,7 +138,7 @@ defmodule DtCore.Test.Sensor.Worker do
     :ok = Process.send(pid, {:event, ev, part}, [])
 
     {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
-    |> assert_receive(5000)    
+    |> assert_receive(5000)
     {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
     |> assert_receive(5000)
     assert :alarm == Worker.alarm_status({config, part})
@@ -163,7 +163,7 @@ defmodule DtCore.Test.Sensor.Worker do
       address: "1", port: 1,
       enabled: true
     }
-    {:ok, pid} = Worker.start_link({config, part, self})
+    {:ok, pid} = Worker.start_link({config, part, self()})
     arm_cmd = {:arm, 0}
     :ok = GenServer.call(pid, arm_cmd)
 
@@ -184,7 +184,7 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
     assert :standby == Worker.alarm_status({config, part})
-  end 
+  end
 
   test "delayed alarm on exit" do
     part = %PartitionModel{
@@ -203,7 +203,7 @@ defmodule DtCore.Test.Sensor.Worker do
       address: "1", port: 1,
       enabled: true
     }
-    {:ok, pid} = Worker.start_link({config, part, self})
+    {:ok, pid} = Worker.start_link({config, part, self()})
 
     arm_cmd = {:arm, part.exit_delay}
     :ok = GenServer.call(pid, arm_cmd)
@@ -222,6 +222,6 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
     assert :alarm == Worker.alarm_status({config, part})
-  end 
+  end
 
 end

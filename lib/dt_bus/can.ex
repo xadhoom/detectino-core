@@ -59,11 +59,11 @@ defmodule DtBus.Can do
   end
 
   def start_listening(filter_fun \\ fn(_) -> true end) do
-    GenServer.call(__MODULE__, {:start_listening, self, filter_fun})
+    GenServer.call(__MODULE__, {:start_listening, self(), filter_fun})
   end
 
   def stop_listening do
-    GenServer.call(__MODULE__, {:stop_listening, self})
+    GenServer.call(__MODULE__, {:stop_listening, self()})
   end
 
   #
@@ -90,7 +90,7 @@ defmodule DtBus.Can do
 
     {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
 
-    ping = Dict.put_new state.ping, payload, from
+    ping = Map.put_new state.ping, payload, from
     {:noreply, %{state | ping: ping}}
   end
 
@@ -150,7 +150,7 @@ defmodule DtBus.Can do
 
     {:ok, state} = case what do
       {:can_frame, _msgid, _len, _data, _intf, _ts} ->
-        {:ok, state} = handle_canframe(what, state)
+        {:ok, _state} = handle_canframe(what, state)
       default ->
         Logger.warn "Got unknown message #{inspect default}"
     end
@@ -176,7 +176,7 @@ defmodule DtBus.Can do
         if dst_node_id == 0 do
           case command do
             :pong ->
-              {:ok, state} = handle_pong(data, state)
+              {:ok, _state} = handle_pong(data, state)
             :event ->
               << _, _, _, _, portd, porta, msb, lsb >> = data
               value = msb <<< 8 |> bor(lsb)
@@ -206,7 +206,7 @@ defmodule DtBus.Can do
   end
 
   defp handle_pong(data, state) do
-    case Dict.pop(state.ping, data) do
+    case Map.pop(state.ping, data) do
       {nil, _pingrq} -> {:ok, state}
       {from, pingrq} ->
         GenServer.reply from, data

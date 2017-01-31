@@ -7,13 +7,15 @@ defmodule DtBus.CanHelper do
 
   require Logger
 
-  @commands %{1 => :ping, 
+  @commands %{1 => :ping,
               2 => :pong,
               3 => :event,
               4 => :read,
               5 => :readd}
 
-  @fromcommands Enum.map(@commands, fn({k, v}) -> {v, k} end)
+  @fromcommands Enum.reduce(@commands, %{}, fn({k, v}, acc) ->
+    Map.put(acc, v, k)
+  end)
 
   @subcommands %{0 => :unsolicited,
                  1 => :reply,
@@ -21,7 +23,9 @@ defmodule DtBus.CanHelper do
                  4 => :read_one
                }
 
-  @fromsubcommands Enum.map(@subcommands, fn({k, v}) -> {v, k} end)
+  @fromsubcommands Enum.reduce(@subcommands, %{}, fn({k, v}, acc) ->
+    Map.put(acc, v, k)
+  end)
 
   @subcommands_read %{
                     0 => :read_all,
@@ -42,15 +46,17 @@ defmodule DtBus.CanHelper do
                     15 => :read_t15,
                     16 => :read_t16
                     }
-  
-  @fromsubcommands_read Enum.map(@subcommands_read, fn({k, v}) -> {v, k} end)
+
+  @fromsubcommands_read Enum.reduce(@subcommands_read, %{}, fn({k, v}, acc) ->
+    Map.put(acc, v, k)
+  end)
 
   def command(value) when is_integer(value) do
     Map.get(@commands, value, :unk)
   end
 
   def tocommand(atom) when is_atom(atom) do
-    Dict.get(@fromcommands, atom, nil)
+    Map.get(@fromcommands, atom, nil)
   end
 
   def subcommand(value) when is_integer(value) do
@@ -58,7 +64,7 @@ defmodule DtBus.CanHelper do
   end
 
   def tosubcommand(atom) when is_atom(atom) do
-    Dict.get(@fromsubcommands, atom, nil)
+    Map.get(@fromsubcommands, atom, nil)
   end
 
   def subcommand_read(value) when is_integer(value) do
@@ -66,10 +72,10 @@ defmodule DtBus.CanHelper do
   end
 
   def tosubcommand_read(atom) when is_atom(atom) do
-    Dict.get(@fromsubcommands_read, atom, nil)
+    Map.get(@fromsubcommands_read, atom, nil)
   end
 
-  def build_msgid(sender, dest, command, subcommand) when 
+  def build_msgid(sender, dest, command, subcommand) when
       (command === :read or command === :readd) and
       is_atom(subcommand) and is_integer(sender) and is_integer(dest)
       do
@@ -80,8 +86,8 @@ defmodule DtBus.CanHelper do
     bor(tosubcommand_read(subcommand)) # subcommand
   end
 
-  def build_msgid(sender, dest, command, subcommand) when 
-      is_atom(command) and is_atom(subcommand) 
+  def build_msgid(sender, dest, command, subcommand) when
+      is_atom(command) and is_atom(subcommand)
       and is_integer(sender) and is_integer(dest)
       do
     (2 <<< 30) |> # set EXT_BIT

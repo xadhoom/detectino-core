@@ -12,11 +12,8 @@ defmodule DtWeb.User do
     field :role, :string
     field :pin, :string
 
-    timestamps
+    timestamps()
   end
-
-  @required_fields ~w(name username encrypted_password password role)
-  @optional_fields ~w()
 
   def create_changeset(model, params \\ :empty) do
     model

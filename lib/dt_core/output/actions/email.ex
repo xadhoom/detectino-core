@@ -19,38 +19,38 @@ defmodule DtCore.Output.Actions.Email do
   def recover(ev, config) do
     subject = build_subject({:off, ev})
     msg = build_msg(ev)
-    email = new
-      |> to(config.to)
-      |> from(config.from)
-      |> subject(subject)
-      |> text_body(msg)
-      |> Mailer.deliver
+    new()
+    |> to(config.to)
+    |> from(config.from)
+    |> subject(subject)
+    |> text_body(msg)
+    |> Mailer.deliver
   end
 
   def trigger(ev, config) do
     subject = build_subject({:on, ev})
     msg = build_msg(ev)
-    email = new
-      |> to(config.to)
-      |> from(config.from)
-      |> subject(subject)
-      |> text_body(msg)
-      |> Mailer.deliver
+    new()
+    |> to(config.to)
+    |> from(config.from)
+    |> subject(subject)
+    |> text_body(msg)
+    |> Mailer.deliver
   end
 
-  def build_subject({:on, ev = %SensorEv{}}) do
+  def build_subject({:on, _ev = %SensorEv{}}) do
     "Sensor Alarm started"
   end
 
-  def build_subject({:on, ev = %PartitionEv{}}) do
+  def build_subject({:on, _ev = %PartitionEv{}}) do
     "Partition Alarm started"
   end
 
-  def build_subject({:off, ev = %SensorEv{}}) do
+  def build_subject({:off, _ev = %SensorEv{}}) do
     "Sensor Alarm recovered"
   end
 
-  def build_subject({:off, ev = %PartitionEv{}}) do
+  def build_subject({:off, _ev = %PartitionEv{}}) do
     "Partition Alarm recovered"
   end
 

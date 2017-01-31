@@ -69,7 +69,7 @@ defmodule DtCore.Sensor.Server do
         partition_sup: nil,
         sensors: [],
         partitions: [],
-        receiver: self,
+        receiver: self(),
         part_state_cache: :ets.new(:part_state_cache, [:set, :public])
       }
     }

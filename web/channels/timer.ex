@@ -4,7 +4,7 @@ defmodule DtWeb.Channels.Timer do
   require Logger
 
   def join("timer:time", _message, socket) do
-    send(self, :after_join)
+    send(self(), :after_join)
     {:ok, socket}
   end
 

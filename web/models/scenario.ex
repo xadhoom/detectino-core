@@ -7,7 +7,7 @@ defmodule DtWeb.Scenario do
     field :name, :string
     field :enabled, :boolean, default: false
 
-    timestamps
+    timestamps()
 
     has_many :partitions_scenarios, DtWeb.PartitionScenario
     many_to_many :partitions,
