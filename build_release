@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Angular2 stuff
 rm -fR priv/static/*
