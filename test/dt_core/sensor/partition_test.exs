@@ -328,15 +328,6 @@ defmodule DtCore.Test.Sensor.Partition do
   end
 
   test "partition alarm is stopped on disarm", ctx do
-    sensors = [
-      %SensorModel{name: "A", balance: "NC", th1: 10,
-        partitions: [], enabled: true, address: "1", port: 1},
-      %SensorModel{name: "B", balance: "NC", th1: 10,
-        partitions: [], enabled: true, address: "2", port: 1}
-      ]
-    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
-      sensors: sensors}
-
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
     Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "2", port: 1, type: :alarm}
@@ -344,7 +335,7 @@ defmodule DtCore.Test.Sensor.Partition do
     key = %{source: :partition, name: "prot", type: :alarm}
     Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
-    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
+    {:ok, pid, part} = start_nc_idle_partition(ctx)
 
     :ok = Partition.arm(part, "ARM")
 
@@ -367,6 +358,11 @@ defmodule DtCore.Test.Sensor.Partition do
   end
 
   test "get partition alarm status", ctx do
+    {:ok, _pid, part} = start_nc_idle_partition(ctx)
+    assert :standby == Partition.alarm_status(part)
+  end
+
+  defp start_nc_idle_partition(ctx) do
     sensors = [
       %SensorModel{name: "A", balance: "NC", th1: 10,
         partitions: [], enabled: true, address: "1", port: 1},
@@ -375,8 +371,8 @@ defmodule DtCore.Test.Sensor.Partition do
       ]
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
       sensors: sensors}
-    {:ok, _pid} = Partition.start_link({part, ctx[:cache]})
-    assert :standby == Partition.alarm_status(part)
+    {ret, pid} = Partition.start_link({part, ctx[:cache]})
+    {ret, pid, part}
   end
 
   defp register_deol_listeners do
