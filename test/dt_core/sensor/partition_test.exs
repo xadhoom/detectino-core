@@ -366,6 +366,19 @@ defmodule DtCore.Test.Sensor.Partition do
     |> assert_receive(5000)
   end
 
+  test "get partition alarm status", ctx do
+    sensors = [
+      %SensorModel{name: "A", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "1", port: 1},
+      %SensorModel{name: "B", balance: "NC", th1: 10,
+        partitions: [], enabled: true, address: "2", port: 1}
+      ]
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      sensors: sensors}
+    {:ok, _pid} = Partition.start_link({part, ctx[:cache]})
+    assert :standby == Partition.alarm_status(part)
+  end
+
   defp register_deol_listeners do
     key = %{source: :sensor, address: "1", port: 1, type: :reading}
     Registry.register(DtCore.OutputsRegistry.registry, key, [])

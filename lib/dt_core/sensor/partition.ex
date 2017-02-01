@@ -60,6 +60,12 @@ defmodule DtCore.Sensor.Partition do
     |> GenServer.call({:disarm, mode})
   end
 
+  def alarm_status(config = %PartitionModel{}) do
+    config
+    |> Utils.partition_server_pid
+    |> GenServer.call({:alarm_status?})
+  end
+
   #
   # GenServer Callbacks
   #
@@ -158,6 +164,10 @@ defmodule DtCore.Sensor.Partition do
       v -> v
     end
     {:reply, res, state}
+  end
+
+  def handle_call({:alarm_status?}, _from, state) do
+    {:reply, state.status, state}
   end
 
   defp reload_cache(state) do
