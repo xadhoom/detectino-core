@@ -280,15 +280,6 @@ defmodule DtCore.Test.Sensor.Partition do
   end
 
   test "partion alarm is stopped when all sensors are idle", ctx do
-    sensors = [
-      %SensorModel{name: "A", balance: "NC", th1: 10,
-        partitions: [], enabled: true, address: "1", port: 1},
-      %SensorModel{name: "B", balance: "NC", th1: 10,
-        partitions: [], enabled: true, address: "2", port: 1}
-      ]
-    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
-      sensors: sensors}
-
     key = %{source: :sensor, address: "1", port: 1, type: :alarm}
     Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :sensor, address: "2", port: 1, type: :alarm}
@@ -296,7 +287,7 @@ defmodule DtCore.Test.Sensor.Partition do
     key = %{source: :partition, name: "prot", type: :alarm}
     Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
-    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
+    {:ok, pid, part} = start_nc_idle_partition(ctx)
 
     :ok = Partition.arm(part, "ARM")
 
