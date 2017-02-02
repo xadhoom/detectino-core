@@ -66,6 +66,10 @@ defmodule DtCore.Sensor.Partition do
     |> GenServer.call({:alarm_status?})
   end
 
+  def alarm_status(server) when is_pid(server) do
+    GenServer.call(server, {:alarm_status?})
+  end
+
   #
   # GenServer Callbacks
   #

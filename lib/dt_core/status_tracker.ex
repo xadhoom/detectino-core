@@ -1,25 +1,34 @@
 defmodule DtCore.StatusTracker do
   @moduledoc """
-  Keeps track of all system alarms to have
-  a current snapshot without having to query
-  all sensors and partitions.
+  Helper module to get alarm status on partitions and sensors.
   """
-  use GenServer
+  alias DtCore.Sensor.Partition
+  alias DtCore.Sensor.PartitionSup
 
   require Logger
 
-  #
-  # Client APIs
-  #
-  def start_link do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+  @doc "Check if any partition is on alarm"
+  @spec alarm_status() :: boolean
+  def alarm_status do
+    Supervisor.which_children(PartitionSup)
+    |> in_alarm?
   end
 
-  #
-  # GenServer callbacks
-  #
-  def init(_) do
-    Logger.info "Starting Status Tracker"
-    {:ok, nil}
+  @doc "Get the number of running partitions"
+  @spec running_partitions() :: integer
+  def running_partitions do
+    ret = Supervisor.count_children(PartitionSup)
+    ret.active
   end
+
+  defp in_alarm?(childrens) do
+    childrens
+    |> Enum.any?(fn({_id, pid, _type, _modules}) ->
+      case Partition.alarm_status(pid) do
+        :alarm -> true
+        _ -> false
+      end
+    end)
+  end
+
 end
