@@ -3270,7 +3270,7 @@ body {
       top: -20px;
       font-size: 12px;
       color: #3F51B5; }
-    body .md-inputfield input.ng-invalid ~ label {
+    body .md-inputfield input.ng-dirty.ng-invalid ~ label {
       color: #e62a10; }
     body .md-inputfield .ui-message.ui-messages-error {
       background-color: transparent;
@@ -3606,7 +3606,8 @@ body {
     padding: 0;
     right: 0;
     bottom: 0;
-    margin-right: 0; }
+    margin-right: 0;
+    position: absolute; }
     body .ui-autocomplete .ui-autocomplete-dropdown.ui-button.ui-button-icon-only .ui-button-text {
       display: none; }
     body .ui-autocomplete .ui-autocomplete-dropdown.ui-button.ui-button-icon-only .fa {
@@ -3634,6 +3635,10 @@ body {
     body .ui-autocomplete.ui-autocomplete-multiple .ui-autocomplete-token .ui-autocomplete-token-label {
       display: inline-block;
       vertical-align: middle; }
+  body .ui-autocomplete.ui-autocomplete-multiple .ui-autocomplete-dropdown {
+    top: .75em; }
+  body .ui-fluid .ui-autocomplete.ui-autocomplete-dd > .ui-inputtext {
+    width: 100%; }
   body .ui-dropdown {
     border-bottom: 1px solid #bdbdbd;
     box-sizing: border-box;
@@ -3803,6 +3808,8 @@ body {
       body .ui-multiselect-panel.ui-widget .ui-multiselect-item:not(.ui-state-highlight):hover {
         background-color: #e8e8e8;
         color: #000000; }
+      body .ui-multiselect-panel.ui-widget .ui-multiselect-item.ui-state-highlight {
+        color: #ffffff; }
   body .ui-spinner .ui-spinner-button {
     width: 1em;
     height: .75em;
@@ -3918,6 +3925,8 @@ body {
     border-radius: 0; }
     body .ui-calendar .ui-datepicker-trigger .fa {
       color: #757575; }
+    body .ui-calendar .ui-datepicker-trigger:enabled:hover {
+      background-color: transparent; }
   body .ui-fluid .ui-calendar.ui-calendar-w-btn .ui-inputtext {
     width: 100%; }
   body .ui-datepicker {
@@ -4741,9 +4750,11 @@ body .ui-datatable .ui-datatable-thead > tr {
     body .ui-datatable .ui-datatable-thead > tr th.ui-sortable-column:not(.ui-state-active):hover {
       background-color: #e8e8e8;
       color: #000000; }
+    body .ui-datatable .ui-datatable-thead > tr th .ui-column-title {
+      display: inline-block;
+      vertical-align: middle; }
     body .ui-datatable .ui-datatable-thead > tr th .ui-sortable-column-icon {
       vertical-align: middle;
-      margin: -.25em 0 0 0;
       color: #757575; }
     body .ui-datatable .ui-datatable-thead > tr th .ui-column-resizer {
       font-family: 'Material Icons';
@@ -5667,7 +5678,7 @@ body .ui-dialog .ui-dialog-titlebar {
     width: 1.5em;
     text-align: center;
     margin-top: .5em; }
-    body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon.ui-state-hover, body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon.ui-state-focus {
+    body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon:hover, body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon:focus {
       background-color: #e8e8e8;
       color: #000000; }
     body .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon .fa {
@@ -5758,7 +5769,7 @@ body .ui-overlaypanel .ui-overlaypanel-close {
   body .ui-overlaypanel .ui-overlaypanel-close span {
     color: #ffffff;
     line-height: inherit; }
-  body .ui-overlaypanel .ui-overlaypanel-close.ui-state-hover {
+  body .ui-overlaypanel .ui-overlaypanel-close:hover {
     background-color: #ad1457; }
 body .ui-tooltip {
   opacity: 0.9;
