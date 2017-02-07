@@ -38,7 +38,7 @@ defmodule DtWeb.EventChannelTest do
     {:ok, _, _socket} = socket()
     |> subscribe_and_join(ChannelEvent, "event:arm", %{})
 
-    assert_push "event", %{armed: true}
+    assert_push "event", %{armed: true}, 1000
   end
 
   test "gets running alarm status" do
@@ -47,7 +47,7 @@ defmodule DtWeb.EventChannelTest do
     {:ok, _, _socket} = socket()
     |> subscribe_and_join(ChannelEvent, "event:alarm", %{})
 
-    assert_push "event", %{alarmed: true}
+    assert_push "event", %{alarmed: true}, 1000
   end
 
   defp start_idle_partition do
