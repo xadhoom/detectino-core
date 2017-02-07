@@ -25,7 +25,7 @@ before_install:
   - npm --version
   - npm config set spin false
   - npm config set progress false
-  - npm install -g angular-cli
+  - npm install -g @angular/cli@latest
   - sh -e /etc/init.d/xvfb start
   - echo "--no-sandbox" > ~/.config/chromium-flags.conf;
 
