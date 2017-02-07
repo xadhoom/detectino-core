@@ -10,7 +10,7 @@ defmodule DtWeb.Repo.Migrations.CreateUser do
       add :role, :string
       add :pin, :string
 
-      timestamps
+      timestamps()
     end
 
     create unique_index(:users, [:username])
