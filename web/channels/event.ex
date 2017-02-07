@@ -6,6 +6,7 @@ defmodule DtWeb.Channels.Event do
   require Logger
 
   def join("event:arm", _message, socket) do
+    send(self(), :after_join_arm)
     {:ok, socket}
   end
 
@@ -14,16 +15,32 @@ defmodule DtWeb.Channels.Event do
     {:ok, socket}
   end
 
-  def handle_info(:after_join_alarm, socket) do
+  def handle_info(:after_join_arm, socket) do
     Etimer.start_link(socket)
-    push_status(socket)
+    push_arm_status(socket)
     {:noreply, socket}
   end
 
-  def push_status(socket) do
-    alarmed = StatusTracker.alarm_status()
+  def handle_info(:after_join_alarm, socket) do
+    Etimer.start_link(socket)
+    push_alarm_status(socket)
+    {:noreply, socket}
+  end
+
+  def push_arm_status(socket) do
+    armed = StatusTracker.armed?()
+    push socket, "event", %{armed: armed}
+    Etimer.start_timer(socket, :time, 1000,
+      {__MODULE__, :push_arm_status, [socket]}
+    )
+  end
+
+  def push_alarm_status(socket) do
+    alarmed = StatusTracker.alarmed?()
     push socket, "event", %{alarmed: alarmed}
-    Etimer.start_timer(socket, :time, 1000, {__MODULE__, :push_status, [socket]})
+    Etimer.start_timer(socket, :time, 1000,
+      {__MODULE__, :push_alarm_status, [socket]}
+    )
   end
 
 end

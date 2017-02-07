@@ -8,8 +8,8 @@ defmodule DtCore.StatusTracker do
   require Logger
 
   @doc "Check if any partition is on alarm"
-  @spec alarm_status() :: boolean
-  def alarm_status do
+  @spec alarmed?() :: boolean
+  def alarmed? do
     Supervisor.which_children(PartitionSup)
     |> in_alarm?
   end
@@ -21,6 +21,13 @@ defmodule DtCore.StatusTracker do
     ret.active
   end
 
+  @doc "Returns true if any partition is armed"
+  @spec armed?() :: boolean
+  def armed? do
+    Supervisor.which_children(PartitionSup)
+    |> any_armed?
+  end
+
   defp in_alarm?(childrens) do
     childrens
     |> Enum.any?(fn({_id, pid, _type, _modules}) ->
@@ -28,6 +35,13 @@ defmodule DtCore.StatusTracker do
         :alarm -> true
         _ -> false
       end
+    end)
+  end
+
+  defp any_armed?(childrens) do
+    childrens
+    |> Enum.any?(fn({_id, pid, _type, _modules}) ->
+      Partition.armed?(pid)
     end)
   end
 

@@ -9,9 +9,23 @@ defmodule DtCore.Test.StatusTrackerTest do
   alias DtCore.Sensor.PartitionSup
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
+  alias DtCore.Test.TimerHelper
 
   setup_all do
     cache = :ets.new(:part_state_cache, [:set, :public])
+    {:ok, [cache: cache]}
+  end
+
+  setup do
+    cache = :ets.new(:part_state_cache, [:set, :public])
+
+    on_exit fn ->
+      # give sometime to process to exit
+      TimerHelper.wait_until fn ->
+        assert Process.whereis(PartitionSup) == nil
+      end
+    end
+
     {:ok, [cache: cache]}
   end
 
@@ -19,7 +33,13 @@ defmodule DtCore.Test.StatusTrackerTest do
     {:ok, _, _} = start_idle_partition(ctx)
 
     assert StatusTracker.running_partitions() == 1
-    assert StatusTracker.alarm_status() == false
+    assert StatusTracker.alarmed?() == false
+  end
+
+  test "report not armed partition", ctx do
+    {:ok, _, _} = start_idle_partition(ctx)
+    assert StatusTracker.running_partitions() == 1
+    assert StatusTracker.armed?() == false
   end
 
   test "report alarmed partition", ctx do
@@ -27,7 +47,17 @@ defmodule DtCore.Test.StatusTrackerTest do
     alarm_partition(pid, part)
 
     assert StatusTracker.running_partitions() == 1
-    assert StatusTracker.alarm_status() == true
+    TimerHelper.wait_until fn ->
+      assert StatusTracker.alarmed?() == true
+    end
+  end
+
+  test "report armed partition", ctx do
+    {:ok, pid, part} = start_idle_partition(ctx)
+    alarm_partition(pid, part)
+
+    assert StatusTracker.running_partitions() == 1
+    assert StatusTracker.armed?() == true
   end
 
   defp alarm_partition(pid, part) do

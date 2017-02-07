@@ -28,6 +28,10 @@ defmodule DtCore.Sensor.Partition do
     |> GenServer.call({:arming_status})
   end
 
+  def armed?(server) when is_pid(server) do
+    GenServer.call(server, {:armed?})
+  end
+
   def alive?(config = %PartitionModel{}) do
     pid = config
     |> Utils.partition_server_pid
@@ -151,6 +155,11 @@ defmodule DtCore.Sensor.Partition do
 
   def handle_call({:arming_status}, _from, state) do
     res = state.config.armed
+    {:reply, res, state}
+  end
+
+  def handle_call({:armed?}, _from, state) do
+    res = state.config.armed in @arm_modes
     {:reply, res, state}
   end
 

@@ -9,13 +9,21 @@ defmodule DtWeb.EventChannelTest do
   alias DtCore.Sensor.PartitionSup
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
-  # alias DtCore.OutputsRegistry
 
   test "can join arm topic" do
     assert {:ok, :state} = ChannelEvent.join("event:arm", nil, :state)
   end
 
-  test "gets idle status" do
+  test "gets not armed status" do
+    start_idle_partition()
+
+    {:ok, _, _socket} = socket()
+    |> subscribe_and_join(ChannelEvent, "event:arm", %{})
+
+    assert_push "event", %{armed: false}
+  end
+
+  test "gets idle alarm status" do
     start_idle_partition()
 
     {:ok, _, _socket} = socket()
@@ -24,7 +32,16 @@ defmodule DtWeb.EventChannelTest do
     assert_push "event", %{alarmed: false}
   end
 
-  test "gets alarm status" do
+  test "gets armed status" do
+    start_alarmed_partition()
+
+    {:ok, _, _socket} = socket()
+    |> subscribe_and_join(ChannelEvent, "event:arm", %{})
+
+    assert_push "event", %{armed: true}
+  end
+
+  test "gets running alarm status" do
     start_alarmed_partition()
 
     {:ok, _, _socket} = socket()
