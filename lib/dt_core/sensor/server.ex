@@ -70,7 +70,7 @@ defmodule DtCore.Sensor.Server do
         sensors: [],
         partitions: [],
         receiver: self(),
-        part_state_cache: :ets.new(:part_state_cache, [:set, :public])
+        part_state_cache: nil
       }
     }
   end
@@ -110,6 +110,7 @@ defmodule DtCore.Sensor.Server do
   sensors from the DB
   """
   def handle_info(:start, state) do
+    state = init_cache(state)
     case Supervisor.start_child(state.sup, supervisor(PartitionSup, [],
                                 restart: :temporary)) do
       {:ok, partpid} ->
@@ -176,6 +177,14 @@ defmodule DtCore.Sensor.Server do
     Logger.debug "Received event #{inspect ev} from bus"
     {:ok, state} = dispatch_event({ev, state})
     {:noreply, state}
+  end
+
+  defp init_cache(state) do
+    case state.part_state_cache do
+      nil -> nil
+      _ -> :ets.delete(state.part_state_cache)
+    end
+    %{state | part_state_cache: :ets.new(:part_state_cache, [:set, :public])}
   end
 
   defp do_reload(state) do
