@@ -4,6 +4,7 @@ defmodule DtWeb.Sockets.Socket do
 
   ## Channels
   channel "timer:*", DtWeb.Channels.Timer
+  channel "event:*", DtWeb.Channels.Event
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
