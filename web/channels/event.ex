@@ -29,7 +29,7 @@ defmodule DtWeb.Channels.Event do
 
   def push_arm_status(socket) do
     armed = StatusTracker.armed?()
-    push socket, "event", %{armed: armed}
+    push socket, "arm", %{armed: armed}
     Etimer.start_timer(socket, :time, 1000,
       {__MODULE__, :push_arm_status, [socket]}
     )
@@ -37,7 +37,7 @@ defmodule DtWeb.Channels.Event do
 
   def push_alarm_status(socket) do
     alarmed = StatusTracker.alarmed?()
-    push socket, "event", %{alarmed: alarmed}
+    push socket, "alarm", %{alarmed: alarmed}
     Etimer.start_timer(socket, :time, 1000,
       {__MODULE__, :push_alarm_status, [socket]}
     )
