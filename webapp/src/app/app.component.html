@@ -4,7 +4,7 @@
     <div class="topbar clearfix" *ngIf="auth.authenticated()">
       <div class="topbar-left">
         <a (click)="router.navigate(['/home'])">
-          <i class="material-icons">home</i>
+          <i class="material-icons" [style.color]="isArmed ? 'red': 'white'">home</i>
         </a>
       </div>
       <div class="topbar-center">

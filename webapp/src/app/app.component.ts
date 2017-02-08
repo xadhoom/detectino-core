@@ -31,6 +31,8 @@ export class AppComponent implements AfterViewInit {
   public time: string;
   public date: string;
 
+  public isArmed: boolean;
+
   constructor(private el: ElementRef, public router: Router,
     private auth: AuthService,
     private notificationService: NotificationService,
@@ -48,6 +50,16 @@ export class AppComponent implements AfterViewInit {
 
   startWebSock() {
     this.socket.subscribe('timer', 'time', (time) => this.updateTime(time));
+    this.socket.subscribe('event', 'arm', (isarmed) => this.updateArmState(isarmed));
+  }
+
+  updateArmState(isarmed) {
+    console.log(isarmed);
+    if (isarmed.armed) {
+      this.isArmed = true;
+    } else {
+      this.isArmed = false;
+    }
   }
 
   updateTime(time) {
