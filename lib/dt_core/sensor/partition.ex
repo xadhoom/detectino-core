@@ -9,6 +9,7 @@ defmodule DtCore.Sensor.Partition do
   alias DtCore.Sensor.Worker
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event
+  alias DtCore.ArmEv
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
   alias DtCore.EventBridge
@@ -225,19 +226,23 @@ defmodule DtCore.Sensor.Partition do
       "ARM" ->
         Logger.info("Arming")
         arm_all(state.sensors, state.config)
+        notify_arm_operation(state, :immediate)
         config = %PartitionModel{state.config | armed: "ARM"}
         {:ok, %{state | config: config}}
       "ARMSTAY" ->
         Logger.info("Partial Arming")
         arm_partial(state.sensors, state.config, false)
+        notify_arm_operation(state, :partial)
         config = %PartitionModel{state.config | armed: "ARMSTAY"}
         {:ok, %{state | config: config}}
       "ARMSTAYIMMEDIATE" ->
         Logger.info("Partial Arming, immediate mode")
         arm_partial(state.sensors, state.config, true)
+        notify_arm_operation(state, :partial)
         config = %PartitionModel{state.config | armed: "ARMSTAYIMMEDIATE"}
         {:ok, %{state | config: config}}
       "DISARM" ->
+        notify_disarm_operation(state)
         {:ok, state}
       nil ->
         {:ok, state}
@@ -247,6 +252,18 @@ defmodule DtCore.Sensor.Partition do
     end
   end
 
+  defp notify_arm_operation(state, :partial) do
+    dispatch({:start, %ArmEv{name: state.config.name, partial: true}})
+  end
+
+  defp notify_arm_operation(state, :immediate) do
+    dispatch({:start, %ArmEv{name: state.config.name, partial: false}})
+  end
+
+  defp notify_disarm_operation(state) do
+    dispatch({:stop, %ArmEv{name: state.config.name, partial: nil}})
+  end
+
   defp dispatch(msg = {_op, ev = %SensorEv{}}) do
     key = %{source: :sensor, address: ev.address, port: ev.port, type: ev.type}
     EventBridge.dispatch(key, msg)
@@ -254,6 +271,11 @@ defmodule DtCore.Sensor.Partition do
 
   defp dispatch(msg = {_op, ev = %PartitionEv{}}) do
     key = %{source: :partition, name: ev.name, type: ev.type}
+    EventBridge.dispatch(key, msg)
+  end
+
+  defp dispatch(msg = {_op, ev = %ArmEv{}}) do
+    key = %{source: :partition, name: ev.name}
     EventBridge.dispatch(key, msg)
   end
 

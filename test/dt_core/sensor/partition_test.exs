@@ -7,18 +7,24 @@ defmodule DtCore.Test.Sensor.Partition do
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event, as: Event
+  alias DtCore.ArmEv
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
+  alias DtCore.EventBridge
   alias DtCore.Test.TimerHelper
 
   @arm_disarmed "DISARM"
 
   setup_all do
-    {:ok, _} = DtCore.EventBridge.start_link()
+    {:ok, _} = EventBridge.start_link()
     :ok
   end
 
   setup do
+    on_exit fn ->
+      EventBridge.stop_listening()
+    end
+
     {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
     cache = :ets.new(:part_state_cache, [:set, :public])
     {:ok, [cache: cache]}
@@ -62,18 +68,44 @@ defmodule DtCore.Test.Sensor.Partition do
     |> refute_receive(1000)
   end
 
+  test "arm event is sent on total arming", ctx do
+    EventBridge.start_listening()
+    {:ok, part, _pid} = setup_register_single_nc_sensor(ctx)
+
+    :ok = Partition.arm(part, "ARM")
+    {:bridge_ev, _key, {:start, %ArmEv{partial: :false, name: "prot"}}}
+    |> assert_receive(5000)
+  end
+
+  test "arm event is sent on partial arming", ctx do
+    EventBridge.start_listening()
+    {:ok, part, _pid} = setup_register_single_nc_sensor(ctx)
+
+    :ok = Partition.arm(part, "ARMSTAY")
+    {:bridge_ev, _key, {:start, %ArmEv{partial: :true, name: "prot"}}}
+    |> assert_receive(5000)
+  end
+
+  test "arm event is sent on partial, immediate arming", ctx do
+    EventBridge.start_listening()
+    {:ok, part, _pid} = setup_register_single_nc_sensor(ctx)
+
+    :ok = Partition.arm(part, "ARMSTAYIMMEDIATE")
+    {:bridge_ev, _key, {:start, %ArmEv{partial: :true, name: "prot"}}}
+    |> assert_receive(5000)
+  end
+
+  test "arm event is sent on disarming", ctx do
+    EventBridge.start_listening()
+    {:ok, part, _pid} = setup_register_single_nc_sensor(ctx)
+
+    :ok = Partition.disarm(part, "DISARM")
+    {:bridge_ev, _key, {:stop, %ArmEv{partial: :nil, name: "prot"}}}
+    |> assert_receive(5000)
+  end
+
   test "triggers alarm on immediate sensor", ctx do
-    sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
-      partitions: [], enabled: true, address: "1", port: 1}
-    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
-      sensors: [sensor]}
-
-    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
-    Registry.register(DtCore.OutputsRegistry.registry, key, [])
-    key = %{source: :partition, name: "prot", type: :alarm}
-    Registry.register(DtCore.OutputsRegistry.registry, key, [])
-
-    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
+    {:ok, part, pid} = setup_register_single_nc_sensor(ctx)
 
     :ok = Partition.arm(part, "ARM")
 
@@ -388,5 +420,20 @@ defmodule DtCore.Test.Sensor.Partition do
     Registry.register(DtCore.OutputsRegistry.registry, key, [])
 
     :ok
+  end
+
+  defp setup_register_single_nc_sensor(ctx) do
+    sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
+      partitions: [], enabled: true, address: "1", port: 1}
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      sensors: [sensor]}
+
+    key = %{source: :sensor, address: "1", port: 1, type: :alarm}
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
+    key = %{source: :partition, name: "prot", type: :alarm}
+    Registry.register(DtCore.OutputsRegistry.registry, key, [])
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
+    {:ok, part, pid}
   end
 end

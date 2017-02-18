@@ -48,10 +48,28 @@ defmodule DtCore.PartitionEv do
     Used to format output from Partition Workers.
     Is listened to via DtCore.OutputsRegistry.
 
+    name: the partition name, binary()
+    delayed: whether is a delayed alarm (from a delayed sensor), boolean()
+    type: alarm type, atom()
+
     type values:
       :alarm
   """
   defstruct name: nil,
     delayed: false,
     type: nil
+end
+
+defmodule DtCore.ArmEv do
+  @moduledoc """
+    Used notify about arming/disarming events from each Partition.
+    Is listened to via DtCore.OutputsRegistry.
+
+    name: the partition name, binary()
+    partial: whether is a partial arming, boolean()
+
+  """
+  defstruct name: nil,
+    partial: nil
+
 end
