@@ -10,6 +10,7 @@ defmodule DtCore.Sensor.Partition do
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event
   alias DtCore.ArmEv
+  alias DtCore.ExitTimerEv
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
   alias DtCore.EventBridge
@@ -86,7 +87,8 @@ defmodule DtCore.Sensor.Partition do
       sensors: [],
       cache: cache,
       status: :standby,
-      last: nil
+      last: nil,
+      t_exit: nil
     }
     newstate = state
     |> reload_cache
@@ -119,6 +121,11 @@ defmodule DtCore.Sensor.Partition do
 
     status = query_alarm_status(state.sensors)
     {:noreply, %{state | status: status, last: last}}
+  end
+
+  def handle_info({:reset_exit}, state) do
+    state = notify_exit_timer_stop(state)
+    {:noreply, state}
   end
 
   def handle_call({:arm, mode}, _from, state) do
@@ -226,23 +233,23 @@ defmodule DtCore.Sensor.Partition do
       "ARM" ->
         Logger.info("Arming")
         arm_all(state.sensors, state.config)
-        notify_arm_operation(state, :immediate)
+        state = notify_arm_operation(state, :immediate)
         config = %PartitionModel{state.config | armed: "ARM"}
         {:ok, %{state | config: config}}
       "ARMSTAY" ->
         Logger.info("Partial Arming")
         arm_partial(state.sensors, state.config, false)
-        notify_arm_operation(state, :partial)
+        state = notify_arm_operation(state, :partial)
         config = %PartitionModel{state.config | armed: "ARMSTAY"}
         {:ok, %{state | config: config}}
       "ARMSTAYIMMEDIATE" ->
         Logger.info("Partial Arming, immediate mode")
         arm_partial(state.sensors, state.config, true)
-        notify_arm_operation(state, :partial)
+        state = notify_arm_operation(state, :partial)
         config = %PartitionModel{state.config | armed: "ARMSTAYIMMEDIATE"}
         {:ok, %{state | config: config}}
       "DISARM" ->
-        notify_disarm_operation(state)
+        state = notify_disarm_operation(state)
         {:ok, state}
       nil ->
         {:ok, state}
@@ -254,14 +261,38 @@ defmodule DtCore.Sensor.Partition do
 
   defp notify_arm_operation(state, :partial) do
     dispatch({:start, %ArmEv{name: state.config.name, partial: true}})
+    notify_exit_timer_start(state)
   end
 
   defp notify_arm_operation(state, :immediate) do
     dispatch({:start, %ArmEv{name: state.config.name, partial: false}})
+    notify_exit_timer_start(state)
   end
 
   defp notify_disarm_operation(state) do
     dispatch({:stop, %ArmEv{name: state.config.name, partial: nil}})
+    notify_exit_timer_stop(state)
+  end
+
+  defp notify_exit_timer_start(state = %{config: %{exit_delay: nil}}) do
+    state
+  end
+
+  defp notify_exit_timer_start(state) do
+    dispatch({:start, %ExitTimerEv{name: state.config.name}})
+    tref = Process.send_after(self(),
+      {:reset_exit}, state.config.exit_delay * 1000)
+    %{state | t_exit: tref}
+  end
+
+  defp notify_exit_timer_stop(state = %{t_exit: nil}) do
+    state
+  end
+
+  defp notify_exit_timer_stop(state) do
+    Process.cancel_timer(state.t_exit)
+    dispatch({:stop, %ExitTimerEv{name: state.config.name}})
+    %{state | t_exit: nil}
   end
 
   defp dispatch(msg = {_op, ev = %SensorEv{}}) do
@@ -275,6 +306,11 @@ defmodule DtCore.Sensor.Partition do
   end
 
   defp dispatch(msg = {_op, ev = %ArmEv{}}) do
+    key = %{source: :partition, name: ev.name}
+    EventBridge.dispatch(key, msg)
+  end
+
+  defp dispatch(msg = {_op, ev = %ExitTimerEv{}}) do
     key = %{source: :partition, name: ev.name}
     EventBridge.dispatch(key, msg)
   end

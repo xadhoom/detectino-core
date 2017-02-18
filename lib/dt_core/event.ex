@@ -63,7 +63,6 @@ end
 defmodule DtCore.ArmEv do
   @moduledoc """
     Used notify about arming/disarming events from each Partition.
-    Is listened to via DtCore.OutputsRegistry.
 
     name: the partition name, binary()
     partial: whether is a partial arming, boolean()
@@ -71,5 +70,16 @@ defmodule DtCore.ArmEv do
   """
   defstruct name: nil,
     partial: nil
+
+end
+
+defmodule DtCore.ExitTimerEv do
+  @moduledoc """
+    Used notify exit timer start/stop when a partition is armed.
+
+    name: the partition name, binary()
+
+  """
+  defstruct name: nil
 
 end

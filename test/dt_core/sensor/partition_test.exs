@@ -10,8 +10,10 @@ defmodule DtCore.Test.Sensor.Partition do
   alias DtCore.ArmEv
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
+  alias DtCore.ExitTimerEv
   alias DtCore.EventBridge
   alias DtCore.Test.TimerHelper
+  alias DtCore.Test.Utils
 
   @arm_disarmed "DISARM"
 
@@ -101,6 +103,19 @@ defmodule DtCore.Test.Sensor.Partition do
 
     :ok = Partition.disarm(part, "DISARM")
     {:bridge_ev, _key, {:stop, %ArmEv{partial: :nil, name: "prot"}}}
+    |> assert_receive(5000)
+  end
+
+  test "on arm an exit delay event is sent", ctx do
+    EventBridge.start_listening()
+    {:ok, part, _pid} = setup_single_nc_delayed_sensor(ctx)
+    Utils.flush_mailbox()
+
+    :ok = Partition.arm(part, "ARM")
+    {:bridge_ev, _key, {:start, %ExitTimerEv{name: "prot"}}}
+    |> assert_receive(5000)
+
+    {:bridge_ev, _key, {:stop, %ExitTimerEv{name: "prot"}}}
     |> assert_receive(5000)
   end
 
@@ -432,6 +447,16 @@ defmodule DtCore.Test.Sensor.Partition do
     Registry.register(DtCore.OutputsRegistry.registry, key, [])
     key = %{source: :partition, name: "prot", type: :alarm}
     Registry.register(DtCore.OutputsRegistry.registry, key, [])
+
+    {:ok, pid} = Partition.start_link({part, ctx[:cache]})
+    {:ok, part, pid}
+  end
+
+  defp setup_single_nc_delayed_sensor(ctx) do
+    sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
+      partitions: [], enabled: true, address: "1", port: 1}
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed,
+      exit_delay: 1, sensors: [sensor]}
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     {:ok, part, pid}
