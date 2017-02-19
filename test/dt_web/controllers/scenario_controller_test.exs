@@ -8,11 +8,14 @@ defmodule DtWeb.ScenarioControllerTest do
   alias DtWeb.ControllerHelperTest, as: Helper
   alias DtWeb.ReloadRegistry
   alias DtCore.Sensor.Partition, as: PartitionProcess
+  alias DtCore.Test.TimerHelper
 
   setup_all do
-    :meck.new(PartitionProcess)
-    :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
-    :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+    TimerHelper.wait_until fn ->
+      :meck.new(PartitionProcess)
+      :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
+      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+    end
   end
 
   setup %{conn: conn} do

@@ -4,11 +4,14 @@ defmodule DtWeb.PartitionControllerTest do
   alias DtCore.Sensor.Partition, as: PartitionProcess
   alias DtWeb.Partition, as: PartitionModel
   alias DtWeb.ControllerHelperTest, as: Helper
+  alias DtCore.Test.TimerHelper
 
   setup_all do
-    :meck.new(PartitionProcess)
-    :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
-    :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+    TimerHelper.wait_until fn ->
+      :meck.new(PartitionProcess)
+      :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
+      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+    end
   end
 
   setup %{conn: conn} do
