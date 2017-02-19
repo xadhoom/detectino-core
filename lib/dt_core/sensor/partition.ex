@@ -229,35 +229,42 @@ defmodule DtCore.Sensor.Partition do
     true = :ets.insert(state.cache, {name, state.config})
   end
 
-  defp do_arm(state, mode) do
-    case mode do
-      "ARM" ->
-        Logger.info("Arming")
-        arm_all(state.sensors, state.config)
-        state = notify_arm_operation(state, :immediate)
-        config = %PartitionModel{state.config | armed: "ARM"}
-        {:ok, %{state | config: config}}
-      "ARMSTAY" ->
-        Logger.info("Partial Arming")
-        arm_partial(state.sensors, state.config, false)
-        state = notify_arm_operation(state, :partial)
-        config = %PartitionModel{state.config | armed: "ARMSTAY"}
-        {:ok, %{state | config: config}}
-      "ARMSTAYIMMEDIATE" ->
-        Logger.info("Partial Arming, immediate mode")
-        arm_partial(state.sensors, state.config, true)
-        state = notify_arm_operation(state, :partial)
-        config = %PartitionModel{state.config | armed: "ARMSTAYIMMEDIATE"}
-        {:ok, %{state | config: config}}
-      "DISARM" ->
-        state = notify_disarm_operation(state)
-        {:ok, state}
-      nil ->
-        {:ok, state}
-      x ->
-        Logger.error("This should not happen, invalid arming #{inspect x}")
-        {:error, state}
-    end
+  defp do_arm(state, "ARM") do
+    Logger.info("Arming")
+    arm_all(state.sensors, state.config)
+    state = notify_arm_operation(state, :immediate)
+    config = %PartitionModel{state.config | armed: "ARM"}
+    {:ok, %{state | config: config}}
+  end
+
+  defp do_arm(state, "ARMSTAY") do
+    Logger.info("Partial Arming")
+    arm_partial(state.sensors, state.config, false)
+    state = notify_arm_operation(state, :partial)
+    config = %PartitionModel{state.config | armed: "ARMSTAY"}
+    {:ok, %{state | config: config}}
+  end
+
+  defp do_arm(state, "ARMSTAYIMMEDIATE") do
+    Logger.info("Partial Arming, immediate mode")
+    arm_partial(state.sensors, state.config, true)
+    state = notify_arm_operation(state, :partial)
+    config = %PartitionModel{state.config | armed: "ARMSTAYIMMEDIATE"}
+    {:ok, %{state | config: config}}
+  end
+
+  defp do_arm(state, "DISARM") do
+    state = notify_disarm_operation(state)
+    {:ok, state}
+  end
+
+  defp do_arm(state, nil) do
+    {:ok, state}
+  end
+
+  defp do_arm(state, v) do
+    Logger.error("This should not happen, invalid arming #{inspect v}")
+    {:error, state}
   end
 
   defp notify_arm_operation(state, :partial) do
