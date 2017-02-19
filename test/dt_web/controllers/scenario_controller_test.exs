@@ -7,6 +7,13 @@ defmodule DtWeb.ScenarioControllerTest do
   alias DtWeb.PartitionScenario, as: PartitionScenarioModel
   alias DtWeb.ControllerHelperTest, as: Helper
   alias DtWeb.ReloadRegistry
+  alias DtCore.Sensor.Partition, as: PartitionProcess
+
+  setup_all do
+    :meck.new(PartitionProcess)
+    :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
+    :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+  end
 
   setup %{conn: conn} do
     DtWeb.ReloadRegistry.registry
@@ -117,9 +124,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "ARM"
 
-    # check that a reload event is sent
-    {:reload}
-    |> assert_receive(5000)
+    assert :meck.called(PartitionProcess, :arm, [record, "ARM"])
   end
 
   test "run a scenario with partial modes", %{conn: conn} do
@@ -147,9 +152,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "ARMSTAY"
 
-    # check that a reload event is sent
-    {:reload}
-    |> assert_receive(5000)
+    assert :meck.called(PartitionProcess, :arm, [record, "ARMSTAY"])
   end
 
   test "arm a scenario with partial modes, but immediate", %{conn: conn} do
@@ -177,9 +180,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "ARMSTAYIMMEDIATE"
 
-    # check that a reload event is sent
-    {:reload}
-    |> assert_receive(5000)
+    assert :meck.called(PartitionProcess, :arm, [record, "ARMSTAYIMMEDIATE"])
   end
 
   test "run a scenario with disarm partition", %{conn: conn} do
@@ -216,9 +217,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "DISARM"
 
-    # check that a reload event is sent
-    {:reload}
-    |> assert_receive(5000)
+    assert :meck.called(PartitionProcess, :disarm, [record, "DISARM"])
   end
 
   test "run a scenario with mixed modes", %{conn: conn} do
@@ -266,9 +265,10 @@ defmodule DtWeb.ScenarioControllerTest do
     assert Enum.any?(records, fn(x) -> x.armed == "ARMSTAY" end)
     assert Enum.any?(records, fn(x) -> x.armed == "ARMSTAYIMMEDIATE" end)
 
-    # check that a reload event is sent
-    {:reload}
-    |> assert_receive(5000)
+    assert :meck.called(PartitionProcess, :disarm, [:_, "DISARM"])
+    assert :meck.called(PartitionProcess, :arm, [:_, "ARM"])
+    assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAY"])
+    assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAYIMMEDIATE"])
   end
 
   test "auth: get all scenarios", %{conn: conn} do

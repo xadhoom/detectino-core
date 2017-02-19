@@ -11,13 +11,15 @@ defmodule DtWeb.ScenarioController do
   alias DtWeb.Scenario
   alias DtWeb.User
   alias DtWeb.Partition
+  alias DtCore.Sensor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
 
   require Logger
 
   plug EnsureAuthenticated, [handler: SessionController]
   plug PinAuthorize when not action in [:get_available]
-  plug CoreReloader, nil when not action in [:index, :show, :get_available]
+  plug CoreReloader, nil when not action in [
+    :index, :show, :get_available, :run]
 
   def get_available(conn, _params) do
     q = from s in Scenario, where: s.enabled == true
@@ -83,6 +85,7 @@ defmodule DtWeb.ScenarioController do
         |> Repo.update
         case ret do
           :ok ->
+            arm_disarm_partition_proc(struct_or_cset)
             true
           :error ->
             Logger.error("Cannot update: #{inspect struct_or_cset}")
@@ -91,6 +94,15 @@ defmodule DtWeb.ScenarioController do
         end
       end)
     end)
+  end
+
+  defp arm_disarm_partition_proc(partition) do
+    case partition.armed do
+      "DISARM" ->
+        PartitionProcess.disarm(partition, "DISARM")
+      v ->
+        PartitionProcess.arm(partition, v)
+    end
   end
 
   defp run_arm_disarm_op(partition_scenario) do
