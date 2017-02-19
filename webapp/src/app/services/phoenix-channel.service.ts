@@ -9,12 +9,13 @@ declare var Phoenix: any;
 @Injectable()
 export class PhoenixChannelService {
   private socket: any;
-  private channel: any;
+  private channels: { [key: string]: any };
   private feeds: { [key: string]: Array<any> };
   private subject: Subject<MessageEvent>;
 
   constructor() {
     this.feeds = {};
+    this.channels = {};
   }
 
   public disconnect() {
@@ -36,10 +37,10 @@ export class PhoenixChannelService {
     this.reopen_channels();
   }
 
-  public subscribe(topic: string, key: string, cb: Function) {
-    const chankey = topic + ':' + key;
+  public subscribe(topic: string, event: string, cb: Function) {
+    const chankey = topic + ':' + event;
     if (!this.feeds[chankey]) {
-      this._subscribe(topic, key, cb);
+      this._subscribe(topic, event, cb);
     } else {
       this.feeds[chankey].push(cb);
     }
@@ -51,8 +52,8 @@ export class PhoenixChannelService {
     return proto + host;
   }
 
-  private _subscribe(topic: string, key: string, cb: Function) {
-    const chankey = topic + ':' + key;
+  private _subscribe(topic: string, event: string, cb: Function) {
+    const chankey = topic + ':' + event;
 
     this.feeds[chankey] = [];
     this.feeds[chankey].push(cb);
@@ -62,13 +63,18 @@ export class PhoenixChannelService {
       return;
     }
 
-    const channel = this.socket.channel(chankey, {});
-    channel.join();
-    channel.on(key, (msg) => {
+    let channel = this.channels[topic];
+    if (!channel) {
+      channel = this.socket.channel(topic, {});
+      channel.join();
+      this.channels[topic] = channel;
+    }
+    channel.on(event, (msg) => {
       this.feeds[chankey].forEach((callback) => {
         const ret = callback(msg);
       });
     });
+
     channel.onError((error) => console.log('Error from channel', error));
     channel.onClose(() => console.log('Channel closed', chankey));
   }
@@ -77,8 +83,9 @@ export class PhoenixChannelService {
     for (const chankey in this.feeds) {
       if (this.feeds.hasOwnProperty(chankey)) {
         this.feeds[chankey].forEach((cb) => {
-          const topickey = chankey.split(':', 2);
-          this._subscribe(topickey[0], topickey[1], cb);
+          const topic_event = chankey.split(':', 3);
+          const topic = topic_event[0] + ':' + topic_event[1];
+          this._subscribe(topic, topic_event[2], cb);
         });
       }
     }
