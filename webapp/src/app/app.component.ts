@@ -12,7 +12,7 @@ import { Message } from 'primeng/primeng';
 
 import {
   NotificationService, AuthService,
-  PhoenixChannelService, PinService
+  PhoenixChannelService, PinService, BeeperService
 } from './services';
 
 @Component({
@@ -37,7 +37,7 @@ export class AppComponent implements AfterViewInit {
     public auth: AuthService,
     private notificationService: NotificationService,
     public pinSrv: PinService,
-    private socket: PhoenixChannelService) {
+    private socket: PhoenixChannelService, private beeper: BeeperService) {
 
     this.subscription = notificationService.messages$.subscribe(
       messages => { this.notifications = messages; }
@@ -51,8 +51,8 @@ export class AppComponent implements AfterViewInit {
   startWebSock() {
     this.socket.subscribe('timer:time', 'time', (time) => this.updateTime(time));
     this.socket.subscribe('event:arm', 'arm', (isarmed) => this.updateArmState(isarmed));
-    this.socket.subscribe('event:exit_timer', 'start', (ev) => this.handleExitTimerEv(ev));
-    this.socket.subscribe('event:exit_timer', 'stop', (ev) => this.handleExitTimerEv(ev));
+    this.socket.subscribe('event:exit_timer', 'start', (ev) => this.startExitTimerEv(ev));
+    this.socket.subscribe('event:exit_timer', 'stop', (ev) => this.stopExitTimerEv(ev));
   }
 
   updateArmState(isarmed) {
@@ -63,8 +63,16 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  handleExitTimerEv(ev) {
+  startExitTimerEv(ev) {
     console.log(ev);
+    const name = ev.partition;
+    this.beeper.start_beeping(name);
+  };
+
+  stopExitTimerEv(ev) {
+    console.log(ev);
+    const name = ev.partition;
+    this.beeper.stop_beeping(name);
   };
 
   updateTime(time) {

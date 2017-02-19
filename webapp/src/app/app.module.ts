@@ -10,7 +10,7 @@ import {
   AuthService, AuthGuardService, NotificationService,
   UserService, SensorService, ScenarioService, PartitionService,
   PartitionScenarioService, OutputService, EventService, PhoenixChannelService,
-  PinService
+  PinService, BeeperService
 } from './services';
 
 import {
@@ -99,7 +99,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
     OutputService,
     EventService,
     AuthGuardService,
-    PhoenixChannelService, PinService],
+    PhoenixChannelService, PinService, BeeperService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
