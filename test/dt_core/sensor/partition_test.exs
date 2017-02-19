@@ -120,6 +120,21 @@ defmodule DtCore.Test.Sensor.Partition do
     |> assert_receive(5000)
   end
 
+  test "on immediate partial arm an exit delay event has 0 duration", ctx do
+    EventBridge.start_listening()
+    {:ok, part, _pid} = setup_single_nc_delayed_sensor(ctx, 30)
+    Utils.flush_mailbox()
+
+    :ok = Partition.arm(part, "ARMSTAYIMMEDIATE")
+    {:bridge_ev, _key, {:start, %ExitTimerEv{name: "prot"}}}
+    |> assert_receive(5000)
+
+    # even if we set 30 seconds, we should receive it immediately
+    # since is an *immediate* partial arming
+    {:bridge_ev, _key, {:stop, %ExitTimerEv{name: "prot"}}}
+    |> assert_receive(5000)
+  end
+
   test "on disarm a stop exit delay event is sent", ctx do
     EventBridge.start_listening()
     {:ok, part, _pid} = setup_single_nc_delayed_sensor(ctx, 30)

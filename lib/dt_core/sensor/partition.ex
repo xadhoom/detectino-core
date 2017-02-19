@@ -248,7 +248,7 @@ defmodule DtCore.Sensor.Partition do
   defp do_arm(state, "ARMSTAYIMMEDIATE") do
     Logger.info("Partial Arming, immediate mode")
     arm_partial(state.sensors, state.config, true)
-    state = notify_arm_operation(state, :partial)
+    state = notify_arm_operation(state, :partial_immediate)
     config = %PartitionModel{state.config | armed: "ARMSTAYIMMEDIATE"}
     {:ok, %{state | config: config}}
   end
@@ -272,6 +272,11 @@ defmodule DtCore.Sensor.Partition do
     notify_exit_timer_start(state)
   end
 
+  defp notify_arm_operation(state, :partial_immediate) do
+    dispatch({:start, %ArmEv{name: state.config.name, partial: true}})
+    notify_exit_timer_start(state, 0)
+  end
+
   defp notify_arm_operation(state, :immediate) do
     dispatch({:start, %ArmEv{name: state.config.name, partial: false}})
     notify_exit_timer_start(state)
@@ -282,15 +287,22 @@ defmodule DtCore.Sensor.Partition do
     notify_exit_timer_stop(state)
   end
 
-  defp notify_exit_timer_start(state = %{config: %{exit_delay: nil}}) do
+  defp notify_exit_timer_start(state, force_delay \\ nil)
+
+  defp notify_exit_timer_start(state = %{config: %{exit_delay: nil}}, _) do
     state
   end
 
-  defp notify_exit_timer_start(state) do
+  defp notify_exit_timer_start(state, force_delay) do
     dispatch({:start, %ExitTimerEv{name: state.config.name}})
-    delay = round(state.config.exit_delay * 1000) # just in case...
+
+    delay = case force_delay do
+      d when is_number(d) -> d
+      _ -> state.config.exit_delay
+    end
+
     tref = Process.send_after(self(),
-      {:reset_exit}, delay)
+      {:reset_exit}, round(delay*1000))
     %{state | t_exit: tref}
   end
 
