@@ -16,11 +16,11 @@ export class IntrusionComponent implements OnInit {
   errorMessage: string;
 
   public selectedPartition: Partition;
-  private showArmDialog: boolean;
+  public showArmDialog: boolean;
 
   constructor(private partitionService: PartitionService,
     private notificationService: NotificationService,
-    private pinSrv: PinService) {
+    public pinSrv: PinService) {
     this.selectedPartition = null;
     this.showArmDialog = false;
   }
@@ -64,7 +64,7 @@ export class IntrusionComponent implements OnInit {
     this.selectedPartition = part;
   }
 
-  private isArmed(partition: Partition) {
+  public isArmed(partition: Partition) {
     let armed = false;
     switch (partition.armed) {
       case 'ARM':

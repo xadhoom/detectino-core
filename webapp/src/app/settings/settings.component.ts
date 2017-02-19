@@ -14,7 +14,7 @@ export class SettingsComponent implements OnInit {
   links: Object[];
 
   constructor(private router: Router,
-    private pinSrv: PinService) {
+    public pinSrv: PinService) {
     this.links = [
       { path: 'users' },
       { path: 'sensors' },

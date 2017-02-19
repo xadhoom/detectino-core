@@ -14,7 +14,7 @@ export class ScenarioslistComponent implements OnInit {
 
   constructor(private scenarioService: ScenarioService,
     private notificationService: NotificationService,
-    private pinSrv: PinService) { }
+    public pinSrv: PinService) { }
 
   ngOnInit() {
     this.scenarios = [];

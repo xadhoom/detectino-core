@@ -34,7 +34,7 @@ export class AppComponent implements AfterViewInit {
   public isArmed: boolean;
 
   constructor(private el: ElementRef, public router: Router,
-    private auth: AuthService,
+    public auth: AuthService,
     private notificationService: NotificationService,
     public pinSrv: PinService,
     private socket: PhoenixChannelService) {
