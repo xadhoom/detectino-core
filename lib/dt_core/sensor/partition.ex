@@ -152,6 +152,7 @@ defmodule DtCore.Sensor.Partition do
         Logger.error("This should not happen, invalid disarm #{inspect x}")
         {:error, state}
     end
+    state = notify_disarm_operation(state)
     true = save_state(state)
     {:reply, res, state}
   end
@@ -280,8 +281,9 @@ defmodule DtCore.Sensor.Partition do
 
   defp notify_exit_timer_start(state) do
     dispatch({:start, %ExitTimerEv{name: state.config.name}})
+    delay = round(state.config.exit_delay * 1000) # just in case...
     tref = Process.send_after(self(),
-      {:reset_exit}, state.config.exit_delay * 1000)
+      {:reset_exit}, delay)
     %{state | t_exit: tref}
   end
 
