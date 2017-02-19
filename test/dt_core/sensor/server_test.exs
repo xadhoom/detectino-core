@@ -11,7 +11,7 @@ defmodule DtCore.Test.Sensor.Server do
 
   setup do
     TimerHelper.wait_until fn ->
-      assert {:ok, _pid} == Sup.start_link
+      assert {:ok, _pid} = Sup.start_link
     end
 
     on_exit fn ->
