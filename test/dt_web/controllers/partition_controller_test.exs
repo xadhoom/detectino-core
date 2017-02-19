@@ -149,7 +149,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARM"
 
-    assert :meck.called(PartitionProcess, :arm, [:_, "ARM"])
+    assert :meck.called(PartitionProcess, :arm, [part, "ARM"])
   end
 
   test "arm a partition, stay mode", %{conn: conn} do
@@ -167,7 +167,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARMSTAY"
 
-    assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAY"])
+    assert :meck.called(PartitionProcess, :arm, [part, "ARMSTAY"])
   end
 
   test "arm a partition, immediate stay", %{conn: conn} do
@@ -185,7 +185,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARMSTAYIMMEDIATE"
 
-    assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAYIMMEDIATE"])
+    assert :meck.called(PartitionProcess, :arm, [part, "ARMSTAYIMMEDIATE"])
   end
 
   test "arm a partition, invalid mode", %{conn: conn} do
