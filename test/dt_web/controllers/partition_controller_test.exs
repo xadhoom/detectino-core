@@ -1,5 +1,5 @@
 defmodule DtWeb.PartitionControllerTest do
-  use DtWeb.ConnCase
+  use DtWeb.ConnCase, async: false
 
   alias DtCore.Sensor.Partition, as: PartitionProcess
   alias DtWeb.Partition, as: PartitionModel
