@@ -7,7 +7,7 @@ defmodule DtWeb.PartitionControllerTest do
   alias DtCore.Test.TimerHelper
 
   setup_all do
-    TimerHelper.wait_until fn ->
+    TimerHelper.wait_until 1000, ErlangError, fn ->
       :meck.new(PartitionProcess)
       :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
       :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
