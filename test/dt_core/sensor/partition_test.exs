@@ -1,5 +1,5 @@
 defmodule DtCore.Test.Sensor.Partition do
-  use DtCore.EctoCase
+  use ExUnit.Case, async: false
 
   alias DtCore.Sensor.Worker
   alias DtCore.Sensor.Partition
