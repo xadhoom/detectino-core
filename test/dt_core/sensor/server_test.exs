@@ -1,5 +1,5 @@
 defmodule DtCore.Test.Sensor.Server do
-  use DtCore.EctoCase
+  use DtCore.EctoCase, async: false
 
   alias DtCore.Sensor.Sup
   alias DtCore.Sensor.Server
@@ -10,7 +10,9 @@ defmodule DtCore.Test.Sensor.Server do
   alias DtBus.Event, as: BusEvent
 
   setup do
-    {:ok, _pid} = Sup.start_link
+    TimerHelper.wait_until fn ->
+      assert {:ok, _pid} == Sup.start_link
+    end
 
     on_exit fn ->
       TimerHelper.wait_until fn ->
@@ -26,7 +28,7 @@ defmodule DtCore.Test.Sensor.Server do
     |> Repo.insert!
 
     assert :ok == Server.reload
-  
+
     TimerHelper.wait_until fn ->
       assert {:ok, 1} == Server.partitions
     end
@@ -34,7 +36,7 @@ defmodule DtCore.Test.Sensor.Server do
 
   test "One partition starts one worker (reload via Registry msg)" do
     assert {:ok, 0} == Server.partitions
-    
+
     %PartitionModel{name: "a"}
     |> Repo.insert!
 
@@ -42,7 +44,7 @@ defmodule DtCore.Test.Sensor.Server do
       fn listeners ->
         for {pid, _} <- listeners, do: send(pid, {:reload})
       end)
-  
+
     TimerHelper.wait_until fn ->
       assert {:ok, 1} == Server.partitions
     end
@@ -58,7 +60,7 @@ defmodule DtCore.Test.Sensor.Server do
     end)
 
     assert :ok == Server.reload
-  
+
     TimerHelper.wait_until fn ->
       assert {:ok, 3} == Server.partitions
     end
@@ -66,7 +68,7 @@ defmodule DtCore.Test.Sensor.Server do
 
   test "event from unk sensor gets cached into state" do
     assert {:ok, 0} == Server.sensors
-  
+
     ev = %BusEvent{address: "one", port: 1}
     :sensor_server
     |> send({:event, ev})
@@ -78,7 +80,7 @@ defmodule DtCore.Test.Sensor.Server do
 
   test "not sent event is not in cache" do
     assert {:ok, 0} == Server.sensors
-  
+
     ev = %BusEvent{address: "one", port: 1}
 
     assert Server.known_sensor?(ev) == false
@@ -87,7 +89,7 @@ defmodule DtCore.Test.Sensor.Server do
   test "event from unk sensor goes into repo" do
     assert {:ok, 0} == Server.sensors
     assert Repo.one(SensorModel) == nil
-  
+
     ev = %BusEvent{address: "one", port: 1}
     :sensor_server
     |> send({:event, ev})
@@ -102,7 +104,7 @@ defmodule DtCore.Test.Sensor.Server do
   test "many events create many record and are cached" do
     assert {:ok, 0} == Server.sensors
     assert Repo.one(SensorModel) == nil
-  
+
     [%BusEvent{address: "one", port: 1},
      %BusEvent{address: "one", port: 2},
      %BusEvent{address: "one", port: 3}]
