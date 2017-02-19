@@ -18,6 +18,7 @@ defmodule DtCore.Test.Sensor.Partition do
   @arm_disarmed "DISARM"
 
   setup_all do
+    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
     {:ok, _} = EventBridge.start_link()
     :ok
   end
@@ -27,7 +28,6 @@ defmodule DtCore.Test.Sensor.Partition do
       EventBridge.stop_listening()
     end
 
-    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
     cache = :ets.new(:part_state_cache, [:set, :public])
     {:ok, [cache: cache]}
   end
@@ -108,12 +108,25 @@ defmodule DtCore.Test.Sensor.Partition do
 
   test "on arm an exit delay event is sent", ctx do
     EventBridge.start_listening()
-    {:ok, part, _pid} = setup_single_nc_delayed_sensor(ctx)
+    {:ok, part, _pid} = setup_single_nc_delayed_sensor(ctx, 0.1)
     Utils.flush_mailbox()
 
     :ok = Partition.arm(part, "ARM")
     {:bridge_ev, _key, {:start, %ExitTimerEv{name: "prot"}}}
     |> assert_receive(5000)
+
+    # on expire (we set 0.1 second delay)
+    {:bridge_ev, _key, {:stop, %ExitTimerEv{name: "prot"}}}
+    |> assert_receive(5000)
+  end
+
+  test "on disarm a stop exit delay event is sent", ctx do
+    EventBridge.start_listening()
+    {:ok, part, _pid} = setup_single_nc_delayed_sensor(ctx, 30)
+    Utils.flush_mailbox()
+
+    :ok = Partition.arm(part, "ARM")
+    :ok = Partition.disarm(part, "DISARM")
 
     {:bridge_ev, _key, {:stop, %ExitTimerEv{name: "prot"}}}
     |> assert_receive(5000)
@@ -452,11 +465,11 @@ defmodule DtCore.Test.Sensor.Partition do
     {:ok, part, pid}
   end
 
-  defp setup_single_nc_delayed_sensor(ctx) do
+  defp setup_single_nc_delayed_sensor(ctx, delay) do
     sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
     part = %PartitionModel{name: "prot", armed: @arm_disarmed,
-      exit_delay: 1, sensors: [sensor]}
+      exit_delay: delay, sensors: [sensor]}
 
     {:ok, pid} = Partition.start_link({part, ctx[:cache]})
     {:ok, part, pid}
