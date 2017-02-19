@@ -9,10 +9,11 @@ defmodule DtWeb.PartitionController do
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
+  alias DtCore.Sensor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
-  plug CoreReloader, nil when not action in [:index, :show]
+  plug CoreReloader, nil when not action in [:index, :show, :arm, :disarm]
   plug PinAuthorize
 
   def disarm(conn, %{"id" => id}) do
@@ -20,7 +21,10 @@ defmodule DtWeb.PartitionController do
       nil ->
         send_resp(conn, 404, StatusCodes.status_code(404))
       part ->
-        part |> Partition.disarm |> Repo.update!
+        part
+        |> Partition.disarm
+        |> Repo.update!
+        |> PartitionProcess.disarm("DISARM")
         send_resp(conn, 204, StatusCodes.status_code(204))
     end
   end
@@ -33,7 +37,9 @@ defmodule DtWeb.PartitionController do
         cset = part |> Partition.arm(mode)
         case cset.valid? do
           true ->
-            cset |> Repo.update!
+            cset
+            |> Repo.update!
+            |> PartitionProcess.arm(mode)
             send_resp(conn, 204, StatusCodes.status_code(204))
           false ->
             send_resp(conn, 400, StatusCodes.status_code(400))

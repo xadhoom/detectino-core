@@ -1,8 +1,15 @@
 defmodule DtWeb.PartitionControllerTest do
   use DtWeb.ConnCase
 
+  alias DtCore.Sensor.Partition, as: PartitionProcess
   alias DtWeb.Partition, as: PartitionModel
   alias DtWeb.ControllerHelperTest, as: Helper
+
+  setup_all do
+    :meck.new(PartitionProcess)
+    :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
+    :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+  end
 
   setup %{conn: conn} do
     DtWeb.ReloadRegistry.registry
@@ -141,6 +148,8 @@ defmodule DtWeb.PartitionControllerTest do
 
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARM"
+
+    assert :meck.called(PartitionProcess, :arm, [:_, "ARM"])
   end
 
   test "arm a partition, stay mode", %{conn: conn} do
@@ -157,6 +166,8 @@ defmodule DtWeb.PartitionControllerTest do
 
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARMSTAY"
+
+    assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAY"])
   end
 
   test "arm a partition, immediate stay", %{conn: conn} do
@@ -173,6 +184,8 @@ defmodule DtWeb.PartitionControllerTest do
 
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARMSTAYIMMEDIATE"
+
+    assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAYIMMEDIATE"])
   end
 
   test "arm a partition, invalid mode", %{conn: conn} do
@@ -204,6 +217,8 @@ defmodule DtWeb.PartitionControllerTest do
 
     part = Repo.one!(PartitionModel)
     assert part.armed == "DISARM"
+
+    assert :meck.called(PartitionProcess, :disarm, [part, "DISARM"])
   end
 
   test "disarm invalid partition", %{conn: conn} do
