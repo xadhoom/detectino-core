@@ -49,8 +49,10 @@ export class AppComponent implements AfterViewInit {
   }
 
   startWebSock() {
-    this.socket.subscribe('timer', 'time', (time) => this.updateTime(time));
-    this.socket.subscribe('event', 'arm', (isarmed) => this.updateArmState(isarmed));
+    this.socket.subscribe('timer:time', 'time', (time) => this.updateTime(time));
+    this.socket.subscribe('event:arm', 'arm', (isarmed) => this.updateArmState(isarmed));
+    this.socket.subscribe('event:exit_timer', 'start', (ev) => this.handleExitTimerEv(ev));
+    this.socket.subscribe('event:exit_timer', 'stop', (ev) => this.handleExitTimerEv(ev));
   }
 
   updateArmState(isarmed) {
@@ -60,6 +62,10 @@ export class AppComponent implements AfterViewInit {
       this.isArmed = false;
     }
   }
+
+  handleExitTimerEv(ev) {
+    console.log(ev);
+  };
 
   updateTime(time) {
     let options = {};
