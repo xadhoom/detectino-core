@@ -54,7 +54,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   updateArmState(isarmed) {
-    console.log(isarmed);
     if (isarmed.armed) {
       this.isArmed = true;
     } else {
