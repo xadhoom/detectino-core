@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   PartitionService, SensorService,
   NotificationService
 } from '../services';
 import { Sensor } from '../models/sensor';
 import { Partition } from '../models/partition';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-sensors',
   templateUrl: './sensors.component.html',
-  styleUrls: ['./sensors.component.scss']
+  styleUrls: ['./sensors.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class SensorsComponent implements OnInit {
@@ -17,13 +19,17 @@ export class SensorsComponent implements OnInit {
   sensor: Sensor;
 
   sensors: Sensor[];
-
+  balance_types: SelectItem[];
   selectedPartitions: Partition[];
   partitions: Partition[];
 
   selectedSensor: Sensor;
 
   displayDialog: boolean;
+  displayTh1: boolean;
+  displayTh2: boolean;
+  displayTh3: boolean;
+  displayTh4: boolean;
 
   newSensor: boolean;
 
@@ -34,6 +40,12 @@ export class SensorsComponent implements OnInit {
     private notificationService: NotificationService) { };
 
   ngOnInit() {
+    this.balance_types = [{ label: 'Select a type', value: null }];
+    this.balance_types.push({ label: 'NC', value: 'NC' });
+    this.balance_types.push({ label: 'NO', value: 'NO' });
+    this.balance_types.push({ label: 'EOL', value: 'EOL' });
+    this.balance_types.push({ label: 'DEOL', value: 'DEOL' });
+    this.balance_types.push({ label: 'TEOL', value: 'TEOL' });
     this.all();
   };
 
@@ -104,7 +116,46 @@ export class SensorsComponent implements OnInit {
     return avail.filter(i => bIDs.indexOf(i.id) < 0);
   };
 
-  cloneSensor(s: Sensor): Sensor {
+  public checkThresholds() {
+    this.checkTh1();
+    this.checkTh2();
+    this.checkTh3();
+    this.checkTh4();
+  }
+
+  ngDoCheck() {
+    if (this.sensor) {
+      this.checkThresholds();
+    }
+  }
+
+  private checkTh1() {
+    if (this.sensor.balance) {
+      this.displayTh1 = true;
+    }
+    return false;
+  }
+
+  private checkTh2() {
+    const balances = ['EOL', 'DEOL', 'TEOL'];
+    this.displayTh2 = this.checkBalance(balances);
+  }
+
+  private checkTh3() {
+    const balances = ['DEOL', 'TEOL'];
+    this.displayTh3 = this.checkBalance(balances);
+  }
+
+  private checkTh4() {
+    const balances = ['TEOL'];
+    this.displayTh4 = this.checkBalance(balances);
+  }
+
+  private checkBalance(balances: string[]) {
+    return balances.some((balance) => this.sensor.balance == balance);
+  }
+
+  private cloneSensor(s: Sensor): Sensor {
     const sensor = new Sensor();
     for (const prop in s) {
       if (prop) {

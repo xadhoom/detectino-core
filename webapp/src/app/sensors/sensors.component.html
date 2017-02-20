@@ -14,7 +14,7 @@
             <button type="button" class="float_left" pButton icon="ui-icon-add" (click)="showDialogToAdd()" label="Add"></button>
           </div>
         </p-footer>
-      </p-dataTable>
+        </p-dataTable>
     </div>
   </div>
 
@@ -26,9 +26,11 @@
         </div>
       </div>
       <div class="ui-g form-group">
+
         <div class="ui-g-12">
           <label for="acName">Name</label>
         </div>
+
         <div class="ui-g-12">
           <input pInputText id="acName" [(ngModel)]="sensor.name" />
         </div>
@@ -47,12 +49,69 @@
           <input pInputText id="acPort" [(ngModel)]="sensor.port" />
         </div>
 
-        <div class="ui-g-12">
-          <label for="acEnabled">Enabled</label>
+        <div class="ui-g-4">
+          <p-checkbox id="acEntryDelay" [(ngModel)]="sensor.entry_delay" binary="true"></p-checkbox>
+          <label for="acEntryDelay">Entry delay</label>
         </div>
-        <div class="ui-g-12">
-          <p-checkbox id="acEnabled" [(ngModel)]="sensor.enabled" binary="true"></p-checkbox>
+
+        <div class="ui-g-4">
+          <p-checkbox id="acExitDelay" [(ngModel)]="sensor.exit_delay" binary="true"></p-checkbox>
+          <label for="acExitDelay">Exit delay</label>
         </div>
+
+        <div class="ui-g-4"></div>
+
+        <div class="ui-g-4">
+          <p-checkbox id="acFull24h" [(ngModel)]="sensor.full24h" binary="true"></p-checkbox>
+          <label for="acFull24h">24Hrs</label>
+        </div>
+
+        <div class="ui-g-4">
+          <p-checkbox id="acInternal" [(ngModel)]="sensor.internal" binary="true"></p-checkbox>
+          <label for="acInternal">Internal</label>
+        </div>
+
+        <div class="ui-g-4"></div>
+
+        <div class="ui-g-12">
+          <label for="acBalance">Balance Types:&nbsp;</label>
+          <p-dropdown id="acBalance" [(ngModel)]="sensor.balance" [options]="balance_types" [autoWidth]="true">
+          </p-dropdown>
+        </div>
+
+        <div class="ui-g-3">
+          <div *ngIf="displayTh1">
+            <label for="acTh1">Threshold 1</label>
+            <p-spinner id="acTh1" [(ngModel)]="sensor.th1" [min]="0" [max]="1024"></p-spinner>
+          </div>
+        </div>
+
+        <div class="ui-g-3">
+          <div *ngIf="displayTh2">
+            <label for="acTh2">Threshold 2</label>
+            <p-spinner id="acTh2" [(ngModel)]="sensor.th2" [min]="0" [max]="1024"></p-spinner>
+          </div>
+        </div>
+
+        <div class="ui-g-3">
+          <div *ngIf="displayTh3">
+            <label for="acTh3">Threshold 3</label>
+            <p-spinner id="acTh3" [(ngModel)]="sensor.th3" [min]="0" [max]="1024"></p-spinner>
+          </div>
+        </div>
+
+        <div class="ui-g-3">
+          <div *ngIf="displayTh4">
+            <label for="acTh4">Threshold 4</label>
+            <p-spinner id="acTh4" [(ngModel)]="sensor.th4" [min]="0" [max]="1024"></p-spinner>
+          </div>
+        </div>
+
+        <div class="ui-g-12">
+          <p-inputSwitch id="acEnabled" [(ngModel)]="sensor.enabled" binary="true"></p-inputSwitch>
+          <label for="acEnabled">Sensor enabled</label>
+        </div>
+
       </div>
     </div>
 
