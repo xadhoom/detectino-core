@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, DoCheck, ViewEncapsulation } from '@angular/core';
 import {
   PartitionService, SensorService,
   NotificationService
@@ -14,7 +14,7 @@ import { SelectItem } from 'primeng/primeng';
   encapsulation: ViewEncapsulation.None
 })
 
-export class SensorsComponent implements OnInit {
+export class SensorsComponent implements OnInit, DoCheck {
 
   sensor: Sensor;
 
@@ -152,7 +152,7 @@ export class SensorsComponent implements OnInit {
   }
 
   private checkBalance(balances: string[]) {
-    return balances.some((balance) => this.sensor.balance == balance);
+    return balances.some((balance) => this.sensor.balance === balance);
   }
 
   private cloneSensor(s: Sensor): Sensor {
