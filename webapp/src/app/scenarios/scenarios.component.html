@@ -1,4 +1,4 @@
-<div class="ui-g ui-g-fluid">
+<div class="ui-g">
 
   <div class="ui-g-12" *ngIf="!displayDialog">
     <div class="card card-w-title">
@@ -16,9 +16,9 @@
     </div>
   </div>
 
-  <div class="ui-g-12" *ngIf="displayDialog">
+  <div class="ui-g-12 ui-fluid" *ngIf="displayDialog">
     <div class="card card-w-title">
-      <div class="ui-grid ui-grid-responsive ui-grid-forms ui-fluid ui-grid-pad">
+      <div class="ui-grid ui-grid-responsive ui-grid-forms ui-grid-pad">
         <div class="ui-grid-row">
           <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Edit Scenario"></button>
         </div>

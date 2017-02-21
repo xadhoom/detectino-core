@@ -1,30 +1,25 @@
-<div class="ui-g-12">
-  <div class="card card-w-title">
-    <div class="ui-grid ui-grid-responsive ui-grid-pad">
-      <div class="ui-grid-row" *ngFor="let item of items; let idx=index">
+<div class="ui-g">
+  <div class="ui-g-12" *ngFor="let item of items; let idx=index">
 
-        <div class="ui-grid-col-1"><label class="ui-outputlabel" for="dropdown">Partition</label></div>
-        <div class="ui-grid-col-4">
-          <p-dropdown [(ngModel)]="item.partition_id" (onChange)="onPartitionChange($event, idx)" [options]="partitions" [autoWidth]="false">
-          </p-dropdown>
-        </div>
-
-        <div class="ui-grid-col-1"><label class="ui-outputlabel" for="dropdown">Mode</label></div>
-        <div class="ui-grid-col-4">
-          <p-dropdown [(ngModel)]="item.mode" (onChange)="onModeChange($event, idx)" [options]="modes" [autoWidth]="false">
-          </p-dropdown>
-        </div>
-
-        <div class="ui-grid-col-1"></div>
-
-        <div class="ui-grid-col-1">
-          <button type="button" pButton icon="fa-close" (click)="destroy(idx)" class="RedButton"></button>
-        </div>
-
-      </div>
-      <div class="ui-grid-row">
-        <button type="button" pButton icon="fa-plus" (click)="addPartitionScenario()" label="Add Partition"></button>
-      </div>
+    <div class="ui-g-4">
+      <label class="ui-outputlabel" for="dropdown">Partition</label>
+      <p-dropdown [(ngModel)]="item.partition_id" (onChange)="onPartitionChange($event, idx)" [options]="partitions" [autoWidth]="false">
+      </p-dropdown>
     </div>
+
+    <div class="ui-g-4">
+      <label class="ui-outputlabel" for="dropdown">Mode</label>
+      <p-dropdown [(ngModel)]="item.mode" (onChange)="onModeChange($event, idx)" [options]="modes" [autoWidth]="false">
+      </p-dropdown>
+    </div>
+
+    <div class="ui-g-4">
+      <button type="button" pButton icon="fa-close" (click)="destroy(idx)" class="RedButton"></button>
+    </div>
+
+  </div>
+
+  <div class="ui-g-12">
+    <button type="button" pButton icon="fa-plus" (click)="addPartitionScenario()" label="Add Partition"></button>
   </div>
 </div>
