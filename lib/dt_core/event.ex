@@ -52,8 +52,7 @@ defmodule DtCore.PartitionEv do
     delayed: whether is a delayed alarm (from a delayed sensor), boolean()
     type: alarm type, atom()
 
-    type values:
-      :alarm
+    type values: same as %DtCore.SensorEv{} type field
   """
   defstruct name: nil,
     delayed: false,
