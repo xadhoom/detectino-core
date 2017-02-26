@@ -151,16 +151,13 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   defp build_filter(fields, params) do
-    params = Enum.map(params, fn(param) ->
-      {key, value} = param
-      {String.to_atom(key), value}
-    end
-    )
     Enum.filter_map(fields, fn(field) ->
-      Keyword.has_key?(params, field)
+      field = Atom.to_string(field)
+      Map.has_key?(params, field)
     end,
     fn(field) ->
-      value = Keyword.get(params, field)
+      search_field = Atom.to_string(field)
+      value = Map.get(params, search_field)
       {field, value}
     end
     )

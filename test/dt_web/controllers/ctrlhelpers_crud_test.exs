@@ -17,6 +17,23 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert total_h == ["1"]
   end
 
+  test "Get all with filter" do
+    Repo.insert!(@user3)
+    Repo.insert!(@user2)
+    Repo.insert!(@user1)
+
+    conn = Phoenix.ConnTest.build_conn
+
+    filt = %{"name" => "b"}
+    {:ok, conn, items} = Crud.all(conn, filt, {Repo, User, nil})
+
+    total_h = get_resp_header(conn, "x-total-count")
+    assert total_h == ["1"]
+
+    first = Enum.at(items, 0)
+    assert first.name == "b"
+  end
+
   test "Get all with ordering" do
     Repo.insert!(@user3)
     Repo.insert!(@user2)
