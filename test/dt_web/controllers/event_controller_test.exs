@@ -14,7 +14,7 @@ defmodule DtWeb.EventControllerTest do
     response(conn, 401)
   end
 
-  test "create an event", %{conn: conn} do
+  test "create and retrieve an event", %{conn: conn} do
     conn = Helper.login(conn)
 
     # create an event
