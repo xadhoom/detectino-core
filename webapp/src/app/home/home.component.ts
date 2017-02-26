@@ -32,6 +32,10 @@ export class HomeComponent implements OnInit {
     this.openLink('/intrusion');
   }
 
+  openLogs() {
+    this.openLink('/eventlogs');
+  }
+
   stop_menu(e) {
     e.preventDefault();
     return false;

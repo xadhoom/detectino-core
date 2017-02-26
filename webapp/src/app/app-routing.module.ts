@@ -13,9 +13,9 @@ import { OutputsComponent } from './outputs';
 import { EventsComponent } from './events';
 import { SettingsComponent } from './settings';
 import { IntrusionComponent } from './intrusion';
+import { EventlogsComponent } from './eventlogs';
 
 const routes: Routes = [
-  // {    path: '',children: []}
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuardService] },
@@ -27,7 +27,8 @@ const routes: Routes = [
   { path: 'outputs', component: OutputsComponent, canActivate: [AuthGuardService] },
   { path: 'events', component: EventsComponent, canActivate: [AuthGuardService] },
   { path: 'settings', component: SettingsComponent, canActivate: [AuthGuardService] },
-  { path: 'intrusion', component: IntrusionComponent, canActivate: [AuthGuardService] }
+  { path: 'intrusion', component: IntrusionComponent, canActivate: [AuthGuardService] },
+  { path: 'eventlogs', component: EventlogsComponent, canActivate: [AuthGuardService] },
 ];
 
 @NgModule({

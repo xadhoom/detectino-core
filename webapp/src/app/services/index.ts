@@ -11,3 +11,4 @@ export * from './event.service';
 export * from './phoenix-channel.service';
 export * from './pin.service';
 export * from './beeper.service';
+export * from './eventlog.service';

@@ -10,7 +10,7 @@ import {
   AuthService, AuthGuardService, NotificationService,
   UserService, SensorService, ScenarioService, PartitionService,
   PartitionScenarioService, OutputService, EventService, PhoenixChannelService,
-  PinService, BeeperService
+  PinService, BeeperService, EventlogService
 } from './services';
 
 import {
@@ -38,6 +38,7 @@ import { PartitionConfigComponent } from './events/partition-config/partition-co
 import { SensorConfigComponent } from './events/sensor-config/sensor-config.component';
 import { PartitionsScenariosComponent } from './scenarios/partitions-scenarios/partitions-scenarios.component';
 import { PindialogComponent } from './pindialog/pindialog.component';
+import { EventlogsComponent } from './eventlogs/eventlogs.component';
 
 export function authHttpServiceFactory(http: Http, options: RequestOptions) {
   return new AuthHttp(new AuthConfig({
@@ -69,7 +70,8 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
     SensorConfigComponent,
     ScenarioslistComponent,
     PartitionsScenariosComponent,
-    PindialogComponent
+    PindialogComponent,
+    EventlogsComponent
   ],
   imports: [
     BrowserModule,
@@ -99,7 +101,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
     OutputService,
     EventService,
     AuthGuardService,
-    PhoenixChannelService, PinService, BeeperService],
+    PhoenixChannelService, PinService, BeeperService, EventlogService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
