@@ -44,6 +44,8 @@ defmodule DtWeb.Router do
 
     resources "/events", EventController, only: @api_methods
 
+    resources "/eventlogs", EventLogController, only: @api_methods
+
     post "/users/check_pin", UserController, :check_pin
     post "/users/:id/invalidate", SessionController, :invalidate, as: :api_login
     resources "/users", UserController, only: @api_methods
