@@ -133,7 +133,7 @@ export class Crud {
     const links = res.headers.get('link');
     if (links) {
       this.links = LinkHeader.parse(links);
-      //console.log(this.links);
+      // console.log(this.links);
     }
     const body = res.json();
     return { total: 42, data: body || [] };

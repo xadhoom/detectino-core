@@ -39,19 +39,19 @@ export class EventlogsComponent implements OnInit {
   };
 
   public getSorted(event) {
-    //console.log('sort ev:', event);
+    // console.log('sort ev:', event);
     this.sortPage.sort = event.field;
     if (event.order > 0) {
-      this.sortPage.direction = "asc"
+      this.sortPage.direction = 'asc';
     } else {
-      this.sortPage.direction = "desc"
+      this.sortPage.direction = 'desc';
     }
 
     return this.getLogs();
   }
 
   public getPaged(event) {
-    //console.log('page ev:', event);
+    // console.log('page ev:', event);
     this.sortPage.page = event.page + 1; // primeng index is 0 based
     this.sortPage.per_page = event.rows;
     return this.getLogs();
