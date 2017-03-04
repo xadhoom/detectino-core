@@ -9,14 +9,15 @@
 
     <div class="ui-g-12" *ngIf="!displayDialog">
       <div class="card card-w-title">
-        <p-dataTable [value]="eventlogs" [rows]="10" [paginator]="true" selectionMode="single" [(selection)]="selected" (onRowSelect)="onRowSelect($event)"
-          [responsive]="true">
+        <p-dataTable [value]="eventlogs" (onSort)="getSorted($event)" [rows]="sortPage.per_page" [paginator]="false" selectionMode="single"
+          [(selection)]="selected" (onRowSelect)="onRowSelect($event)" [responsive]="true">
           <header>Event logs</header>
           <p-column field="type" header="Type" [sortable]="false"></p-column>
           <p-column field="acked" header="Acked" [sortable]="false"></p-column>
           <p-column field="operation" header="Operation" [sortable]="false"></p-column>
           <p-column field="inserted_at" header="Timestamp" [sortable]="true"></p-column>
           </p-dataTable>
+          <p-paginator (onPageChange)="getPaged($event)" [rows]="sortPage.per_page" [totalRecords]="totalRecords" pageLinkSize="3"></p-paginator>
       </div>
     </div>
 

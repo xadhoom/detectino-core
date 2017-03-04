@@ -7,7 +7,7 @@ import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/catch';
 
 import { Scenario } from '../models/scenario';
-import { Crud, CrudSettings } from './crud';
+import { Crud } from './crud';
 import { PinService } from './pin.service';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class ScenarioService extends Crud {
   }
 
   public run(s: Scenario): Observable<boolean> {
-    const rqOpts = this.buildOptions(new CrudSettings());
+    const rqOpts = this.buildOptions();
     const url = this.baseurl + '/' + s.id + '/run';
     return this.http.post(url, null, rqOpts).
       map((res) => {

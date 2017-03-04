@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Eventlog } from '../models/eventlog';
+import { PageSortFilter } from '../services/crud';
 import { EventlogService, NotificationService, PinService } from '../services';
 
 @Component({
@@ -16,9 +17,18 @@ export class EventlogsComponent implements OnInit {
   new: boolean;
   errorMessage: string;
 
+  // pagination & sort stuff
+  public sortPage: PageSortFilter;
+  public totalRecords: number;
+
   constructor(private eventlogService: EventlogService,
     private notificationService: NotificationService,
-    public pinSrv: PinService) { };
+    public pinSrv: PinService) {
+    this.sortPage = new PageSortFilter({
+      page: 1, per_page: 10, sort: null, direction: null
+    });
+    this.totalRecords = 0;
+  };
 
   ngOnInit() {
     this.eventlogs = [];
@@ -28,14 +38,35 @@ export class EventlogsComponent implements OnInit {
     );
   };
 
-  getLogs() {
+  public getSorted(event) {
+    //console.log('sort ev:', event);
+    this.sortPage.sort = event.field;
+    if (event.order > 0) {
+      this.sortPage.direction = "asc"
+    } else {
+      this.sortPage.direction = "desc"
+    }
+
+    return this.getLogs();
+  }
+
+  public getPaged(event) {
+    //console.log('page ev:', event);
+    this.sortPage.page = event.page + 1; // primeng index is 0 based
+    this.sortPage.per_page = event.rows;
+    return this.getLogs();
+  }
+
+  public getLogs() {
     if (!this.pinSrv.getPin()) {
       return;
     }
 
-    this.eventlogService.getLogs().
+    this.eventlogService.getLogsPaged(this.sortPage).
       subscribe(
-      eventlogs => this.eventlogs = eventlogs,
+      res => {
+        this.eventlogs = res.data; this.totalRecords = res.total;
+      },
       error => this.onError(error)
       );
   };

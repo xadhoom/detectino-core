@@ -17,7 +17,7 @@ import {
   ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
   DialogModule, InputTextModule, DropdownModule, PasswordModule,
   DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
-  InputSwitchModule
+  InputSwitchModule, PaginatorModule
 } from 'primeng/primeng';
 
 import { MdIconModule, MdIconRegistry } from '@angular2-material/icon';
@@ -81,7 +81,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
     ButtonModule, ToolbarModule, MessagesModule, GrowlModule,
     DialogModule, InputTextModule, DropdownModule, PasswordModule,
     DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
-    InputSwitchModule,
+    InputSwitchModule, PaginatorModule,
     JsonpModule, MdIconModule
   ],
   providers: [{

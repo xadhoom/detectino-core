@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AuthHttp } from 'angular2-jwt';
 import { Eventlog } from '../models/eventlog';
-import { Crud } from './crud';
+import { Crud, CrudSettings, PageSortFilter } from './crud';
 import { PinService } from './pin.service';
 
 @Injectable()
@@ -14,8 +14,14 @@ export class EventlogService extends Crud {
     super(http, pinSrv);
   }
 
-  getLogs(): Observable<Eventlog[]> {
-    return this._read(this.baseurl);
+  getLogsPaged(opts: PageSortFilter): Observable<{ total: number, data: Eventlog[] }> {
+    const rq_opts = new CrudSettings();
+    rq_opts.enablePaging();
+    rq_opts.setPage(opts.page);
+    rq_opts.setPerPage(opts.per_page);
+    rq_opts.setSortField(opts.sort);
+    rq_opts.setSortDir(opts.direction);
+    return this._readPaged(this.baseurl, rq_opts);
   };
 
   destroy(ev: Eventlog): Observable<Eventlog> {

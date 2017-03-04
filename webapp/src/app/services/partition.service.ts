@@ -7,7 +7,7 @@ import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/catch';
 
 import { Partition } from '../models/partition';
-import { Crud, CrudSettings } from './crud';
+import { Crud } from './crud';
 import { PinService } from './pin.service';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class PartitionService extends Crud {
   };
 
   public arm(p: Partition, mode: string): Observable<boolean> {
-    const rqOpts = this.buildOptions(new CrudSettings());
+    const rqOpts = this.buildOptions();
     const url = this.baseurl + '/' + p.id + '/arm';
     return this.http.post(url, { mode: mode }, rqOpts).
       map((res) => {
@@ -42,7 +42,7 @@ export class PartitionService extends Crud {
   }
 
   public disarm(p: Partition): Observable<boolean> {
-    const rqOpts = this.buildOptions(new CrudSettings());
+    const rqOpts = this.buildOptions();
     const url = this.baseurl + '/' + p.id + '/disarm';
     return this.http.post(url, null, rqOpts).
       map((res) => {
