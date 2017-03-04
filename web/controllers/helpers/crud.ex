@@ -12,7 +12,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
   # also in delete, show, update...
   #
 
-  def all(conn, params, {repo, model, orderby}, assocs \\ []) do
+  def all(conn, params, {repo, model, sortdefs}, assocs \\ []) do
     filter = :fields
     |> model.__schema__
     |> build_filter(params)
@@ -25,11 +25,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
     |> Map.get("per_page", "10")
     |> String.to_integer
 
-    order_by = case orderby do
-      nil -> []
-      x when is_list(x) -> x
-      _invalid -> []
-    end
+    order_by = build_sorting_with_def(params, sortdefs)
 
     q = from m in model,
       where: ^filter,
@@ -64,6 +60,13 @@ defmodule DtWeb.CtrlHelpers.Crud do
     |> trunc
 
     link = %ExLinkHeader{
+      self: %ExLinkHeaderEntry{
+        scheme: conn.scheme,
+        host: conn.host,
+        path: conn.request_path,
+        params: %{per_page: per_page, page: page},
+        attributes: %{total: total}
+      },
       first: %ExLinkHeaderEntry{
         scheme: conn.scheme,
         host: conn.host,
@@ -148,6 +151,43 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
   def delete(conn, _) do
     {:error, conn, 403}
+  end
+
+  defp build_sorting_with_def(params, nil) do
+    case Map.get(params, "sort") do
+      f when is_binary(f) ->
+        field = String.to_existing_atom(f)
+        dir = Map.get(params, "direction") |> dir_to_atom()
+        Keyword.new([{dir, field}])
+      nil ->
+        []
+    end
+  end
+
+  defp build_sorting_with_def(params, default) when is_list(default) do
+    # right now we support only ordering by 1 field
+    build_sorting_with_def(params, Enum.at(default, 0))
+  end
+
+  defp build_sorting_with_def(params, default) when is_atom(default) do
+    field = case Map.get(params, "sort") do
+      f when is_binary(f) ->
+        String.to_existing_atom(f)
+      nil ->
+        default
+    end
+
+    dir = Map.get(params, "direction") |> dir_to_atom()
+
+    Keyword.new([{dir, field}])
+  end
+
+  defp dir_to_atom(dir) do
+    case dir do
+      "asc" -> :asc
+      "desc" -> :desc
+      _ -> :asc
+    end
   end
 
   defp build_filter(fields, params) do
