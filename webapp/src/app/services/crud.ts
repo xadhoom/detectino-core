@@ -8,6 +8,15 @@ import { PinService } from './pin.service';
 
 const LinkHeader = require('http-link-header');
 
+export class Filter {
+  key: string;
+  value: string;
+  constructor({key, value}) {
+    this.key = key;
+    this.value = value;
+  }
+}
+
 export class PageSortFilterArgs {
   page: number;
   per_page: number;
@@ -20,13 +29,25 @@ export class PageSortFilter {
   per_page: number;
   sort: string;
   direction: string;
+  filters: Filter[];
 
   constructor({page, per_page, sort, direction}: PageSortFilterArgs) {
     this.page = page;
     this.per_page = per_page;
     this.sort = sort;
     this.direction = direction;
+    this.filters = [];
   }
+
+  public addFilter(k, v): Filter[] {
+    const filter = new Filter({ 'key': k, 'value': v });
+    if (this.filters.indexOf(filter) < 0) {
+      this.filters.push(filter);
+    }
+    return this.filters;
+  }
+  public clearFilters(): void { this.filters = [] };
+  public getFilters(): Filter[] { return this.filters; }
 }
 
 export class CrudSettings {
@@ -35,10 +56,12 @@ export class CrudSettings {
   private per_page: number;
   private sort_field: string;
   private sort_direction: string;
+  private filters: Filter[];
 
   constructor() {
     this.paged = false; this.per_page = 20; this.page = 1;
     this.sort_field = null; this.sort_direction = null;
+    this.filters = [];
   }
 
   // paging helpers
@@ -58,6 +81,10 @@ export class CrudSettings {
 
   public setSortDir(dir: string) { this.sort_direction = dir; }
   public getSortDir(): string { return this.sort_direction; }
+
+  // simple filter helpers
+  public setFilters(filters: Filter[]) { this.filters = filters; }
+  public getFilters(): Filter[] { return this.filters; }
 }
 
 export class Crud {
@@ -162,7 +189,7 @@ export class Crud {
   }
 
   protected setSearchUrlParams(options: CrudSettings): URLSearchParams {
-    const search = new URLSearchParams();
+    let search = new URLSearchParams();
     if (options.isPaged()) {
       search.set('per_page', String(options.getPerPage()));
       search.set('page', String(options.getPage()));
@@ -178,6 +205,23 @@ export class Crud {
       search.set('direction', sort_dir);
     }
 
+    const filters = options.getFilters();
+    for (let i = 0; i < filters.length; i++) {
+      const filter = filters[i];
+      search = this.filter_with_guards(search, filter);
+    }
+
+    return search;
+  }
+
+  protected filter_with_guards(search: URLSearchParams, filter: Filter): URLSearchParams {
+    const reserved = ['page', 'per_page', 'sort', 'direction'];
+    const needle = filter.key;
+    if (reserved.indexOf(needle) >= 0) {
+      return search;
+    }
+
+    search.set(needle, filter.value);
     return search;
   }
 

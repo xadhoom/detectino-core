@@ -38,22 +38,26 @@ export class EventlogsComponent implements OnInit {
     );
   };
 
-  public getSorted(event) {
-    // console.log('sort ev:', event);
-    this.sortPage.sort = event.field;
-    if (event.order > 0) {
+  public getLazy(event) {
+    const page = Math.ceil((event.first + event.rows) / event.rows)
+    this.sortPage.page = page;
+    this.sortPage.per_page = event.rows;
+
+    this.sortPage.sort = event.sortField;
+    if (event.sortOrder > 0) {
       this.sortPage.direction = 'asc';
     } else {
       this.sortPage.direction = 'desc';
     }
 
-    return this.getLogs();
-  }
+    this.sortPage.clearFilters();
+    for (const key in event.filters) {
+      if (event.filters.hasOwnProperty(key)) {
+        const value = event.filters[key].value;
+        this.sortPage.addFilter(key, value);
+      }
+    }
 
-  public getPaged(event) {
-    // console.log('page ev:', event);
-    this.sortPage.page = event.page + 1; // primeng index is 0 based
-    this.sortPage.per_page = event.rows;
     return this.getLogs();
   }
 

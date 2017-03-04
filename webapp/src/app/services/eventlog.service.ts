@@ -21,6 +21,7 @@ export class EventlogService extends Crud {
     rq_opts.setPerPage(opts.per_page);
     rq_opts.setSortField(opts.sort);
     rq_opts.setSortDir(opts.direction);
+    rq_opts.setFilters(opts.filters);
     return this._readPaged(this.baseurl, rq_opts);
   };
 
