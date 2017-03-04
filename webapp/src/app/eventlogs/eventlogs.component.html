@@ -9,7 +9,7 @@
 
     <div class="ui-g-12" *ngIf="!displayDialog">
       <div class="card card-w-title">
-        <p-dataTable [value]="eventlogs" (onLazyLoad)="getLazy($event)" [lazy]="true" [paginator]="true" [totalRecords]="totalRecords"
+        <p-dataTable [value]="eventlogs" [filterDelay]="500" (onLazyLoad)="getLazy($event)" [lazy]="true" [paginator]="true" [totalRecords]="totalRecords"
           [rows]="sortPage.per_page" [paginator]="false" selectionMode="single" [(selection)]="selected" (onRowSelect)="onRowSelect($event)"
           [responsive]="true">
           <header>Event logs</header>

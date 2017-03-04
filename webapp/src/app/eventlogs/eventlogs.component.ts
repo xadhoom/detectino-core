@@ -39,7 +39,7 @@ export class EventlogsComponent implements OnInit {
   };
 
   public getLazy(event) {
-    const page = Math.ceil((event.first + event.rows) / event.rows)
+    const page = Math.ceil((event.first + event.rows) / event.rows);
     this.sortPage.page = page;
     this.sortPage.per_page = event.rows;
 
@@ -68,9 +68,7 @@ export class EventlogsComponent implements OnInit {
 
     this.eventlogService.getLogsPaged(this.sortPage).
       subscribe(
-      res => {
-        this.eventlogs = res.data; this.totalRecords = res.total;
-      },
+      res => { this.eventlogs = res.data; this.totalRecords = res.total; },
       error => this.onError(error)
       );
   };

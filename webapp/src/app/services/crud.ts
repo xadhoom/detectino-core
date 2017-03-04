@@ -46,7 +46,7 @@ export class PageSortFilter {
     }
     return this.filters;
   }
-  public clearFilters(): void { this.filters = [] };
+  public clearFilters(): void { this.filters = []; };
   public getFilters(): Filter[] { return this.filters; }
 }
 
@@ -96,8 +96,8 @@ export class Crud {
   _read(url: string, options?: CrudSettings): Observable<any[]> {
     const rqOpts = this.buildOptions();
     return this.http.get(url, rqOpts).
-      map(this.parseResponse).
-      catch(this.handleError);
+      map(this.parseResponse.bind(this)).
+      catch(this.handleError.bind(this));
   };
 
   _readPaged(url: string, options?: CrudSettings): Observable<{ total: number, data: any[] }> {
@@ -109,8 +109,8 @@ export class Crud {
     rqOpts.search = search;
 
     return this.http.get(url, rqOpts).
-      map(this.parsePagedResponse).
-      catch(this.handleError);
+      map(this.parsePagedResponse.bind(this)).
+      catch(this.handleError.bind(this));
   }
 
   _save(obj: any, url: string, options?: CrudSettings): Observable<any> {
@@ -128,8 +128,8 @@ export class Crud {
     }
 
     return this.http.request(rq).
-      map(this.parseResponse).
-      catch(this.handleError);
+      map(this.parseResponse.bind(this)).
+      catch(this.handleError.bind(this));
   };
 
   _destroy(obj: any, url: string, options?: CrudSettings): Observable<any> {
@@ -148,7 +148,7 @@ export class Crud {
 
     return this.http.request(rq).
       map(res => []).
-      catch(this.handleError);
+      catch(this.handleError.bind(this));
   }
 
   protected parseResponse(res: Response) {
@@ -160,18 +160,28 @@ export class Crud {
     const links = res.headers.get('link');
     if (links) {
       this.links = LinkHeader.parse(links);
-      // console.log(this.links);
     }
     const body = res.json();
-    return { total: 42, data: body || [] };
+    const total = this.getTotal(this.links);
+    return { total: total, data: body || [] };
+  };
+
+  protected getTotal(links): number {
+    let total = 0;
+    for (let i = 0; i < links.refs.length; i++) {
+      const ref = links.refs[i];
+      if (ref.rel !== 'self') { continue; }
+      total = ref.total;
+    }
+    return total;
   };
 
   protected handleError(error: any) {
-    const errTxt = error.text();
+    const errTxt = error.text;
     let errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
     if (errTxt && errTxt !== error.statusText) {
-      errMsg = `${errMsg}: ${error.text()}`;
+      errMsg = `${errMsg}: ${error.text}`;
     }
     return Observable.throw(new Error(errMsg));
   };
