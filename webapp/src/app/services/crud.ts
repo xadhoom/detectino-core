@@ -96,8 +96,8 @@ export class Crud {
   _read(url: string, options?: CrudSettings): Observable<any[]> {
     const rqOpts = this.buildOptions();
     return this.http.get(url, rqOpts).
-      map(this.parseResponse.bind(this)).
-      catch(this.handleError.bind(this));
+      map(val => this.parseResponse(val)).
+      catch(err => this.handleError(err));
   };
 
   _readPaged(url: string, options?: CrudSettings): Observable<{ total: number, data: any[] }> {
@@ -109,8 +109,8 @@ export class Crud {
     rqOpts.search = search;
 
     return this.http.get(url, rqOpts).
-      map(this.parsePagedResponse.bind(this)).
-      catch(this.handleError.bind(this));
+      map(val => this.parsePagedResponse(val)).
+      catch(err => this.handleError(err));
   }
 
   _save(obj: any, url: string, options?: CrudSettings): Observable<any> {
@@ -128,8 +128,8 @@ export class Crud {
     }
 
     return this.http.request(rq).
-      map(this.parseResponse.bind(this)).
-      catch(this.handleError.bind(this));
+      map(val => this.parseResponse(val)).
+      catch(err => this.handleError(err));
   };
 
   _destroy(obj: any, url: string, options?: CrudSettings): Observable<any> {
@@ -148,7 +148,7 @@ export class Crud {
 
     return this.http.request(rq).
       map(res => []).
-      catch(this.handleError.bind(this));
+      catch(err => this.handleError(err));
   }
 
   protected parseResponse(res: Response) {
