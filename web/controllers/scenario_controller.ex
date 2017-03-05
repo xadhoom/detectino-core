@@ -41,7 +41,7 @@ defmodule DtWeb.ScenarioController do
       nil -> 404
       record ->
         record
-        |> check_user(pin)
+        |> check_user(pin) # TODO: why? the PinAuthorize should do that for us.
         |> run_scenario()
     end
     send_resp(conn, code, StatusCodes.status_code(code))
