@@ -55,4 +55,9 @@ defmodule DtWeb.EventLog do
     |> validate_inclusion(:type, @source_types)
   end
 
+  def ack(struct) do
+    struct
+    |> cast(%{acked: true}, [:acked])
+  end
+
 end

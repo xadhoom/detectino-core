@@ -48,4 +48,19 @@ defmodule DtWeb.EventLogControllerTest do
     assert total == 1
   end
 
+  test "ack events", %{conn: conn} do
+    params = %{type: "alarm", acked: false,
+      operation: "start", details: %ArmEv{}}
+    eventlog = EventLog.create_changeset(%EventLog{}, params)
+    |> Repo.insert!
+
+    Helper.login(conn)
+    |> put_req_header("p-dt-pin", "666666")
+    |> post(event_log_path(conn, :ack, eventlog))
+    |> response(204)
+
+    eventlog = Repo.one(EventLog)
+    assert eventlog.acked == true
+  end
+
 end

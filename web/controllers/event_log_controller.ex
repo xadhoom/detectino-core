@@ -31,4 +31,24 @@ defmodule DtWeb.EventLogController do
     send_resp(conn, 501, StatusCodes.status_code(501))
   end
 
+  def ack(conn, %{"id" => id}) do
+    code = case Repo.get(EventLog, id) do
+      nil -> 404
+      eventlog -> do_ack(eventlog)
+    end
+    send_resp(conn, code, StatusCodes.status_code(code))
+  end
+
+  defp do_ack(eventlog) do
+    case eventlog do
+      nil -> 401
+      x ->
+        {ret, _} = EventLog.ack(x) |> Repo.update
+        case ret do
+          :ok -> 204
+          _ -> 500
+        end
+    end
+  end
+
 end
