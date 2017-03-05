@@ -31,6 +31,34 @@ defmodule DtWeb.EventLogController do
     send_resp(conn, 501, StatusCodes.status_code(501))
   end
 
+  def ackall(conn, _params) do
+    op = Repo.transaction(fn ->
+      ackall_txn()
+    end)
+
+    code = case op do
+      {:ok, _} ->
+        204
+      {:error, any} ->
+        Logger.error("Cannot ack all events, cause #{inspect any}")
+        500
+    end
+
+    send_resp(conn, code, StatusCodes.status_code(code))
+  end
+
+  def ackall_txn() do
+    q = from e in EventLog,
+      where: [acked: false]
+    Repo.all(q)
+    |> Enum.each(fn(ev) ->
+      case do_ack(ev) do
+        204 -> nil
+        _ -> Repo.rollback(:cannot_ack_all_logs) # mmmh must be sure of the txn
+      end
+    end)
+  end
+
   def ack(conn, %{"id" => id}) do
     code = case Repo.get(EventLog, id) do
       nil -> 404

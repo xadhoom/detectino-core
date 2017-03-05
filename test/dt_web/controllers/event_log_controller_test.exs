@@ -56,11 +56,35 @@ defmodule DtWeb.EventLogControllerTest do
 
     Helper.login(conn)
     |> put_req_header("p-dt-pin", "666666")
-    |> post(event_log_path(conn, :ack, eventlog))
+    |> put(event_log_path(conn, :ack, eventlog))
     |> response(204)
 
     eventlog = Repo.one(EventLog)
     assert eventlog.acked == true
+  end
+
+  test "ack all events", %{conn: conn} do
+    [%{type: "alarm", acked: false,
+      operation: "start", details: %ArmEv{}},
+    %{type: "alarm", acked: false,
+      operation: "start", details: %ArmEv{}}]
+    |> Enum.each(fn(ev) ->
+      EventLog.create_changeset(%EventLog{}, ev)
+      |> Repo.insert!
+    end)
+
+    Helper.login(conn)
+    |> put_req_header("p-dt-pin", "666666")
+    |> put(event_log_path(conn, :ackall))
+    |> response(204)
+
+    eventlogs = Repo.all(EventLog)
+
+    assert Enum.count(eventlogs) == 2
+
+    Enum.each(eventlogs, fn(eventlog) ->
+      assert eventlog.acked == true
+    end)
   end
 
 end
