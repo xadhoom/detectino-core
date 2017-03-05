@@ -36,7 +36,7 @@ export class EventlogService extends Crud {
   ack(ev: Eventlog): Observable<boolean> {
     const rqOpts = this.buildOptions();
     const url = this.baseurl + '/' + ev.id + '/ack';
-    return this.http.post(url, null, rqOpts).
+    return this.http.put(url, null, rqOpts).
       map((res) => {
         return true;
       }).
@@ -46,7 +46,7 @@ export class EventlogService extends Crud {
   ackAll(): Observable<boolean> {
     const rqOpts = this.buildOptions();
     const url = this.baseurl + '/ackall';
-    return this.http.post(url, null, rqOpts).
+    return this.http.put(url, null, rqOpts).
       map((res) => {
         return true;
       }).
