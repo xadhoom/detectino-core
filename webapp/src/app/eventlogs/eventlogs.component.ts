@@ -111,7 +111,10 @@ export class EventlogsComponent implements OnInit {
   public ackEvent(e: Eventlog) {
     const runOp = this.eventlogService.ack(e);
     runOp.subscribe(
-      res => this.notificationService.success('Event log acked!'),
+      res => {
+        this.notificationService.success('Event log acked!');
+        this.refresh();
+      },
       error => this.onError(error)
     );
   };
