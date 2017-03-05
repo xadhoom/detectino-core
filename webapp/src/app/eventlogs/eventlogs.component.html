@@ -21,5 +21,43 @@
       </div>
     </div>
 
+    <div class="ui-g-12 ui-fluid" *ngIf="displayDialog">
+
+      <div class="card card-w-title">
+        <div class="ui-grid ui-grid-responsive ui-grid-forms ui-grid-pad">
+          <div class="ui-grid-row">
+            <button type="button" pButton icon="ui-icon-arrow-back" (click)="refresh()" label="Event log details"></button>
+          </div>
+        </div>
+
+        <div class="ui-g form-group">
+
+          <div class="ui-g-6">
+            <label for="acType">Type</label>
+            <input pInputText id="acType" [disabled]="true" [(ngModel)]="eventlog.type" />
+          </div>
+          <div class="ui-g-6">
+            <label for="acOp">Operation</label>
+            <input pInputText id="acOp" [disabled]="true" [(ngModel)]="eventlog.operation" />
+          </div>
+
+          <div class="ui-g-12">
+            <label for="acTs">Timestamp</label>
+            <input pInputText id="acTs" [disabled]="true" [(ngModel)]="eventlog.inserted_at" />
+          </div>
+
+          <div class="ui-g-12">
+            <h3 class="first">Details</h3>
+            <div class="ui-g-12" *ngFor="let detail of eventlogDetails">
+              <label>{{detail.detail}}</label>
+              <input pInputText [disabled]="true" [(ngModel)]="detail.value" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </div>

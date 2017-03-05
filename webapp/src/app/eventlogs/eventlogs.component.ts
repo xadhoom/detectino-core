@@ -12,6 +12,7 @@ export class EventlogsComponent implements OnInit {
 
   eventlog: Eventlog;
   eventlogs: Eventlog[];
+  eventlogDetails: Iterable<Object>;
   selected: Eventlog;
   displayDialog: boolean;
   new: boolean;
@@ -102,10 +103,21 @@ export class EventlogsComponent implements OnInit {
   onRowSelect(event) {
     this.new = false;
     this.eventlog = this.cloneRecord(event.data);
+    this.eventlogDetails = this.getDetails(this.eventlog);
     this.displayDialog = true;
   };
 
-  cloneRecord(ev: Eventlog): Eventlog {
+  private getDetails(eventlog: Eventlog): Iterable<Object> {
+    const res = [];
+    for (const detail in eventlog.details) {
+      if (eventlog.details.hasOwnProperty(detail)) {
+        res.push({ detail: detail, value: eventlog.details[detail] });
+      }
+    }
+    return res;
+  }
+
+  private cloneRecord(ev: Eventlog): Eventlog {
     const record = new Eventlog();
     for (const prop in ev) {
       if (prop) {
