@@ -54,7 +54,7 @@ defmodule DtWeb.EventChannelTest do
     {:ok, _, _socket} = socket()
     |> subscribe_and_join(ChannelEvent, "event:alarm", %{})
 
-    assert_push "alarm", %{alarmed: true}, 1000
+    assert_push "alarm", %{alarmed: true}, 2000
   end
 
   test "exit timer start" do
