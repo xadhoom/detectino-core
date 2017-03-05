@@ -33,4 +33,14 @@ export class EventlogService extends Crud {
     return this._save(ev, this.baseurl);
   };
 
+  ack(ev: Eventlog): Observable<boolean> {
+    const rqOpts = this.buildOptions();
+    const url = this.baseurl + '/' + ev.id + '/ack';
+    return this.http.post(url, null, rqOpts).
+      map((res) => {
+        return true;
+      }).
+      catch(this.handleError);
+  }
+
 }

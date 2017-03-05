@@ -54,6 +54,10 @@
             </div>
           </div>
 
+          <div class="ui-g-12" *ngIf="!eventlog.acked">
+            <button type="button" pButton icon="ui-icon-check" (click)="ackEvent(eventlog)" label="Ack" class="full_button green-btn"></button>
+          </div>
+
         </div>
       </div>
 

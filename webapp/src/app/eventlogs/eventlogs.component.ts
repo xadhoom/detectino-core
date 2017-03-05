@@ -105,6 +105,15 @@ export class EventlogsComponent implements OnInit {
     this.eventlog = this.cloneRecord(event.data);
     this.eventlogDetails = this.getDetails(this.eventlog);
     this.displayDialog = true;
+    // console.log(this.eventlog);
+  };
+
+  public ackEvent(e: Eventlog) {
+    const runOp = this.eventlogService.ack(e);
+    runOp.subscribe(
+      res => this.notificationService.success('Event log acked!'),
+      error => this.onError(error)
+    );
   };
 
   private getDetails(eventlog: Eventlog): Iterable<Object> {
