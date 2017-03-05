@@ -9,6 +9,8 @@
 
     <div class="ui-g-12" *ngIf="!displayDialog">
       <div class="card card-w-title">
+        <button type="button" pButton icon="ui-icon-check" (click)="ackAllEvents()" label="Ack All" class="full_button green-btn"></button>
+
         <p-dataTable [value]="eventlogs" [filterDelay]="500" (onLazyLoad)="getLazy($event)" [lazy]="true" [paginator]="true" [totalRecords]="totalRecords"
           [rows]="sortPage.per_page" [paginator]="false" selectionMode="single" [(selection)]="selected" (onRowSelect)="onRowSelect($event)"
           [responsive]="true">
@@ -18,6 +20,7 @@
           <p-column field="operation" header="Operation" [sortable]="false"></p-column>
           <p-column field="inserted_at" header="Timestamp" [sortable]="true"></p-column>
           </p-dataTable>
+
       </div>
     </div>
 

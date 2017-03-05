@@ -119,6 +119,17 @@ export class EventlogsComponent implements OnInit {
     );
   };
 
+  public ackAllEvents() {
+    const runOp = this.eventlogService.ackAll();
+    runOp.subscribe(
+      res => {
+        this.notificationService.success('All events acked!');
+        this.refresh();
+      },
+      error => this.onError(error)
+    );
+  };
+
   private getDetails(eventlog: Eventlog): Iterable<Object> {
     const res = [];
     for (const detail in eventlog.details) {
