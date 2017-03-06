@@ -21,6 +21,27 @@ defmodule DtBus.CanSim do
     GenServer.call(__MODULE__, {:autorun})
   end
 
+  def short(port, value \\ 50) do
+    GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
+  end
+
+  def idle(port, value \\ 200) do
+    GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
+  end
+
+  def alarm(port, value \\ 300) do
+    GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
+  end
+
+  def failure(port, value \\ 400) do
+    # only on grade 3 sensors is available
+    GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
+  end
+
+  def open(port, value \\ 600) do
+    GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
+  end
+
   #
   # GenServer Callbacks
   #
@@ -31,6 +52,11 @@ defmodule DtBus.CanSim do
 
   def handle_call({:autorun}, _from, state) do
     :timer.send_interval(10_000, :status)
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:gen_analog_ev, port, value}, _from, state) do
+    send_analog_can_message(value, port, state)
     {:reply, :ok, state}
   end
 
@@ -75,10 +101,7 @@ defmodule DtBus.CanSim do
     # send random analog reads...
     Enum.each(1..8, fn(index) ->
       val = Enum.random(1..1024) #random reading, for now
-      msb = band(val >>> 8, 0xff)
-      lsb = band val, 0xff
-      payload = <<0,0,0,0,0,index,msb,lsb>>
-      state.sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
+      send_analog_can_message(val, index, state)
     end)
 
     # send random digital reads...
@@ -144,6 +167,14 @@ defmodule DtBus.CanSim do
     subcommand = Canhelper.tosubcommand_read terminal
     payload = <<0,0,0,0,subcommand,0,msb,lsb>>
     sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
+  end
+
+  defp send_analog_can_message(value, port, state) do
+    msgid = Canhelper.build_msgid(state.myid, 0, :event, :unsolicited)
+    msb = band(value >>> 8, 0xff)
+    lsb = band value, 0xff
+    payload = <<0,0,0,0,0,port,msb,lsb>>
+    state.sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
   end
 
 end
