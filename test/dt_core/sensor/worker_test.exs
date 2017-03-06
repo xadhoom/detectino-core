@@ -85,7 +85,7 @@ defmodule DtCore.Test.Sensor.Worker do
     |> assert_receive(5000)
     {:start, %SensorEv{type: :fault, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    assert :tamper == Worker.alarm_status({config, part})
+    assert :fault == Worker.alarm_status({config, part})
 
     ev = %Event{address: "1", port: 1, value: 25}
     :ok = Process.send(pid, {:event, ev, part}, [])
