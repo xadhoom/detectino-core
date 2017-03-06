@@ -123,7 +123,7 @@ defmodule DtCore.Sensor.Worker do
       :reading -> :standby
       :standby -> :standby
       :tamper -> :tamper
-      :fault -> :tamper
+      :fault -> :fault
       :short -> :tamper
       :alarm -> :alarm
     end

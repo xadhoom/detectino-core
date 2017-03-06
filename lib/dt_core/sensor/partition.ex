@@ -355,6 +355,7 @@ defmodule DtCore.Sensor.Partition do
         if ev == state.last do
           Logger.debug("skipping already sent partition ev")
         else
+          Logger.debug("Sending partion event #{inspect ev}")
           ev |> dispatch
         end
         ev
@@ -365,13 +366,16 @@ defmodule DtCore.Sensor.Partition do
     status = state.status
     case op do
       :start ->
-        {op, %PartitionEv{type: ev.type, name: state.config.name}}
+        {op, %PartitionEv{type: ev.type,
+          delayed: ev.delayed, name: state.config.name}}
       :stop ->
         case query_alarm_status(state.sensors) do
           :standby ->
-            {op, %PartitionEv{type: ev.type, name: state.config.name}}
+            {op, %PartitionEv{type: ev.type,
+              delayed: ev.delayed, name: state.config.name}}
           x when x in @statuses and x != status ->
-            {op, %PartitionEv{type: ev.type, name: state.config.name}}
+            {op, %PartitionEv{type: ev.type,
+              delayed: ev.delayed, name: state.config.name}}
           x ->
             Logger.info("Not stopping partition alarm due to others: #{x}")
             nil
@@ -439,6 +443,7 @@ defmodule DtCore.Sensor.Partition do
         :standby -> {:cont, :standby}
         :alarm -> {:halt, :alarm}
         :tamper -> {:halt, :tamper}
+        :fault -> {:halt, :fault}
         x ->
           Logger.error("Unhandled status #{inspect x}")
           {:halt, :tamper}
