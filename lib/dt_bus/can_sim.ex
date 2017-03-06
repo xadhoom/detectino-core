@@ -33,7 +33,7 @@ defmodule DtBus.CanSim do
     GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
   end
 
-  def failure(port, value \\ 400) do
+  def fault(port, value \\ 400) do
     # only on grade 3 sensors is available
     GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
   end
