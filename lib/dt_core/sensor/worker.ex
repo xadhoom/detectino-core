@@ -40,6 +40,7 @@ defmodule DtCore.Sensor.Worker do
       "and port #{config.port}"
     state = %{
       config: config,
+      original_config: config,
       receiver: receiver,
       armed: false,
       cur_ev: %SensorEv{
@@ -101,6 +102,7 @@ defmodule DtCore.Sensor.Worker do
 
   def handle_call({:arm, delay}, _from, state) do
     Logger.debug("Arming sensor")
+    state = reset_config(state)
     state
     |> zone_exit_delay(delay)
     |> will_reset_delay(:exit)
@@ -110,6 +112,7 @@ defmodule DtCore.Sensor.Worker do
 
   def handle_call({:disarm}, _from, state) do
     Logger.debug("Disarming sensor")
+    state = reset_config(state)
     config = state.config
 
     ev = build_ev_type(:standby, config.address, config.port)
@@ -189,8 +192,8 @@ defmodule DtCore.Sensor.Worker do
 
   defp process_inarm(ev, partition, state) do
     urgent = urgent?(state.config)
-    p_entry = compute_entry_delay(partition, urgent)
-    p_exit = compute_exit_delay(partition, urgent)
+    p_entry = compute_entry_delay(partition, urgent, state)
+    p_exit = compute_exit_delay(partition, urgent, state)
 
     sensor_ev = process_event(ev, state)
 
@@ -204,18 +207,20 @@ defmodule DtCore.Sensor.Worker do
     end
   end
 
-  defp compute_exit_delay(partition, urgent) do
-    case partition.exit_delay do
+  defp compute_exit_delay(partition, urgent, state) do
+    delay = case partition.exit_delay do
       d when is_integer(d) and not urgent -> d
       _ -> 0
     end
+    zone_exit_delay(state, delay)
   end
 
-  defp compute_entry_delay(partition, urgent) do
-    case partition.entry_delay do
+  defp compute_entry_delay(partition, urgent, state) do
+    delay = case partition.entry_delay do
       d when is_integer(d) and not urgent -> d
       _ -> 0
     end
+    zone_entry_delay(state, delay)
   end
 
   def inarm_delay({ev, sensor_ev, partition, p_exit}) do
@@ -380,6 +385,11 @@ defmodule DtCore.Sensor.Worker do
       address: address,
       port: port
     }
+  end
+
+  defp reset_config(state) do
+    Logger.debug("Resetting sensor config")
+    %{state | config: state.original_config}
   end
 
 end
