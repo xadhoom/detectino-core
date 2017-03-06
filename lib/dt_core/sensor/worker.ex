@@ -228,7 +228,14 @@ defmodule DtCore.Sensor.Worker do
   end
 
   def inarm_nodelay({ev, sensor_ev, partition, p_entry, urgent, state}) do
-    delay = p_entry * 1000
+    delay = case ev_type_is_delayed?(sensor_ev) do
+      true ->
+        p_entry * 1000
+      _ ->
+        Logger.debug("Event #{inspect sensor_ev} " <>
+          "not delayed because is not an alarm")
+        0
+    end
     case delay do
       0 ->
         %SensorEv{sensor_ev | delayed: false, urgent: urgent}
@@ -238,6 +245,13 @@ defmodule DtCore.Sensor.Worker do
           delay)
         maybe_start_entry_timer(state, p_entry)
         %SensorEv{sensor_ev | delayed: true}
+    end
+  end
+
+  defp ev_type_is_delayed?(ev) do
+    case ev.type do
+      :alarm -> true
+      _ -> false
     end
   end
 
