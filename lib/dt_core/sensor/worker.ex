@@ -197,7 +197,14 @@ defmodule DtCore.Sensor.Worker do
 
     sensor_ev = process_event(ev, state)
 
-    case exit_delay?(ev, urgent, state) do
+    is_exit_delayed = exit_delay?(ev, urgent, state)
+    exit_delay = case ev_type_is_delayed?(sensor_ev) do
+      true -> is_exit_delayed
+      false -> false
+      v -> v
+    end
+
+    case exit_delay do
       false ->
         inarm_nodelay({ev, sensor_ev, partition, p_entry, urgent, state})
       true ->
@@ -267,7 +274,6 @@ defmodule DtCore.Sensor.Worker do
       false when urgent ->
         false
       true ->
-        Logger.error("I should not be there!")
         nil
     end
   end
