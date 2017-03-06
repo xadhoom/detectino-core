@@ -142,6 +142,7 @@ defmodule DtCore.Sensor.Partition do
 
         case state.last do
           {_, ev = %PartitionEv{}} ->
+            Logger.debug("Dispatching stop for partition alarm")
             dispatch({:stop, ev})
           _ -> nil
         end

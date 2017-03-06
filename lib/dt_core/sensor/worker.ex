@@ -267,6 +267,7 @@ defmodule DtCore.Sensor.Worker do
       false when urgent ->
         false
       true ->
+        Logger.error("I should not be there!")
         nil
     end
   end
