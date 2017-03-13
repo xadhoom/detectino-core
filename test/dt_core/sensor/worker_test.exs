@@ -10,19 +10,6 @@ defmodule DtCore.Test.Sensor.Worker do
   @arm_disarmed "DISARM"
   @arm_armed "ARM"
 
-  # @nc_model %SensorModel{name: "NC", address: "1", port: 1,
-  #  balance: "NC", th1: 10, partitions: [], enabled: true}
-  # @no_model %SensorModel{name: "NO", address: "1", port: 1,
-  #  balance: "NO", th1: 10, partitions: [], enabled: true}
-  # @eol_model %SensorModel{name: "EOL", address: "1", port: 1,
-  #  balance: "EOL", th1: 10, th2: 20, partitions: [], enabled: true}
-  # @deol_model %SensorModel{name: "DEOL", address: "1", port: 1,
-  #  balance: "DEOL", th1: 10, th2: 20, th3: 30, partitions: [],
-  #  enabled: true}
-  # @teol_model %SensorModel{name: "TEOL", address: "1", port: 1,
-  #  balance: "TEOL", th1: 10, th2: 20, th3: 30, th4: 40, partitions: [],
-  #  enabled: true}
-
   test "no alarm but simple events if partion is not armed" do
     part = %PartitionModel{name: "prot", armed: @arm_disarmed}
     config = %SensorModel{name: "NC", balance: "NC", th1: 10,
