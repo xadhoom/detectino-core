@@ -27,6 +27,18 @@ defmodule DtCore.Test.Sensor.Worker do
     assert :standby == Worker.alarm_status({config, part})
   end
 
+  test "disarm an already disarmed sensor" do
+    part = %PartitionModel{name: "prot", armed: @arm_disarmed}
+    config = %SensorModel{name: "NC", balance: "NC", th1: 10,
+      partitions: [], enabled: true, address: "1", port: 1}
+    {:ok, pid} = Worker.start_link({config, part, self()})
+
+    disarm_cmd = {:disarm}
+    :ok = GenServer.call(pid, disarm_cmd)
+
+    assert :standby == Worker.alarm_status({config, part})
+  end
+
   test "triggers alarm on immediate sensor" do
     part = %PartitionModel{name: "part1", armed: @arm_armed}
     config = %SensorModel{name: "NC", balance: "NC", th1: 10,
@@ -139,7 +151,7 @@ defmodule DtCore.Test.Sensor.Worker do
     part = %PartitionModel{
       name: "part1",
       armed: @arm_armed,
-      entry_delay: 1
+      entry_delay: 60
       }
     config = %SensorModel{
       name: "sense1",
@@ -170,6 +182,46 @@ defmodule DtCore.Test.Sensor.Worker do
     |> assert_receive(5000)
     {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
+    assert :standby == Worker.alarm_status({config, part})
+  end
+
+  test "delayed alarm on exit is cancelled if partition is unarmed in time" do
+    part = %PartitionModel{
+      name: "part1",
+      armed: @arm_armed,
+      exit_delay: 60
+      }
+    config = %SensorModel{
+      name: "sense1",
+      balance: "NC",
+      th1: 10,
+      exit_delay: true,
+      partitions: [],
+      address: "1", port: 1,
+      enabled: true
+    }
+    {:ok, pid} = Worker.start_link({config, part, self()})
+    arm_cmd = {:arm, 0}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
+
+    disarm_cmd = {:disarm}
+    :ok = GenServer.call(pid, disarm_cmd)
+
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+
+    {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
     assert :standby == Worker.alarm_status({config, part})
   end
 

@@ -46,6 +46,7 @@ defmodule DtCore.Sensor.Worker do
       cur_ev: %SensorEv{
         type: :standby, address: config.address, port: config.port
       },
+      last_ev: nil,
       status: :standby
     }
     {:ok, state}
@@ -63,7 +64,7 @@ defmodule DtCore.Sensor.Worker do
           event = do_receive_event(ev, partition, state)
           state = sensor_state(event, state)
           :ok = Process.send(state.receiver, {:start, event}, [])
-          state
+          %{state | last_ev: ev}
         else
           state
         end
@@ -113,11 +114,17 @@ defmodule DtCore.Sensor.Worker do
   def handle_call({:disarm}, _from, state) do
     Logger.debug("Disarming sensor")
     state = reset_config(state)
-    config = state.config
 
-    ev = build_ev_type(:standby, config.address, config.port)
-    state = sensor_state(ev, state)
-    :ok = Process.send(state.receiver, {:start, ev}, [])
+    state = case state.last_ev do
+      nil ->
+        state
+      last_ev ->
+        ev = process_indisarm(last_ev, nil, state)
+        state = sensor_state(ev, state)
+        :ok = Process.send(state.receiver, {:start, ev}, [])
+        state
+    end
+
     {:reply, :ok, %{state | armed: false}}
   end
 
@@ -179,9 +186,8 @@ defmodule DtCore.Sensor.Worker do
     end
   end
 
-  defp process_indisarm(ev, _partition, state) do
+  defp process_indisarm(ev = %Event{}, _partition, state) do
     sensor_ev = process_event(ev, state)
-    %SensorEv{sensor_ev | type: :reading}
 
     case sensor_ev.type do
       :alarm ->
