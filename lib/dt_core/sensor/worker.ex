@@ -19,7 +19,7 @@ defmodule DtCore.Sensor.Worker do
   def start_link({config = %SensorModel{}, partition = %PartitionModel{},
     receiver}) do
     {:ok, name} = Utils.sensor_server_name(config, partition)
-    GenServer.start_link(__MODULE__, {config, receiver}, name: name)
+    GenServer.start_link(__MODULE__, {config, receiver, name}, name: name)
   end
 
   def alarm_status({config = %SensorModel{}, partition = %PartitionModel{}}) do
@@ -35,7 +35,7 @@ defmodule DtCore.Sensor.Worker do
   #
   # GenServer callbacks
   #
-  def init({config, receiver}) do
+  def init({config, receiver, name}) do
     Logger.info "Starting Sensor Worker with addr #{config.address} " <>
       "and port #{config.port}"
     state = %{
@@ -47,7 +47,8 @@ defmodule DtCore.Sensor.Worker do
         type: :standby, address: config.address, port: config.port
       },
       last_ev: nil,
-      status: :standby
+      status: :standby,
+      myname: name
     }
     {:ok, state}
   end
