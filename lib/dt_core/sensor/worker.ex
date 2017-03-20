@@ -227,9 +227,9 @@ defmodule DtCore.Sensor.Worker do
 
     case exit_delay do
       false ->
-        inarm_nodelay({ev, sensor_ev, partition, p_entry, urgent, state})
+        inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent, state})
       true ->
-        inarm_delay({ev, sensor_ev, partition, p_exit})
+        inarm_exit_delay({ev, sensor_ev, partition, p_exit})
       _ ->
         %SensorEv{sensor_ev | delayed: false, urgent: urgent}
     end
@@ -251,7 +251,7 @@ defmodule DtCore.Sensor.Worker do
     zone_entry_delay(state, delay)
   end
 
-  def inarm_delay({ev, sensor_ev, partition, p_exit}) do
+  def inarm_exit_delay({ev, sensor_ev, partition, p_exit}) do
     Logger.debug "scheduling delayed exit alarm"
     delay = p_exit * 1000
     ev = %Event{ev | delayed: true}
@@ -260,7 +260,7 @@ defmodule DtCore.Sensor.Worker do
     %SensorEv{sensor_ev | delayed: true}
   end
 
-  def inarm_nodelay({ev, sensor_ev, partition, p_entry, urgent, state}) do
+  def inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent, state}) do
     delay = case ev_type_is_delayed?(sensor_ev) do
       true ->
         p_entry * 1000
