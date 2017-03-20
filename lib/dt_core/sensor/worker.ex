@@ -12,6 +12,7 @@ defmodule DtCore.Sensor.Worker do
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event, as: Event
   alias DtCore.SensorEv
+  alias DtCore.Sensor.Worker
 
   #
   # Client APIs
@@ -32,6 +33,16 @@ defmodule DtCore.Sensor.Worker do
     GenServer.call(name, {:armed?})
   end
 
+  @doc false
+  def expire_timer({:entry_timer, name}) do
+    GenServer.call(name, {:reset_entry})
+  end
+
+  @doc false
+  def expire_timer({:exit_timer, name}) do
+    GenServer.call(name, {:reset_exit})
+  end
+
   #
   # GenServer callbacks
   #
@@ -50,6 +61,7 @@ defmodule DtCore.Sensor.Worker do
       status: :standby,
       myname: name
     }
+    Etimer.start_link(state.myname)
     {:ok, state}
   end
 
@@ -76,18 +88,18 @@ defmodule DtCore.Sensor.Worker do
     {:noreply, newstate}
   end
 
-  def handle_info({:reset_entry}, state) do
+  def handle_call({:reset_entry}, _from, state) do
     Logger.info("Resetting Entry Delay")
     config = %SensorModel{state.config | entry_delay: false}
     state = %{state | config: config}
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 
-  def handle_info({:reset_exit}, state) do
+  def handle_call({:reset_exit}, _from, state) do
     Logger.info("Resetting Exit Delay")
     config = %SensorModel{state.config | exit_delay: false}
     state = %{state | config: config}
-    {:noreply, state}
+    {:reply, :ok, state}
   end
 
   def handle_call({:internal?}, _from, state) do
@@ -107,7 +119,7 @@ defmodule DtCore.Sensor.Worker do
     state = reset_config(state)
     state
     |> zone_exit_delay(delay)
-    |> will_reset_delay(:exit)
+    |> will_reset_delay(:exit, state)
 
     {:reply, :ok, %{state | armed: true}}
   end
@@ -142,7 +154,7 @@ defmodule DtCore.Sensor.Worker do
     %{state | cur_ev: ev, status: status}
   end
 
-  defp will_reset_delay(delay, delay_t) do
+  defp will_reset_delay(delay, delay_t, state) do
     delay = case delay do
       nil -> 0
       v when is_integer v  -> v
@@ -152,9 +164,11 @@ defmodule DtCore.Sensor.Worker do
     end
     case delay_t do
       :entry ->
-        Process.send_after(self(), {:reset_entry}, delay * 1000)
+        :ok = Etimer.start_timer(state.myname, :entry_timer, delay * 1000,
+          {Worker, :expire_timer, [{:entry_timer, state.myname}]})
       :exit ->
-        Process.send_after(self(), {:reset_exit}, delay * 1000)
+        :ok = Etimer.start_timer(state.myname, :exit_timer, delay * 1000,
+          {Worker, :expire_timer, [{:exit_timer, state.myname}]})
     end
   end
 
@@ -301,7 +315,7 @@ defmodule DtCore.Sensor.Worker do
       v when is_nil(v) or v == false ->
         state
         |> zone_entry_delay(entry_delay)
-        |> will_reset_delay(:entry)
+        |> will_reset_delay(:entry, state)
     end
   end
 
