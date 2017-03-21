@@ -164,11 +164,9 @@ defmodule DtCore.Sensor.Worker do
     end
     case delay_t do
       :entry ->
-        :ok = Etimer.start_timer(state.myname, :entry_timer, delay * 1000,
-          {Worker, :expire_timer, [{:entry_timer, state.myname}]})
+        :ok = start_entry_timer(delay, state)
       :exit ->
-        :ok = Etimer.start_timer(state.myname, :exit_timer, delay * 1000,
-          {Worker, :expire_timer, [{:exit_timer, state.myname}]})
+        :ok = start_exit_timer(delay, state)
     end
   end
 
@@ -418,6 +416,16 @@ defmodule DtCore.Sensor.Worker do
   defp reset_config(state) do
     Logger.debug("Resetting sensor config")
     %{state | config: state.original_config}
+  end
+
+  defp start_entry_timer(delay, state) do
+    Etimer.start_timer(state.myname, :entry_timer, delay * 1000,
+      {Worker, :expire_timer, [{:entry_timer, state.myname}]})
+  end
+
+  defp start_exit_timer(delay, state) do
+    Etimer.start_timer(state.myname, :exit_timer, delay * 1000,
+      {Worker, :expire_timer, [{:exit_timer, state.myname}]})
   end
 
 end
