@@ -249,7 +249,7 @@ defmodule DtCore.Sensor.Worker do
     zone_entry_delay(state, delay)
   end
 
-  def inarm_exit_delay({ev, sensor_ev, partition, p_exit}) do
+  defp inarm_exit_delay({ev, sensor_ev, partition, p_exit}) do
     Logger.debug "scheduling delayed exit alarm"
     delay = p_exit * 1000
     ev = %Event{ev | delayed: true}
@@ -258,7 +258,7 @@ defmodule DtCore.Sensor.Worker do
     %SensorEv{sensor_ev | delayed: true}
   end
 
-  def inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent, state}) do
+  defp inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent, state}) do
     delay = case ev_type_is_delayed?(sensor_ev) do
       true ->
         p_entry * 1000
@@ -306,7 +306,7 @@ defmodule DtCore.Sensor.Worker do
     end
   end
 
-  def maybe_start_entry_timer(state, entry_delay) do
+  defp maybe_start_entry_timer(state, entry_delay) do
     case state.config.exit_delay do
       true ->
         Logger.info "Still in exit delay, not resetting entry"
