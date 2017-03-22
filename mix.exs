@@ -69,7 +69,7 @@ defmodule Detectino.Mixfile do
      {:exrm, "~> 1.0"},
      {:conform, "~> 2.1"},
      {:conform_exrm, "~> 1.0"},
-     {:dialyxir, "~> 0.4", only: [:dev], runtime: false}
+     {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
    ]
   end
 
