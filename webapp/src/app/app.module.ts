@@ -21,7 +21,7 @@ import {
   InputSwitchModule, PaginatorModule
 } from 'primeng/primeng';
 
-import { MdIconModule, MdIconRegistry } from '@angular2-material/icon';
+import { MdIconModule, MdIconRegistry } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
