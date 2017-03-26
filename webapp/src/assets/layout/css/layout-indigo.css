@@ -141,6 +141,8 @@
 
 .ui-g.form-group > div {
   padding: .75em 1em; }
+.ui-g.form-group-m > div {
+  padding: 1em; }
 
 /* Ripple */
 /* Ripple Effect Style like Google Material Buttons Effect*/

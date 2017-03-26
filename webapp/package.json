@@ -12,16 +12,16 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "^2.4.8",
-    "@angular/compiler": "^2.4.8",
-    "@angular/core": "^2.4.8",
-    "@angular/forms": "^2.4.8",
-    "@angular/http": "^2.4.8",
-    "@angular/material": "^2.0.0-beta.2",
-    "@angular/platform-browser": "^2.4.8",
-    "@angular/platform-browser-dynamic": "^2.4.8",
-    "@angular/router": "^3.4.8",
-    "angular2-jwt": "^0.1.28",
+    "@angular/common": "^4.0.0",
+    "@angular/compiler": "^4.0.0",
+    "@angular/core": "^4.0.0",
+    "@angular/forms": "^4.0.0",
+    "@angular/http": "^4.0.0",
+    "@angular/material": "git+https://github.com/angular/material2.git",
+    "@angular/platform-browser": "^4.0.0",
+    "@angular/platform-browser-dynamic": "^4.0.0",
+    "@angular/router": "^4.0.0",
+    "angular2-jwt": "git+https://github.com/auth0/angular2-jwt.git",
     "angular2-uuid": "^1.1.1",
     "chart.js": "^2.4.0",
     "core-js": "^2.4.1",
@@ -31,15 +31,15 @@
     "jquery": "^3.1.1",
     "moment": "^2.17.1",
     "nanoscroller": "^0.8.7",
-    "primeng": "^2.0.5",
+    "primeng": "^4.0.0-rc.1",
     "quill": "^1.2.0",
     "rxjs": "^5.1.0",
     "ts-helpers": "^1.1.1",
-    "zone.js": "^0.7.6"
+    "zone.js": "^0.8.4"
   },
   "devDependencies": {
-    "@angular/cli": "^1.0.0-rc.4",
-    "@angular/compiler-cli": "^2.4.8",
+    "@angular/cli": "^1.0.0",
+    "@angular/compiler-cli": "^4.0.0",
     "@types/hammerjs": "^2.0.34",
     "@types/jasmine": "2.5.38",
     "@types/node": "~6.0.60",
@@ -54,7 +54,7 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "protractor": "~5.1.0",
     "ts-node": "~2.0.0",
-    "tslint": "~4.4.2",
-    "typescript": "~2.0.3"
+    "tslint": "~4.5.0",
+    "typescript": "~2.2.0"
   }
 }
