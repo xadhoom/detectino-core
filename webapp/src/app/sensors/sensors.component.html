@@ -118,11 +118,11 @@
     <div class="card card-w-title">
       <h2 class="BigTopic">Associated Partitions</h2>
       <p-pickList [source]="partitions" [target]="selectedPartitions" sourceHeader="Available" targetHeader="Selected" [responsive]="true">
-        <template let-partition pTemplate="item">
+        <ng-template let-partition pTemplate="item">
           <li class="ui-picklist-item ui-helper-clearfix picklist-entry">
             <div class="picklist-text">{{partition.name}}</div>
           </li>
-        </template>
+        </ng-template>
       </p-pickList>
       <div class="ui-g">
         <div class="ui-g-12 ui-md-6">

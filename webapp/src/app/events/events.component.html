@@ -59,11 +59,11 @@
     <div class="card card-w-title">
       <h2 class="BigTopic">Associated Outputs</h2>
       <p-pickList [source]="outputs" [target]="selectedOutputs" sourceHeader="Available" targetHeader="Selected" [responsive]="true">
-        <template let-output pTemplate="item">
+        <ng-template let-output pTemplate="item">
           <li class="ui-picklist-item ui-helper-clearfix picklist-entry">
             <div class="picklist-text">{{output.name}}</div>
           </li>
-        </template>
+        </ng-template>
       </p-pickList>
       <div class="ui-g">
         <div class="ui-g-12 ui-md-6">
