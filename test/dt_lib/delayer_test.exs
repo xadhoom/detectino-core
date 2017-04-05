@@ -101,4 +101,15 @@ defmodule DtLib.Test.Delayer do
     assert_received :d
   end
 
+  test "can start many delayers" do
+    {:ok, pid} = Delayer.start_link()
+    assert is_pid(pid)
+
+    {:ok, pid} = Delayer.start_link()
+    assert is_pid(pid)
+
+    {:ok, pid} = Delayer.start_link()
+    assert is_pid(pid)
+  end
+
 end
