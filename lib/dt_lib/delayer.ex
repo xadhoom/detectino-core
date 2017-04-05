@@ -10,6 +10,9 @@ defmodule DtLib.Delayer do
   A simple term storage which spits back
   them after an user choosen delay.
   Each stored term has it's own delay.
+
+  All delays must be expressed in milliseconds.
+  The granularity is 10 milliseconds.
   """
   use GenServer
 
@@ -31,8 +34,12 @@ defmodule DtLib.Delayer do
     :error
   end
 
+  @doc """
+  put a term into my storage, I'll spit it back
+  to you after the specified delay
+  """
   @spec put(pid(), any(), non_neg_integer()) :: {:ok, reference()}
-  def put(server, term, delay) do
+  def put(server, term, delay) when is_integer(delay) do
     GenServer.call(server, {:put, term, delay})
   end
 
@@ -41,8 +48,14 @@ defmodule DtLib.Delayer do
     GenServer.call(server, {:tick})
   end
 
+  @doc """
+  Warp my time in the future.
+  Basically adds an offset (only positive) which may
+  trigger events.
+  Mostly used in tests.
+  """
   @spec warp(pid(), non_neg_integer()) :: :warped
-  def warp(server, offset) do
+  def warp(server, offset) when is_integer(offset) and offset > 0 do
     GenServer.call(server, {:warp, offset})
   end
 
