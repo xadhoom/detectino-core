@@ -43,9 +43,25 @@ defmodule DtLib.Test.Delayer do
   test "cancel an event" do
     {:ok, pid} = Delayer.start_link()
     {:ok, ref} = Delayer.put(pid, :atom, 1000)
+
     assert :ok = Delayer.cancel(pid, ref)
+
     :warped = Delayer.warp(pid, 10_000)
     refute_received :atom
+  end
+
+  test "cancel all events" do
+    {:ok, pid} = Delayer.start_link()
+    {:ok, _ref} = Delayer.put(pid, :an, 1000)
+    {:ok, _ref} = Delayer.put(pid, :atom, 2000)
+    {:ok, _ref} = Delayer.put(pid, :here, 3000)
+
+    assert :ok = Delayer.stop_all(pid)
+
+    :warped = Delayer.warp(pid, 10_000)
+    refute_received :an
+    refute_received :atom
+    refute_received :here
   end
 
   test "warp the time" do
