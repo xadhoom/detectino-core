@@ -40,6 +40,14 @@ defmodule DtLib.Test.Delayer do
     assert :error == Delayer.put(:any, :any, 0)
   end
 
+  test "cancel an event" do
+    {:ok, pid} = Delayer.start_link()
+    {:ok, ref} = Delayer.put(pid, :atom, 1000)
+    assert :ok = Delayer.cancel(pid, ref)
+    :warped = Delayer.warp(pid, 10_000)
+    refute_received :atom
+  end
+
   test "warp the time" do
     {:ok, pid} = Delayer.start_link()
 
