@@ -2,10 +2,12 @@ defmodule DtCore.Test.Sensor.Worker do
   use ExUnit.Case, async: false
 
   alias DtCore.Sensor.Worker
+  alias DtCore.Sensor.Utils
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
   alias DtCore.Event, as: Event
   alias DtCore.SensorEv
+  alias DtCore.Test.TimerHelper
 
   @arm_disarmed "DISARM"
   @arm_armed "ARM"
@@ -103,7 +105,7 @@ defmodule DtCore.Test.Sensor.Worker do
   end
 
   test "alarm on entry is delayed by partion time if sensor is a delayed one" do
-     {:ok, part, config, pid} = setup_delayed_nc(1, false)
+     {:ok, part, config, pid} = setup_delayed_nc(3, false)
 
     arm_cmd = {:arm, part.exit_delay}
     :ok = GenServer.call(pid, arm_cmd)
@@ -123,7 +125,7 @@ defmodule DtCore.Test.Sensor.Worker do
   end
 
   test "delayed alarm on entry is cancelled if partition is unarmed in time" do
-    {:ok, part, config, pid} = setup_delayed_nc(false, 60)
+    {:ok, part, config, pid} = setup_delayed_nc(60, false)
 
     arm_cmd = {:arm, 0}
     :ok = GenServer.call(pid, arm_cmd)
@@ -145,6 +147,63 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
     assert :standby == Worker.alarm_status({config, part})
+  end
+
+  test "delayed alarm on entry is restarted on a new alarm event" do
+    :ok = setup_etimer_meck()
+
+    # setup sensor
+    {:ok, part, config, pid} = setup_delayed_nc(60, false)
+    {:ok, server_name} = Utils.sensor_server_name(config, part)
+
+    # arm sensor
+    arm_cmd = {:arm, 0}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # sends a reading that triggers an alarm
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # entry timer should kick in (on busy system may not be immediate)
+    TimerHelper.wait_until fn() ->
+      assert :meck.called(
+        Etimer, :start_timer,
+        [:_, :entry_timer, part.entry_delay * 1000,
+          {Worker, :expire_timer, [{:entry_timer, server_name}]}
+        ]
+      )
+    end
+    # and we must forcefully trigger it, since is mocked
+    Worker.expire_timer({:entry_timer, server_name})
+    # and flush the events
+    send pid, {:flush, :entry}
+    # now check
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    # now put the sensor back in idle status
+    ev = %Event{address: "1", port: 1, value: 5}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # check that the alarm is stopped
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+
+    # send another alarm reading
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # entry timer should start again
+    assert :meck.called(
+      Etimer, :start_timer,
+      [:_, :entry_timer, part.entry_delay * 1000,
+        {Worker, :expire_timer, [{:entry_timer, server_name}]}
+      ]
+    )
+
+    :ok = clean_etimer_meck()
   end
 
   test "delayed alarm on exit is cancelled if partition is unarmed in time" do
@@ -223,6 +282,20 @@ defmodule DtCore.Test.Sensor.Worker do
     }
     {:ok, pid} = Worker.start_link({sensor, partition, self()})
     {:ok, partition, sensor, pid}
+  end
+
+  defp setup_etimer_meck do
+    :meck.new(Etimer, [:passthrough])
+    :meck.expect(Etimer, :start_timer,
+      fn(_ ,_ ,_ ,_ ) ->
+        :ok
+      end)
+    :ok
+  end
+
+  defp clean_etimer_meck do
+    :meck.unload(Etimer)
+    :ok
   end
 
 end

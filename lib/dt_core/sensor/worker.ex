@@ -13,6 +13,18 @@ defmodule DtCore.Sensor.Worker do
   alias DtCore.Event, as: Event
   alias DtCore.SensorEv
   alias DtCore.Sensor.Worker
+  alias DtLib.Delayer
+
+  defstruct config: nil,
+    original_config: nil,
+    receiver: nil,
+    armed: false,
+    cur_ev: nil,
+    last_ev: nil,
+    status: nil,
+    myname: nil,
+    exit_timers: nil,
+    entry_timers: nil
 
   #
   # Client APIs
@@ -49,7 +61,9 @@ defmodule DtCore.Sensor.Worker do
   def init({config, receiver, name}) do
     Logger.info "Starting Sensor Worker with addr #{config.address} " <>
       "and port #{config.port}"
-    state = %{
+    {:ok, entry_t_pid} = Delayer.start_link()
+    {:ok, exit_t_pid} = Delayer.start_link()
+    state = %Worker{
       config: config,
       original_config: config,
       receiver: receiver,
@@ -59,12 +73,26 @@ defmodule DtCore.Sensor.Worker do
       },
       last_ev: nil,
       status: :standby,
-      myname: name
+      myname: name,
+      exit_timers: exit_t_pid,
+      entry_timers: entry_t_pid
     }
     Etimer.start_link(state.myname)
     {:ok, state}
   end
 
+  @doc false
+  def handle_info({:flush, :entry}, state) do
+    # used only for tests
+    {:ok, events} = Delayer.stop_all(state.entry_timers)
+    Enum.each(events, fn(ev) ->
+      send self(), ev
+    end)
+    {:noreply, state}
+  end
+
+  @spec handle_info({:event, %Event{}, %PartitionModel{}},
+    %Worker{}) :: {:noreply, %Worker{}}
   def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
     config = state.config
     newstate = case config.enabled do
@@ -74,10 +102,10 @@ defmodule DtCore.Sensor.Worker do
       true ->
         if ev.address == config.address and ev.port == config.port do
           Logger.debug("Got event from server")
-          event = do_receive_event(ev, partition, state)
+          {event, state} = do_receive_event(ev, partition, state)
           state = sensor_state(event, state)
           :ok = Process.send(state.receiver, {:start, event}, [])
-          %{state | last_ev: ev}
+          %Worker{state | last_ev: ev}
         else
           state
         end
@@ -91,14 +119,14 @@ defmodule DtCore.Sensor.Worker do
   def handle_call({:reset_entry}, _from, state) do
     Logger.info("Resetting Entry Delay")
     config = %SensorModel{state.config | entry_delay: false}
-    state = %{state | config: config}
+    state = %Worker{state | config: config}
     {:reply, :ok, state}
   end
 
   def handle_call({:reset_exit}, _from, state) do
     Logger.info("Resetting Exit Delay")
     config = %SensorModel{state.config | exit_delay: false}
-    state = %{state | config: config}
+    state = %Worker{state | config: config}
     {:reply, :ok, state}
   end
 
@@ -121,7 +149,7 @@ defmodule DtCore.Sensor.Worker do
     |> zone_exit_delay(delay)
     |> will_reset_delay(:exit, state)
 
-    {:reply, :ok, %{state | armed: true}}
+    {:reply, :ok, %Worker{state | armed: true}}
   end
 
   def handle_call({:disarm}, _from, state) do
@@ -132,13 +160,16 @@ defmodule DtCore.Sensor.Worker do
       nil ->
         state
       last_ev ->
-        ev = process_indisarm(last_ev, nil, state)
+        # processing again last event in disarm state
+        # in order to cancel any previous trigger
+        {ev, state} = process_indisarm(last_ev, nil, state)
         state = sensor_state(ev, state)
+        # and send it to our receiver
         :ok = Process.send(state.receiver, {:start, ev}, [])
         state
     end
 
-    {:reply, :ok, %{state | armed: false}}
+    {:reply, :ok, %Worker{state | armed: false}}
   end
 
   defp sensor_state(ev, state) do
@@ -151,7 +182,7 @@ defmodule DtCore.Sensor.Worker do
       :alarm -> :alarm
     end
     :ok = Process.send(state.receiver, {:stop, state.cur_ev}, [])
-    %{state | cur_ev: ev, status: status}
+    %Worker{state | cur_ev: ev, status: status}
   end
 
   defp will_reset_delay(delay, delay_t, state) do
@@ -185,6 +216,8 @@ defmodule DtCore.Sensor.Worker do
   end
 
   @doc false
+  @spec do_receive_event(%Event{}, %PartitionModel{},
+    %Worker{}) :: {%SensorEv{}, %Worker{}}
   defp do_receive_event(ev = %Event{}, partition = %PartitionModel{}, state) do
     case state.armed do
       v when v == "DISARM" or v == false ->
@@ -199,16 +232,20 @@ defmodule DtCore.Sensor.Worker do
     end
   end
 
+  @spec process_indisarm(%Event{}, any(),
+    %Worker{}) :: {%SensorEv{}, %Worker{}}
   defp process_indisarm(ev = %Event{}, _partition, state) do
     sensor_ev = process_event(ev, state)
 
     case sensor_ev.type do
       :alarm ->
-          %SensorEv{sensor_ev | type: :reading}
-      _ -> sensor_ev
+          {%SensorEv{sensor_ev | type: :reading}, state}
+      _ -> {sensor_ev, state}
     end
   end
 
+  @spec process_inarm(%Event{}, %PartitionModel{},
+    %Worker{}) :: {%SensorEv{}, %Worker{}}
   defp process_inarm(ev, partition, state) do
     urgent = urgent?(state.config)
     p_entry = compute_entry_delay(partition, urgent, state)
@@ -220,16 +257,15 @@ defmodule DtCore.Sensor.Worker do
     exit_delay = case ev_type_is_delayed?(sensor_ev) do
       true -> is_exit_delayed
       false -> false
-      v -> v
     end
 
     case exit_delay do
       false ->
-        inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent, state})
+        inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent}, state)
       true ->
-        inarm_exit_delay({ev, sensor_ev, partition, p_exit})
+        inarm_exit_delay({ev, sensor_ev, partition, p_exit}, state)
       _ ->
-        %SensorEv{sensor_ev | delayed: false, urgent: urgent}
+        {%SensorEv{sensor_ev | delayed: false, urgent: urgent}, state}
     end
   end
 
@@ -249,21 +285,24 @@ defmodule DtCore.Sensor.Worker do
     zone_entry_delay(state, delay)
   end
 
-  defp inarm_exit_delay({ev, sensor_ev, partition, p_exit}) do
+  @spec inarm_exit_delay({%Event{}, %SensorEv{}, %PartitionModel{}, integer()},
+    %Worker{}) :: {%SensorEv{}, %Worker{}}
+  defp inarm_exit_delay({ev, sensor_ev, partition, p_exit}, state) do
     Logger.debug "scheduling delayed exit alarm"
     delay = p_exit * 1000
     ev = %Event{ev | delayed: true}
     # XXX this one should be cancelled if disarmed
-    _timer = Process.send_after(self(), {:event, ev, partition},
-      delay)
-    %SensorEv{sensor_ev | delayed: true}
+    Delayer.put(state.exit_timers, {:event, ev, partition}, delay)
+    {%SensorEv{sensor_ev | delayed: true}, state}
   end
 
-  defp inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent, state}) do
+  @spec inarm_no_exit_delay({%Event{}, %SensorEv{}, %PartitionModel{},
+    integer(), boolean()}, %Worker{}) :: {%SensorEv{}, %Worker{}}
+  defp inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent}, state) do
     # this one is the entry delay
     delay = case ev_type_is_delayed?(sensor_ev) do
       true ->
-        p_entry * 1000
+        p_entry
       _ ->
         Logger.debug("Event #{inspect sensor_ev} " <>
           "not delayed because is not an alarm")
@@ -271,14 +310,13 @@ defmodule DtCore.Sensor.Worker do
     end
     case delay do
       0 ->
-        %SensorEv{sensor_ev | delayed: false, urgent: urgent}
+        {%SensorEv{sensor_ev | delayed: false, urgent: urgent}, state}
       _ ->
         ev = %Event{ev | delayed: true}
         # XXX this one should be cancelled if disarmed
-        _timer = Process.send_after(self(), {:event, ev, partition},
-          delay)
+        Delayer.put(state.entry_timers, {:event, ev, partition}, delay)
         maybe_start_entry_timer(state, p_entry)
-        %SensorEv{sensor_ev | delayed: true}
+        {%SensorEv{sensor_ev | delayed: true}, state}
     end
   end
 
@@ -418,7 +456,7 @@ defmodule DtCore.Sensor.Worker do
 
   defp reset_config(state) do
     Logger.debug("Resetting sensor config")
-    %{state | config: state.original_config}
+    %Worker{state | config: state.original_config}
   end
 
   defp start_entry_timer(delay, state) do
