@@ -94,21 +94,30 @@ defmodule DtLib.Delayer do
 
   @doc false
   @spec handle_call({:cancel, reference()}, any(),
-    %Delayer{}) :: {:reply, :ok, %Delayer{}}
+    %Delayer{}) :: {:reply, {:ok, any()}, %Delayer{}}
   def handle_call({:cancel, ref}, _from, state) do
+    expunged = state.terms
+    |> Enum.find(fn(x) ->
+      ref == x.ref
+    end)
+    |> Map.get(:term)
+
     terms = state.terms
     |> Enum.reject(fn(x) ->
       ref == x.ref
     end)
     state = %{state | terms: terms}
-    {:reply, :ok, state}
+    {:reply, {:ok, expunged}, state}
   end
 
   @doc false
   @spec handle_call({:stop_all}, any(),
-    %Delayer{}) :: {:reply, :ok, %Delayer{}}
+    %Delayer{}) :: {:reply, {:ok, [any(), ...]}, %Delayer{}}
   def handle_call({:stop_all}, _from, state) do
-    {:reply, :ok, %{state | terms: []}}
+    terms = Enum.map(state.terms, fn(x) ->
+      Map.get(x, :term)
+    end)
+    {:reply, {:ok, terms}, %{state | terms: []}}
   end
 
   @doc false

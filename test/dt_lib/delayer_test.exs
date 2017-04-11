@@ -44,7 +44,7 @@ defmodule DtLib.Test.Delayer do
     {:ok, pid} = Delayer.start_link()
     {:ok, ref} = Delayer.put(pid, :atom, 1000)
 
-    assert :ok = Delayer.cancel(pid, ref)
+    assert {:ok, :atom} = Delayer.cancel(pid, ref)
 
     :warped = Delayer.warp(pid, 10_000)
     refute_received :atom
@@ -56,7 +56,8 @@ defmodule DtLib.Test.Delayer do
     {:ok, _ref} = Delayer.put(pid, :atom, 2000)
     {:ok, _ref} = Delayer.put(pid, :here, 3000)
 
-    assert :ok = Delayer.stop_all(pid)
+    # they will be in opposite order
+    assert {:ok, [:here, :atom, :an]} = Delayer.stop_all(pid)
 
     :warped = Delayer.warp(pid, 10_000)
     refute_received :an
