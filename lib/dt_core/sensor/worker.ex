@@ -91,6 +91,16 @@ defmodule DtCore.Sensor.Worker do
     {:noreply, state}
   end
 
+  @doc false
+  def handle_info({:flush, :exit}, state) do
+    # used only for tests
+    {:ok, events} = Delayer.stop_all(state.exit_timers)
+    Enum.each(events, fn(ev) ->
+      send self(), ev
+    end)
+    {:noreply, state}
+  end
+
   @spec handle_info({:event, %Event{}, %PartitionModel{}},
     %Worker{}) :: {:noreply, %Worker{}}
   def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
