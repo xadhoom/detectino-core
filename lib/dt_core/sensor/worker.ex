@@ -291,7 +291,7 @@ defmodule DtCore.Sensor.Worker do
     Logger.debug "scheduling delayed exit alarm"
     delay = p_exit * 1000
     ev = %Event{ev | delayed: true}
-    # XXX this one should be cancelled if disarmed
+    # XXX this one should be cancelled if disarmed, or better call {:flush, :exit}
     Delayer.put(state.exit_timers, {:event, ev, partition}, delay)
     {%SensorEv{sensor_ev | delayed: true}, state}
   end
@@ -313,7 +313,7 @@ defmodule DtCore.Sensor.Worker do
         {%SensorEv{sensor_ev | delayed: false, urgent: urgent}, state}
       _ ->
         ev = %Event{ev | delayed: true}
-        # XXX this one should be cancelled if disarmed
+        # XXX this one should be cancelled if disarmed or better call {:flush, :entry}
         Delayer.put(state.entry_timers, {:event, ev, partition}, delay)
         maybe_start_entry_timer(state, p_entry)
         {%SensorEv{sensor_ev | delayed: true}, state}
