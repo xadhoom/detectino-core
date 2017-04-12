@@ -38,23 +38,23 @@ defmodule DtBus.Can do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  def ping(node_id) when is_integer node_id do
+  def ping(node_id) when is_integer(node_id) do
     GenServer.call __MODULE__, {:ping, node_id}
   end
 
-  def read(node_id, terminal) when is_integer node_id and is_atom terminal do
+  def read(node_id, terminal) when is_integer(node_id) and is_atom(terminal) do
     GenServer.cast __MODULE__, {:read, node_id, terminal}
   end
 
-  def read_all(node_id) when is_integer node_id do
+  def read_all(node_id) when is_integer(node_id) do
     GenServer.cast __MODULE__, {:read, node_id, :read_all}
   end
 
-  def readd(node_id, terminal) when is_integer node_id and is_atom terminal do
+  def readd(node_id, terminal) when is_integer(node_id) and is_atom(terminal) do
     GenServer.cast __MODULE__, {:readd, node_id, terminal}
   end
 
-  def readd_all(node_id) when is_integer node_id do
+  def readd_all(node_id) when is_integer(node_id) do
     GenServer.cast __MODULE__, {:readd, node_id, :read_all}
   end
 

@@ -127,12 +127,7 @@ defmodule DtCore.Sensor.Server do
 
   @doc false
   def handle_info({:reload}, state) do
-    {res, state} = do_reload(state)
-    case res do
-      {:error, any} ->
-        Logger.error("Got reload error #{inspect any}")
-      _ -> nil
-    end
+    {:ok, state} = do_reload(state)
     {:noreply, state}
   end
 
@@ -188,14 +183,9 @@ defmodule DtCore.Sensor.Server do
   end
 
   defp do_reload(state) do
-    case Supervisor.stop(state.partition_sup, :normal) do
-      :ok ->
-        send self(), :start
-        {:ok, %{state | partition_sup: nil}}
-      any ->
-        Logger.error "Error stopping partition worker sup #{inspect any}"
-        {{:error, any}, state}
-      end
+    :ok = Supervisor.stop(state.partition_sup, :normal)
+    send self(), :start
+    {:ok, %{state | partition_sup: nil}}
   end
 
   defp dispatch_event({ev = %BusEvent{}, state}) do
