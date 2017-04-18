@@ -261,6 +261,8 @@ defmodule DtCore.Sensor.Worker do
     p_entry = compute_entry_delay(partition, urgent, state)
     p_exit = compute_exit_delay(partition, urgent, state)
 
+    # TODO: check if is a transition from idle -> alarm and then
+    # restart the delay timer if is entry
     sensor_ev = process_event(ev, state)
 
     is_exit_delayed = exit_delay?(ev, urgent, state)
