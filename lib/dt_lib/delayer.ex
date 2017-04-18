@@ -69,7 +69,7 @@ defmodule DtLib.Delayer do
   Cancel the timer associated to the given refernce.
   Always returns :ok, even if reference is not valid
   """
-  @spec cancel(pid(), reference()) :: :ok
+  @spec cancel(pid(), reference()) :: {:ok, any()}
   def cancel(server, ref) do
     GenServer.call(server, {:cancel, ref})
   end
@@ -77,7 +77,7 @@ defmodule DtLib.Delayer do
   @doc """
   Stop all timers.
   """
-  @spec stop_all(pid()) :: :ok
+  @spec stop_all(pid()) :: {:ok, [any(), ...]}
   def stop_all(server) do
     GenServer.call(server, {:stop_all})
   end

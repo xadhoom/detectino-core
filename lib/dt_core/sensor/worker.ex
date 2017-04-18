@@ -91,6 +91,16 @@ defmodule DtCore.Sensor.Worker do
     {:noreply, state}
   end
 
+  @doc false
+  def handle_info({:flush, :exit}, state) do
+    # used only for tests
+    {:ok, events} = Delayer.stop_all(state.exit_timers)
+    Enum.each(events, fn(ev) ->
+      send self(), ev
+    end)
+    {:noreply, state}
+  end
+
   @spec handle_info({:event, %Event{}, %PartitionModel{}},
     %Worker{}) :: {:noreply, %Worker{}}
   def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
@@ -300,6 +310,7 @@ defmodule DtCore.Sensor.Worker do
     integer(), boolean()}, %Worker{}) :: {%SensorEv{}, %Worker{}}
   defp inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent}, state) do
     # this one is the entry delay
+    IO.inspect p_entry
     delay = case ev_type_is_delayed?(sensor_ev) do
       true ->
         p_entry
