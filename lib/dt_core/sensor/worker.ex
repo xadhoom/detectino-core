@@ -310,6 +310,7 @@ defmodule DtCore.Sensor.Worker do
     integer(), boolean()}, %Worker{}) :: {%SensorEv{}, %Worker{}}
   defp inarm_no_exit_delay({ev, sensor_ev, partition, p_entry, urgent}, state) do
     # this one is the entry delay
+    IO.inspect p_entry
     delay = case ev_type_is_delayed?(sensor_ev) do
       true ->
         p_entry

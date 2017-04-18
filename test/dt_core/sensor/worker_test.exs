@@ -225,7 +225,11 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :standby, address: "1", port: 1}}
     |> assert_receive(5000)
 
+    :ok = clean_etimer_meck()
+    :ok = setup_etimer_meck()
+
     # send another alarm reading
+    IO.inspect :sending_another_alarm
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
@@ -240,7 +244,8 @@ defmodule DtCore.Test.Sensor.Worker do
     :ok = clean_etimer_meck()
   end
 
-  test "delayed alarm on exit is restarted on a new alarm event" do
+  test "delayed alarm on exit is not restarted on a new alarm event" do
+    # but instead should be immediate
     :ok = setup_etimer_meck()
 
     # setup sensor
@@ -254,6 +259,12 @@ defmodule DtCore.Test.Sensor.Worker do
     # sends a reading that triggers an alarm
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # check that a delayed event is sent
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
 
     # entry timer should kick in (on busy system may not be immediate)
     TimerHelper.wait_until fn() ->
@@ -270,6 +281,8 @@ defmodule DtCore.Test.Sensor.Worker do
     # and flush the events
     send pid, {:flush, :exit}
     # now check
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
     {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
@@ -283,18 +296,26 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :standby, address: "1", port: 1}}
     |> assert_receive(5000)
 
+    :ok = clean_etimer_meck()
+    :ok = setup_etimer_meck()
+
     # send another alarm reading
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    # entry timer should start again
-    assert :meck.called(
+    # entry timer should *not* start again
+    refute :meck.called(
       Etimer, :start_timer,
       [:_, :exit_timer, part.exit_delay * 1000,
         {Worker, :expire_timer, [{:exit_timer, server_name}]}
       ]
     )
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
 
+    refute_received _
     :ok = clean_etimer_meck()
   end
 
