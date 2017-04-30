@@ -231,7 +231,7 @@ defmodule DtCore.Sensor.Worker do
   defp do_receive_event(ev = %Event{}, partition = %PartitionModel{}, state) do
     case state.armed do
       v when v == "DISARM" or v == false ->
-        case state.config.full24h do
+        case urgent?(state.config) do
           true ->
             process_inarm(ev, partition, state)
           _ ->
