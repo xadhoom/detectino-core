@@ -473,13 +473,26 @@ defmodule DtCore.Sensor.Worker do
   end
 
   defp start_entry_timer(delay, state) do
-    Etimer.start_timer(state.myname, :entry_timer, delay * 1000,
+    delay = case Etimer.stop_timer(state.myname, :entry_timer) do
+      {:ok, remaing_time} -> remaing_time
+      :not_running -> delay * 1000
+    end
+    Etimer.start_timer(state.myname, :entry_timer, delay,
       {Worker, :expire_timer, [{:entry_timer, state.myname}]})
   end
 
   defp start_exit_timer(delay, state) do
-    Etimer.start_timer(state.myname, :exit_timer, delay * 1000,
+    delay = case Etimer.stop_timer(state.myname, :exit_timer) do
+      {:ok, remaing_time} -> remaing_time
+      :not_running -> delay * 1000
+    end
+    Etimer.start_timer(state.myname, :exit_timer, delay,
       {Worker, :expire_timer, [{:exit_timer, state.myname}]})
+  end
+
+  @spec idle_to_alarm?(%SensorEv{}, %Worker{}) :: boolean
+  defp idle_to_alarm?(ev = %SensorEv{}, state) do
+    #case state.last_ev.type
   end
 
 end
