@@ -3,6 +3,8 @@ import {
   PartitionService, NotificationService,
   PinService
 } from '../services';
+import { MdIconRegistry } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Partition } from '../models/partition';
 
 @Component({
@@ -20,9 +22,23 @@ export class IntrusionComponent implements OnInit {
 
   constructor(private partitionService: PartitionService,
     private notificationService: NotificationService,
-    public pinSrv: PinService) {
+    public pinSrv: PinService, iconRegistry: MdIconRegistry,
+    sanitizer: DomSanitizer) {
     this.selectedPartition = null;
     this.showArmDialog = false;
+
+    iconRegistry.addSvgIcon(
+      'lock-outline',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/lock-outline.svg'));
+    iconRegistry.addSvgIcon(
+      'lock-open-outline',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/lock-open-outline.svg'));
+    iconRegistry.addSvgIcon(
+      'security-home',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/security-home.svg'));
+    iconRegistry.addSvgIcon(
+      'security-close',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/images/close.svg'));
   }
 
   ngOnInit() {

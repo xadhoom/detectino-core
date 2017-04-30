@@ -19,7 +19,7 @@
     <div class="ui-g-12" *ngIf="!isArmed(selectedPartition)">
       <div class="card colorbox colorbox-ARM" (click)="doArm(selectedPartition, 'ARM')">
         <div>
-          <md-icon svgSrc="assets/images/lock-outline.svg" class="svg-material-icons"></md-icon>
+          <md-icon svgIcon="lock-outline" class="svg-material-icons"></md-icon>
         </div>
         <div>
           <span class="fullname">Arm Away</span>
@@ -30,7 +30,7 @@
     <div class="ui-g-12" *ngIf="!isArmed(selectedPartition)">
       <div class="card colorbox colorbox-ARMSTAY" (click)="doArm(selectedPartition, 'ARMSTAY')">
         <div>
-          <md-icon svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
+          <md-icon svgIcon="security-home" class="svg-material-icons"></md-icon>
         </div>
         <div>
           <span class="fullname">Arm Stay</span>
@@ -41,7 +41,7 @@
     <div class="ui-g-12" *ngIf="!isArmed(selectedPartition)">
       <div class="card colorbox colorbox-ARMSTAYIMMEDIATE" (click)="doArm(selectedPartition, 'ARMSTAYIMMEDIATE')">
         <div>
-          <md-icon svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
+          <md-icon svgIcon="security-home" class="svg-material-icons"></md-icon>
         </div>
         <div>
           <span class="fullname">Arm Stay Immediate</span>
@@ -52,7 +52,7 @@
     <div class="ui-g-12" *ngIf="isArmed(selectedPartition)">
       <div class="card colorbox colorbox-DISARM" (click)="doDisarm(selectedPartition)">
         <div>
-          <md-icon svgSrc="assets/images/lock-open-outline.svg" class="svg-material-icons"></md-icon>
+          <md-icon svgIcon="lock-open-outline" class="svg-material-icons"></md-icon>
         </div>
         <div>
           <span class="fullname">Disarm</span>
@@ -64,7 +64,7 @@
 
       <div class="card colorbox colorbox-2" (click)="cancelArming()">
         <div>
-          <md-icon svgSrc="assets/images/close.svg" class="svg-material-icons"></md-icon>
+          <md-icon svgIcon="security-close" class="svg-material-icons"></md-icon>
         </div>
         <div>
           <span class="fullname">Cancel</span>
@@ -79,11 +79,11 @@
     <div class="ui-g-12 ui-sm-6 ui-md-4 ui-lg-3" *ngFor="let partition of partitions">
       <div class="card colorbox colorbox-{{partition.armed}}">
         <div (click)="armDisarmPartition(partition)">
-          <md-icon *ngIf="partition.armed == 'ARMSTAY'" svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
-          <md-icon *ngIf="partition.armed == 'ARMSTAYIMMEDIATE'" svgSrc="assets/images/security-home.svg" class="svg-material-icons"></md-icon>
-          <md-icon *ngIf="partition.armed == 'ARM'" svgSrc="assets/images/lock-outline.svg" class="svg-material-icons"></md-icon>
-          <md-icon *ngIf="partition.armed == 'DISARM'" svgSrc="assets/images/lock-open-outline.svg" class="svg-material-icons"></md-icon>
-          <md-icon *ngIf="!partition.armed" svgSrc="assets/images/lock-open-outline.svg" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'ARMSTAY'" svgIcon="security-home" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'ARMSTAYIMMEDIATE'" svgIcon="security-home" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'ARM'" svgIcon="lock-outline" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="partition.armed == 'DISARM'" svgIcon="lock-open-outline" class="svg-material-icons"></md-icon>
+          <md-icon *ngIf="!partition.armed" svgIcon="lock-open-outline" class="svg-material-icons"></md-icon>
         </div>
         <div>
           <!--span class="colorbox-name"></span-->
