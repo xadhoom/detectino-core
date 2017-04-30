@@ -34,7 +34,7 @@ export class AuthService {
       return false;
     }
     // Check if there's an unexpired JWT
-    const expired = !tokenNotExpired();
+    const expired = !tokenNotExpired('id_token');
     if (expired) {
       this.logout();
       return false;

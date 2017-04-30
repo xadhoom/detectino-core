@@ -10,7 +10,7 @@ export class AuthGuardService {
   canActivate(): Observable<boolean> {
     let res = false;
 
-    if (tokenNotExpired()) {
+    if (tokenNotExpired('id_token')) {
       res = true;
     } else {
       this.router.navigateByUrl('/login');
