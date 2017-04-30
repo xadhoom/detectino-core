@@ -36,7 +36,7 @@ defmodule DtWeb.Sensor do
   If no params are provided, an invalid changeset is returned
   with no validation performed.
   """
-  def create_changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
@@ -45,7 +45,7 @@ defmodule DtWeb.Sensor do
     |> unique_constraint(:port, name: :sensors_address_port_index)
   end
 
-  def update_changeset(model, params \\ :empty) do
+  def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)

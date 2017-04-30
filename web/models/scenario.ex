@@ -18,14 +18,14 @@ defmodule DtWeb.Scenario do
   @optional_fields ~w()
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
 
-  def create_changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
     |> unique_constraint(:name)
   end
 
-  def update_changeset(model, params \\ :empty) do
+  def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)

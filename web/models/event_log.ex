@@ -41,14 +41,14 @@ defmodule DtWeb.EventLog do
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @source_types ["arm", "exit_timer", "alarm", "disarm"]
 
-  def create_changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @source_types)
   end
 
-  def update_changeset(model, params \\ :empty) do
+  def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields)
     |> validate_required(@validate_required)

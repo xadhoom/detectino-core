@@ -2,8 +2,6 @@ defmodule DtWeb.Plugs.PinAuthorize do
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 
-  use DtWeb.Web, :controller
-
   alias DtWeb.Repo
   alias DtWeb.User
   alias DtWeb.StatusCodes

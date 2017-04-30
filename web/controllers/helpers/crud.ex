@@ -12,6 +12,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
   # also in delete, show, update...
   #
 
+  @spec all(Plug.Conn.t, map, {module, module, [atom] | nil}, [atom]) ::
+    {:ok, Plug.Conn.t, list} | {:error, Plug.Conn.t, pos_integer}
   def all(conn, params, {repo, model, sortdefs}, assocs \\ []) do
     filter = :fields
     |> model.__schema__
@@ -27,28 +29,32 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     order_by = build_sorting_with_def(params, sortdefs)
 
-    q = from m in model,
-      where: ^filter,
-      limit: ^per_page,
-      offset: ^((page - 1) * per_page),
-      order_by: ^order_by,
-      preload: ^assocs
-    items = repo.all(q)
+    try do
+      q = from m in model,
+        where: ^filter,
+        limit: ^per_page,
+        offset: ^((page - 1) * per_page),
+        order_by: ^order_by,
+        preload: ^assocs
+      items = repo.all(q)
 
-    qc = from m in model,
-      select: count(m.id),
-      where: ^filter
-    total = repo.one(qc)
+      qc = from m in model,
+        select: count(m.id),
+        where: ^filter
+      total = repo.one(qc)
 
-    total_s = total
-    |> Integer.to_string
+      total_s = total
+      |> Integer.to_string
 
-    conn = put_resp_header(conn, "x-total-count", total_s)
+      conn = put_resp_header(conn, "x-total-count", total_s)
 
-    links = links(conn, page, per_page, total)
-    newconn = put_resp_header(conn, "link", links)
+      links = links(conn, page, per_page, total)
+      newconn = put_resp_header(conn, "link", links)
 
-    {:ok, newconn, items}
+      {:ok, newconn, items}
+    rescue
+      Ecto.QueryError -> {:error, conn, 500}
+    end
   end
 
   def links(conn, page, per_page, total) do

@@ -16,18 +16,18 @@ defmodule DtWeb.OutputControllerTest do
 
   test "create an output", %{conn: conn} do
     conn = Helper.login(conn)
+    data = %{name: "this is a test", type: "bus", enabled: false,
+      bus_settings: %{address: "addr", type: "bistable", "port": 1}}
 
     # create an output
     conn = conn
-    |> post(output_path(conn, :create),
-      %{name: "this is a test", type: "bus", enabled: false})
+    |> post(output_path(conn, :create), data)
     conn |> response(401)
 
     conn = conn
     |> Helper.newconn
     |> put_req_header("p-dt-pin", "666666")
-    |> post(output_path(conn, :create),
-      %{name: "this is a test", type: "bus", enabled: false})
+    |> post(output_path(conn, :create), data)
     json = json_response(conn, 201)
     assert json["name"] == "this is a test"
 

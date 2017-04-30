@@ -14,7 +14,7 @@ defmodule DtWeb.BusSettings do
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @types ["monostable", "bistable"]
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)

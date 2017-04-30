@@ -33,7 +33,7 @@ defmodule DtWeb.Event do
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @source_types ["sensor", "partition"]
 
-  def create_changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
@@ -41,7 +41,7 @@ defmodule DtWeb.Event do
     |> check_config
   end
 
-  def update_changeset(model, params \\ :empty) do
+  def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@validate_required)
@@ -57,8 +57,6 @@ defmodule DtWeb.Event do
         add_error(changeset, :source_config, "invalid")
       {_, field} ->
         cast_config(changeset, field)
-      _ ->
-        add_error(changeset, :source_config, "invalid")
     end
   end
 

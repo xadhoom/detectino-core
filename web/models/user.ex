@@ -15,7 +15,7 @@ defmodule DtWeb.User do
     timestamps()
   end
 
-  def create_changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, ~w(name username password role pin))
     |> validate_required([:name, :username, :password, :role])
@@ -24,7 +24,7 @@ defmodule DtWeb.User do
     |> maybe_update_password
   end
 
-  def update_changeset(model, params \\ :empty) do
+  def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, ~w(id name username password role pin))
     |> validate_required([:id, :name, :username, :role])

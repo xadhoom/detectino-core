@@ -1,8 +1,6 @@
 defmodule DtWeb.Plugs.CheckPermissions do
   import Plug.Conn
 
-  use DtWeb.Web, :controller
-
   alias DtWeb.StatusCodes
 
   require Logger

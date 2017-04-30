@@ -21,7 +21,7 @@ defmodule DtWeb.Output do
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @valid_types ["bus", "email"]
 
-  def create_changeset(model, params \\ :empty) do
+  def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> cast_embeds
@@ -29,7 +29,7 @@ defmodule DtWeb.Output do
     |> validate_inclusion(:type, @valid_types)
   end
 
-  def update_changeset(model, params \\ :empty) do
+  def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> cast_embeds
@@ -40,9 +40,9 @@ defmodule DtWeb.Output do
   defp cast_embeds(changeset) do
     case get_field(changeset, :type) do
       "email" ->
-        changeset |> cast_embed(:email_settings, [:required])
+        changeset |> cast_embed(:email_settings, required: true)
       "bus" ->
-        changeset |> cast_embed(:bus_settings, [:required])
+        changeset |> cast_embed(:bus_settings, required: true)
       _ ->
         changeset
       end
