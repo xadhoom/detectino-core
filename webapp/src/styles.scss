@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @charset "UTF-8";
 
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
 .colorbox .fullname {
   font-size: 1.5em;
   color: #ffffff;
