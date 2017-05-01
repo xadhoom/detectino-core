@@ -172,7 +172,7 @@ defmodule DtCore.Sensor.Worker do
 
   @spec handle_call({:arm, pos_integer}, any, Worker.t) :: {:reply, :ok, Worker.t}
   def handle_call({:arm, delay}, _from, state)
-      when is_integer(delay) and delay > 0 do
+      when is_number(delay) and delay > 0 do
     Logger.debug("Arming sensor")
 
     state = reset_config(state)
