@@ -559,6 +559,117 @@ defmodule DtCore.Test.Sensor.Worker do
     refute_receive _
   end
 
+  test "multiple alarm events should be squelched" do
+    # setup sensor
+    {:ok, part, config, pid} = setup_delayed_nc(60, false)
+
+    # arm it
+    arm_cmd = {:arm, 0}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # send an alarm value
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # now check
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    refute_receive _
+    assert :alarm == Worker.alarm_status({config, part})
+
+    # flush events and check
+    send pid, {:flush, :entry}
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    # send another reading, since we're alarm we do not expect events
+    :ok = Process.send(pid, {:event, ev, part}, [])
+    refute_receive _, 1000
+  end
+
+  test "disarm during an alarm converts to a reading event" do
+    # setup sensor
+    {:ok, part, config, pid} = setup_delayed_nc(false, false)
+
+    # arm it
+    arm_cmd = {:arm, 0}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # send an alarm value
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # now check
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+    refute_receive _
+    assert :alarm == Worker.alarm_status({config, part})
+
+    # now disarm the system
+    disarm_cmd = {:disarm}
+    :ok = GenServer.call(pid, disarm_cmd)
+
+    # we should receive a stop of the alarm and start of simple reading
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    assert :standby == Worker.alarm_status({config, part})
+
+    refute_receive _, 1000
+  end
+
+  test "disarm during triggered, delayed alarm converts to a reading event" do
+    # setup sensor
+    {:ok, part, config, pid} = setup_delayed_nc(60, false)
+
+    # arm it
+    arm_cmd = {:arm, 0}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # send an alarm value
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # now check
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    refute_receive _
+    assert :alarm == Worker.alarm_status({config, part})
+
+    # flush events and check
+    send pid, {:flush, :entry}
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    # now disarm the system
+    disarm_cmd = {:disarm}
+    :ok = GenServer.call(pid, disarm_cmd)
+
+    # we should receive a stop of the alarm and start of simple reading
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    assert :standby == Worker.alarm_status({config, part})
+
+    refute_receive _, 1000
+  end
+
   defp setup_nc do
     partition = %PartitionModel{name: "NCPART", armed: @arm_disarmed}
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,

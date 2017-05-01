@@ -110,6 +110,25 @@ defmodule DtCore.Sensor.Worker do
     Worker.t) :: {:noreply, Worker.t}
   def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}},
     state) do
+
+    cmp_ev = ev |> Map.from_struct |> Map.drop([:delayed])
+    cmp_last_ev = case state.last_ev do
+      nil -> nil
+      v -> v |> Map.from_struct |> Map.drop([:delayed])
+    end
+
+    newstate = case cmp_last_ev do
+      ^cmp_ev -> state
+      _ -> receive_event({:event, ev, partition}, state)
+    end
+
+    {:noreply, newstate}
+  end
+
+  @spec handle_info({:delayed_event, %Event{}, %PartitionModel{}},
+    Worker.t) :: {:noreply, Worker.t}
+  def handle_info({:delayed_event, ev = %Event{}, partition = %PartitionModel{}},
+    state) do
     newstate = case state.last_ev do
       ^ev -> state
       _ -> receive_event({:event, ev, partition}, state)
@@ -338,7 +357,7 @@ defmodule DtCore.Sensor.Worker do
     delay = p_exit * 1000
     ev = %Event{ev | delayed: true}
     # XXX this one should be cancelled if disarmed, or better call {:flush, :exit}
-    Delayer.put(state.exit_timers, {:event, ev, partition}, delay)
+    Delayer.put(state.exit_timers, {:delayed_event, ev, partition}, delay)
     {%SensorEv{sensor_ev | delayed: true}, state}
   end
 
@@ -353,7 +372,7 @@ defmodule DtCore.Sensor.Worker do
       _ ->
         ev = %Event{ev | delayed: true}
         # XXX this one should be cancelled if disarmed or better call {:flush, :entry}
-        Delayer.put(state.entry_timers, {:event, ev, partition}, delay)
+        Delayer.put(state.entry_timers, {:delayed_event, ev, partition}, delay)
         {%SensorEv{sensor_ev | delayed: true}, state}
     end
   end
