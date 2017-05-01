@@ -37,7 +37,7 @@ defmodule DtCore.Output.Server do
   # GenServer callbacks
   #
   def init(sup) do
-    Logger.info "Supervisor #{inspect sup} starting Output Server"
+    Logger.info fn -> "Supervisor #{inspect sup} starting Output Server" end
     send self(), :start
     {:ok, %{
       sup: sup,
@@ -76,7 +76,7 @@ defmodule DtCore.Output.Server do
         Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
         {:noreply, state}
       {:error, err} ->
-        Logger.error "Error starting Outputs Sup #{inspect err}"
+        Logger.error fn -> "Error starting Outputs Sup #{inspect err}" end
         {:stop, err, state}
     end
   end
@@ -110,11 +110,13 @@ defmodule DtCore.Output.Server do
     sup = state.output_sup
     case pid do
       ^sup ->
-        Logger.error "Outputs Sup died with reason #{inspect reason}, I quit!"
+        Logger.error fn ->
+          "Outputs Sup died with reason #{inspect reason}, I quit!"
+        end
         {:stop, reason, state}
       any ->
-        Logger.info "Got :DOWN message from #{inspect any} " <>
-          "but is not my outputs worker supervisor, ignoring...."
+        Logger.info fn -> "Got :DOWN message from #{inspect any} " <>
+          "but is not my outputs worker supervisor, ignoring...." end
         {:noreply, state}
     end
   end
@@ -140,13 +142,13 @@ defmodule DtCore.Output.Server do
   defp start_output(output, state) do
     id = output.name
     case Supervisor.start_child(state.output_sup,
-          worker(Worker,[{output}],
+          worker(Worker, [{output}],
             restart: :transient, id: id)) do
       {:ok, pid} ->
-        Logger.info "Started output worker with pid #{inspect pid}"
+        Logger.info fn -> "Started output worker with pid #{inspect pid}" end
       {:error, err} ->
-        Logger.error "Cannot start output worker: " <>
-          "#{inspect err} #{inspect output}"
+        Logger.error fn -> "Cannot start output worker: " <>
+          "#{inspect err} #{inspect output}" end
     end
   end
 

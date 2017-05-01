@@ -33,7 +33,7 @@ defmodule DtLib.Delayer do
     GenServer.start_link(__MODULE__, self())
   end
 
-  @spec put(any(), any(), 0) :: :error;
+  @spec put(any(), any(), 0) :: :error
   @spec put(pid(), any(), pos_integer()) :: {:ok, reference()}
   def put(_, _, 0) do
     :error

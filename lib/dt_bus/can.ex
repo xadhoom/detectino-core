@@ -76,14 +76,14 @@ defmodule DtBus.Can do
     c_if = Application.get_env(:detectino, :can_interface)
     :can_router.join({:can_sock, 0, [{:device, c_if}]})
     cur_ifs = :can_router.interfaces
-    Logger.info "Started CanBus Interface #{inspect cur_ifs}"
+    Logger.info fn -> "Started CanBus Interface #{inspect cur_ifs}" end
     {:ok,
       %DtBus.Can{}
     }
   end
 
   def handle_call({:ping, node_id}, from, state) do
-    Logger.debug "Pinging node #{node_id}"
+    Logger.debug fn -> "Pinging node #{node_id}" end
 
     msgid = Canhelper.build_msgid(0, node_id, :ping, :unsolicited)
     payload = :crypto.strong_rand_bytes(8)
@@ -109,15 +109,15 @@ defmodule DtBus.Can do
   end
 
   def handle_call(value, _from, state) do
-    Logger.info "Got call message #{inspect value}"
+    Logger.info fn -> "Got call message #{inspect value}" end
     {:reply, nil, state}
   end
 
   def handle_cast({:read, node_id, terminal}, state) do
-    Logger.debug "Reading from node #{node_id}: analog #{terminal}"
+    Logger.debug fn -> "Reading from node #{node_id}: analog #{terminal}" end
 
     msgid = Canhelper.build_msgid(0, node_id, :read, terminal)
-    payload = <<0,0,0,0,0,0,0,0>>
+    payload = <<0, 0, 0, 0, 0, 0, 0, 0>>
 
     {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
 
@@ -125,10 +125,10 @@ defmodule DtBus.Can do
   end
 
   def handle_cast({:readd, node_id, terminal}, state) do
-    Logger.debug "Reading from node #{node_id}: digital #{terminal}"
+    Logger.debug fn -> "Reading from node #{node_id}: digital #{terminal}" end
 
     msgid = Canhelper.build_msgid(0, node_id, :readd, terminal)
-    payload = <<0,0,0,0,0,0,0,0>>
+    payload = <<0, 0, 0, 0, 0, 0, 0, 0>>
 
     {:can_frame, msgid, 8, payload, 0, -1} |> :can_router.send
 
@@ -136,7 +136,7 @@ defmodule DtBus.Can do
   end
 
   def handle_cast(value, state) do
-    Logger.info "Got cast message #{inspect value}"
+    Logger.info fn -> "Got cast message #{inspect value}" end
     {:noreply, state}
   end
 
@@ -146,13 +146,13 @@ defmodule DtBus.Can do
   end
 
   def handle_info(what, state) do
-    Logger.debug "Got info message #{inspect what}"
+    Logger.debug fn -> "Got info message #{inspect what}" end
 
     {:ok, state} = case what do
       {:can_frame, _msgid, _len, _data, _intf, _ts} ->
         {:ok, _state} = handle_canframe(what, state)
       default ->
-        Logger.warn "Got unknown message #{inspect default}"
+        Logger.warn fn -> "Got unknown message #{inspect default}" end
     end
     {:noreply, state}
   end
@@ -168,10 +168,10 @@ defmodule DtBus.Can do
   defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
     {:ok, state} = case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
-        Logger.info "Got command:#{command}, " <>
+        Logger.info fn -> "Got command:#{command}, " <>
         "subcommand:#{subcommand} " <>
         "from id:#{src_node_id} to id:#{dst_node_id} " <>
-        "datalen:#{inspect len} payload:#{inspect data}"
+        "datalen:#{inspect len} payload:#{inspect data}" end
 
         if dst_node_id == 0 do
           case command do
@@ -195,7 +195,7 @@ defmodule DtBus.Can do
                 port: port, value: value})
               {:ok, state}
             default ->
-              Logger.warn "Unhandled command #{inspect default}"
+              Logger.warn fn -> "Unhandled command #{inspect default}" end
               {:ok, state}
           end
         end

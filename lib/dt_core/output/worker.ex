@@ -35,7 +35,7 @@ defmodule DtCore.Output.Worker do
   # GenServer callbacks
   #
   def init({config}) do
-    Logger.info "Starting Output Worker #{config.name}"
+    Logger.info fn -> "Starting Output Worker #{config.name}" end
     {:ok, _pid} = Etimer.start_link(config.name)
     run_subscribe(config)
     state = %{
@@ -48,7 +48,7 @@ defmodule DtCore.Output.Worker do
   def handle_call({:timer_expiry, :mono_expiry}, _from, state) do
     state = case state.config.type do
       "email" ->
-        Logger.error("Should not have timer expiry with email outputs")
+        Logger.error "Should not have timer expiry with email outputs"
         state
       "bus" ->
         :ok = Bus.recover(state, true)
@@ -116,7 +116,7 @@ defmodule DtCore.Output.Worker do
 
   defp subscribe(_ = %EventModel{source: s, source_config: sc})
     when is_nil(s) or is_nil(sc) do
-    Logger.error("Incomplete source config, not subscribing to any event")
+    Logger.error "Incomplete source config, not subscribing to any event"
   end
 
   defp subscribe(event = %EventModel{}) do
@@ -134,7 +134,7 @@ defmodule DtCore.Output.Worker do
 
     case key do
       nil ->
-        Logger.error("Empty key, not subscribing to any event")
+        Logger.error "Empty key, not subscribing to any event"
       v when is_map v ->
         Registry.register(OutputsRegistry.registry, v, [])
     end

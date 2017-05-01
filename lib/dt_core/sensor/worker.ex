@@ -115,7 +115,7 @@ defmodule DtCore.Sensor.Worker do
           state
         end
       _ ->
-        Logger.debug("Uh? Cannot get enabled status: #{inspect ev}")
+        Logger.debug fn -> "Uh? Cannot get enabled status: #{inspect ev}" end
         state
     end
     {:noreply, newstate}

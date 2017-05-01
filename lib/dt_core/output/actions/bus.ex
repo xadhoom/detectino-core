@@ -61,7 +61,7 @@ defmodule DtCore.Output.Actions.Bus do
           )
         true
       v ->
-        Logger.warn "unhandled off time value #{inspect v}"
+        Logger.warn fn -> "unhandled off time value #{inspect v}" end
         false
     end
   end

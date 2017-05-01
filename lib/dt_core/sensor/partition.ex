@@ -80,8 +80,8 @@ defmodule DtCore.Sensor.Partition do
   # GenServer Callbacks
   #
   def init({config, cache}) do
-    Logger.debug("Starting partition worker with " <>
-      "#{inspect config} config")
+    Logger.debug fn -> "Starting partition worker with " <>
+      "#{inspect config} config" end
     state = %{
       config: config,
       sensors: [],
@@ -97,11 +97,13 @@ defmodule DtCore.Sensor.Partition do
   end
 
   def handle_info({:event, ev = %Event{}}, state) do
-    Logger.debug "Received event #{inspect ev} from server"
+    Logger.debug fn -> "Received event #{inspect ev} from server" end
 
     state.sensors
     |> Enum.each(fn(pid) ->
-      Logger.debug "Sending event #{inspect ev} to sensor #{inspect pid}"
+      Logger.debug fn ->
+        "Sending event #{inspect ev} to sensor #{inspect pid}"
+      end
       send pid, {:event, ev, state.config}
     end)
 
@@ -110,7 +112,9 @@ defmodule DtCore.Sensor.Partition do
 
   def handle_info(msg = {op, _ev = %SensorEv{}}, state) when op == :start
     or op == :stop do
-    Logger.debug "Received event #{inspect msg} from one of our sensors"
+    Logger.debug fn ->
+      "Received event #{inspect msg} from one of our sensors"
+    end
     msg |> dispatch
 
     last = case maybe_partition_alarm(msg, state) do
@@ -150,7 +154,9 @@ defmodule DtCore.Sensor.Partition do
         config = %PartitionModel{state.config | armed: "DISARM"}
         {:ok, %{state | config: config}}
       x ->
-        Logger.error("This should not happen, invalid disarm #{inspect x}")
+        Logger.error fn ->
+          "This should not happen, invalid disarm #{inspect x}"
+        end
         {:error, state}
     end
     state = notify_disarm_operation(state)
@@ -216,7 +222,7 @@ defmodule DtCore.Sensor.Partition do
           # we restart the entire partition if one server crashes
           acc ++ [pid]
         {:error, what} ->
-          Logger.error "Cannot start Sensor, #{inspect what}"
+          Logger.error fn -> "Cannot start Sensor, #{inspect what}" end
           acc
       end
     end)
@@ -264,7 +270,9 @@ defmodule DtCore.Sensor.Partition do
   end
 
   defp do_arm(state, v) do
-    Logger.error("This should not happen, invalid arming #{inspect v}")
+    Logger.error fn ->
+      "This should not happen, invalid arming #{inspect v}"
+    end
     {:error, state}
   end
 
@@ -303,7 +311,7 @@ defmodule DtCore.Sensor.Partition do
     end
 
     tref = Process.send_after(self(),
-      {:reset_exit}, round(delay*1000))
+      {:reset_exit}, round(delay * 1000))
     %{state | t_exit: tref}
   end
 
@@ -354,9 +362,9 @@ defmodule DtCore.Sensor.Partition do
       nil -> nil
       ev ->
         if ev == state.last do
-          Logger.debug("skipping already sent partition ev")
+          Logger.debug "skipping already sent partition ev"
         else
-          Logger.debug("Sending partion event #{inspect ev}")
+          Logger.debug fn -> "Sending partion event #{inspect ev}" end
           ev |> dispatch
         end
         ev
@@ -378,11 +386,13 @@ defmodule DtCore.Sensor.Partition do
             {op, %PartitionEv{type: ev.type,
               delayed: ev.delayed, name: state.config.name}}
           x ->
-            Logger.info("Not stopping partition alarm due to others: #{x}")
+            Logger.info fn ->
+              "Not stopping partition alarm due to others: #{x}"
+            end
             nil
         end
       x ->
-        Logger.error("Unhandled operation #{inspect x})")
+        Logger.error fn -> "Unhandled operation #{inspect x})" end
         nil
     end
   end
@@ -404,7 +414,9 @@ defmodule DtCore.Sensor.Partition do
       internal? = sensor |> GenServer.call({:internal?})
       case internal? do
         true ->
-          Logger.info("Skip arming sensor #{inspect sensor} because internal")
+          Logger.info fn ->
+            "Skip arming sensor #{inspect sensor} because internal"
+          end
         _ ->
           sensor |> arm_partial_run(partition, immediate)
       end
@@ -446,7 +458,7 @@ defmodule DtCore.Sensor.Partition do
         :tamper -> {:halt, :tamper}
         :fault -> {:halt, :fault}
         x ->
-          Logger.error("Unhandled status #{inspect x}")
+          Logger.error fn -> "Unhandled status #{inspect x}" end
           {:halt, :tamper}
       end
     end)

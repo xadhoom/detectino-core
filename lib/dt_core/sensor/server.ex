@@ -61,7 +61,7 @@ defmodule DtCore.Sensor.Server do
   # GenServer callbacks
   #
   def init(sup) do
-    Logger.info "Supervisor #{inspect sup} started Sensor Server"
+    Logger.info fn -> "Supervisor #{inspect sup} started Sensor Server" end
     {:ok, _myself} = Bus.start_listening
     send self(), :start
     {:ok, %{
@@ -120,7 +120,7 @@ defmodule DtCore.Sensor.Server do
         Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
         {:noreply, state}
       {:error, err} ->
-        Logger.error "Error starting Partition Sup #{inspect err}"
+        Logger.error fn -> "Error starting Partition Sup #{inspect err}" end
         {:stop, err, state}
     end
   end
@@ -152,11 +152,13 @@ defmodule DtCore.Sensor.Server do
     partition_sup = state.partition_sup
     case pid do
       ^partition_sup ->
-        Logger.error "Partition Sup died with reason #{inspect reason}, I quit!"
+        Logger.error fn ->
+          "Partition Sup died with reason #{inspect reason}, I quit!"
+        end
         {:stop, reason, state}
       any ->
-        Logger.info "Got :DOWN message from #{inspect any} " <>
-          "but is not my partition worker supervisor, ignoring...."
+        Logger.info fn -> "Got :DOWN message from #{inspect any} " <>
+          "but is not my partition worker supervisor, ignoring...." end
         {:noreply, state}
     end
   end
@@ -169,7 +171,7 @@ defmodule DtCore.Sensor.Server do
   Basically a sort of autodiscovery
   """
   def handle_info({:event, ev = %BusEvent{}}, state) do
-    Logger.debug "Received event #{inspect ev} from bus"
+    Logger.debug fn -> "Received event #{inspect ev} from bus" end
     {:ok, state} = dispatch_event({ev, state})
     {:noreply, state}
   end
@@ -199,7 +201,9 @@ defmodule DtCore.Sensor.Server do
     |> Supervisor.which_children
     |> Enum.each(fn(child) ->
       {_id, pid, _type, _modules} = child
-      Logger.debug "sending event #{inspect ev} to partition #{inspect pid}"
+      Logger.debug fn ->
+        "sending event #{inspect ev} to partition #{inspect pid}"
+      end
       send pid, {:event, ev}
     end)
     {:ok, state}
@@ -256,13 +260,13 @@ defmodule DtCore.Sensor.Server do
   defp start_partition(partition, state) do
     id = partition.name
     case Supervisor.start_child(state.partition_sup,
-          worker(Partition,[{partition, state.part_state_cache}],
+          worker(Partition, [{partition, state.part_state_cache}],
             restart: :transient, id: id)) do
       {:ok, pid} ->
-        Logger.info "Started partition worker with pid #{inspect pid}"
+        Logger.info fn -> "Started partition worker with pid #{inspect pid}" end
       {:error, err} ->
-        Logger.error "Cannot start partition worker: " <>
-          "#{inspect err} #{inspect partition}"
+        Logger.error fn -> "Cannot start partition worker: " <>
+          "#{inspect err} #{inspect partition}" end
     end
   end
 

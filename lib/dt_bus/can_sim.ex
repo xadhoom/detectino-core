@@ -61,12 +61,12 @@ defmodule DtBus.CanSim do
   end
 
   def handle_call(value, _from, state) do
-    Logger.debug "Got call message #{inspect value}"
+    Logger.debug fn -> "Got call message #{inspect value}" end
     {:reply, nil, state}
   end
 
   def handle_cast(value, state) do
-    Logger.debug "Got cast message #{inspect value}"
+    Logger.debug fn -> "Got cast message #{inspect value}" end
     {:noreply, state}
   end
 
@@ -74,9 +74,10 @@ defmodule DtBus.CanSim do
     case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
         if dst_node_id == state.myid do
-          Logger.info "Got command:#{command}, subcommand:#{subcommand} " <>
+          Logger.info fn -> "Got command:#{command}, " <>
+            "subcommand:#{subcommand} " <>
             "from id:#{src_node_id} to id:#{dst_node_id} " <>
-            "datalen:#{inspect len} payload:#{inspect data}"
+            "datalen:#{inspect len} payload:#{inspect data}" end
           case command do
             :ping ->
               handle_ping(state.myid, src_node_id, data, state.sender_fn)
@@ -85,7 +86,7 @@ defmodule DtBus.CanSim do
             :readd ->
               handle_readd(state.myid, subcommand, src_node_id, state.sender_fn)
             unh ->
-              Logger.warn "Unhandled can command #{inspect unh}"
+              Logger.warn fn -> "Unhandled can command #{inspect unh}" end
           end
         end
     _v -> nil
@@ -107,14 +108,14 @@ defmodule DtBus.CanSim do
     # send random digital reads...
     Enum.each(1..3, fn(index) ->
       val = Enum.random(0..1) #random reading, for now
-      payload = <<0,0,0,0,index,0,0,val>>
+      payload = <<0, 0, 0, 0, index, 0, 0, val>>
       state.sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
     end)
     {:noreply, state}
   end
 
   def handle_info(value, state) do
-    Logger.debug "Got info message #{inspect value}"
+    Logger.debug fn -> "Got info message #{inspect value}" end
     {:noreply, state}
   end
 
@@ -130,7 +131,7 @@ defmodule DtBus.CanSim do
       val = Enum.random(1..1024) #random reading, for now
       msb = band(val >>> 8, 0xff)
       lsb = band val, 0xff
-      payload = <<0,0,0,0,0,index,msb,lsb>>
+      payload = <<0, 0, 0, 0, 0, index, msb, lsb>>
       sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
     end)
 
@@ -142,7 +143,7 @@ defmodule DtBus.CanSim do
     msb = band(val >>> 8, 0xff)
     lsb = band(val, 0xff)
     subcommand = Canhelper.tosubcommand_read terminal
-    payload = <<0,0,0,0,0,subcommand,msb,lsb>>
+    payload = <<0, 0, 0, 0, 0, subcommand, msb, lsb>>
     sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
   end
 
@@ -153,7 +154,7 @@ defmodule DtBus.CanSim do
       val = Enum.random(1..1024) #random reading, for now
       msb = band(val >>> 8, 0xff)
       lsb = band(val, 0xff)
-      payload = <<0,0,0,0,index,0,msb,lsb>>
+      payload = <<0, 0, 0, 0, index, 0, msb, lsb>>
       sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
     end)
 
@@ -165,7 +166,7 @@ defmodule DtBus.CanSim do
     msb = band(val >>> 8, 0xff)
     lsb = band(val, 0xff)
     subcommand = Canhelper.tosubcommand_read terminal
-    payload = <<0,0,0,0,subcommand,0,msb,lsb>>
+    payload = <<0, 0, 0, 0, subcommand, 0, msb, lsb>>
     sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
   end
 
@@ -173,7 +174,7 @@ defmodule DtBus.CanSim do
     msgid = Canhelper.build_msgid(state.myid, 0, :event, :unsolicited)
     msb = band(value >>> 8, 0xff)
     lsb = band value, 0xff
-    payload = <<0,0,0,0,0,port,msb,lsb>>
+    payload = <<0, 0, 0, 0, 0, port, msb, lsb>>
     state.sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
   end
 
