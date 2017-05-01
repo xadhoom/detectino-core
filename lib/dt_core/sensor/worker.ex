@@ -23,7 +23,8 @@ defmodule DtCore.Sensor.Worker do
     status: atom,
     myname: String.t,
     exit_timers: pid,
-    entry_timers: pid}
+    entry_timers: pid,
+    exit_t_running: boolean}
   defstruct config: nil,
     original_config: nil,
     receiver: nil,
@@ -33,7 +34,8 @@ defmodule DtCore.Sensor.Worker do
     status: nil,
     myname: nil,
     exit_timers: nil,
-    entry_timers: nil
+    entry_timers: nil,
+    exit_t_running: false
 
   #
   # Client APIs
@@ -140,7 +142,7 @@ defmodule DtCore.Sensor.Worker do
   def handle_call({:reset_exit}, _from, state) do
     Logger.info("Resetting Exit Delay")
     config = %SensorModel{state.config | exit_delay: false}
-    state = %Worker{state | config: config}
+    state = %Worker{state | config: config, exit_t_running: false}
     {:reply, :ok, state}
   end
 
@@ -156,7 +158,9 @@ defmodule DtCore.Sensor.Worker do
     {:reply, state.status, state}
   end
 
-  def handle_call({:arm, 0}, _from, state) do
+  @spec handle_call({:arm, nil | 0 | false}, any, Worker.t) :: {:reply, :ok, Worker.t}
+  def handle_call({:arm, v}, _from, state)
+      when is_nil(v) or v == 0 or v == false do
     Logger.debug("Arming sensor now!")
     state = reset_config(state)
 
@@ -166,12 +170,20 @@ defmodule DtCore.Sensor.Worker do
     {:reply, :ok, %Worker{state | armed: true}}
   end
 
-  def handle_call({:arm, delay}, _from, state) do
+  @spec handle_call({:arm, pos_integer}, any, Worker.t) :: {:reply, :ok, Worker.t}
+  def handle_call({:arm, delay}, _from, state)
+      when is_integer(delay) and delay > 0 do
     Logger.debug("Arming sensor")
+
     state = reset_config(state)
-    state
-    |> zone_exit_delay(delay)
-    |> will_reset_delay(:exit, state)
+
+    state = case zone_exit_delay(state, delay) do
+      0 ->
+        config = %SensorModel{state.config | exit_delay: false}
+        %Worker{state | config: config}
+      d ->
+        will_reset_delay(d, :exit, state)
+    end
 
     {:reply, :ok, %Worker{state | armed: true}}
   end
@@ -213,14 +225,8 @@ defmodule DtCore.Sensor.Worker do
   end
 
   defp will_reset_delay(delay, :exit, state) do
-    delay = case delay do
-      nil -> 0
-      v when is_integer v  -> v
-      unk ->
-        Logger.error "Got invalid delay value #{inspect unk}"
-        0
-    end
       :ok = start_exit_timer(delay, state)
+      %{state | exit_t_running: true}
   end
 
   defp zone_entry_delay(state, delay) do
@@ -321,7 +327,7 @@ defmodule DtCore.Sensor.Worker do
     case is_exit_delayed? do
       false ->
         # here we may have or not an entry delay
-        case ev_type_is_delayed?(sensor_ev) do
+        case ev_type_is_delayed_on_entry?(sensor_ev, state) do
           true ->
             inarm_entry_delay({ev, sensor_ev, partition, p_entry, urgent}, state)
           false ->
@@ -383,6 +389,19 @@ defmodule DtCore.Sensor.Worker do
       _ -> false
     end
   end
+
+  defp ev_type_is_delayed_on_entry?(ev, state) do
+    ev
+    |> ev_type_is_delayed?
+    |> run_entry_delay?(state.exit_t_running, state.config.exit_delay, state.config.entry_delay)
+  end
+
+  @spec run_entry_delay?(boolean, boolean, boolean, boolean) :: boolean
+  # defp run_entry_delay?(is_delayed_ev, t_exit_running, exit_delay, entry_delay)
+  defp run_entry_delay?(false, _, _, _) do false end
+  defp run_entry_delay?(true, true, false, _) do false end
+  defp run_entry_delay?(true, false, _, true) do true end
+  defp run_entry_delay?(true, false, _, false) do false end
 
   defp priority_event?(ev) do
     case ev.type do

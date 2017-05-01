@@ -670,6 +670,103 @@ defmodule DtCore.Test.Sensor.Worker do
     refute_receive _, 1000
   end
 
+  test "alarm triggered during exit delay kicks in during timer expiry" do
+    # setup sensor
+    part = %PartitionModel{
+      name: "PART_DELAYED",
+      armed: @arm_disarmed,
+      entry_delay: 60,
+      exit_delay: 60
+      }
+    config = %SensorModel{
+      name: "NC_DELAYED",
+      balance: "NC",
+      th1: 10,
+      entry_delay: true,
+      exit_delay: false,
+      partitions: [],
+      address: "1", port: 1,
+      enabled: true
+    }
+    {:ok, pid} = Worker.start_link({config, part, self()})
+
+    # arm it
+    arm_cmd = {:arm, part.exit_delay}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # send a reading that triggers an alarm
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # we should receive stop of the idle status and start of the delayed alarm
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
+    refute_receive _
+
+    # expire and check
+    send pid, {:flush, :entry}
+
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    refute_receive _, 1000
+  end
+
+  test "delayed alarm triggered during exit delay kicks in after timer expiry" do
+    # setup sensor
+    part = %PartitionModel{
+      name: "PART_DELAYED",
+      armed: @arm_armed,
+      entry_delay: 60,
+      exit_delay: 60
+      }
+    config = %SensorModel{
+      name: "NC_DELAYED",
+      balance: "NC",
+      th1: 10,
+      entry_delay: true,
+      exit_delay: true,
+      partitions: [],
+      address: "1", port: 1,
+      enabled: true
+    }
+    {:ok, pid} = Worker.start_link({config, part, self()})
+    {:ok, server_name} = Utils.sensor_server_name(config, part)
+
+    # arm it
+    arm_cmd = {:arm, part.exit_delay}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # send a reading that triggers an alarm
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # we should receive stop of the idle status and start of the delayed alarm
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    assert :alarm == Worker.alarm_status({config, part})
+    refute_receive _
+
+    # now expire timers
+    Worker.expire_timer({:exit_timer, server_name})
+    send pid, {:flush, :exit}
+
+    # check
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    refute_receive _, 1000
+  end
+
   defp setup_nc do
     partition = %PartitionModel{name: "NCPART", armed: @arm_disarmed}
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
