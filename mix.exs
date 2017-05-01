@@ -56,7 +56,7 @@ defmodule Detectino.Mixfile do
      {:uuid, "~> 1.1"},
      {:ex_link_header, "~> 0.0.5"},
      {:timex, "~> 3.1"},
-     {:credo, "~> 0.6", only: [:dev, :test]},
+     {:credo, "~> 0.7", only: [:dev, :test]},
      {:ecto, "~> 2.1"},
      {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.1"},
      {:swoosh, "~> 0.5.0"},
