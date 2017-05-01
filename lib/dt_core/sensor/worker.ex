@@ -258,15 +258,32 @@ defmodule DtCore.Sensor.Worker do
 
     sensor_ev = process_event(ev, state)
 
-    is_exit_delayed = exit_delay?(ev, urgent, state)
-    exit_delay = case ev_type_is_delayed?(sensor_ev) do
-      true -> is_exit_delayed
+    # check if exit delay applies
+    is_exit_delayed? = case ev_type_is_delayed?(sensor_ev) do
+      true -> exit_delay?(ev, urgent, state)
       false -> false
     end
 
-    case exit_delay do
+    case priority_event?(sensor_ev) do
+      false -> nil
+      true ->
+        case exit_delay?(ev, urgent, state) do
+          true ->
+            {:ok, _} = Delayer.stop_all(state.exit_timers)
+          false ->
+            {:ok, _} = Delayer.stop_all(state.entry_timers)
+        end
+    end
+
+    case is_exit_delayed? do
       false ->
-        inarm_entry_delay({ev, sensor_ev, partition, p_entry, urgent}, state)
+        # here we may have or not an entry delay
+        case ev_type_is_delayed?(sensor_ev) do
+          true ->
+            inarm_entry_delay({ev, sensor_ev, partition, p_entry, urgent}, state)
+          false ->
+            inarm_entry_delay({ev, sensor_ev, partition, 0, urgent}, state)
+        end
       true ->
         inarm_exit_delay({ev, sensor_ev, partition, p_exit}, state)
       _ ->
@@ -305,14 +322,7 @@ defmodule DtCore.Sensor.Worker do
     integer(), boolean()}, %Worker{}) :: {%SensorEv{}, %Worker{}}
   defp inarm_entry_delay({ev, sensor_ev, partition, p_entry, urgent}, state) do
     # this one handles the entry delay
-    delay = case ev_type_is_delayed?(sensor_ev) do
-      true ->
-        p_entry * 1000
-      _ ->
-        Logger.debug("Event #{inspect sensor_ev} " <>
-          "not delayed because is not an alarm")
-        0
-    end
+    delay = p_entry * 1000
     case delay do
       0 ->
         {%SensorEv{sensor_ev | delayed: false, urgent: urgent}, state}
@@ -320,7 +330,6 @@ defmodule DtCore.Sensor.Worker do
         ev = %Event{ev | delayed: true}
         # XXX this one should be cancelled if disarmed or better call {:flush, :entry}
         Delayer.put(state.entry_timers, {:event, ev, partition}, delay)
-        #maybe_start_entry_timer(state, p_entry)
         {%SensorEv{sensor_ev | delayed: true}, state}
     end
   end
@@ -328,6 +337,13 @@ defmodule DtCore.Sensor.Worker do
   defp ev_type_is_delayed?(ev) do
     case ev.type do
       :alarm -> true
+      _ -> false
+    end
+  end
+
+  defp priority_event?(ev) do
+    case ev.type do
+      v when v in [:fault, :short, :tamper] -> true
       _ -> false
     end
   end

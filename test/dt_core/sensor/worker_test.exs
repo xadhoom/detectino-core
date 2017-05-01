@@ -205,7 +205,7 @@ defmodule DtCore.Test.Sensor.Worker do
     Worker.expire_timer({:exit_timer, server_name})
     # and flush the events
     send pid, {:flush, :exit}
-    refute_receive _, 5000
+    refute_receive _, 1000
 
     :ok = clean_etimer_meck()
   end
@@ -457,6 +457,90 @@ defmodule DtCore.Test.Sensor.Worker do
     assert :alarm == Worker.alarm_status({config, part})
   end
 
+  test "tamper during exit delay is immediate and cancels queued alarms" do
+    # setup sensor
+    {:ok, part, config, pid} = setup_delayed_eol(false, 60)
+    {:ok, server_name} = Utils.sensor_server_name(config, part)
+
+    # arm sensor
+    arm_cmd = {:arm, part.exit_delay}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # sends a reading that triggers an alarm
+    ev = %Event{address: "2", port: 2, value: 30}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # check that a delayed event is sent
+    {:stop, %SensorEv{type: :standby, address: "2", port: 2}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "2", port: 2, delayed: true}}
+    |> assert_receive(5000)
+    refute_receive _
+
+    # sends a reading that triggers a tamper
+    ev = %Event{address: "2", port: 2, value: 5}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # check that an immediate tamper event is sent
+    {:stop, %SensorEv{type: :alarm, address: "2", port: 2, delayed: true}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :short, address: "2", port: 2, delayed: false}}
+    |> assert_receive(5000)
+    refute_receive _
+
+    # check the status
+    assert :tamper == Worker.alarm_status({config, part})
+
+    # cleanup phase
+    # be sure to expire the exit timer, we should not receive anything
+    Worker.expire_timer({:exit_timer, server_name})
+    # and flush the events
+    send pid, {:flush, :exit}
+
+    # check that no other events are sent
+    refute_receive _, 1000
+  end
+
+  test "tamper during entry delay is immediate and cancels queued alarms" do
+    # setup sensor
+    {:ok, part, config, pid} = setup_delayed_eol(60, false)
+
+    # arm sensor
+    arm_cmd = {:arm, 0}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # sends a reading that triggers an alarm
+    ev = %Event{address: "2", port: 2, value: 30}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # check that a delayed event is sent
+    {:stop, %SensorEv{type: :standby, address: "2", port: 2}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "2", port: 2, delayed: true}}
+    |> assert_receive(5000)
+    refute_receive _
+
+    # sends a reading that triggers a tamper
+    ev = %Event{address: "2", port: 2, value: 5}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # check that an immediate tamper event is sent
+    {:stop, %SensorEv{type: :alarm, address: "2", port: 2, delayed: true}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :short, address: "2", port: 2, delayed: false}}
+    |> assert_receive(5000)
+    refute_receive _
+
+    # check the status
+    assert :tamper == Worker.alarm_status({config, part})
+
+    # cleanup phase and flush the events
+    send pid, {:flush, :entry}
+
+    # check that no other events are sent
+    refute_receive _, 1000
+  end
+
   defp setup_nc do
     partition = %PartitionModel{name: "NCPART", armed: @arm_disarmed}
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
@@ -480,6 +564,28 @@ defmodule DtCore.Test.Sensor.Worker do
       exit_delay: is_integer(exit_delay),
       partitions: [],
       address: "1", port: 1,
+      enabled: true
+    }
+    {:ok, pid} = Worker.start_link({sensor, partition, self()})
+    {:ok, partition, sensor, pid}
+  end
+
+  defp setup_delayed_eol(entry_delay, exit_delay) do
+    partition = %PartitionModel{
+      name: "PART_EOL_DELAYED",
+      armed: @arm_armed,
+      entry_delay: entry_delay,
+      exit_delay: exit_delay
+      }
+    sensor = %SensorModel{
+      name: "EOL_DELAYED",
+      balance: "EOL",
+      th1: 10,
+      th2: 20,
+      entry_delay: is_integer(entry_delay),
+      exit_delay: is_integer(exit_delay),
+      partitions: [],
+      address: "2", port: 2,
       enabled: true
     }
     {:ok, pid} = Worker.start_link({sensor, partition, self()})
