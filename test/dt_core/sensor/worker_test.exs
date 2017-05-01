@@ -427,10 +427,6 @@ defmodule DtCore.Test.Sensor.Worker do
     |> assert_receive(5000)
     {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
-    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
-    |> assert_receive(5000)
-    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
-    |> assert_receive(5000)
 
     refute_receive _
   end
@@ -539,6 +535,28 @@ defmodule DtCore.Test.Sensor.Worker do
 
     # check that no other events are sent
     refute_receive _, 1000
+  end
+
+  test "multiple idle events should be squelched" do
+    # setup sensor
+    {:ok, part, _config, pid} = setup_delayed_nc(false, false)
+
+    # send idle reading
+    ev = %Event{address: "1", port: 1, value: 5}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # the first will issue a stop+start on standby
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :standby, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    # send other idle readings...
+    :ok = Process.send(pid, {:event, ev, part}, [])
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # we should not receive anything
+    refute_receive _
   end
 
   defp setup_nc do

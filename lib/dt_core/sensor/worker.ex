@@ -108,30 +108,13 @@ defmodule DtCore.Sensor.Worker do
 
   @spec handle_info({:event, %Event{}, %PartitionModel{}},
     Worker.t) :: {:noreply, Worker.t}
-  def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
-    config = state.config
-    newstate = case config.enabled do
-      false ->
-        Logger.debug("Ignoring event from server  cause I'm not online")
-        state
-      true ->
-        if ev.address == config.address and ev.port == config.port do
-          Logger.debug("Got event from server")
-          {event, state} = do_receive_event(ev, partition, state)
-          status = sensor_state(event, state)
-
-          # and send it to our receiver
-          :ok = Process.send(state.receiver, {:stop, state.cur_ev}, [])
-          :ok = Process.send(state.receiver, {:start, event}, [])
-
-          %Worker{state | last_ev: ev, cur_ev: event, status: status}
-        else
-          state
-        end
-      _ ->
-        Logger.debug fn -> "Uh? Cannot get enabled status: #{inspect ev}" end
-        state
+  def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}},
+    state) do
+    newstate = case state.last_ev do
+      ^ev -> state
+      _ -> receive_event({:event, ev, partition}, state)
     end
+
     {:noreply, newstate}
   end
 
@@ -235,7 +218,32 @@ defmodule DtCore.Sensor.Worker do
     end
   end
 
-  @doc false
+  @spec receive_event({:event, %Event{}, %PartitionModel{}},
+    Worker.t) :: Worker.t
+  defp receive_event({:event, ev = %Event{}, partition = %PartitionModel{}},
+    state) do
+    config = state.config
+    case config.enabled do
+      false ->
+        Logger.debug("Ignoring event from server  cause I'm not online")
+        state
+      true ->
+        if ev.address == config.address and ev.port == config.port do
+          Logger.debug("Got event from server")
+          {event, state} = do_receive_event(ev, partition, state)
+          status = sensor_state(event, state)
+          :ok = Process.send(state.receiver, {:stop, state.cur_ev}, [])
+          :ok = Process.send(state.receiver, {:start, event}, [])
+          %Worker{state | last_ev: ev, cur_ev: event, status: status}
+        else
+          state
+        end
+      _ ->
+        Logger.debug fn -> "Uh? Cannot get enabled status: #{inspect ev}" end
+        state
+    end
+  end
+
   @spec do_receive_event(%Event{}, %PartitionModel{},
     Worker.t) :: {%SensorEv{}, Worker.t}
   defp do_receive_event(ev = %Event{}, partition = %PartitionModel{}, state) do
