@@ -264,6 +264,7 @@ defmodule DtCore.Sensor.Worker do
       false -> false
     end
 
+    # cleanup queued alarms if a tamper kicks in
     case priority_event?(sensor_ev) do
       false -> nil
       true ->
