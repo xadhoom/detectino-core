@@ -15,12 +15,21 @@ defmodule DtCore.Sensor.Worker do
   alias DtCore.Sensor.Worker
   alias DtLib.Delayer
 
+  @type t :: %__MODULE__{original_config: %SensorModel{},
+    receiver: pid,
+    armed: boolean,
+    cur_ev: %SensorEv{} | nil, # last sent %SensorEv{}
+    last_ev: %Event{} | nil, # last received %Event{}
+    status: atom,
+    myname: String.t,
+    exit_timers: pid,
+    entry_timers: pid}
   defstruct config: nil,
     original_config: nil,
     receiver: nil,
     armed: false,
-    cur_ev: nil,
-    last_ev: nil,
+    cur_ev: nil, # last sent %SensorEv{}
+    last_ev: nil, # last received %Event{}
     status: nil,
     myname: nil,
     exit_timers: nil,
@@ -53,6 +62,7 @@ defmodule DtCore.Sensor.Worker do
   #
   # GenServer callbacks
   #
+  @spec init({%SensorModel{}, pid, String.t}) :: {:ok, Worker.t}
   def init({config, receiver, name}) do
     Logger.info "Starting Sensor Worker with addr #{config.address} " <>
       "and port #{config.port}"
@@ -97,7 +107,7 @@ defmodule DtCore.Sensor.Worker do
   end
 
   @spec handle_info({:event, %Event{}, %PartitionModel{}},
-    %Worker{}) :: {:noreply, %Worker{}}
+    Worker.t) :: {:noreply, Worker.t}
   def handle_info({:event, ev = %Event{}, partition = %PartitionModel{}}, state) do
     config = state.config
     newstate = case config.enabled do
@@ -108,9 +118,13 @@ defmodule DtCore.Sensor.Worker do
         if ev.address == config.address and ev.port == config.port do
           Logger.debug("Got event from server")
           {event, state} = do_receive_event(ev, partition, state)
-          state = sensor_state(event, state)
+          status = sensor_state(event, state)
+
+          # and send it to our receiver
+          :ok = Process.send(state.receiver, {:stop, state.cur_ev}, [])
           :ok = Process.send(state.receiver, {:start, event}, [])
-          %Worker{state | last_ev: ev}
+
+          %Worker{state | last_ev: ev, cur_ev: event, status: status}
         else
           state
         end
@@ -173,17 +187,20 @@ defmodule DtCore.Sensor.Worker do
         # processing again last event in disarm state
         # in order to cancel any previous trigger
         {ev, state} = process_indisarm(last_ev, nil, state)
-        state = sensor_state(ev, state)
+        status = sensor_state(ev, state)
+
         # and send it to our receiver
+        :ok = Process.send(state.receiver, {:stop, state.cur_ev}, [])
         :ok = Process.send(state.receiver, {:start, ev}, [])
-        state
+
+        %Worker{state | cur_ev: ev, status: status}
     end
 
     {:reply, :ok, %Worker{state | armed: false}}
   end
 
-  defp sensor_state(ev, state) do
-    status = case ev.type do
+  defp sensor_state(ev, _state) do
+    case ev.type do
       :reading -> :standby
       :standby -> :standby
       :tamper -> :tamper
@@ -191,8 +208,6 @@ defmodule DtCore.Sensor.Worker do
       :short -> :tamper
       :alarm -> :alarm
     end
-    :ok = Process.send(state.receiver, {:stop, state.cur_ev}, [])
-    %Worker{state | cur_ev: ev, status: status}
   end
 
   defp will_reset_delay(delay, :exit, state) do
@@ -222,7 +237,7 @@ defmodule DtCore.Sensor.Worker do
 
   @doc false
   @spec do_receive_event(%Event{}, %PartitionModel{},
-    %Worker{}) :: {%SensorEv{}, %Worker{}}
+    Worker.t) :: {%SensorEv{}, Worker.t}
   defp do_receive_event(ev = %Event{}, partition = %PartitionModel{}, state) do
     case state.armed do
       v when v == "DISARM" or v == false ->
@@ -238,7 +253,7 @@ defmodule DtCore.Sensor.Worker do
   end
 
   @spec process_indisarm(%Event{}, any(),
-    %Worker{}) :: {%SensorEv{}, %Worker{}}
+    Worker.t) :: {%SensorEv{}, Worker.t}
   defp process_indisarm(ev = %Event{}, _partition, state) do
     sensor_ev = process_event(ev, state)
 
@@ -250,7 +265,7 @@ defmodule DtCore.Sensor.Worker do
   end
 
   @spec process_inarm(%Event{}, %PartitionModel{},
-    %Worker{}) :: {%SensorEv{}, %Worker{}}
+    Worker.t) :: {%SensorEv{}, Worker.t}
   defp process_inarm(ev, partition, state) do
     urgent = urgent?(state.config)
     p_entry = compute_entry_delay(partition, urgent, state)
@@ -308,8 +323,8 @@ defmodule DtCore.Sensor.Worker do
     zone_entry_delay(state, delay)
   end
 
-  @spec inarm_exit_delay({%Event{}, %SensorEv{}, %PartitionModel{}, integer()},
-    %Worker{}) :: {%SensorEv{}, %Worker{}}
+  @spec inarm_exit_delay({%Event{}, %SensorEv{}, %PartitionModel{},
+    non_neg_integer}, Worker.t) :: {%SensorEv{}, Worker.t}
   defp inarm_exit_delay({ev, sensor_ev, partition, p_exit}, state) do
     Logger.debug "scheduling delayed exit alarm"
     delay = p_exit * 1000
@@ -320,7 +335,7 @@ defmodule DtCore.Sensor.Worker do
   end
 
   @spec inarm_entry_delay({%Event{}, %SensorEv{}, %PartitionModel{},
-    integer(), boolean()}, %Worker{}) :: {%SensorEv{}, %Worker{}}
+    non_neg_integer, boolean}, Worker.t) :: {%SensorEv{}, Worker.t}
   defp inarm_entry_delay({ev, sensor_ev, partition, p_entry, urgent}, state) do
     # this one handles the entry delay
     delay = p_entry * 1000
