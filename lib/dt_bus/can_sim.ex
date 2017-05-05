@@ -2,7 +2,6 @@ defmodule DtBus.CanSim do
   @moduledoc """
   Provide a CanBus simulator to aid in development and testing.
   """
-
   use GenServer
   use Bitwise
 
@@ -10,15 +9,13 @@ defmodule DtBus.CanSim do
 
   require Logger
 
+  @send_interval 500
+
   #
   # Client APIs
   #
   def start_link(myid, sender_fn \\ &(:can_router.send &1)) when is_integer(myid) and myid > 0 and myid < 127 do
     GenServer.start_link(__MODULE__, {myid, sender_fn}, name: __MODULE__)
-  end
-
-  def autorun do
-    GenServer.call(__MODULE__, {:autorun})
   end
 
   def short(port, value \\ 50) do
@@ -42,21 +39,31 @@ defmodule DtBus.CanSim do
     GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
   end
 
+  def stop do
+    GenServer.call(__MODULE__, {:stop})
+  end
+
   #
   # GenServer Callbacks
   #
   def init({myid, sender_fn}) do
     :can_router.attach()
-    {:ok, %{myid: myid, sender_fn: sender_fn}}
+    {:ok, %{myid: myid, sender_fn: sender_fn, running: nil}}
   end
 
-  def handle_call({:autorun}, _from, state) do
-    :timer.send_interval(10_000, :status)
+  def handle_call({:stop}, _from, state) do
+    case state.running do
+      tref when is_reference(tref) ->
+        Process.cancel_timer(tref)
+      _ -> nil
+    end
+    state = %{state | running: nil}
     {:reply, :ok, state}
   end
 
-  def handle_call({:gen_analog_ev, port, value}, _from, state) do
-    send_analog_can_message(value, port, state)
+  def handle_call(cmd = {:gen_analog_ev, _port, _value}, _f, state) do
+    tref = Process.send_after(self(), cmd, @send_interval)
+    state = %{state | running: tref}
     {:reply, :ok, state}
   end
 
@@ -95,23 +102,15 @@ defmodule DtBus.CanSim do
     {:noreply, state}
   end
 
-  def handle_info(:status, state) do
-    Logger.debug "Sending can frame"
-    msgid = Canhelper.build_msgid(state.myid, 0, :event, :unsolicited)
-
-    # send random analog reads...
-    Enum.each(1..8, fn(index) ->
-      val = Enum.random(1..1024) #random reading, for now
-      send_analog_can_message(val, index, state)
-    end)
-
-    # send random digital reads...
-    Enum.each(1..3, fn(index) ->
-      val = Enum.random(0..1) #random reading, for now
-      payload = <<0, 0, 0, 0, index, 0, 0, val>>
-      state.sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
-    end)
-    {:noreply, state}
+  def handle_info(cmd = {:gen_analog_ev, port, value}, state) do
+    send_analog_can_message(value, port, state)
+    tref = case state.running do
+      v when is_reference(v) ->
+        Process.send_after(self(), cmd, @send_interval)
+      false ->
+        nil
+    end
+    {:noreply, %{state | running: tref}}
   end
 
   def handle_info(value, state) do
