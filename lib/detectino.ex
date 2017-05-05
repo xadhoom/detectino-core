@@ -38,6 +38,8 @@ defmodule Detectino do
     :ok
   end
 
+  # TODO: use this fn to automatically run migrations when
+  # starting the app on production
   defp run_migrations do
     path = Application.app_dir(:detectino) <> "/priv/repo/migrations"
     Ecto.Migrator.run(DtWeb.Repo, path, :up, [{:all, true}, {:log, :debug}])
