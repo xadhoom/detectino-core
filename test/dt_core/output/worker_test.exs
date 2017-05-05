@@ -1,8 +1,6 @@
 defmodule DtCore.Test.Output.Worker do
   use DtCore.EctoCase
 
-  import Swoosh.TestAssertions
-
   alias DtCore.Sup
   alias DtWeb.Output, as: OutputModel
   alias DtWeb.Event, as: EventModel
@@ -13,6 +11,8 @@ defmodule DtCore.Test.Output.Worker do
   alias DtCore.Test.TimerHelper
   alias DtCore.SensorEv
   alias DtCore.PartitionEv
+  alias Swoosh.Email
+  alias DtCore.Output.Actions.Email, as: EmailConfig
 
   setup_all do
     :meck.new(Etimer, [:passthrough])
@@ -125,17 +125,23 @@ defmodule DtCore.Test.Output.Worker do
     s_ev_end = {:stop, %SensorEv{type: :alarm, address: "10", port: 5}}
     p_ev_end = {:stop, %PartitionEv{type: :alarm, name: "area one"}}
 
+    s_ev_delayed = {:start,
+      %SensorEv{type: :alarm, address: "10", port: 5, delayed: true}}
+
     Worker.handle_info(s_ev, state)
-    assert_email_sent subject: "Sensor Alarm started"
+    get_subject(:sensor_start) |> assert_email
 
     Worker.handle_info(p_ev, state)
-    assert_email_sent subject: "Partition Alarm started"
+    get_subject(:partition_start) |> assert_email
 
     Worker.handle_info(s_ev_end, state)
-    assert_email_sent subject: "Sensor Alarm recovered"
+    get_subject(:sensor_end) |> assert_email
 
     Worker.handle_info(p_ev_end, state)
-    assert_email_sent subject: "Partition Alarm recovered"
+    get_subject(:partition_end) |> assert_email
+
+    Worker.handle_info(s_ev_delayed, state)
+    get_delayed_subject(:sensor_start) |> assert_email(true)
   end
 
   test "monostable output on time" do
@@ -326,6 +332,32 @@ defmodule DtCore.Test.Output.Worker do
       address: "addr", port: 42
     }
     |> assert_receive(5000)
+  end
+
+  defp assert_email(subject, delayed \\ false) do
+    assert_received {
+      :email,
+      %Email{
+        subject: ^subject,
+        private: %{
+          delayed_event: ^delayed
+        }
+      }
+    }
+  end
+
+  defp get_subject(which) when is_atom(which) do
+    :detectino
+    |> Application.get_env(EmailConfig)
+    |> Keyword.get(:alarm_subjects)
+    |> Map.get(which)
+  end
+
+  defp get_delayed_subject(which) when is_atom(which) do
+    :detectino
+    |> Application.get_env(EmailConfig)
+    |> Keyword.get(:delayed_alarm_subjects)
+    |> Map.get(which)
   end
 
 end
