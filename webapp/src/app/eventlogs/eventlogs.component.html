@@ -11,15 +11,15 @@
       <div class="card card-w-title">
         <button type="button" pButton icon="ui-icon-check" (click)="ackAllEvents()" label="Ack All" class="full_button green-btn"></button>
 
-        <p-dataTable [value]="eventlogs" [filterDelay]="500" (onLazyLoad)="getLazy($event)" [lazy]="true" [paginator]="true" [totalRecords]="totalRecords"
-          [rows]="sortPage.per_page" [paginator]="false" selectionMode="single" [(selection)]="selected" (onRowSelect)="onRowSelect($event)"
-          [responsive]="true">
+        <p-dataTable [value]="eventlogs" [filterDelay]="500" (onLazyLoad)="lazyGrid.getLazy($event)" [lazy]="true" [paginator]="true"
+          [totalRecords]="lazyGrid.getTotalRecords()" [rows]="lazyGrid.getPerPage()" selectionMode="single" [(selection)]="selected"
+          (onRowSelect)="onRowSelect($event)" [responsive]="true">
           <header>Event logs</header>
           <p-column field="type" header="Type" [sortable]="false" [filter]="true" filterPlaceholder="Search"></p-column>
           <p-column field="acked" header="Acked" [sortable]="false"></p-column>
           <p-column field="operation" header="Operation" [sortable]="false"></p-column>
           <p-column field="inserted_at" header="Timestamp" [sortable]="true"></p-column>
-          </p-dataTable>
+        </p-dataTable>
 
       </div>
     </div>

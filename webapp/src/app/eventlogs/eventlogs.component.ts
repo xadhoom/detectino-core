@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Eventlog } from '../models/eventlog';
 import { PageSortFilter } from '../services/crud';
 import { EventlogService, NotificationService, PinService } from '../services';
+import { LazyGrid } from '../shared/components/lazy_grid';
 
 @Component({
   selector: 'app-eventlogs',
@@ -19,16 +20,13 @@ export class EventlogsComponent implements OnInit {
   errorMessage: string;
 
   // pagination & sort stuff
-  public sortPage: PageSortFilter;
-  public totalRecords: number;
+  public lazyGrid: LazyGrid;
 
   constructor(private eventlogService: EventlogService,
     private notificationService: NotificationService,
     public pinSrv: PinService) {
-    this.sortPage = new PageSortFilter({
-      page: 1, per_page: 10, sort: null, direction: null
-    });
-    this.totalRecords = 0;
+
+    this.lazyGrid = new LazyGrid(() => this.getLogs());
   };
 
   ngOnInit() {
@@ -39,37 +37,14 @@ export class EventlogsComponent implements OnInit {
     );
   };
 
-  public getLazy(event) {
-    const page = Math.ceil((event.first + event.rows) / event.rows);
-    this.sortPage.page = page;
-    this.sortPage.per_page = event.rows;
-
-    this.sortPage.sort = event.sortField;
-    if (event.sortOrder > 0) {
-      this.sortPage.direction = 'asc';
-    } else {
-      this.sortPage.direction = 'desc';
-    }
-
-    this.sortPage.clearFilters();
-    for (const key in event.filters) {
-      if (event.filters.hasOwnProperty(key)) {
-        const value = event.filters[key].value;
-        this.sortPage.addFilter(key, value);
-      }
-    }
-
-    return this.getLogs();
-  }
-
   public getLogs() {
     if (!this.pinSrv.getPin()) {
       return;
     }
 
-    this.eventlogService.getLogsPaged(this.sortPage).
+    this.eventlogService.getLogsPaged(this.lazyGrid.getSortPage()).
       subscribe(
-      res => { this.eventlogs = res.data; this.totalRecords = res.total; },
+      res => { this.eventlogs = res.data; this.lazyGrid.setTotalRecords(res.total); },
       error => this.onError(error)
       );
   };
