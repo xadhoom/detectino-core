@@ -8,6 +8,9 @@
 # Generate on crash by the VM
 erl_crash.dump
 
+# Erlang trace artifacts
+ttb_last_config
+
 # Static artifacts
 /node_modules
 
