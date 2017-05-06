@@ -24,7 +24,8 @@ defmodule DtLib.Delayer do
 
   defstruct terms: [],
     offset: 0,
-    recipient: nil
+    recipient: nil,
+    timer: nil
 
   @granularity 10 # in msecs
 
@@ -87,8 +88,8 @@ defmodule DtLib.Delayer do
   @doc false
   @spec init(pid()) :: {:ok, %Delayer{}}
   def init(recipient) do
-    start_ticker()
-    state = %Delayer{recipient: recipient}
+    tref = reschedule_tick()
+    state = %Delayer{recipient: recipient, timer: tref}
     {:ok, state}
   end
 
@@ -124,12 +125,14 @@ defmodule DtLib.Delayer do
   @spec handle_call({:warp}, any(),
     %Delayer{}) :: {:reply, :warped, %Delayer{}}
   def handle_call({:warp, offset}, _from, state) do
-    Etimer.stop_timer(self(), :tick)
+    with tref when is_reference(tref) <- state.timer do
+      Process.cancel_timer(tref)
+    end
     state = %{state | offset: offset}
     terms = process_entries(state)
-    reschedule_tick()
+    tref = reschedule_tick()
 
-    {:reply, :warped, %{state | terms: terms}}
+    {:reply, :warped, %{state | terms: terms, timer: tref}}
   end
 
   @doc false
@@ -147,12 +150,11 @@ defmodule DtLib.Delayer do
   end
 
   @doc false
-  @spec handle_call({:tick}, any(),
-    %Delayer{}) :: {:reply, :ok, %Delayer{}}
-  def handle_call({:tick}, _from, state) do
+  @spec handle_info({:tick}, %Delayer{}) :: {:noreply, %Delayer{}}
+  def handle_info({:tick}, state) do
     terms = process_entries(state)
-    reschedule_tick()
-    {:reply, :ok, %{state | terms: terms}}
+    tref = reschedule_tick()
+    {:noreply, %{state | terms: terms, timer: tref}}
   end
 
   defp process_entries(state) do
@@ -161,16 +163,8 @@ defmodule DtLib.Delayer do
     end)
   end
 
-  defp start_ticker do
-    server_name = self()
-    Etimer.start_link(server_name)
-    reschedule_tick()
-  end
-
   defp reschedule_tick do
-    server_name = self()
-    Etimer.start_timer(server_name, :tick, @granularity,
-      {__MODULE__, :tick, [server_name]})
+    Process.send_after(self(), {:tick}, @granularity)
   end
 
   defp check_expired(term, state) do
