@@ -2,7 +2,8 @@
 
   <div class="ui-g-12" *ngIf="!displayDialog">
     <div class="card card-w-title">
-      <p-dataTable [value]="sensors" [rows]="10" [paginator]="true" selectionMode="single" [(selection)]="selectedSensor" (onRowSelect)="onRowSelect($event)"
+      <p-dataTable [value]="sensors" [rows]="10" [filterDelay]="500" (onLazyLoad)="lazyGrid.getLazy($event)" [lazy]="true" [totalRecords]="lazyGrid.getTotalRecords()"
+        [rows]="lazyGrid.getPerPage()" [paginator]="true" selectionMode="single" [(selection)]="selectedSensor" (onRowSelect)="onRowSelect($event)"
         [responsive]="true">
         <header>Sensors</header>
         <p-column field="address" header="Address" [sortable]="true"></p-column>
@@ -14,7 +15,7 @@
             <button type="button" class="float_left" pButton icon="ui-icon-add" (click)="showDialogToAdd()" label="Add"></button>
           </div>
         </p-footer>
-        </p-dataTable>
+      </p-dataTable>
     </div>
   </div>
 

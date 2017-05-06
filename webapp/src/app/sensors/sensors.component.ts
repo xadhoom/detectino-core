@@ -6,6 +6,7 @@ import {
 import { Sensor } from '../models/sensor';
 import { Partition } from '../models/partition';
 import { SelectItem } from 'primeng/primeng';
+import { LazyGrid } from '../shared/components/lazy_grid';
 
 @Component({
   selector: 'app-sensors',
@@ -34,9 +35,14 @@ export class SensorsComponent implements OnInit, DoCheck {
 
   errorMessage: string;
 
+  // pagination & sort stuff
+  public lazyGrid: LazyGrid;
+
   constructor(private sensorService: SensorService,
     private partitionService: PartitionService,
-    private notificationService: NotificationService) { };
+    private notificationService: NotificationService) {
+    this.lazyGrid = new LazyGrid(() => this.all());
+  };
 
   ngOnInit() {
     this.balance_types = [{ label: 'Select a type', value: null }];
@@ -61,9 +67,9 @@ export class SensorsComponent implements OnInit, DoCheck {
     this.selectedPartitions = [];
     this.allPartitions();
 
-    this.sensorService.all().
+    this.sensorService.getPaged(this.lazyGrid.getSortPage()).
       subscribe(
-      items => this.sensors = items,
+      res => { this.sensors = res.data; this.lazyGrid.setTotalRecords(res.total); },
       error => this.onError(error)
       );
   };
