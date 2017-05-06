@@ -18,6 +18,10 @@ defmodule DtBus.CanSim do
     GenServer.start_link(__MODULE__, {myid, sender_fn}, name: __MODULE__)
   end
 
+  def flood do
+    GenServer.call(__MODULE__, {:flood})
+  end
+
   def short(port, value \\ 50) do
     GenServer.call(__MODULE__, {:gen_analog_ev, port, value})
   end
@@ -48,7 +52,14 @@ defmodule DtBus.CanSim do
   #
   def init({myid, sender_fn}) do
     :can_router.attach()
-    {:ok, %{myid: myid, sender_fn: sender_fn, running: nil}}
+    {:ok, %{myid: myid, sender_fn: sender_fn, flood: false, running: nil}}
+  end
+
+  def handle_call({:flood}, _f, state) do
+    case state.flood do
+      true -> {:reply, :disabled, %{state | flood: false}}
+      false -> {:reply, :enabled, %{state | flood: true}}
+    end
   end
 
   def handle_call({:stop}, _from, state) do
@@ -104,12 +115,12 @@ defmodule DtBus.CanSim do
 
   def handle_info(cmd = {:gen_analog_ev, port, value}, state) do
     send_analog_can_message(value, port, state)
-    tref = case state.running do
-      v when is_reference(v) ->
-        Process.send_after(self(), cmd, @send_interval)
-      false ->
-        nil
-    end
+    tref = with v when is_reference(v) <- state.running,
+                true <- state.flood do
+                  Process.send_after(self(), cmd, @send_interval)
+          else
+            _ -> nil
+          end
     {:noreply, %{state | running: tref}}
   end
 
