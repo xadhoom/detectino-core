@@ -109,7 +109,7 @@ defmodule DtBus.Can do
   end
 
   def handle_call(value, _from, state) do
-    Logger.info fn -> "Got call message #{inspect value}" end
+    Logger.debug fn -> "Got call message #{inspect value}" end
     {:reply, nil, state}
   end
 
@@ -135,8 +135,13 @@ defmodule DtBus.Can do
     {:noreply, state}
   end
 
+  def handle_cast({:send, _}, state) do
+    # ignore :send messages sent by the can router
+    {:noreply, state}
+  end
+
   def handle_cast(value, state) do
-    Logger.info fn -> "Got cast message #{inspect value}" end
+    Logger.warn fn -> "Got unhandled cast message #{inspect value}" end
     {:noreply, state}
   end
 
@@ -168,7 +173,7 @@ defmodule DtBus.Can do
   defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
     {:ok, state} = case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
-        Logger.info fn -> "Got command:#{command}, " <>
+        Logger.debug fn -> "Got command:#{command}, " <>
         "subcommand:#{subcommand} " <>
         "from id:#{src_node_id} to id:#{dst_node_id} " <>
         "datalen:#{inspect len} payload:#{inspect data}" end
