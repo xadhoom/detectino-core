@@ -48,7 +48,7 @@ defmodule DtWeb.PartitionController do
   end
 
   defp arm_transaction(cset, mode) do
-    Repo.transaction(fn ->
+    {_, result} = Repo.transaction(fn ->
       case cset.valid? do
         true ->
           res = cset
@@ -56,12 +56,13 @@ defmodule DtWeb.PartitionController do
           |> PartitionProcess.arm(mode)
           case res do
             :ok -> :ok
-            {:error, :tripped} -> Repo.rollback(:tripped)
+            {:error, :tripped} -> Repo.rollback({:error, :tripped})
           end
         false ->
           {:error, :bad_request}
       end
     end)
+    result
   end
 
 end
