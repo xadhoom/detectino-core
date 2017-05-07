@@ -162,6 +162,15 @@ defmodule DtCore.Test.Sensor.Partition do
     |> assert_receive(5000)
   end
 
+  test "cannot arm tripped partition", ctx do
+    {:ok, part, pid} = setup_register_single_nc_sensor(ctx)
+
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+
+    {:error, :tripped} = Partition.arm(part, "ARM")
+  end
+
   test "arm partial sensor", ctx do
     s_int = %SensorModel{name: "INT", balance: "NC", th1: 10,
         partitions: [], enabled: true, address: "1", port: 1, internal: true}

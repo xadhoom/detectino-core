@@ -133,9 +133,17 @@ defmodule DtCore.Sensor.Partition do
   end
 
   def handle_call({:arm, mode}, _from, state) do
-    {res, state} = do_arm(state, mode)
-    true = save_state(state)
-    {:reply, res, state}
+    all_idle = Enum.all?(state.sensors, fn(sensor) ->
+      :standby == Worker.alarm_status(sensor)
+    end)
+
+    with true <- all_idle do
+      {res, state} = do_arm(state, mode)
+      true = save_state(state)
+      {:reply, res, state}
+    else
+      _ -> {:reply, {:error, :tripped}, state}
+    end
   end
 
   def handle_call({:disarm, mode}, _from, state) do
@@ -424,17 +432,16 @@ defmodule DtCore.Sensor.Partition do
   defp arm_partial_run(sensor, partition, immediate) do
     case immediate do
       true ->
-        sensor |> GenServer.call({:arm, partition.exit_delay})
+        :ok = GenServer.call(sensor, {:arm, partition.exit_delay})
       false ->
-        sensor |> GenServer.call({:arm, 0})
+        :ok = GenServer.call(sensor, {:arm, 0})
     end
   end
 
   defp arm_all(sensors, partition) do
     sensors
     |> Enum.each(fn(sensor) ->
-      sensor
-      |> GenServer.call({:arm, partition.exit_delay})
+      :ok = GenServer.call(sensor, {:arm, partition.exit_delay})
     end)
   end
 
@@ -455,6 +462,7 @@ defmodule DtCore.Sensor.Partition do
         :alarm -> {:halt, :alarm}
         :tamper -> {:halt, :tamper}
         :fault -> {:halt, :fault}
+        :reading -> {:halt, :alarm}
         x ->
           Logger.error fn -> "Unhandled status #{inspect x}" end
           {:halt, :tamper}

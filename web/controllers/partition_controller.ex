@@ -29,22 +29,39 @@ defmodule DtWeb.PartitionController do
     end
   end
 
-  def arm(conn, %{"id" => id, "mode" => mode}) do
+  def arm(conn, params) do
+    case do_arm(params) do
+      :ok -> send_resp(conn, 204, StatusCodes.status_code(204))
+      {:error, :bad_request} -> send_resp(conn, 400, StatusCodes.status_code(400))
+      {:error, :tripped} -> send_resp(conn, 403, StatusCodes.status_code(403))
+      {:error, :not_found} -> send_resp(conn, 404, StatusCodes.status_code(404))
+    end
+  end
+
+  defp do_arm(%{"id" => id, "mode" => mode}) do
     case Repo.get(Partition, id) do
       nil ->
-        send_resp(conn, 404, StatusCodes.status_code(404))
+        {:error, :not_found}
       part ->
-        cset = part |> Partition.arm(mode)
-        case cset.valid? do
-          true ->
-            cset
-            |> Repo.update!
-            |> PartitionProcess.arm(mode)
-            send_resp(conn, 204, StatusCodes.status_code(204))
-          false ->
-            send_resp(conn, 400, StatusCodes.status_code(400))
-        end
+        part |> Partition.arm(mode) |> arm_transaction(mode)
     end
+  end
+
+  defp arm_transaction(cset, mode) do
+    Repo.transaction(fn ->
+      case cset.valid? do
+        true ->
+          res = cset
+          |> Repo.update!
+          |> PartitionProcess.arm(mode)
+          case res do
+            :ok -> :ok
+            {:error, :tripped} -> Repo.rollback(:tripped)
+          end
+        false ->
+          {:error, :bad_request}
+      end
+    end)
   end
 
 end

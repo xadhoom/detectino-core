@@ -18,12 +18,10 @@ defmodule DtCore.Test.Sensor.Worker do
     ev = %Event{address: "1", port: 1, value: 15}
     :ok = Process.send(pid, {:event, ev, part}, [])
 
-    assert :standby == Worker.alarm_status({config, part})
+    assert :reading == Worker.alarm_status({config, part})
 
     {:start, %SensorEv{type: :reading, address: "1", port: 1}}
     |> assert_receive(5000)
-
-    assert :standby == Worker.alarm_status({config, part})
   end
 
   test "disarm an already disarmed NC sensor" do
@@ -149,7 +147,7 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
     refute_receive _
-    assert :standby == Worker.alarm_status({config, part})
+    assert :reading == Worker.alarm_status({config, part})
 
     # flush queued messages, if any
     send pid, {:flush, :entry}
@@ -199,7 +197,7 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
-    assert :standby == Worker.alarm_status({config, part})
+    assert :reading == Worker.alarm_status({config, part})
 
     # be sure to expire the exit timer, we should not receive anything
     Worker.expire_timer({:exit_timer, server_name})
@@ -622,7 +620,7 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
-    assert :standby == Worker.alarm_status({config, part})
+    assert :reading == Worker.alarm_status({config, part})
 
     refute_receive _, 1000
   end
@@ -665,7 +663,7 @@ defmodule DtCore.Test.Sensor.Worker do
     {:start, %SensorEv{type: :reading, address: "1", port: 1, delayed: false}}
     |> assert_receive(5000)
 
-    assert :standby == Worker.alarm_status({config, part})
+    assert :reading == Worker.alarm_status({config, part})
 
     refute_receive _, 1000
   end
@@ -765,6 +763,27 @@ defmodule DtCore.Test.Sensor.Worker do
     |> assert_receive(5000)
 
     refute_receive _, 1000
+  end
+
+  test "sensor cannot be armed if tripped" do
+    # setup sensor
+    {:ok, part, _config, pid} = setup_nc()
+
+    # send an alarm reading
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # check response
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :reading, address: "1", port: 1}}
+    |> assert_receive(5000)
+
+    # now arm the system, arming should be refused
+    arm_cmd = {:arm, part.exit_delay}
+    {:error, :tripped} = GenServer.call(pid, arm_cmd)
+
+    refute_receive _
   end
 
   defp setup_nc do

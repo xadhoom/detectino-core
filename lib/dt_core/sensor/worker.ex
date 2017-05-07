@@ -15,6 +15,9 @@ defmodule DtCore.Sensor.Worker do
   alias DtCore.Sensor.Worker
   alias DtLib.Delayer
 
+  @type idle_status :: :standby
+  @type tripped_status :: :reading | :tamper | :fault | :alarm
+
   @type t :: %__MODULE__{original_config: %SensorModel{},
     receiver: pid,
     armed: boolean,
@@ -49,6 +52,10 @@ defmodule DtCore.Sensor.Worker do
   def alarm_status({config = %SensorModel{}, partition = %PartitionModel{}}) do
     {:ok, name} = Utils.sensor_server_name(config, partition)
     GenServer.call(name, {:alarm_status?})
+  end
+
+  def alarm_status(server) when is_pid(server) do
+    GenServer.call(server, {:alarm_status?})
   end
 
   def armed?({config = %SensorModel{}, partition = %PartitionModel{}}) do
@@ -158,8 +165,9 @@ defmodule DtCore.Sensor.Worker do
     {:reply, state.status, state}
   end
 
-  @spec handle_call({:arm, nil | 0 | false}, any, Worker.t) :: {:reply, :ok, Worker.t}
-  def handle_call({:arm, v}, _from, state)
+  @spec handle_call({:arm, nil | 0 | false}, any, %Worker{status: idle_status}) ::
+    {:reply, :ok, Worker.t} | {:reply, {:error, atom}, Worker.t}
+  def handle_call({:arm, v}, _from, state = %Worker{status: :standby})
       when is_nil(v) or v == 0 or v == false do
     Logger.debug("Arming sensor now!")
     state = reset_config(state)
@@ -170,8 +178,9 @@ defmodule DtCore.Sensor.Worker do
     {:reply, :ok, %Worker{state | armed: true}}
   end
 
-  @spec handle_call({:arm, pos_integer}, any, Worker.t) :: {:reply, :ok, Worker.t}
-  def handle_call({:arm, delay}, _from, state)
+  @spec handle_call({:arm, pos_integer}, any, %Worker{status: idle_status}) ::
+    {:reply, :ok, Worker.t}
+  def handle_call({:arm, delay}, _from, state = %Worker{status: :standby})
       when is_number(delay) and delay > 0 do
     Logger.debug("Arming sensor")
 
@@ -186,6 +195,12 @@ defmodule DtCore.Sensor.Worker do
     end
 
     {:reply, :ok, %Worker{state | armed: true}}
+  end
+
+  @spec handle_call({:arm, any}, any, %Worker{status: tripped_status}) ::
+    {:reply, {:error, :tripped}, Worker.t}
+  def handle_call({:arm, _}, _from, state) do
+    {:reply, {:error, :tripped}, state}
   end
 
   def handle_call({:disarm}, _from, state) do
@@ -213,9 +228,10 @@ defmodule DtCore.Sensor.Worker do
     {:reply, :ok, %Worker{state | armed: false}}
   end
 
+  @spec sensor_state(%SensorEv{}, any) :: idle_status | tripped_status
   defp sensor_state(ev, _state) do
     case ev.type do
-      :reading -> :standby
+      :reading -> :reading
       :standby -> :standby
       :tamper -> :tamper
       :fault -> :fault
