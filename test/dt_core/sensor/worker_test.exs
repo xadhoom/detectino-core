@@ -557,7 +557,7 @@ defmodule DtCore.Test.Sensor.Worker do
     refute_receive _
   end
 
-  test "multiple alarm events should be squelched" do
+  test "multiple, identical alarm events should be squelched" do
     # setup sensor
     {:ok, part, config, pid} = setup_delayed_nc(60, false)
 
@@ -586,6 +586,42 @@ defmodule DtCore.Test.Sensor.Worker do
 
     # send another reading, since we're alarm we do not expect events
     :ok = Process.send(pid, {:event, ev, part}, [])
+
+    refute_receive _, 1000
+  end
+
+  test "multiple, similar alarm events should be squelched" do
+    # setup sensor
+    {:ok, part, config, pid} = setup_delayed_nc(60, false)
+
+    # arm it
+    arm_cmd = {:arm, 0}
+    :ok = GenServer.call(pid, arm_cmd)
+
+    # send an alarm value
+    ev = %Event{address: "1", port: 1, value: 15}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
+    # now check
+    {:stop, %SensorEv{type: :standby, address: "1", port: 1}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    refute_receive _
+    assert :alarm == Worker.alarm_status({config, part})
+
+    # flush events and check
+    send pid, {:flush, :entry}
+    {:stop, %SensorEv{type: :alarm, address: "1", port: 1, delayed: true}}
+    |> assert_receive(5000)
+    {:start, %SensorEv{type: :alarm, address: "1", port: 1, delayed: false}}
+    |> assert_receive(5000)
+
+    # send another reading, since we're alarmed we do not expect events
+    # even if the reading *value* is different, but is still an alarm
+    ev = %Event{address: "1", port: 1, value: 20}
+    :ok = Process.send(pid, {:event, ev, part}, [])
+
     refute_receive _, 1000
   end
 
