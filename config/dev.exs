@@ -43,7 +43,6 @@ config :detectino, DtWeb.Repo,
   pool_size: 10
 
 config :detectino, DtCore.Output.Actions.Email.Mailer,
-  adapter: Swoosh.Adapters.Logger,
-  level: :debug
+  adapter: Swoosh.Adapters.Local
 
 config :detectino, :can_interface, "vcan0"
