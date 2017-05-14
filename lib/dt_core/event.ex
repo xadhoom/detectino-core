@@ -19,8 +19,7 @@ defmodule DtCore.Event do
     type: nil,
     subtype: nil,
     value: nil,
-    delayed: false
-
+    delayed: :drop_me_asap
 end
 
 defmodule DtCore.SensorEv do
@@ -41,6 +40,34 @@ defmodule DtCore.SensorEv do
     address: nil,
     port: nil,
     urgent: false
+end
+
+defmodule DtCore.DetectorEv do
+  @moduledoc """
+    Used to format output from Detector Workers.
+    Is listened to by Partition Workers and via DtCore.OutputsRegistry.
+
+    type values:
+      :realtime
+      :alarm
+      :short
+      :idle
+      :fault
+      :tamper
+  """
+  defstruct type: nil,
+    address: nil,
+    port: nil
+end
+
+defmodule DtCore.DetectorExitEv do
+  defstruct address: nil,
+    port: nil
+end
+
+defmodule DtCore.DetectorEntryEv do
+  defstruct address: nil,
+    port: nil
 end
 
 defmodule DtCore.PartitionEv do
