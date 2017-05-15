@@ -54,7 +54,7 @@ defmodule DtCore.Monitor.Detector do
     GenServer.call(server, :arm)
   end
 
-  def subscribe(server, timeouts = {entry_timeout, exit_timeout}) do
+  def subscribe(server, timeouts = {_entry_timeout, _exit_timeout}) do
     GenServer.call(server, {:subscribe, self(), timeouts})
   end
 
@@ -95,12 +95,7 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def handle_call(:arm, _from, state) do
-    case state.config.exit_delay do
-      true ->
-        :ok = DetectorFsm.arm(state.fsm, state.exit_timeout)
-      false ->
-        :ok = DetectorFsm.arm(state.fsm, 0)
-    end
+    :ok = DetectorFsm.arm(state.fsm, state.exit_timeout)
     {:reply, :ok, state}
   end
 

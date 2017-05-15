@@ -67,27 +67,25 @@ defmodule DtCore.Monitor.DetectorFsm do
     {:next_state, :tampered, data}
   end
 
-  def handle_event({:call, from}, {:arm, 0}, :idle, data) do
-    ev = %DetectorEv{port: data.config.port, address: data.config.address,
-      type: :idle}
-    send data.receiver, {:start, ev}
-
-    {:next_state, :idle_arm, data, [{:reply, from, :ok}]}
-  end
-
   def handle_event({:call, from}, {:arm, exit_timeout}, :idle, data)
-    when exit_timeout > 0 do
-    ev = %DetectorEv{port: data.config.port, address: data.config.address,
+    when is_integer(exit_timeout) do
+    idle_ev = %DetectorEv{port: data.config.port, address: data.config.address,
       type: :idle}
-    ex_ev = %DetectorExitEv{port: data.config.port,
-      address: data.config.address}
-    send data.receiver, {:stop, ev}
-    send data.receiver, {:start, ex_ev}
 
-    {:next_state, :exit_wait, data, [
-      {:reply, from, :ok},
-      {:state_timeout, exit_timeout * 1000, :exit_wait}
-      ]}
+    case data.config.exit_delay do
+      true ->
+        ex_ev = %DetectorExitEv{port: data.config.port,
+          address: data.config.address}
+        send data.receiver, {:stop, idle_ev}
+        send data.receiver, {:start, ex_ev}
+        {:next_state, :exit_wait, data, [
+          {:reply, from, :ok},
+          {:state_timeout, exit_timeout * 1000, :exit_wait}
+          ]}
+      false ->
+        send data.receiver, {:start, idle_ev}
+        {:next_state, :idle_arm, data, [{:reply, from, :ok}]}
+    end
   end
 
 end
