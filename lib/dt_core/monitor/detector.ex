@@ -102,6 +102,8 @@ defmodule DtCore.Monitor.Detector do
   @spec handle_info({:event, %Event{}}, Detector.t) :: {:noreply, Detector.t}
   def handle_info({:event, ev = %Event{}}, state) do
     case process_event(ev, state) do
+      :not_me ->
+        Logger.debug "Wrong event address/port %{inspect ev}"
       :error ->
         Logger.warn "Cannot decode event %{inspect ev}"
       v ->
@@ -144,13 +146,20 @@ defmodule DtCore.Monitor.Detector do
   end
 
   defp process_event(ev = %Event{}, state) do
-    case state.config.balance do
-      "NC" -> nc(ev, state)
-      "NO" -> no(ev, state)
-      "EOL" -> eol(ev, state)
-      "DEOL" -> deol(ev, state)
-      "TEOL" -> teol(ev, state)
-      _ -> :error
+    port = state.config.port
+    addr = state.config.address
+    with ^port <- ev.port,
+      ^addr <- ev.address do
+      case state.config.balance do
+        "NC" -> nc(ev, state)
+        "NO" -> no(ev, state)
+        "EOL" -> eol(ev, state)
+        "DEOL" -> deol(ev, state)
+        "TEOL" -> teol(ev, state)
+        _ -> :error
+      end
+    else
+      _ -> :not_me
     end
   end
 
@@ -159,7 +168,7 @@ defmodule DtCore.Monitor.Detector do
     th1 = me.th1
     case ev.value do
       v when (v < th1) ->
-        build_ev_type(:standby, ev.address, ev.port)
+        build_ev_type(:idle, ev.address, ev.port)
       _ ->
         build_ev_type(:alarm, ev.address, ev.port)
     end
@@ -172,7 +181,7 @@ defmodule DtCore.Monitor.Detector do
       v when (v < th1) ->
         build_ev_type(:alarm, ev.address, ev.port)
       _ ->
-        build_ev_type(:standby, ev.address, ev.port)
+        build_ev_type(:idle, ev.address, ev.port)
     end
   end
 
@@ -184,7 +193,7 @@ defmodule DtCore.Monitor.Detector do
       v when (v < th1) ->
         build_ev_type(:short, ev.address, ev.port)
       v when (v < th2) ->
-        build_ev_type(:standby, ev.address, ev.port)
+        build_ev_type(:idle, ev.address, ev.port)
       _ ->
         build_ev_type(:alarm, ev.address, ev.port)
     end
@@ -199,7 +208,7 @@ defmodule DtCore.Monitor.Detector do
       v when (v < th1) ->
         build_ev_type(:short, ev.address, ev.port)
       v when (v < th2) ->
-        build_ev_type(:standby, ev.address, ev.port)
+        build_ev_type(:idle, ev.address, ev.port)
       v when (v < th3) ->
         build_ev_type(:alarm, ev.address, ev.port)
       _ ->
@@ -217,7 +226,7 @@ defmodule DtCore.Monitor.Detector do
       v when (v < th1) ->
         build_ev_type(:short, ev.address, ev.port)
       v when (v < th2) ->
-        build_ev_type(:standby, ev.address, ev.port)
+        build_ev_type(:idle, ev.address, ev.port)
       v when (v < th3) ->
         build_ev_type(:alarm, ev.address, ev.port)
       v when (v < th4) ->

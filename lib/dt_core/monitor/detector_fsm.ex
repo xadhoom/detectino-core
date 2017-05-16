@@ -20,7 +20,7 @@ defmodule DtCore.Monitor.DetectorFsm do
     GenStateMachine.call(server, :status)
   end
 
-  def event(server, ev=%DetectorEv{}) when is_pid(server) do
+  def event(server, ev = %DetectorEv{}) when is_pid(server) do
     GenStateMachine.cast(server, ev)
   end
 
@@ -32,7 +32,14 @@ defmodule DtCore.Monitor.DetectorFsm do
   # GenStateMachine callbacks
   #
   def init({config = %SensorModel{}, receiver}) do
-    {:ok, :idle, %{config: config, receiver: receiver}}
+    cur_event = %DetectorEv{
+      type: :idle,
+      address: config.address,
+      port: config.port
+    }
+    {:ok, :idle, %{
+      config: config, receiver: receiver, last_event: cur_event
+    }}
   end
 
   def handle_event({:call, from}, :status, state, _data) do
@@ -42,31 +49,35 @@ defmodule DtCore.Monitor.DetectorFsm do
   #
   # :idle state callbacks
   #
-  def handle_event(:cast, _ev = %DetectorEv{type: :idle}, :idle, _data) do
-    :keep_state_and_data
+  # process idle event in idle state
+  def handle_event(:cast, ev = %DetectorEv{type: :idle}, :idle, data) do
+    data = %{data | last_event: ev}
+    {:next_state, :idle, data}
   end
 
+  # process alarm event in idle state
   def handle_event(:cast, ev = %DetectorEv{type: :alarm}, :idle, data) do
-    send data.receiver, {:stop, %DetectorEv{ev | type: :idle}}
-
+    send data.receiver, {:stop, data.last_event}
     case data.config.full24h do
       false ->
-        send data.receiver, {:start, %DetectorEv{ev | type: :realtime}}
-        {:next_state, :realtime, data}
+        rt_ev = %DetectorEv{ev | type: :realtime}
+        send data.receiver, {:start, rt_ev}
+        {:next_state, :realtime, %{data | last_event: rt_ev}}
       true ->
         send data.receiver, {:start, ev}
-        {:next_state, :alarmed, data}
+        {:next_state, :alarmed, %{data | last_event: ev}}
     end
-
   end
 
+  # process tamper (short) event in idle state
   def handle_event(:cast, ev = %DetectorEv{type: :short}, :idle, data) do
     send data.receiver, {:stop, %DetectorEv{ev | type: :idle}}
     send data.receiver, {:start, ev}
 
-    {:next_state, :tampered, data}
+    {:next_state, :tampered, %{data | last_event: ev}}
   end
 
+  # process arm request event in idle state
   def handle_event({:call, from}, {:arm, exit_timeout}, :idle, data)
     when is_integer(exit_timeout) do
     idle_ev = %DetectorEv{port: data.config.port, address: data.config.address,
@@ -86,6 +97,49 @@ defmodule DtCore.Monitor.DetectorFsm do
         send data.receiver, {:start, idle_ev}
         {:next_state, :idle_arm, data, [{:reply, from, :ok}]}
     end
+  end
+
+  #
+  # :tampered state callbacks
+  #
+  # process idle event in tampered state
+  def handle_event(:cast, ev = %DetectorEv{type: :idle}, :tampered, data) do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :idle, %{data | last_event: ev}}
+  end
+
+  # process tamper event in tampered state
+  def handle_event(:cast, ev = %DetectorEv{type: type}, :tampered, data)
+    when type in [:tamper, :short, :fault] do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :tampered, %{data | last_event: ev}}
+  end
+
+  # process alarm event in tampered state
+  def handle_event(:cast, ev = %DetectorEv{type: :alarm}, :tampered, data) do
+    send data.receiver, {:stop, data.last_event}
+    case data.config.full24h do
+      false ->
+        rt_ev = %DetectorEv{ev | type: :realtime}
+        send data.receiver, {:start, rt_ev}
+        {:next_state, :realtime, %{data | last_event: rt_ev}}
+      true ->
+        send data.receiver, {:start, ev}
+        {:next_state, :alarmed, %{data | last_event: ev}}
+    end
+  end
+
+  #
+  # :realtime state callbacks
+  #
+  # process tamper event in realtime state
+  def handle_event(:cast, ev = %DetectorEv{type: type}, :realtime, data)
+    when type in [:tamper, :short, :fault] do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :tampered, %{data | last_event: ev}}
   end
 
 end
