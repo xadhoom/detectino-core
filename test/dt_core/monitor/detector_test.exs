@@ -19,7 +19,7 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
-  test "no alarm but realtime event if NC partion is not armed" do
+  test "no alarm but realtime event if NC sensor is not armed" do
     {:ok, config, pid} = setup_nc()
 
     ev = %Event{address: "1", port: 1, value: 15}
@@ -31,7 +31,7 @@ defmodule DtCore.Test.Monitor.Detector do
     |> assert_receive(5000)
   end
 
-  test "alarm event if 24H NC partion is not armed" do
+  test "alarm event if 24H NC sensor is not armed" do
     {:ok, config, pid} = setup_24h_nc()
 
     ev = %Event{address: "1", port: 1, value: 15}
@@ -43,7 +43,7 @@ defmodule DtCore.Test.Monitor.Detector do
     |> assert_receive(5000)
   end
 
-  test "tamper event on not armed partition" do
+  test "tamper event on not armed sensor" do
     {:ok, config, pid} = setup_eol()
 
     ev = %Event{address: "2", port: 2, value: 5}
@@ -105,7 +105,7 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
-  test "arm a not delayed partition" do
+  test "arm a not delayed sensor" do
     {:ok, config, _pid} = setup_eol()
 
     Detector.arm({config})
@@ -116,7 +116,7 @@ defmodule DtCore.Test.Monitor.Detector do
     assert :idle_arm == Detector.status({config})
   end
 
-  test "arm an exit delayed partition" do
+  test "arm an exit delayed sensor" do
     {:ok, config, _pid} = setup_eol(0, 30)
 
     Detector.arm({config})
@@ -129,7 +129,7 @@ defmodule DtCore.Test.Monitor.Detector do
     assert :exit_wait == Detector.status({config})
   end
 
-  test "arm a tampered partition" do
+  test "arm a tampered sensor" do
     {:ok, config, pid} = setup_deol()
 
     ev = %Event{address: "4", port: 4, value: 35}
