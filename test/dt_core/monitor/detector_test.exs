@@ -46,15 +46,15 @@ defmodule DtCore.Test.Monitor.Detector do
   test "tamper event on not armed partition" do
     {:ok, config, pid} = setup_eol()
 
-    ev = %Event{address: "1", port: 1, value: 5}
+    ev = %Event{address: "2", port: 2, value: 5}
     :ok = Process.send(pid, {:event, ev}, [])
 
     assert :tampered == Detector.status({config})
 
-    {:stop, %DetectorEv{type: :idle, address: "1", port: 1}}
+    {:stop, %DetectorEv{type: :idle, address: "2", port: 2}}
     |> assert_receive(5000)
 
-    {:start, %DetectorEv{type: :short, address: "1", port: 1}}
+    {:start, %DetectorEv{type: :short, address: "2", port: 2}}
     |> assert_receive(5000)
   end
 
