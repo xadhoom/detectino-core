@@ -58,7 +58,7 @@ defmodule DtCore.Test.Monitor.Detector do
     |> assert_receive(5000)
   end
 
-  test "all events on not teol sensor" do
+  test "all events on not armed teol sensor" do
     {:ok, config, pid} = setup_teol()
     assert :idle == Detector.status({config})
 
