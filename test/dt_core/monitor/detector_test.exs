@@ -139,6 +139,58 @@ defmodule DtCore.Test.Monitor.Detector do
     {:error, :tripped} = Detector.arm({config})
   end
 
+  test "alarm event on a not armed tampered sensor" do
+    {:ok, config, pid} = setup_deol()
+
+    # put in tamper state
+    ev = %Event{address: "4", port: 4, value: 35}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered == Detector.status({config})
+
+    # check
+    {:stop, %DetectorEv{type: :idle, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    ev = %Event{address: "4", port: 4, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :realtime == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :realtime, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "alarm event on a not armed tampered 24h sensor" do
+    {:ok, config, pid} = setup_24h_deol()
+
+    # put in tamper state
+    ev = %Event{address: "4", port: 4, value: 35}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered == Detector.status({config})
+
+    # check
+    {:stop, %DetectorEv{type: :idle, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    ev = %Event{address: "4", port: 4, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :alarmed == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :alarm, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
@@ -202,6 +254,25 @@ defp setup_deol do
       partitions: [],
       address: "4", port: 4,
       enabled: true
+    }
+    {:ok, pid} = Detector.start_link({sensor})
+    :ok = Detector.subscribe(pid, {0, 0})
+    {:ok, sensor, pid}
+  end
+
+  defp setup_24h_deol do
+    sensor = %SensorModel{
+      name: "DEOL",
+      balance: "DEOL",
+      th1: 10,
+      th2: 20,
+      th3: 30,
+      entry_delay: false,
+      exit_delay: false,
+      partitions: [],
+      address: "4", port: 4,
+      enabled: true,
+      full24h: true
     }
     {:ok, pid} = Detector.start_link({sensor})
     :ok = Detector.subscribe(pid, {0, 0})
