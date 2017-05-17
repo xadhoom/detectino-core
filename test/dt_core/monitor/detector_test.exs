@@ -240,6 +240,55 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
+  test "alarm event in alarmed state" do
+    {:ok, config, pid} = setup_deol_alarmed()
+
+    # send alarm event
+    ev = %Event{address: "4", port: 4, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :alarmed == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "tamper event in alarmed state" do
+    {:ok, config, pid} = setup_deol_alarmed()
+
+    # send tamper event
+    ev = %Event{address: "4", port: 4, value: 35}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :alarm, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "idle event in alarmed state" do
+    {:ok, config, pid} = setup_deol_alarmed()
+
+    # send idle event
+    ev = %Event{address: "4", port: 4, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :idle == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :alarm, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :idle, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "arm a sensor in alarmed state" do
+    {:ok, config, _pid} = setup_deol_alarmed()
+    {:error, :tripped} = Detector.arm({config})
+    refute_receive _
+  end
+
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
@@ -289,6 +338,22 @@ defmodule DtCore.Test.Monitor.Detector do
     {:ok, pid} = Detector.start_link({sensor})
     :ok = Detector.subscribe(pid, {entry_delay, exit_delay})
     {:ok, sensor, pid}
+  end
+
+  defp setup_deol_alarmed do
+    {:ok, config, pid} = setup_24h_deol()
+
+    # put in realtime state
+    ev = %Event{address: "4", port: 4, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :alarmed == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :alarm, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    {:ok, config, pid}
   end
 
   defp setup_deol_realtime do
