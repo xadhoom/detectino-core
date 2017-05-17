@@ -95,8 +95,8 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def handle_call(:arm, _from, state) do
-    :ok = DetectorFsm.arm(state.fsm, state.exit_timeout)
-    {:reply, :ok, state}
+    reply = DetectorFsm.arm(state.fsm, state.exit_timeout)
+    {:reply, reply, state}
   end
 
   @spec handle_info({:event, %Event{}}, Detector.t) :: {:noreply, Detector.t}

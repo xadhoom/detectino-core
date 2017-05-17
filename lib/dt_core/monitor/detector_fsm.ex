@@ -70,7 +70,8 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   # process tamper (short) event in idle state
-  def handle_event(:cast, ev = %DetectorEv{type: :short}, :idle, data) do
+  def handle_event(:cast, ev = %DetectorEv{type: tamper}, :idle, data)
+    when tamper in [:short, :tamper, :fault] do
     send data.receiver, {:stop, %DetectorEv{ev | type: :idle}}
     send data.receiver, {:start, ev}
 
@@ -129,6 +130,12 @@ defmodule DtCore.Monitor.DetectorFsm do
         send data.receiver, {:start, ev}
         {:next_state, :alarmed, %{data | last_event: ev}}
     end
+  end
+
+  # process arm request event in tampered state
+  def handle_event({:call, from}, {:arm, exit_timeout}, :tampered, data)
+    when is_integer(exit_timeout) do
+      {:keep_state_and_data, [{:reply, from, {:error, :tripped}}]}
   end
 
   #

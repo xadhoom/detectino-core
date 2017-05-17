@@ -129,6 +129,16 @@ defmodule DtCore.Test.Monitor.Detector do
     assert :exit_wait == Detector.status({config})
   end
 
+  test "arm a tampered partition" do
+    {:ok, config, pid} = setup_deol()
+
+    ev = %Event{address: "4", port: 4, value: 35}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered == Detector.status({config})
+
+    {:error, :tripped} = Detector.arm({config})
+  end
+
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
@@ -177,6 +187,24 @@ defmodule DtCore.Test.Monitor.Detector do
     }
     {:ok, pid} = Detector.start_link({sensor})
     :ok = Detector.subscribe(pid, {entry_delay, exit_delay})
+    {:ok, sensor, pid}
+  end
+
+defp setup_deol do
+    sensor = %SensorModel{
+      name: "DEOL",
+      balance: "DEOL",
+      th1: 10,
+      th2: 20,
+      th3: 30,
+      entry_delay: false,
+      exit_delay: false,
+      partitions: [],
+      address: "4", port: 4,
+      enabled: true
+    }
+    {:ok, pid} = Detector.start_link({sensor})
+    :ok = Detector.subscribe(pid, {0, 0})
     {:ok, sensor, pid}
   end
 
