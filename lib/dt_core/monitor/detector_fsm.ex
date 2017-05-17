@@ -133,7 +133,7 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   # process arm request event in tampered state
-  def handle_event({:call, from}, {:arm, exit_timeout}, :tampered, data)
+  def handle_event({:call, from}, {:arm, exit_timeout}, :tampered, _data)
     when is_integer(exit_timeout) do
       {:keep_state_and_data, [{:reply, from, {:error, :tripped}}]}
   end
@@ -141,12 +141,30 @@ defmodule DtCore.Monitor.DetectorFsm do
   #
   # :realtime state callbacks
   #
+  # process idle event in realtime state
+  def handle_event(:cast, ev = %DetectorEv{type: :idle}, :realtime, data) do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :idle, %{data | last_event: ev}}
+  end
+
   # process tamper event in realtime state
   def handle_event(:cast, ev = %DetectorEv{type: type}, :realtime, data)
     when type in [:tamper, :short, :fault] do
     send data.receiver, {:stop, data.last_event}
     send data.receiver, {:start, ev}
     {:next_state, :tampered, %{data | last_event: ev}}
+  end
+
+  # process alarm event in realtime state
+  def handle_event(:cast, _ev = %DetectorEv{type: :alarm}, :realtime, _data) do
+    :keep_state_and_data
+  end
+
+  # process arm request event in realtime state
+  def handle_event({:call, from}, {:arm, exit_timeout}, :realtime, _data)
+    when is_integer(exit_timeout) do
+      {:keep_state_and_data, [{:reply, from, {:error, :tripped}}]}
   end
 
 end

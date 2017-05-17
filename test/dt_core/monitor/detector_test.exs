@@ -191,6 +191,55 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
+  test "idle event on a sensor in realtime state" do
+    {:ok, config, pid} = setup_deol_realtime()
+
+    # put in idle state
+    ev = %Event{address: "4", port: 4, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :idle == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :realtime, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :idle, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "tamper event on a sensor in realtime state" do
+    {:ok, config, pid} = setup_deol_realtime()
+
+    # send tamper event
+    ev = %Event{address: "4", port: 4, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :realtime, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :short, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "alarm event on a sensor in realtime state" do
+    {:ok, config, pid} = setup_deol_realtime()
+
+    # send alarm event
+    ev = %Event{address: "4", port: 4, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :realtime == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "arm a sensor in realtime state" do
+    {:ok, config, _pid} = setup_deol_realtime()
+    {:error, :tripped} = Detector.arm({config})
+    refute_receive _
+  end
+
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
@@ -242,7 +291,23 @@ defmodule DtCore.Test.Monitor.Detector do
     {:ok, sensor, pid}
   end
 
-defp setup_deol do
+  defp setup_deol_realtime do
+    {:ok, config, pid} = setup_deol()
+
+    # put in realtime state
+    ev = %Event{address: "4", port: 4, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :realtime == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "4", port: 4}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :realtime, address: "4", port: 4}}
+    |> assert_receive(5000)
+
+    {:ok, config, pid}
+  end
+
+  defp setup_deol do
     sensor = %SensorModel{
       name: "DEOL",
       balance: "DEOL",
