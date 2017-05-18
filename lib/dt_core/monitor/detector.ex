@@ -27,8 +27,8 @@ defmodule DtCore.Monitor.Detector do
   defstruct config: nil,
     fsm: nil,
     listeners: [],
-    exit_timeout: 100_000,
-    entry_timeout: 100_000
+    exit_timeout: 100_000, # TODO: find a better way
+    entry_timeout: 100_000 # TODO: find a better way
 
   #
   # Client APIs
@@ -54,6 +54,14 @@ defmodule DtCore.Monitor.Detector do
     GenServer.call(server, :arm)
   end
 
+  def disarm({config = %SensorModel{}}) do
+    {:ok, name} = Utils.sensor_server_name(config)
+    GenServer.call(name, :disarm)
+  end
+  def disarm(server) when is_pid(server) do
+    GenServer.call(server, :disarm)
+  end
+
   def subscribe(server, timeouts = {_entry_timeout, _exit_timeout}) do
     GenServer.call(server, {:subscribe, self(), timeouts})
   end
@@ -73,9 +81,11 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def handle_call({:subscribe, pid, {entry_timeout, exit_timeout}},
-      _from, state) when is_pid(pid) do
+      _from, state) when is_pid(pid)
+        and is_number(entry_timeout)
+        and is_number(exit_timeout) do
     listeners = [pid | state.listeners]
-    Process.monitor pid
+    Process.monitor pid # TODO: test/implement process crash handling
 
     entry_timeout = if entry_timeout < state.entry_timeout do
       entry_timeout
@@ -95,7 +105,13 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def handle_call(:arm, _from, state) do
-    reply = DetectorFsm.arm(state.fsm, state.exit_timeout)
+    exit_timeout = state.exit_timeout * 1000
+    reply = DetectorFsm.arm(state.fsm, exit_timeout)
+    {:reply, reply, state}
+  end
+
+  def handle_call(:disarm, _from, state) do
+    reply = DetectorFsm.disarm(state.fsm)
     {:reply, reply, state}
   end
 
@@ -134,6 +150,20 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def handle_info({:stop, ev = %DetectorExitEv{}}, state) do
+    Enum.each(state.listeners, fn(listener) ->
+      send listener, {:stop, ev}
+    end)
+    {:noreply, state}
+  end
+
+  def handle_info({:start, ev = %DetectorEntryEv{}}, state) do
+    Enum.each(state.listeners, fn(listener) ->
+      send listener, {:start, ev}
+    end)
+    {:noreply, state}
+  end
+
+  def handle_info({:stop, ev = %DetectorEntryEv{}}, state) do
     Enum.each(state.listeners, fn(listener) ->
       send listener, {:stop, ev}
     end)

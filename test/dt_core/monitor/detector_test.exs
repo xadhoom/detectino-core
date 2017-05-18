@@ -4,6 +4,7 @@ defmodule DtCore.Test.Monitor.Detector do
   alias DtCore.Event
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
+  alias DtCore.DetectorEntryEv
   alias DtCore.Monitor.Detector
 
   alias DtWeb.Sensor, as: SensorModel
@@ -289,6 +290,80 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
+  test "idle event on idle sensor when armed" do
+    {:ok, config, pid} = setup_teol(30, 0.001)
+    |> arm_idle_partition
+
+    # send idle event
+    ev = %Event{address: "3", port: 3, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :idle_arm == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "tamper event on idle sensor when armed" do
+    {:ok, config, pid} = setup_teol(30, 0.001)
+    |> arm_idle_partition
+
+    # send tamper event
+    ev = %Event{address: "3", port: 3, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered_arm == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :short, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "alarm event on idle sensor when armed" do
+    {:ok, config, pid} = setup_teol()
+    |> arm_idle_partition
+
+    # send alarm event
+    ev = %Event{address: "3", port: 3, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :alarmed_arm == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :alarm, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "alarm event on idle, delayed sensor when armed" do
+    {:ok, config, pid} = setup_teol(30, 0.001)
+    |> arm_idle_partition
+
+    # send alarm event
+    ev = %Event{address: "3", port: 3, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :entry_wait == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEntryEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "disarm request on idle sensor" do
+    {:ok, config, _pid} = setup_teol(30, 0.001)
+    |> arm_idle_partition
+    :ok = Detector.disarm({config})
+    assert :idle == Detector.status({config})
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
@@ -427,4 +502,37 @@ defmodule DtCore.Test.Monitor.Detector do
     :ok = Detector.subscribe(pid, {0, 0})
     {:ok, sensor, pid}
   end
+
+  defp setup_teol(entry_delay, exit_delay)
+    when is_number(entry_delay) and is_number(exit_delay) do
+    sensor = %SensorModel{
+      name: "TEOL",
+      balance: "TEOL",
+      th1: 10,
+      th2: 20,
+      th3: 30,
+      th4: 40,
+      entry_delay: is_integer(entry_delay),
+      exit_delay: is_integer(exit_delay),
+      partitions: [],
+      address: "3", port: 3,
+      enabled: true
+    }
+    {:ok, pid} = Detector.start_link({sensor})
+    :ok = Detector.subscribe(pid, {entry_delay, exit_delay})
+    {:ok, sensor, pid}
+  end
+
+  defp arm_idle_partition({:ok, config, pid}) do
+    assert :idle == Detector.status({config})
+
+    :ok = Detector.arm({config})
+    assert :idle_arm == Detector.status({config})
+
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    {:ok, config, pid}
+  end
+
 end
