@@ -105,8 +105,9 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def handle_call(:arm, _from, state) do
+    entry_timeout = state.entry_timeout * 1000
     exit_timeout = state.exit_timeout * 1000
-    reply = DetectorFsm.arm(state.fsm, exit_timeout)
+    reply = DetectorFsm.arm(state.fsm, {entry_timeout, exit_timeout})
     {:reply, reply, state}
   end
 

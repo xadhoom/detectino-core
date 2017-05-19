@@ -394,7 +394,7 @@ defmodule DtCore.Test.Monitor.Detector do
   end
 
   test "timeout event in exit wait state" do
-    {:ok, config, pid} = setup_teol(30, 1)
+    {:ok, config, _pid} = setup_teol(30, 1)
     |> exit_wait_teol_sensor
 
     {:stop, %DetectorExitEv{address: "3", port: 3}}
@@ -419,6 +419,87 @@ defmodule DtCore.Test.Monitor.Detector do
     |> assert_receive(5000)
 
     assert :idle == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "idle event in entry wait state" do
+    {:ok, config, pid} = entry_wait_teol_sensor(30)
+
+    # send idle event
+    ev = %Event{address: "3", port: 3, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :entry_wait == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "alarm event in entry wait state" do
+    {:ok, config, pid} = entry_wait_teol_sensor(30)
+
+    # send alarm event
+    ev = %Event{address: "3", port: 3, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :entry_wait == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "tamper event in entry wait state" do
+    {:ok, config, pid} = entry_wait_teol_sensor(30)
+
+    # send tamper event
+    ev = %Event{address: "3", port: 3, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered_arm == Detector.status({config})
+
+    {:stop, %DetectorEntryEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :short, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "timeout event in entry wait state" do
+    {:ok, config, _pid} = entry_wait_teol_sensor(1)
+
+    {:stop, %DetectorEntryEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :alarm, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    assert :alarmed_arm == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "disarm request in entry wait state" do
+    {:ok, config, _pid} = entry_wait_teol_sensor(30)
+
+    :ok = Detector.disarm({config})
+
+    {:stop, %DetectorEntryEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :realtime, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    assert :realtime == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "disarm request in entry wait state for 24h sensor" do
+    {:ok, config, _pid} = entry_wait_24h_teol_sensor(30)
+
+    :ok = Detector.disarm({config})
+
+    {:stop, %DetectorEntryEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :alarm, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    assert :alarmed == Detector.status({config})
 
     refute_receive _
   end
@@ -571,11 +652,32 @@ defmodule DtCore.Test.Monitor.Detector do
       th2: 20,
       th3: 30,
       th4: 40,
-      entry_delay: is_integer(entry_delay),
-      exit_delay: is_integer(exit_delay),
+      entry_delay: is_integer(entry_delay) and entry_delay > 0,
+      exit_delay: is_integer(exit_delay) and exit_delay > 0,
       partitions: [],
       address: "3", port: 3,
       enabled: true
+    }
+    {:ok, pid} = Detector.start_link({sensor})
+    :ok = Detector.subscribe(pid, {entry_delay, exit_delay})
+    {:ok, sensor, pid}
+  end
+
+  defp setup_24h_teol(entry_delay, exit_delay)
+    when is_number(entry_delay) and is_number(exit_delay) do
+    sensor = %SensorModel{
+      name: "TEOL",
+      balance: "TEOL",
+      th1: 10,
+      th2: 20,
+      th3: 30,
+      th4: 40,
+      entry_delay: is_integer(entry_delay) and entry_delay > 0,
+      exit_delay: is_integer(exit_delay) and exit_delay > 0,
+      partitions: [],
+      address: "3", port: 3,
+      enabled: true,
+      full24h: true
     }
     {:ok, pid} = Detector.start_link({sensor})
     :ok = Detector.subscribe(pid, {entry_delay, exit_delay})
@@ -603,6 +705,52 @@ defmodule DtCore.Test.Monitor.Detector do
     {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
     |> assert_receive(5000)
     {:start, %DetectorExitEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    {:ok, config, pid}
+  end
+
+  defp entry_wait_teol_sensor(entry_delay)do
+    {:ok, config, pid} = setup_teol(entry_delay, 0)
+    assert :idle == Detector.status({config})
+
+    :ok = Detector.arm({config})
+    assert :idle_arm == Detector.status({config})
+
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    # send alarm event to trigger entry timer
+    ev = %Event{address: "3", port: 3, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :entry_wait == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEntryEv{ address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    {:ok, config, pid}
+  end
+
+  defp entry_wait_24h_teol_sensor(entry_delay)do
+    {:ok, config, pid} = setup_24h_teol(entry_delay, 0)
+    assert :idle == Detector.status({config})
+
+    :ok = Detector.arm({config})
+    assert :idle_arm == Detector.status({config})
+
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    # send alarm event to trigger entry timer
+    ev = %Event{address: "3", port: 3, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :entry_wait == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEntryEv{ address: "3", port: 3}}
     |> assert_receive(5000)
 
     {:ok, config, pid}

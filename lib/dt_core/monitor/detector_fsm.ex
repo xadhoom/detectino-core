@@ -24,8 +24,9 @@ defmodule DtCore.Monitor.DetectorFsm do
     GenStateMachine.cast(server, ev)
   end
 
-  def arm(server, exit_timeout) when is_number(exit_timeout) do
-    GenStateMachine.call(server, {:arm, exit_timeout})
+  def arm(server, timeouts = {entry_timeout, exit_timeout})
+    when is_number(entry_timeout) and is_number(exit_timeout) do
+    GenStateMachine.call(server, {:arm, timeouts})
   end
 
   def disarm(server) do
@@ -42,7 +43,8 @@ defmodule DtCore.Monitor.DetectorFsm do
       port: config.port
     }
     {:ok, :idle, %{
-      config: config, receiver: receiver, last_event: cur_event
+      config: config, receiver: receiver, last_event: cur_event,
+      entry_timeout: 0
     }}
   end
 
@@ -83,8 +85,8 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   # process arm request event in idle state
-  def handle_event({:call, from}, {:arm, exit_timeout}, :idle, data)
-    when is_number(exit_timeout) do
+  def handle_event({:call, from}, {:arm, {entry_timeout, exit_timeout}}, :idle, data)
+    when is_number(entry_timeout) and is_number(exit_timeout) do
     idle_ev = %DetectorEv{port: data.config.port, address: data.config.address,
       type: :idle}
 
@@ -94,13 +96,15 @@ defmodule DtCore.Monitor.DetectorFsm do
           address: data.config.address}
         send data.receiver, {:stop, idle_ev}
         send data.receiver, {:start, ex_ev}
-        {:next_state, :exit_wait, %{data | last_event: ex_ev}, [
+        {:next_state, :exit_wait, %{
+          data | last_event: ex_ev, entry_timeout: entry_timeout}, [
           {:reply, from, :ok},
           {:state_timeout, exit_timeout, :exit_timer_expired}
           ]}
       false ->
         send data.receiver, {:start, idle_ev}
-        {:next_state, :idle_arm, data, [{:reply, from, :ok}]}
+        {:next_state, :idle_arm, %{data | entry_timeout: entry_timeout},
+        [{:reply, from, :ok}]}
     end
   end
 
@@ -137,8 +141,7 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   # process arm request event in tampered state
-  def handle_event({:call, from}, {:arm, exit_timeout}, :tampered, _data)
-    when is_number(exit_timeout) do
+  def handle_event({:call, from}, {:arm, _}, :tampered, _data) do
       {:keep_state_and_data, [{:reply, from, {:error, :tripped}}]}
   end
 
@@ -166,8 +169,7 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   # process arm request event in realtime state
-  def handle_event({:call, from}, {:arm, exit_timeout}, :realtime, _data)
-    when is_number(exit_timeout) do
+  def handle_event({:call, from}, {:arm, _}, :realtime, _data) do
       {:keep_state_and_data, [{:reply, from, {:error, :tripped}}]}
   end
 
@@ -195,8 +197,7 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   # process arm request event in alarmed state
-  def handle_event({:call, from}, {:arm, exit_timeout}, :alarmed, _data)
-    when is_number(exit_timeout) do
+  def handle_event({:call, from}, {:arm, _}, :alarmed, _data) do
       {:keep_state_and_data, [{:reply, from, {:error, :tripped}}]}
   end
 
@@ -225,7 +226,9 @@ defmodule DtCore.Monitor.DetectorFsm do
         en_ev = %DetectorEntryEv{port: data.config.port,
           address: data.config.address}
         send data.receiver, {:start, en_ev}
-        {:next_state, :entry_wait, %{data | last_event: en_ev}}
+        {:next_state, :entry_wait, %{data | last_event: en_ev},[
+          {:state_timeout, data.entry_timeout, :entry_timer_expired}
+        ]}
       false ->
         send data.receiver, {:start, ev}
         {:next_state, :alarmed_arm, %{data | last_event: ev}}
@@ -275,5 +278,58 @@ defmodule DtCore.Monitor.DetectorFsm do
     send data.receiver, {:start, idle_ev}
 
     {:next_state, :idle,  %{data | last_event: idle_ev}, [{:reply, from, :ok}]}
+  end
+
+  #
+  # :entry_wait state callbacks
+  # Note: we don't need to cancel the timer, GenStatem
+  # does it for us when we receive a different event
+  #
+  # process idle event in entry_wait state
+  def handle_event(:cast, _ev = %DetectorEv{type: :idle}, :entry_wait, _data) do
+    :keep_state_and_data
+  end
+
+  # process alarm event in entry_wait state
+  def handle_event(:cast, _ev = %DetectorEv{type: :alarm}, :entry_wait, _data) do
+    :keep_state_and_data
+  end
+
+  # process tamper event in entry_wait state
+  def handle_event(:cast, ev = %DetectorEv{type: type}, :entry_wait, data)
+    when type in [:tamper, :short, :fault] do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :tampered_arm, %{data | last_event: ev}}
+  end
+
+  # process timeout exit event in entry_wait state
+  def handle_event(:state_timeout, :entry_timer_expired, :entry_wait, data) do
+    ev = %DetectorEv{port: data.config.port, address: data.config.address,
+      type: :alarm}
+
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :alarmed_arm, %{data | last_event: ev}}
+  end
+
+  # process disarm request event in entry_wait state
+  def handle_event({:call, from}, :disarm, :entry_wait, data) do
+    ev = %DetectorEv{port: data.config.port, address: data.config.address,
+      type: :realtime}
+
+    send data.receiver, {:stop, data.last_event}
+
+    {next_state, ev} = case data.config.full24h do
+      false ->
+        send data.receiver, {:start, ev}
+        {:realtime, ev}
+      true ->
+        ev = %{ev | type: :alarm}
+        send data.receiver, {:start, ev}
+        {:alarmed, ev}
+    end
+
+    {:next_state, next_state,  %{data | last_event: ev}, [{:reply, from, :ok}]}
   end
 end
