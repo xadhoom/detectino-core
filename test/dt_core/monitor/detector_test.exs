@@ -364,6 +364,65 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
+  test "idle event in exit wait state" do
+    {:ok, config, pid} = setup_teol(30, 30)
+    |> exit_wait_teol_sensor
+
+    # send idle event
+    ev = %Event{address: "3", port: 3, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :exit_wait == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "tamper event in exit wait state" do
+    {:ok, config, pid} = setup_teol(30, 30)
+    |> exit_wait_teol_sensor
+
+    # send tamper event
+    ev = %Event{address: "3", port: 3, value: 35}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered_arm == Detector.status({config})
+
+    {:stop, %DetectorExitEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :fault, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "timeout event in exit wait state" do
+    {:ok, config, pid} = setup_teol(30, 1)
+    |> exit_wait_teol_sensor
+
+    {:stop, %DetectorExitEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    assert :idle_arm == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "disarm request in exit wait state" do
+    {:ok, config, _pid} = setup_teol(30, 1)
+    |> exit_wait_teol_sensor
+
+    :ok = Detector.disarm({config})
+
+    {:stop, %DetectorExitEv{address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    assert :idle == Detector.status({config})
+
+    refute_receive _
+  end
+
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
@@ -530,6 +589,20 @@ defmodule DtCore.Test.Monitor.Detector do
     assert :idle_arm == Detector.status({config})
 
     {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    {:ok, config, pid}
+  end
+
+  defp exit_wait_teol_sensor({:ok, config, pid}) do
+    assert :idle == Detector.status({config})
+
+    :ok = Detector.arm({config})
+    assert :exit_wait == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorExitEv{address: "3", port: 3}}
     |> assert_receive(5000)
 
     {:ok, config, pid}

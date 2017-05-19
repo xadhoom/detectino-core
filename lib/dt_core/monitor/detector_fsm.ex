@@ -94,9 +94,9 @@ defmodule DtCore.Monitor.DetectorFsm do
           address: data.config.address}
         send data.receiver, {:stop, idle_ev}
         send data.receiver, {:start, ex_ev}
-        {:next_state, :exit_wait, data, [
+        {:next_state, :exit_wait, %{data | last_event: ex_ev}, [
           {:reply, from, :ok},
-          {:state_timeout, exit_timeout, :exit_wait}
+          {:state_timeout, exit_timeout, :exit_timer_expired}
           ]}
       false ->
         send data.receiver, {:start, idle_ev}
@@ -232,9 +232,48 @@ defmodule DtCore.Monitor.DetectorFsm do
     end
   end
 
-  # process arm request event in alarmed state
+  # process disarm request event in alarmed state
   def handle_event({:call, from}, :disarm, :idle_arm, data) do
     send data.receiver, {:start, data.last_event}
     {:next_state, :idle, data, [{:reply, from, :ok}]}
+  end
+
+  #
+  # :exit_wait state callbacks
+  # Note: we don't need to cancel the timer, GenStatem
+  # does it for us when we receive a different event
+  #
+  # process idle event in exit_wait state
+  def handle_event(:cast, _ev = %DetectorEv{type: :idle}, :exit_wait, _data) do
+    :keep_state_and_data
+  end
+
+  # process tamper event in exit_wait state
+  def handle_event(:cast, ev = %DetectorEv{type: type}, :exit_wait, data)
+    when type in [:tamper, :short, :fault] do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :tampered_arm, %{data | last_event: ev}}
+  end
+
+  # process timeout exit event in exit_wait state
+  def handle_event(:state_timeout, :exit_timer_expired, :exit_wait, data) do
+    idle_ev = %DetectorEv{port: data.config.port, address: data.config.address,
+      type: :idle}
+
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, idle_ev}
+    {:next_state, :idle_arm, %{data | last_event: idle_ev}}
+  end
+
+  # process disarm request event in exit_wait state
+  def handle_event({:call, from}, :disarm, :exit_wait, data) do
+    idle_ev = %DetectorEv{port: data.config.port, address: data.config.address,
+      type: :idle}
+
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, idle_ev}
+
+    {:next_state, :idle,  %{data | last_event: idle_ev}, [{:reply, from, :ok}]}
   end
 end
