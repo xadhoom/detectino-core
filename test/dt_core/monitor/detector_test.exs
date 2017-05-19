@@ -292,7 +292,7 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "idle event on idle sensor when armed" do
     {:ok, config, pid} = setup_teol(30, 0.001)
-    |> arm_idle_partition
+    |> arm_teol_idle_sensor
 
     # send idle event
     ev = %Event{address: "3", port: 3, value: 15}
@@ -304,7 +304,7 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "tamper event on idle sensor when armed" do
     {:ok, config, pid} = setup_teol(30, 0.001)
-    |> arm_idle_partition
+    |> arm_teol_idle_sensor
 
     # send tamper event
     ev = %Event{address: "3", port: 3, value: 5}
@@ -321,7 +321,7 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "alarm event on idle sensor when armed" do
     {:ok, config, pid} = setup_teol()
-    |> arm_idle_partition
+    |> arm_teol_idle_sensor
 
     # send alarm event
     ev = %Event{address: "3", port: 3, value: 25}
@@ -338,7 +338,7 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "alarm event on idle, delayed sensor when armed" do
     {:ok, config, pid} = setup_teol(30, 0.001)
-    |> arm_idle_partition
+    |> arm_teol_idle_sensor
 
     # send alarm event
     ev = %Event{address: "3", port: 3, value: 25}
@@ -355,7 +355,7 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "disarm request on idle sensor" do
     {:ok, config, _pid} = setup_teol(30, 0.001)
-    |> arm_idle_partition
+    |> arm_teol_idle_sensor
     :ok = Detector.disarm({config})
     assert :idle == Detector.status({config})
     {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
@@ -523,7 +523,7 @@ defmodule DtCore.Test.Monitor.Detector do
     {:ok, sensor, pid}
   end
 
-  defp arm_idle_partition({:ok, config, pid}) do
+  defp arm_teol_idle_sensor({:ok, config, pid}) do
     assert :idle == Detector.status({config})
 
     :ok = Detector.arm({config})
