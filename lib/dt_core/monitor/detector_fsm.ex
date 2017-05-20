@@ -53,6 +53,9 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   #
+  # TODO: many callbacks share same code, move it to an helper fun
+  #
+  #
   # :idle state callbacks
   #
   # process idle event in idle state
