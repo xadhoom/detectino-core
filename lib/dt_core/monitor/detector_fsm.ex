@@ -332,4 +332,49 @@ defmodule DtCore.Monitor.DetectorFsm do
 
     {:next_state, next_state,  %{data | last_event: ev}, [{:reply, from, :ok}]}
   end
+
+  #
+  # :tampered_arm state callbacks
+  #
+  # process idle event in tampered_arm state
+  def handle_event(:cast, _ev = %DetectorEv{type: :idle}, :tampered_arm, data) do
+    ev = %DetectorEv{port: data.config.port, address: data.config.address,
+      type: :idle}
+
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :idle_arm, %{data | last_event: ev}}
+  end
+
+  # process tamper event in entry_wait state
+  def handle_event(:cast, ev = %DetectorEv{type: type}, :tampered_arm, data)
+    when type in [:tamper, :short, :fault] do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:keep_state, %{data | last_event: ev}}
+  end
+
+  # process alarm event in tampered_arm state
+  def handle_event(:cast, ev = %DetectorEv{type: :alarm}, :tampered_arm, data) do
+    send data.receiver, {:stop, data.last_event}
+
+    case data.config.entry_delay do
+      true ->
+        en_ev = %DetectorEntryEv{port: data.config.port,
+          address: data.config.address}
+        send data.receiver, {:start, en_ev}
+        {:next_state, :entry_wait, %{data | last_event: en_ev},[
+          {:state_timeout, data.entry_timeout, :entry_timer_expired}
+        ]}
+      false ->
+        send data.receiver, {:start, ev}
+        {:next_state, :alarmed_arm, %{data | last_event: ev}}
+    end
+  end
+
+  # process disarm request event in tampered_arm state
+  def handle_event({:call, from}, :disarm, :tampered_arm, data) do
+    send data.receiver, {:start, data.last_event}
+    {:next_state, :tampered,  data, [{:reply, from, :ok}]}
+  end
 end
