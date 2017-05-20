@@ -117,6 +117,26 @@ defmodule DtCore.Test.Monitor.Detector do
     assert :idle_arm == Detector.status({config})
   end
 
+  test "partial arming an internal sensor does nothing" do
+    {:ok, config, _pid} = setup_internal_eol(0, 0)
+
+    Detector.arm({config, :stay})
+
+    assert :idle == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "partial, immediate arming an internal sensor does nothing" do
+    {:ok, config, _pid} = setup_internal_eol(0, 0)
+
+    Detector.arm({config, :immediate})
+
+    assert :idle == Detector.status({config})
+
+    refute_receive _
+  end
+
   test "arm an exit delayed sensor" do
     {:ok, config, _pid} = setup_eol(0, 30)
 
@@ -128,6 +148,19 @@ defmodule DtCore.Test.Monitor.Detector do
     |> assert_receive(5000)
 
     assert :exit_wait == Detector.status({config})
+  end
+
+  test "arm an exit delayed sensor in immediate mode" do
+    {:ok, config, _pid} = setup_eol(0, 30)
+
+    Detector.arm({config, :immediate})
+
+    {:start, %DetectorEv{type: :idle, address: "2", port: 2}}
+    |> assert_receive(5000)
+
+    assert :idle_arm == Detector.status({config})
+
+    refute_receive _
   end
 
   test "arm a tampered sensor" do
@@ -782,6 +815,25 @@ defmodule DtCore.Test.Monitor.Detector do
     }
     {:ok, pid} = Detector.start_link({sensor})
     :ok = Detector.subscribe(pid, {0, 0})
+    {:ok, sensor, pid}
+  end
+
+  defp setup_internal_eol(entry_delay, exit_delay)
+    when is_integer(entry_delay) and is_integer(exit_delay) do
+    sensor = %SensorModel{
+      name: "EOL",
+      balance: "EOL",
+      th1: 10,
+      th2: 20,
+      entry_delay: is_integer(entry_delay) and entry_delay > 0,
+      exit_delay: is_integer(exit_delay) and exit_delay > 0,
+      partitions: [],
+      address: "2", port: 2,
+      enabled: true,
+      internal: true
+    }
+    {:ok, pid} = Detector.start_link({sensor})
+    :ok = Detector.subscribe(pid, {entry_delay, exit_delay})
     {:ok, sensor, pid}
   end
 
