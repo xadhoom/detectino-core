@@ -377,4 +377,47 @@ defmodule DtCore.Monitor.DetectorFsm do
     send data.receiver, {:start, data.last_event}
     {:next_state, :tampered,  data, [{:reply, from, :ok}]}
   end
+
+  #
+  # :alarmed_arm state callbacks
+  #
+  # process idle event in tampered_arm state
+  def handle_event(:cast, _ev = %DetectorEv{type: :idle}, :alarmed_arm, data) do
+    ev = %DetectorEv{port: data.config.port, address: data.config.address,
+      type: :idle}
+
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :idle_arm, %{data | last_event: ev}}
+  end
+
+  # process tamper event in alarmed_arm state
+  def handle_event(:cast, ev = %DetectorEv{type: type}, :alarmed_arm, data)
+    when type in [:tamper, :short, :fault] do
+    send data.receiver, {:stop, data.last_event}
+    send data.receiver, {:start, ev}
+    {:next_state, :tampered_arm, %{data | last_event: ev}}
+  end
+
+  # process alarm event in alarmed_arm state
+  def handle_event(:cast, _ev = %DetectorEv{type: :alarm}, :alarmed_arm, _data) do
+    :keep_state_and_data
+  end
+
+  # process disarm request event in tampered_arm state
+  def handle_event({:call, from}, :disarm, :alarmed_arm, data) do
+    case data.config.full24h do
+      true ->
+        {:next_state, :alarmed, data, [
+          {:reply, from, :ok}
+        ]}
+      false ->
+        rt_ev = %{data.last_event | type: :realtime}
+        send data.receiver, {:stop, data.last_event}
+        send data.receiver, {:start, rt_ev}
+        {:next_state, :realtime,  %{data | last_event: rt_ev}, [
+          {:reply, from, :ok}
+          ]}
+    end
+  end
 end

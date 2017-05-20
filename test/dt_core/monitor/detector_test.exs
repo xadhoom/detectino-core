@@ -606,8 +606,7 @@ defmodule DtCore.Test.Monitor.Detector do
   test "disarm sensor while is tampered" do
     {:ok, config, _pid} = tamper_arm_teol_sensor(1)
 
-   # send disarm request
-
+    # send disarm request
     :ok = Detector.disarm({config})
     assert :tampered == Detector.status({config})
 
@@ -617,6 +616,77 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
+  test "idle event when sensor is alarmed and armed" do
+    {:ok, config, pid} = alarmed_arm_teol_sensor(false)
+
+    # send an idle event
+    ev = %Event{address: "3", port: 3, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :idle_arm == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :alarm, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "tamper event when sensor is alarmed and armed" do
+    {:ok, config, pid} = alarmed_arm_teol_sensor(false)
+
+    # send a tamper event
+    ev = %Event{address: "3", port: 3, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :tampered_arm == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :alarm, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :short, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "alarm event when sensor is alarmed and armed" do
+    {:ok, config, pid} = alarmed_arm_teol_sensor(false)
+
+    # send an alarm event
+    ev = %Event{address: "3", port: 3, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :alarmed_arm == Detector.status({config})
+
+    refute_receive _
+  end
+
+  test "disarm sensor while is alarmed" do
+    {:ok, config, _pid} = alarmed_arm_teol_sensor(false)
+
+    # send disarm request
+    :ok = Detector.disarm({config})
+    assert :realtime == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :alarm, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :realtime, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "disarm a 24h sensor while is alarmed" do
+    {:ok, config, _pid} = alarmed_arm_teol_sensor(true)
+
+    # send disarm request
+    :ok = Detector.disarm({config})
+    assert :alarmed == Detector.status({config})
+
+    refute_receive _
+  end
+
+  #
+  # Private helper functions to keep tests a bit more clear
+  #
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
@@ -887,6 +957,33 @@ defmodule DtCore.Test.Monitor.Detector do
     {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
     |> assert_receive(5000)
     {:start, %DetectorEv{type: :tamper, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    {:ok, config, pid}
+  end
+
+  defp alarmed_arm_teol_sensor(is24h) when is_boolean(is24h) do
+    {:ok, config, pid} = case is24h do
+      true -> setup_24h_teol(0, 0)
+      false -> setup_teol()
+    end
+    assert :idle == Detector.status({config})
+
+    # arm it
+    :ok = Detector.arm({config})
+    assert :idle_arm == Detector.status({config})
+
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+
+    # send alarm
+    ev = %Event{address: "3", port: 3, value: 25}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :alarmed_arm == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :alarm, address: "3", port: 3}}
     |> assert_receive(5000)
 
     {:ok, config, pid}
