@@ -684,12 +684,77 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
+  test "Can have multiple subscribers" do
+    {:ok, sensor1, pid1} = setup_no("6")
+    {:ok, sensor2, pid2} = setup_no("7")
+
+    # send an idle event
+    for {pid, config} <- [{pid1, sensor1}, {pid2, sensor2}] do
+      ev = %Event{address: config.address, port: 6, value: 15}
+      :ok = Process.send(pid, {:event, ev}, [])
+      assert :idle == Detector.status({config})
+    end
+
+    # send an alarm event
+    for {pid, config} <- [{pid1, sensor1}, {pid2, sensor2}] do
+      ev = %Event{address: config.address, port: 6, value: 5}
+      :ok = Process.send(pid, {:event, ev}, [])
+      assert :realtime == Detector.status({config})
+    end
+
+    {:stop, %DetectorEv{type: :idle, address: "6", port: 6}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :realtime, address: "6", port: 6}}
+    |> assert_receive(5000)
+
+    {:stop, %DetectorEv{type: :idle, address: "7", port: 6}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :realtime, address: "7", port: 6}}
+    |> assert_receive(5000)
+
+    refute_receive _
+  end
+
+  test "Dead subscriber is removed from listners pool" do
+    {:ok, config, pid} = setup_no("6")
+    assert :idle == Detector.status({config})
+
+    # send an alarm event
+    ev = %Event{address: config.address, port: 6, value: 5}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :realtime == Detector.status({config})
+
+    {:stop, %DetectorEv{type: :idle, address: "6", port: 6}}
+    |> assert_receive(5000)
+    {:start, %DetectorEv{type: :realtime, address: "6", port: 6}}
+    |> assert_receive(5000)
+
+    # now we fake a :DOWN event in order to be removed from pool
+    down_ev = {:DOWN, make_ref(), :process, self(), :testing}
+    Process.send(pid, down_ev, [])
+
+    # got back to idle state
+    ev = %Event{address: config.address, port: 6, value: 15}
+    :ok = Process.send(pid, {:event, ev}, [])
+    assert :idle == Detector.status({config})
+
+    refute_receive _
+  end
+
   #
   # Private helper functions to keep tests a bit more clear
   #
   defp setup_nc do
     sensor = %SensorModel{name: "NCSENSOR", balance: "NC", th1: 10,
       partitions: [], enabled: true, address: "1", port: 1}
+    {:ok, pid} = Detector.start_link({sensor})
+    :ok = Detector.subscribe(pid, {0, 0})
+    {:ok, sensor, pid}
+  end
+
+  defp setup_no(address) when is_binary(address) do
+    sensor = %SensorModel{name: "NOSENSOR", balance: "NO", th1: 10,
+      partitions: [], enabled: true, address: address, port: 6}
     {:ok, pid} = Detector.start_link({sensor})
     :ok = Detector.subscribe(pid, {0, 0})
     {:ok, sensor, pid}

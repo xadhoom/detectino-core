@@ -85,7 +85,7 @@ defmodule DtCore.Monitor.Detector do
         and is_number(entry_timeout)
         and is_number(exit_timeout) do
     listeners = [pid | state.listeners]
-    Process.monitor pid # TODO: test/implement process crash handling
+    Process.monitor pid
 
     entry_timeout = if entry_timeout < state.entry_timeout do
       entry_timeout
@@ -169,6 +169,13 @@ defmodule DtCore.Monitor.Detector do
       send listener, {:stop, ev}
     end)
     {:noreply, state}
+  end
+
+  def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
+    listeners = Enum.reject(state.listeners, fn(listener) ->
+      pid == listener
+    end)
+    {:noreply, %{state | listeners: listeners}}
   end
 
   defp process_event(%Event{address: a, port: p, value: v}, _state)
