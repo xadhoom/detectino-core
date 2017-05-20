@@ -19,7 +19,7 @@ defmodule DtCore.Monitor.Detector do
 
   # Internal types
 
-  @typep t :: %__MODULE__{config: %SensorModel{},
+  @typep detector_state :: %__MODULE__{config: %SensorModel{},
     fsm: pid, listeners: list(pid),
     exit_timeout: non_neg_integer,
     entry_timeout: non_neg_integer
@@ -69,7 +69,7 @@ defmodule DtCore.Monitor.Detector do
   #
   # GenServer Callbacks
   #
-  @spec init({%SensorModel{}}) :: {:ok, Detector.t}
+  @spec init({%SensorModel{}}) :: {:ok, detector_state}
   def init({config}) do
     {:ok, fsm} = DetectorFsm.start_link({config, self()})
     {:ok, %__MODULE__{fsm: fsm, config: config}}
