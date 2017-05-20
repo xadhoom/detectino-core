@@ -93,22 +93,23 @@ defmodule DtCore.Monitor.DetectorFsm do
     idle_ev = %DetectorEv{port: data.config.port, address: data.config.address,
       type: :idle}
 
-    case data.config.exit_delay do
-      true ->
-        ex_ev = %DetectorExitEv{port: data.config.port,
+    with true <- data.config.exit_delay,
+      true <- exit_timeout > 0 do
+         ex_ev = %DetectorExitEv{port: data.config.port,
           address: data.config.address}
-        send data.receiver, {:stop, idle_ev}
-        send data.receiver, {:start, ex_ev}
-        {:next_state, :exit_wait, %{
-          data | last_event: ex_ev, entry_timeout: entry_timeout}, [
-          {:reply, from, :ok},
-          {:state_timeout, exit_timeout, :exit_timer_expired}
-          ]}
-      false ->
+          send data.receiver, {:stop, idle_ev}
+          send data.receiver, {:start, ex_ev}
+          {:next_state, :exit_wait, %{
+            data | last_event: ex_ev, entry_timeout: entry_timeout}, [
+            {:reply, from, :ok},
+            {:state_timeout, exit_timeout, :exit_timer_expired}
+            ]}
+    else
+      _ ->
         send data.receiver, {:start, idle_ev}
         {:next_state, :idle_arm, %{data | entry_timeout: entry_timeout},
         [{:reply, from, :ok}]}
-    end
+   end
   end
 
   #

@@ -38,6 +38,11 @@ defmodule DtCore.Monitor.Detector do
     GenServer.start_link(__MODULE__, {config}, name: name)
   end
 
+  def link({config = %SensorModel{}}) do
+    Utils.sensor_server_pid(config)
+    |> Process.link
+  end
+
   def status({config = %SensorModel{}}) do
     {:ok, name} = Utils.sensor_server_name(config)
     GenServer.call(name, :status)
@@ -54,6 +59,11 @@ defmodule DtCore.Monitor.Detector do
     GenServer.call(server, :arm)
   end
 
+  def arm({config = %SensorModel{}, mode}) when mode in [:stay, :immediate] do
+    {:ok, name} = Utils.sensor_server_name(config)
+    GenServer.call(name, {:arm, mode})
+  end
+
   def disarm({config = %SensorModel{}}) do
     {:ok, name} = Utils.sensor_server_name(config)
     GenServer.call(name, :disarm)
@@ -62,6 +72,11 @@ defmodule DtCore.Monitor.Detector do
     GenServer.call(server, :disarm)
   end
 
+  def subscribe({config = %SensorModel{}} ,
+      timeouts = {_entry_timeout, _exit_timeout}) do
+    {:ok, name} = Utils.sensor_server_name(config)
+    GenServer.call(name, {:subscribe, self(), timeouts})
+  end
   def subscribe(server, timeouts = {_entry_timeout, _exit_timeout}) do
     GenServer.call(server, {:subscribe, self(), timeouts})
   end
@@ -78,6 +93,14 @@ defmodule DtCore.Monitor.Detector do
   def handle_call(:status, _from, state) do
     status = DetectorFsm.status(state.fsm)
     {:reply, status, state}
+  end
+
+  def handle_call({:subscribe, pid, {nil, nil}}, _from, state)
+    when is_pid(pid) do
+    listeners = [pid | state.listeners]
+    Process.monitor pid
+
+    {:reply, :ok, %__MODULE__{state | listeners: listeners}}
   end
 
   def handle_call({:subscribe, pid, {entry_timeout, exit_timeout}},
@@ -109,6 +132,27 @@ defmodule DtCore.Monitor.Detector do
     exit_timeout = state.exit_timeout * 1000
     reply = DetectorFsm.arm(state.fsm, {entry_timeout, exit_timeout})
     {:reply, reply, state}
+  end
+
+  def handle_call({:arm, :stay}, from, state) do
+    # if the sensor is internal, do not arm it in stay mode
+    case state.config.internal do
+      true -> {:reply, :ok, state}
+      false -> handle_call(:arm, from, state)
+    end
+  end
+
+  def handle_call({:arm, :immediate}, _from, state) do
+    # if the sensor is internal, do not arm it in stay mode,
+    # otherwise arm with zero exit delay
+    case state.config.internal do
+      true -> {:reply, :ok, state}
+      false ->
+        entry_timeout = state.entry_timeout * 1000
+        exit_timeout = 0
+        reply = DetectorFsm.arm(state.fsm, {entry_timeout, exit_timeout})
+        {:reply, reply, state}
+    end
   end
 
   def handle_call(:disarm, _from, state) do
