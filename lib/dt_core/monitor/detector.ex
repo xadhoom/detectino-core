@@ -143,7 +143,7 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def handle_call({:arm, :immediate}, _from, state) do
-    # if the sensor is internal, do not arm it in stay mode,
+    # if the sensor is internal, do not arm it in immediate mode,
     # otherwise arm with zero exit delay
     case state.config.internal do
       true -> {:reply, :ok, state}
@@ -160,7 +160,7 @@ defmodule DtCore.Monitor.Detector do
     {:reply, reply, state}
   end
 
-  @spec handle_info({:event, %Event{}}, Detector.t) :: {:noreply, Detector.t}
+  @spec handle_info({:event, %Event{}}, detector_state) :: {:noreply, detector_state}
   def handle_info({:event, ev = %Event{}}, state) do
     case process_event(ev, state) do
       :not_me ->
