@@ -11,6 +11,7 @@ defmodule Detectino.Mixfile do
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
      deps: deps(),
+     dialyzer: [plt_add_deps: :project],
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test,
        "coveralls.post": :test, "coveralls.travis": :test]
@@ -24,7 +25,7 @@ defmodule Detectino.Mixfile do
     apps = [
       :phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
       :phoenix_ecto, :postgrex, :timex, :swoosh, :etimer, :can, :guardian,
-      :lager_logger, :exjsx, :comeonin, :ex_link_header, :conform,
+      :lager_logger, :exjsx, :comeonin, :ex_link_header, :plug, :conform,
       :conform_exrm
     ]
     prod_apps = apps ++ [:gen_smtp]
