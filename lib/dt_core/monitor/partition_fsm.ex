@@ -197,24 +197,24 @@ defmodule DtCore.Monitor.PartitionFsm do
   #
   # process idle event in tripped state
   def handle_event(:cast, {_ , dev = %DetectorEv{type: :idle}}, :tripped, data) do
-    data = if !Enum.empty?(data.alarmed) do
+    data = if Enum.empty?(data.alarmed) do
+      data
+    else
       newdata = drop_tripped(:alarmed, dev, data)
       if Enum.empty?(newdata.alarmed) do
         send newdata.receiver, {:stop, build_partition_ev(:alarm, newdata.config)}
       end
       newdata
-    else
-      data
     end
 
-    data = if !Enum.empty?(data.tampered) do
+    data = if Enum.empty?(data.tampered) do
+      data
+    else
       newdata = drop_tripped(:tampered, dev, data)
       if Enum.empty?(newdata.tampered) do
         send newdata.receiver, {:stop, build_partition_ev(:tamper, newdata.config)}
       end
       newdata
-    else
-      data
     end
 
     with true <- Enum.empty?(data.alarmed),
@@ -253,17 +253,17 @@ defmodule DtCore.Monitor.PartitionFsm do
     end)
 
     # empty our tripped lists, send events if applicable
-    alarmed = if !Enum.empty?(data.alarmed) do
-      send data.receiver, {:stop, build_partition_ev(:alarm, data.config)}
+    alarmed = if Enum.empty?(data.alarmed) do
       []
     else
+      send data.receiver, {:stop, build_partition_ev(:alarm, data.config)}
       []
     end
 
-    tampered = if !Enum.empty?(data.tampered) do
-      send data.receiver, {:stop, build_partition_ev(:tamper, data.config)}
+    tampered = if Enum.empty?(data.tampered) do
       []
     else
+      send data.receiver, {:stop, build_partition_ev(:tamper, data.config)}
       []
     end
 
