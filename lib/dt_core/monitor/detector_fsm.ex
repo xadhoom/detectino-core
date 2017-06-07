@@ -230,7 +230,7 @@ defmodule DtCore.Monitor.DetectorFsm do
         en_ev = %DetectorEntryEv{port: data.config.port,
           address: data.config.address}
         send data.receiver, {:start, en_ev}
-        {:next_state, :entry_wait, %{data | last_event: en_ev},[
+        {:next_state, :entry_wait, %{data | last_event: en_ev}, [
           {:state_timeout, data.entry_timeout, :entry_timer_expired}
         ]}
       false ->
@@ -367,7 +367,7 @@ defmodule DtCore.Monitor.DetectorFsm do
         en_ev = %DetectorEntryEv{port: data.config.port,
           address: data.config.address}
         send data.receiver, {:start, en_ev}
-        {:next_state, :entry_wait, %{data | last_event: en_ev},[
+        {:next_state, :entry_wait, %{data | last_event: en_ev}, [
           {:state_timeout, data.entry_timeout, :entry_timer_expired}
         ]}
       false ->
