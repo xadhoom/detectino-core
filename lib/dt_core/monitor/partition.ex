@@ -176,7 +176,7 @@ defmodule DtCore.Monitor.Partition do
   end
 
   def handle_info(any, state) do
-    Logger.warn("Unhandled info message #{inspect any}")
+    Logger.warn fn() -> "Unhandled info message #{inspect any}" end
     {:noreply, state}
   end
 
