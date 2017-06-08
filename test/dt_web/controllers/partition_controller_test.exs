@@ -1,7 +1,7 @@
 defmodule DtWeb.PartitionControllerTest do
   use DtWeb.ConnCase, async: false
 
-  alias DtCore.Sensor.Partition, as: PartitionProcess
+  alias DtCore.Monitor.Partition, as: PartitionProcess
   alias DtWeb.Partition, as: PartitionModel
   alias DtWeb.ControllerHelperTest, as: Helper
   alias DtCore.Test.TimerHelper
@@ -10,7 +10,7 @@ defmodule DtWeb.PartitionControllerTest do
     TimerHelper.wait_until 1000, ErlangError, fn ->
       :meck.new(PartitionProcess)
       :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
-      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}) -> :ok end)
     end
   end
 
@@ -221,7 +221,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "DISARM"
 
-    assert :meck.called(PartitionProcess, :disarm, [part, "DISARM"])
+    assert :meck.called(PartitionProcess, :disarm, [part])
   end
 
   test "disarm invalid partition", %{conn: conn} do

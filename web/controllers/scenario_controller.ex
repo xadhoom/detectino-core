@@ -11,7 +11,7 @@ defmodule DtWeb.ScenarioController do
   alias DtWeb.Scenario
   alias DtWeb.User
   alias DtWeb.Partition
-  alias DtCore.Sensor.Partition, as: PartitionProcess
+  alias DtCore.Monitor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
 
   require Logger
@@ -99,7 +99,7 @@ defmodule DtWeb.ScenarioController do
   defp arm_disarm_partition_proc(partition) do
     case partition.armed do
       "DISARM" ->
-        PartitionProcess.disarm(partition, "DISARM")
+        PartitionProcess.disarm(partition)
       v ->
         PartitionProcess.arm(partition, v)
     end

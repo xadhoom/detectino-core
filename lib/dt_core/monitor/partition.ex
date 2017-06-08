@@ -18,6 +18,8 @@ defmodule DtCore.Monitor.Partition do
 
   require Logger
 
+  @arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
+
   # Internal types
 
   @typep part_state :: %__MODULE__{
@@ -72,7 +74,8 @@ defmodule DtCore.Monitor.Partition do
     |> GenServer.call(:arm)
   end
 
-  def arm(config = %PartitionModel{}, mode) when mode in [:stay, :immediate] do
+  def arm(config = %PartitionModel{}, mode)
+    when mode in [:normal, :stay, :immediate] do
     config
     |> Utils.partition_server_pid
     |> GenServer.call({:arm, mode})
@@ -118,12 +121,27 @@ defmodule DtCore.Monitor.Partition do
     {:ok, state}
   end
 
+  def handle_call({:armed?}, _from, state) do
+    armed = case PartitionFsm.status(state.fsm) do
+      :idle_arm -> true
+      :tripped -> true
+      _ -> false
+    end
+    {:reply, armed, state}
+  end
+
   def handle_call(:status, _from, state) do
     status = PartitionFsm.status(state.fsm)
     {:reply, status, state}
   end
 
   def handle_call(:arm, _from, state) do
+    exit_delay = compute_exit_delay(state)
+    res = PartitionFsm.arm(state.fsm, exit_delay)
+    {:reply, res, state}
+  end
+
+  def handle_call({:arm, :normal}, _from, state) do
     exit_delay = compute_exit_delay(state)
     res = PartitionFsm.arm(state.fsm, exit_delay)
     {:reply, res, state}

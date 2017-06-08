@@ -18,8 +18,7 @@ defmodule DtCore.Event do
     port: nil,
     type: nil,
     subtype: nil,
-    value: nil,
-    delayed: :drop_me_asap
+    value: nil
 end
 
 defmodule DtCore.SensorEv do

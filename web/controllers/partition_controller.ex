@@ -9,7 +9,7 @@ defmodule DtWeb.PartitionController do
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
-  alias DtCore.Sensor.Partition, as: PartitionProcess
+  alias DtCore.Monitor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
@@ -24,7 +24,7 @@ defmodule DtWeb.PartitionController do
         part
         |> Partition.disarm
         |> Repo.update!
-        |> PartitionProcess.disarm("DISARM")
+        |> PartitionProcess.disarm()
         send_resp(conn, 204, StatusCodes.status_code(204))
     end
   end
@@ -39,11 +39,12 @@ defmodule DtWeb.PartitionController do
   end
 
   defp do_arm(%{"id" => id, "mode" => mode}) do
+    amode = mode_str_to_atom(mode)
     case Repo.get(Partition, id) do
       nil ->
         {:error, :not_found}
       part ->
-        part |> Partition.arm(mode) |> arm_transaction(mode)
+        part |> Partition.arm(mode) |> arm_transaction(amode)
     end
   end
 
@@ -63,6 +64,14 @@ defmodule DtWeb.PartitionController do
       end
     end)
     result
+  end
+
+  defp mode_str_to_atom(mode) do
+    case mode do
+      "ARM" -> :normal
+      "ARMSTAY" -> :stay
+      "ARMSTAYIMMEDIATE" -> :immediate
+    end
   end
 
 end

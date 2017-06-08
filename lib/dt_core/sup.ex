@@ -17,7 +17,7 @@ defmodule DtCore.Sup do
         restart: :permanent),
       worker(DtCore.EventBridge, [], restart: :permanent),
       worker(DtCore.EventLogger, [], restart: :permanent),
-      supervisor(DtCore.Sensor.Sup, [], restart: :permanent),
+      supervisor(DtCore.Monitor.Sup, [], restart: :permanent),
       supervisor(DtCore.Output.Sup, [], restart: :permanent)
     ]
     supervise(children, strategy: :one_for_all)

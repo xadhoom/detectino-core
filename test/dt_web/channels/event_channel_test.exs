@@ -1,12 +1,10 @@
 defmodule DtWeb.EventChannelTest do
   use DtWeb.ChannelCase, async: false
 
-  import Supervisor.Spec
-
   alias DtCore.Event, as: Event
   alias DtWeb.Channels.Event, as: ChannelEvent
-  alias DtCore.Sensor.Partition
-  alias DtCore.Sensor.PartitionSup
+  alias DtCore.Monitor.Detector
+  alias DtCore.Monitor.Partition
   alias DtCore.EventBridge
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
@@ -14,6 +12,7 @@ defmodule DtWeb.EventChannelTest do
   setup_all do
     {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
     {:ok, _} = EventBridge.start_link()
+    {:ok, _} = DtCore.Monitor.Sup.start_link()
     :ok
   end
 
@@ -58,56 +57,51 @@ defmodule DtWeb.EventChannelTest do
   end
 
   test "exit timer start" do
-    {_, _, part} = start_idle_partition()
+    {_, _, part, _} = start_idle_partition()
 
     {:ok, _, _socket} = socket()
     |> subscribe_and_join(ChannelEvent, "event:exit_timer", %{})
 
-    :ok = Partition.arm(part, "ARM")
+    :ok = Partition.arm(part)
 
     assert_push "start", %{partition: "prot"}, 1000
     assert_push "stop", %{partition: "prot"}, 1000
   end
 
   defp start_idle_partition do
-    cache = :ets.new(:part_state_cache, [:set, :public])
-    ctx = [cache: cache]
-    start_partition(ctx)
+    start_partition()
   end
 
   defp start_alarmed_partition do
-    cache = :ets.new(:part_state_cache, [:set, :public])
-    ctx = [cache: cache]
-    {:ok, pid, part} = start_partition(ctx)
-    alarm_partition(pid, part)
+    {:ok, _, part, s_pids} = start_partition()
+
+    :ok = Partition.arm(part)
+
+    Enum.each(s_pids, fn(pid) ->
+      ev = %Event{address: "1", port: 1, value: 15}
+      :ok = Process.send(pid, {:event, ev}, [])
+      ev = %Event{address: "2", port: 1, value: 15}
+      :ok = Process.send(pid, {:event, ev}, [])
+    end)
   end
 
-  defp alarm_partition(pid, part) do
-    :ok = Partition.arm(part, "ARM")
-
-    ev = %Event{address: "1", port: 1, value: 15}
-    :ok = Process.send(pid, {:event, ev}, [])
-    ev = %Event{address: "2", port: 1, value: 15}
-    :ok = Process.send(pid, {:event, ev}, [])
-  end
-
-  defp start_partition(ctx) do
+  defp start_partition do
     sensors = [
       %SensorModel{name: "A", balance: "NC", th1: 10,
         partitions: [], enabled: true, address: "1", port: 1},
       %SensorModel{name: "B", balance: "NC", th1: 10,
         partitions: [], enabled: true, address: "2", port: 1}
       ]
-    part = %PartitionModel{name: "prot", armed: "DISARM", exit_delay: 0.1,
-      sensors: sensors}
+    part = %PartitionModel{name: "prot", armed: "DISARM", exit_delay: 0,
+      entry_delay: 0, sensors: sensors}
 
-    {:ok, sup_pid} = PartitionSup.start_link()
+    s_pids = Enum.map(sensors, fn(sensor) ->
+      {:ok, pid} = Detector.start_link({sensor})
+      pid
+    end)
+    {:ok, pid} = Partition.start_link(part)
 
-    {ret, pid} = Supervisor.start_child(sup_pid,
-      worker(Partition,[{part, ctx[:cache]}],
-      restart: :transient, id: part.name))
-
-    {ret, pid, part}
+    {:ok, pid, part, s_pids}
   end
 
 end

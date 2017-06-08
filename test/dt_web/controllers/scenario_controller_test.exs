@@ -7,14 +7,14 @@ defmodule DtWeb.ScenarioControllerTest do
   alias DtWeb.PartitionScenario, as: PartitionScenarioModel
   alias DtWeb.ControllerHelperTest, as: Helper
   alias DtWeb.ReloadRegistry
-  alias DtCore.Sensor.Partition, as: PartitionProcess
+  alias DtCore.Monitor.Partition, as: PartitionProcess
   alias DtCore.Test.TimerHelper
 
   setup_all do
     TimerHelper.wait_until 1000, ErlangError, fn ->
       :meck.new(PartitionProcess)
       :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
-      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, "DISARM") -> :ok end)
+      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}) -> :ok end)
     end
   end
 
@@ -220,7 +220,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "DISARM"
 
-    assert :meck.called(PartitionProcess, :disarm, [record, "DISARM"])
+    assert :meck.called(PartitionProcess, :disarm, [record])
   end
 
   test "run a scenario with mixed modes", %{conn: conn} do
@@ -268,7 +268,7 @@ defmodule DtWeb.ScenarioControllerTest do
     assert Enum.any?(records, fn(x) -> x.armed == "ARMSTAY" end)
     assert Enum.any?(records, fn(x) -> x.armed == "ARMSTAYIMMEDIATE" end)
 
-    assert :meck.called(PartitionProcess, :disarm, [:_, "DISARM"])
+    assert :meck.called(PartitionProcess, :disarm, [:_])
     assert :meck.called(PartitionProcess, :arm, [:_, "ARM"])
     assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAY"])
     assert :meck.called(PartitionProcess, :arm, [:_, "ARMSTAYIMMEDIATE"])
