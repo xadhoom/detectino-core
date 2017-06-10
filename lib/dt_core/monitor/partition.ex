@@ -116,6 +116,20 @@ defmodule DtCore.Monitor.Partition do
       fsm: fsm
     }
     subscribe_sensors({config})
+
+    exit_delay = compute_exit_delay(state)
+    case config.armed do
+      "ARM" ->
+        :ok = PartitionFsm.arm(state.fsm, exit_delay)
+      "ARMSTAY" ->
+        # fake immediate state, because is likely we're recovering
+        # from a process crash
+        :ok = PartitionFsm.arm(state.fsm, :immediate, exit_delay)
+      "ARMSTAYIMMEDIATE" ->
+        :ok = PartitionFsm.arm(state.fsm, :immediate, exit_delay)
+      _ -> nil
+    end
+
     {:ok, state}
   end
 

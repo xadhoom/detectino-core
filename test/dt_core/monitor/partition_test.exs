@@ -41,6 +41,17 @@ defmodule DtCore.Test.Monitor.Partition do
     assert p_pid in links
   end
 
+  test "armed partition from db starts armed" do
+    {partition, _} = start_armed_partition("ARM")
+    assert :idle_arm == Partition.status({partition})
+
+    {partition, _} = start_armed_partition("ARMSTAY")
+    assert :idle_arm == Partition.status({partition})
+
+    {partition, _} = start_armed_partition("ARMSTAYIMMEDIATE")
+    assert :idle_arm == Partition.status({partition})
+  end
+
   test "idle sensor event when idle" do
     {partition, p_pid} = start_partition()
     assert :idle == Partition.status({partition})
@@ -491,6 +502,14 @@ defmodule DtCore.Test.Monitor.Partition do
 
   defp start_partition(sensors \\ []) when is_list(sensors) do
     partition = %PartitionModel{name: UUID.uuid4(), armed: "DISARM",
+      sensors: sensors}
+    {:ok, p_pid} = Partition.start_link(partition)
+    {partition, p_pid}
+  end
+
+  defp start_armed_partition(mode, sensors \\ []) when is_list(sensors) and
+    mode in ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"] do
+    partition = %PartitionModel{name: UUID.uuid4(), armed: mode,
       sensors: sensors}
     {:ok, p_pid} = Partition.start_link(partition)
     {partition, p_pid}
