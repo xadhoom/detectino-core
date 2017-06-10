@@ -1,5 +1,5 @@
 defmodule DtCore.Test.EventBridgeTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case
 
   alias DtCore.EventBridge
 

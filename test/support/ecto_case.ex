@@ -13,7 +13,6 @@ defmodule DtCore.EctoCase do
       alias DtWeb.Repo
       import Ecto.Schema
       import Ecto.Query, only: [from: 2]
-      import DtCore.EctoCase
     end
   end
 

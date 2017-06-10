@@ -40,11 +40,15 @@ defmodule DtWeb.PartitionController do
 
   defp do_arm(%{"id" => id, "mode" => mode}) do
     amode = mode_str_to_atom(mode)
-    case Repo.get(Partition, id) do
-      nil ->
-        {:error, :not_found}
-      part ->
-        part |> Partition.arm(mode) |> arm_transaction(amode)
+    if amode == :error do
+      {:error, :bad_request}
+    else
+      case Repo.get(Partition, id) do
+        nil ->
+          {:error, :not_found}
+        part ->
+          part |> Partition.arm(mode) |> arm_transaction(amode)
+      end
     end
   end
 
@@ -71,6 +75,7 @@ defmodule DtWeb.PartitionController do
       "ARM" -> :normal
       "ARMSTAY" -> :stay
       "ARMSTAYIMMEDIATE" -> :immediate
+      _ -> :error
     end
   end
 

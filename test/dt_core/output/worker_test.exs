@@ -1,7 +1,7 @@
 defmodule DtCore.Test.Output.Worker do
   use DtCore.EctoCase
 
-  alias DtCore.Sup
+  alias DtCore.Monitor.Sup
   alias DtWeb.Output, as: OutputModel
   alias DtWeb.Event, as: EventModel
   alias DtWeb.EmailSettings, as: EmailSettingsModel
@@ -15,15 +15,17 @@ defmodule DtCore.Test.Output.Worker do
   alias DtCore.Output.Actions.Email, as: EmailConfig
 
   setup_all do
+    {:ok, _} = Registry.start_link(:duplicate, OutputsRegistry.registry)
     :meck.new(Etimer, [:passthrough])
     :meck.expect(Etimer, :start_timer,
       fn(_ ,_ ,_ ,_ ) ->
         0
       end)
+    :ok
   end
 
   setup do
-    {:ok, _pid} = Sup.start_link
+    {:ok, _pid} = Sup.start_link()
 
     on_exit fn ->
       TimerHelper.wait_until fn ->

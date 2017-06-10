@@ -1,5 +1,5 @@
 defmodule DtCore.Test.Monitor.Detector do
-  use ExUnit.Case, async: false
+  use ExUnit.Case
 
   alias DtCore.Event
   alias DtCore.DetectorEv

@@ -18,8 +18,6 @@ defmodule DtCore.Monitor.Partition do
 
   require Logger
 
-  @arm_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"]
-
   # Internal types
 
   @typep part_state :: %__MODULE__{
@@ -135,6 +133,14 @@ defmodule DtCore.Monitor.Partition do
     {:reply, status, state}
   end
 
+  def handle_call({:alarm_status?}, _from, state) do
+    status = case PartitionFsm.status(state.fsm) do
+      :tripped -> :alarm
+      _ -> :idle
+    end
+    {:reply, status, state}
+  end
+
   def handle_call(:arm, _from, state) do
     exit_delay = compute_exit_delay(state)
     res = PartitionFsm.arm(state.fsm, exit_delay)
@@ -181,13 +187,13 @@ defmodule DtCore.Monitor.Partition do
     {:noreply, state}
   end
 
-  def handle_info(msg = {_op, ev = %DetectorExitEv{}}, state) do
+  def handle_info({_op, _ = %DetectorExitEv{}}, state) do
     # ignored since not useful to the fsm
     # but maybe makes sense to send it to the fsm in order to be more clear ?
     {:noreply, state}
   end
 
-  def handle_info(msg = {_op, ev = %DetectorEntryEv{}}, state) do
+  def handle_info({_op, _ = %DetectorEntryEv{}}, state) do
     # ignored since not useful to the fsm
     # but maybe makes sense to send it to the fsm in order to be more clear ?
     {:noreply, state}

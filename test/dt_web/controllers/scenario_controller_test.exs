@@ -1,5 +1,5 @@
 defmodule DtWeb.ScenarioControllerTest do
-  use DtWeb.ConnCase, async: false
+  use DtWeb.ConnCase
 
   alias DtWeb.User, as: UserModel
   alias DtWeb.Scenario, as: ScenarioModel

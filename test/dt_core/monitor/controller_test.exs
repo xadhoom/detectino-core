@@ -1,5 +1,5 @@
 defmodule DtCore.Test.Monitor.Controller do
-  use DtCore.EctoCase, async: false
+  use DtCore.EctoCase
 
   alias DtCore.Monitor.Sup
   alias DtCore.Monitor.Controller

@@ -1,18 +1,30 @@
 defmodule DtWeb.EventChannelTest do
-  use DtWeb.ChannelCase, async: false
+  use DtWeb.ChannelCase
 
   alias DtCore.Event, as: Event
   alias DtWeb.Channels.Event, as: ChannelEvent
-  alias DtCore.Monitor.Detector
   alias DtCore.Monitor.Partition
+  alias DtCore.Monitor.Controller
   alias DtCore.EventBridge
   alias DtWeb.Sensor, as: SensorModel
   alias DtWeb.Partition, as: PartitionModel
+  alias DtCore.Test.TimerHelper
 
   setup_all do
     {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
     {:ok, _} = EventBridge.start_link()
+    :ok
+  end
+
+  setup do
     {:ok, _} = DtCore.Monitor.Sup.start_link()
+
+    on_exit fn ->
+      TimerHelper.wait_until fn ->
+        assert Process.whereis(DtCore.Monitor.Sup) == nil
+      end
+    end
+
     :ok
   end
 
@@ -57,15 +69,15 @@ defmodule DtWeb.EventChannelTest do
   end
 
   test "exit timer start" do
-    {_, _, part, _} = start_idle_partition()
+    {:ok, part} = start_idle_partition()
 
     {:ok, _, _socket} = socket()
     |> subscribe_and_join(ChannelEvent, "event:exit_timer", %{})
 
     :ok = Partition.arm(part)
 
-    assert_push "start", %{partition: "prot"}, 1000
-    assert_push "stop", %{partition: "prot"}, 1000
+    assert_push "start", %{partition: "prot"}, 5000
+    assert_push "stop", %{partition: "prot"}, 5000
   end
 
   defp start_idle_partition do
@@ -73,11 +85,12 @@ defmodule DtWeb.EventChannelTest do
   end
 
   defp start_alarmed_partition do
-    {:ok, _, part, s_pids} = start_partition()
+    {:ok, part} = start_partition()
 
     :ok = Partition.arm(part)
 
-    Enum.each(s_pids, fn(pid) ->
+    Controller.get_sensors()
+    |> Enum.each(fn(pid) ->
       ev = %Event{address: "1", port: 1, value: 15}
       :ok = Process.send(pid, {:event, ev}, [])
       ev = %Event{address: "2", port: 1, value: 15}
@@ -92,16 +105,12 @@ defmodule DtWeb.EventChannelTest do
       %SensorModel{name: "B", balance: "NC", th1: 10,
         partitions: [], enabled: true, address: "2", port: 1}
       ]
-    part = %PartitionModel{name: "prot", armed: "DISARM", exit_delay: 0,
+    part = %PartitionModel{name: "prot", armed: "DISARM", exit_delay: 1,
       entry_delay: 0, sensors: sensors}
 
-    s_pids = Enum.map(sensors, fn(sensor) ->
-      {:ok, pid} = Detector.start_link({sensor})
-      pid
-    end)
-    {:ok, pid} = Partition.start_link(part)
+    :ok = Controller.reload({sensors, [part]})
 
-    {:ok, pid, part, s_pids}
+    {:ok, part}
   end
 
 end

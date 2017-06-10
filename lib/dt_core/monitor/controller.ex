@@ -37,10 +37,25 @@ defmodule DtCore.Monitor.Controller do
 
   @doc """
   Reloads the server and workers.
-  This stops workers, worker sup and reloads everything from DB
+  If no config is given, reloads everything from DB, otherwise from the passed
+  tuple {}
   """
+  @spec reload() :: :ok
   def reload do
     GenServer.cast(:sensors_controller, {:reload})
+    :ok
+  end
+
+  @spec reload({list(%SensorModel{}), list(%PartitionModel{})}) :: :ok
+  def reload({sensors, partitions}) do
+    GenServer.call(:sensors_controller, {:start, {sensors, partitions}})
+  end
+
+  @doc """
+  Stops all the workers without restarting the controller
+  """
+  def stop_workers do
+    GenServer.call(:sensors_controller, {:stop_workers})
     :ok
   end
 
@@ -56,6 +71,13 @@ defmodule DtCore.Monitor.Controller do
   """
   def get_partitions do
     GenServer.call(:sensors_controller, {:get_partitions})
+  end
+
+  @doc """
+  Return the pids of the running detectors
+  """
+  def get_sensors do
+    GenServer.call(:sensors_controller, {:get_sensors})
   end
 
   @doc """
@@ -118,12 +140,61 @@ defmodule DtCore.Monitor.Controller do
     {:reply, {:ok, res}, state}
   end
 
+  def handle_call({:get_sensors}, _from, state) do
+    pids = Enum.map(state.detector_workers, fn({_, pid}) ->
+      pid
+    end)
+    {:reply, pids, state}
+  end
+
   @doc false
   def handle_call({:known_sensor, ev = %BusEvent{}}, _from, state) do
     {ev, state} = {ev, state}
                   |> normalize_event
     known = Enum.member?(state.sensors, %{address: ev.address, port: ev.port})
     {:reply, known, state}
+  end
+
+  def handle_call({:stop_workers}, _from, state) do
+    Logger.info "Stopping all controller workers"
+
+    Enum.each(state.partition_workers, fn(worker) ->
+      stop_partition(worker, state)
+    end)
+    Enum.each(state.detector_workers, fn(worker) ->
+      stop_detector(worker, state)
+    end)
+
+    {:reply, :ok, %{state | started: false,
+      partition_workers: [], detector_workers: []}}
+  end
+
+  def handle_call({:start, {sensors, partitions}}, _from, state) do
+    Logger.info("Reloading processes with injected config!")
+
+    Enum.each(state.partition_workers, fn(worker) ->
+      IO.inspect worker
+      stop_partition(worker, state)
+    end)
+    Enum.each(state.detector_workers, fn(worker) ->
+      IO.inspect worker
+
+      stop_detector(worker, state)
+    end)
+
+    detector_workers = Enum.map(sensors, fn(sensor) ->
+      {:ok, id, pid} = start_detector(sensor, state)
+      {id, pid}
+    end)
+
+    partition_workers = Enum.map(partitions, fn(partition) ->
+      {:ok, id, pid} = start_partition(partition, state)
+      {id, pid}
+    end)
+
+    Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
+    {:reply, :ok, %{state | detector_workers: detector_workers,
+      partition_workers: partition_workers, started: true}}
   end
 
   def handle_cast({:reload}, state = %{started: false}) do
@@ -137,7 +208,6 @@ defmodule DtCore.Monitor.Controller do
     Enum.each(state.detector_workers, fn(worker) ->
       stop_detector(worker, state)
     end)
-    {:stop, :normal, state}
     send self(), :start
 
     {:noreply, %{state | started: false,
