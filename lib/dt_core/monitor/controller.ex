@@ -173,12 +173,9 @@ defmodule DtCore.Monitor.Controller do
     Logger.info("Reloading processes with injected config!")
 
     Enum.each(state.partition_workers, fn(worker) ->
-      IO.inspect worker
       stop_partition(worker, state)
     end)
     Enum.each(state.detector_workers, fn(worker) ->
-      IO.inspect worker
-
       stop_detector(worker, state)
     end)
 
