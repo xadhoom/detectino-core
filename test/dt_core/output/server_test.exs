@@ -9,10 +9,11 @@ defmodule DtCore.Test.Output.Server do
   alias DtWeb.ReloadRegistry
 
   setup do
-    {:ok, _pid} = Sup.start_link
+    {:ok, pid} = Sup.start_link
 
     on_exit fn ->
       TimerHelper.wait_until fn ->
+        refute Process.alive?(pid)
         assert Process.whereis(:output_server) == nil
       end
     end
