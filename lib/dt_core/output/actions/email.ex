@@ -12,7 +12,8 @@ defmodule DtCore.Output.Actions.Email do
   """
   import Swoosh.Email
 
-  alias DtCore.SensorEv
+  alias DtCore.DetectorEv
+  alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
   alias DtCore.Output.Actions.Email
   alias DtCore.Output.Actions.Email.Mailer
@@ -41,56 +42,50 @@ defmodule DtCore.Output.Actions.Email do
     |> Mailer.deliver
   end
 
-  def custom(email, _ev = %SensorEv{delayed: true}) do
+  def custom(email, _ev = %DetectorEntryEv{}) do
     put_private(email, :delayed_event, true)
   end
-  def custom(email, _ev = %SensorEv{delayed: false}) do
+  def custom(email, _ev = %DetectorEv{}) do
     put_private(email, :delayed_event, false)
   end
-  def custom(email, _ev = %PartitionEv{delayed: true}) do
-    put_private(email, :delayed_event, true)
-  end
-  def custom(email, _ev = %PartitionEv{delayed: false}) do
+  def custom(email, _ev = %PartitionEv{}) do
     put_private(email, :delayed_event, false)
   end
   def custom(email, _ev) do email end
 
-  def build_subject({:on, _ev = %SensorEv{delayed: false}}) do
+  def build_subject({:on, _ev = %DetectorEv{}}) do
     get_subject(:sensor_start)
   end
 
-  def build_subject({:on, _ev = %PartitionEv{delayed: false}}) do
+  def build_subject({:on, _ev = %PartitionEv{}}) do
     get_subject(:partition_start)
   end
 
-  def build_subject({:off, _ev = %SensorEv{delayed: false}}) do
+  def build_subject({:off, _ev = %DetectorEv{}}) do
     get_subject(:sensor_end)
   end
 
-  def build_subject({:off, _ev = %PartitionEv{delayed: false}}) do
+  def build_subject({:off, _ev = %PartitionEv{}}) do
     get_subject(:partition_end)
   end
 
-  def build_subject({:on, _ev = %SensorEv{delayed: true}}) do
+  def build_subject({:on, _ev = %DetectorEntryEv{}}) do
     get_delayed_subject(:sensor_start)
   end
 
-  def build_subject({:on, _ev = %PartitionEv{delayed: true}}) do
-    get_delayed_subject(:partition_start)
-  end
-
-  def build_subject({:off, _ev = %SensorEv{delayed: true}}) do
+  def build_subject({:off, _ev = %DetectorEntryEv{}}) do
     get_delayed_subject(:sensor_end)
   end
 
-  def build_subject({:off, _ev = %PartitionEv{delayed: true}}) do
-    get_delayed_subject(:partition_end)
-  end
-
-  def build_msg(ev = %SensorEv{}) do
+  def build_msg(ev = %DetectorEv{}) do
     type = Atom.to_string(ev.type)
     port = Integer.to_string(ev.port)
     type <> " from address: " <> ev.address <> ", port: " <> port
+  end
+
+  def build_msg(ev = %DetectorEntryEv{}) do
+    port = Integer.to_string(ev.port)
+    "Entry event from address: " <> ev.address <> ", port: " <> port
   end
 
   def build_msg(ev = %PartitionEv{}) do

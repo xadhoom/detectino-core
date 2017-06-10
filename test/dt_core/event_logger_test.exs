@@ -7,7 +7,7 @@ defmodule DtCore.Test.EventLoggerTest do
   alias DtCore.Test.TimerHelper
 
   alias DtCore.ArmEv
-  alias DtCore.SensorEv
+  alias DtCore.DetectorEv
   alias DtCore.PartitionEv
   alias DtCore.ExitTimerEv
 
@@ -42,7 +42,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves an alarm event from a sensor" do
-    {:start, %SensorEv{type: :short, delayed: true, urgent: false}}
+    {:start, %DetectorEv{type: :short}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -54,7 +54,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves a stop alarm event from a sensor" do
-    {:stop, %SensorEv{type: :short, delayed: true, urgent: false}}
+    {:stop, %DetectorEv{type: :short}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -63,7 +63,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves an alarm event from a partition" do
-    {:start, %PartitionEv{type: :short, delayed: true}}
+    {:start, %PartitionEv{type: :short}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -75,7 +75,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves a stop alarm event from a partition" do
-    {:stop, %PartitionEv{type: :short, delayed: true}}
+    {:stop, %PartitionEv{type: :short}}
     |> dispatch()
 
     log = Repo.one!(EventLog)

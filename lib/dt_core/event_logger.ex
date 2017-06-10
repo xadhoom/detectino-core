@@ -6,7 +6,7 @@ defmodule DtCore.EventLogger do
 
   alias DtCore.EventBridge
   alias DtCore.ArmEv
-  alias DtCore.SensorEv
+  alias DtCore.DetectorEv
   alias DtCore.PartitionEv
   alias DtCore.ExitTimerEv
   alias DtWeb.EventLog
@@ -40,11 +40,11 @@ defmodule DtCore.EventLogger do
     {:noreply, state}
   end
 
-  def handle_info({:bridge_ev, _, {_, %SensorEv{type: :reading}}}, state) do
+  def handle_info({:bridge_ev, _, {_, %DetectorEv{type: :reading}}}, state) do
     {:noreply, state}
   end
 
-  def handle_info({:bridge_ev, _, {op, ev = %SensorEv{}}}, state) do
+  def handle_info({:bridge_ev, _, {op, ev = %DetectorEv{}}}, state) do
     operation = Atom.to_string(op)
     %{type: "alarm", operation: operation, details: ev}
     |> save_eventlog()
@@ -62,7 +62,7 @@ defmodule DtCore.EventLogger do
     true
   end
 
-  def filter({_, {_, %SensorEv{}}}) do
+  def filter({_, {_, %DetectorEv{}}}) do
     true
   end
 

@@ -21,26 +21,6 @@ defmodule DtCore.Event do
     value: nil
 end
 
-defmodule DtCore.SensorEv do
-  @moduledoc """
-    Used to format output from Sensor Workwers.
-    Is listened to by Partition Workers and via DtCore.OutputsRegistry.
-
-    type values:
-      :reading
-      :alarm
-      :short
-      :standby
-      :fault
-      :tamper
-  """
-  defstruct type: nil,
-    delayed: false,
-    address: nil,
-    port: nil,
-    urgent: false
-end
-
 defmodule DtCore.DetectorEv do
   @moduledoc """
     Used to format output from Detector Workers.
@@ -75,13 +55,11 @@ defmodule DtCore.PartitionEv do
     Is listened to via DtCore.OutputsRegistry.
 
     name: the partition name, binary()
-    delayed: whether is a delayed alarm (from a delayed sensor), boolean()
     type: alarm type, atom()
 
-    type values: same as %DtCore.SensorEv{} type field
+    type values: same as %DtCore.DetectorEv{} type field
   """
   defstruct name: nil,
-    delayed: false,
     type: nil
 end
 

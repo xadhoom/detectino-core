@@ -2,14 +2,14 @@ defmodule DtWeb.EventLogType do
   @behaviour Ecto.Type
 
   alias DtCore.ArmEv
-  alias DtCore.SensorEv
+  alias DtCore.DetectorEv
   alias DtCore.PartitionEv
   alias DtCore.ExitTimerEv
 
   def type, do: :json
 
   def cast(v = %ArmEv{}), do: {:ok, v}
-  def cast(v = %SensorEv{}), do: {:ok, v}
+  def cast(v = %DetectorEv{}), do: {:ok, v}
   def cast(v = %PartitionEv{}), do: {:ok, v}
   def cast(v = %ExitTimerEv{}), do: {:ok, v}
   def cast(_), do: :error
@@ -18,7 +18,7 @@ defmodule DtWeb.EventLogType do
   def load(value), do: load(Poison.decode(value))
 
   def dump(ev = %ArmEv{}), do: Poison.encode(ev)
-  def dump(ev = %SensorEv{}), do: Poison.encode(ev)
+  def dump(ev = %DetectorEv{}), do: Poison.encode(ev)
   def dump(ev = %PartitionEv{}), do: Poison.encode(ev)
   def dump(ev = %ExitTimerEv{}), do: Poison.encode(ev)
   def dump(_), do: :error

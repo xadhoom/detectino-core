@@ -13,7 +13,8 @@ defmodule DtCore.Output.Worker do
   alias DtWeb.Event.SensorEvConf
   alias DtWeb.Event.PartitionEvConf
   alias DtCore.OutputsRegistry
-  alias DtCore.SensorEv
+  alias DtCore.DetectorEv
+  alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
   alias DtCore.Output.Actions.Bus
   alias DtCore.Output.Actions.Email
@@ -64,7 +65,12 @@ defmodule DtCore.Output.Worker do
     {:reply, :ok, state}
   end
 
-  def handle_info({:start, ev = %SensorEv{}}, state) do
+  def handle_info({:start, ev = %DetectorEv{}}, state) do
+    run_on_action(ev, state)
+    {:noreply, state}
+  end
+
+  def handle_info({:start, ev = %DetectorEntryEv{}}, state) do
     run_on_action(ev, state)
     {:noreply, state}
   end
@@ -74,8 +80,13 @@ defmodule DtCore.Output.Worker do
     {:noreply, state}
   end
 
-  def handle_info({:stop, ev = %SensorEv{}}, state) do
+  def handle_info({:stop, ev = %DetectorEv{}}, state) do
     run_recover_action(ev, state)
+    {:noreply, state}
+  end
+
+  def handle_info({:stop, ev = %DetectorEntryEv{}}, state) do
+    run_on_action(ev, state)
     {:noreply, state}
   end
 
