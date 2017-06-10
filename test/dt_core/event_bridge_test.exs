@@ -2,10 +2,13 @@ defmodule DtCore.Test.EventBridgeTest do
   use ExUnit.Case
 
   alias DtCore.EventBridge
+  alias DtCore.Test.TimerHelper
 
   setup_all do
-    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
-    {:ok, _pid} = EventBridge.start_link()
+    TimerHelper.wait_until fn ->
+      {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
+      {:ok, _pid} = EventBridge.start_link()
+    end
     :ok
   end
 
