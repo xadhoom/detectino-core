@@ -168,6 +168,7 @@ defmodule DtCore.Monitor.Detector do
       :error ->
         Logger.warn fn() -> "Cannot decode event #{inspect ev}" end
       v ->
+        Logger.debug fn() -> "Processing event #{inspect ev}" end
         DetectorFsm.event(state.fsm, v)
     end
     {:noreply, state}
