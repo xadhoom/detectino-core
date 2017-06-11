@@ -164,9 +164,9 @@ defmodule DtCore.Monitor.Detector do
   def handle_info({:event, ev = %Event{}}, state) do
     case process_event(ev, state) do
       :not_me ->
-        Logger.debug "Wrong event address/port %{inspect ev}"
+        Logger.debug fn() -> "Wrong event address/port #{inspect ev}" end
       :error ->
-        Logger.warn "Cannot decode event %{inspect ev}"
+        Logger.warn fn() -> "Cannot decode event #{inspect ev}" end
       v ->
         DetectorFsm.event(state.fsm, v)
     end
