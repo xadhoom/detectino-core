@@ -73,6 +73,11 @@ defmodule DtBus.CanSim do
   end
 
   def handle_call(cmd = {:gen_analog_ev, _port, _value}, _f, state) do
+    case state.running do
+      tref when is_reference(tref) ->
+        Process.cancel_timer(tref)
+      _ -> nil
+    end
     tref = Process.send_after(self(), cmd, @send_interval)
     state = %{state | running: tref}
     {:reply, :ok, state}
