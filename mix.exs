@@ -55,7 +55,6 @@ defmodule Detectino.Mixfile do
      {:uuid, "~> 1.1"},
      {:ex_link_header, "~> 0.0.5"},
      {:timex, "~> 3.1"},
-     {:credo, "~> 0.7", only: [:dev, :test]},
      {:ecto, "~> 2.1"},
      {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.1"},
      {:swoosh, "~> 0.7"},
@@ -63,10 +62,15 @@ defmodule Detectino.Mixfile do
      {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},
      {:lager, git: "https://github.com/basho/lager.git", override: true},
      {:lager_logger, "~> 1.0"},
+     {:gen_state_machine, "~> 2.0"},
+     # devel stuff
+     {:credo, "~> 0.7", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: [:dev, :test]},
      {:meck, "~> 0.8", only: [:test]},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-     {:gen_state_machine, "~> 2.0"}
+     # release stuff
+     {:distillery, "~> 1.4"}
+
    ]
   end
 
