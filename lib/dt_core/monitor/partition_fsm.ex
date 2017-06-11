@@ -302,12 +302,12 @@ defmodule DtCore.Monitor.PartitionFsm do
 
   defp add_tripped(:tampered, ev = %DetectorEv{}, data) do
     newtampered = {ev.address, ev.port}
-    %{data | tampered: [newtampered | data.tampered]}
+    %{data | tampered: [newtampered | data.tampered] |> Enum.uniq}
   end
 
   defp add_tripped(:alarmed, ev = %DetectorEv{}, data) do
     newalarmed = {ev.address, ev.port}
-    %{data | alarmed: [newalarmed | data.alarmed]}
+    %{data | alarmed: [newalarmed | data.alarmed] |> Enum.uniq}
   end
 
   defp drop_tripped(:tampered, ev = %DetectorEv{}, data) do
