@@ -49,11 +49,16 @@ defmodule DtCore.Monitor.PartitionFsm do
     GenStateMachine.call(server, :status)
   end
 
+  def armed?(server) do
+    GenStateMachine.call(server, :armed?)
+  end
+
   #
   # GenStateMachine callbacks
   #
   def init({config = %PartitionModel{}, receiver}) do
     {:ok, :idle, %{
+      armed: false,
       config: config,
       receiver: receiver,
       tampered: [],
@@ -63,6 +68,10 @@ defmodule DtCore.Monitor.PartitionFsm do
 
   def handle_event({:call, from}, :status, state, _data) do
     {:keep_state_and_data, [{:reply, from, state}]}
+  end
+
+  def handle_event({:call, from}, :armed?, _state, data) do
+    {:keep_state_and_data, [{:reply, from, data.armed}]}
   end
 
   #
@@ -118,7 +127,7 @@ defmodule DtCore.Monitor.PartitionFsm do
           send data.receiver, {:start, arm_ev}
           send data.receiver, {:start, %ExitTimerEv{name: data.config.name}}
           # move to exit_wait state and send back :ok
-          {:next_state, :exit_wait, data, [
+          {:next_state, :exit_wait, %{data | armed: true}, [
             {:reply, from, :ok},
             {:state_timeout, exit_timeout, :exit_timer_expired}
             ]}
@@ -126,13 +135,13 @@ defmodule DtCore.Monitor.PartitionFsm do
           arm_sensors(data, mode)
           send data.receiver, {:start, arm_ev}
           # move to idle_arm state and send back :ok
-          {:next_state, :idle_arm, data, {:reply, from, :ok}}
+          {:next_state, :idle_arm, %{data | armed: true}, {:reply, from, :ok}}
         end
       else
         arm_sensors(data, mode)
         send data.receiver, {:start, arm_ev}
         # move to idle_arm state and send back :ok
-        {:next_state, :idle_arm, data, {:reply, from, :ok}}
+        {:next_state, :idle_arm, %{data | armed: true}, {:reply, from, :ok}}
       end
     else
       # blah blah keep state and send back {:error, :tripped}
@@ -148,7 +157,7 @@ defmodule DtCore.Monitor.PartitionFsm do
       :ok = Detector.disarm({sensor})
     end)
     send data.receiver, {:stop, %ArmEv{name: data.config.name}}
-    {:next_state, :idle, data, {:reply, from, :ok}}
+    {:next_state, :idle, %{data | armed: false}, {:reply, from, :ok}}
   end
 
   #
@@ -189,7 +198,7 @@ defmodule DtCore.Monitor.PartitionFsm do
     end)
     send data.receiver, {:stop, %ExitTimerEv{name: data.config.name}}
     send data.receiver, {:stop, %ArmEv{name: data.config.name}}
-    {:next_state, :idle, data, {:reply, from, :ok}}
+    {:next_state, :idle, %{data | armed: false}, {:reply, from, :ok}}
   end
 
   #
@@ -221,7 +230,11 @@ defmodule DtCore.Monitor.PartitionFsm do
     with true <- Enum.empty?(data.alarmed),
       true <- Enum.empty?(data.tampered)
     do
-      {:next_state, :idle_arm, data}
+      if data.armed do
+        {:next_state, :idle_arm, data}
+      else
+        {:next_state, :idle, data}
+      end
     else
       _ ->
         {:next_state, :tripped, data}
@@ -270,7 +283,7 @@ defmodule DtCore.Monitor.PartitionFsm do
 
     send data.receiver, {:stop, %ArmEv{name: data.config.name}}
 
-    newdata = %{data | alarmed: alarmed, tampered: tampered}
+    newdata = %{data | alarmed: alarmed, tampered: tampered, armed: false}
     {:next_state, :idle, newdata, {:reply, from, :ok}}
   end
 

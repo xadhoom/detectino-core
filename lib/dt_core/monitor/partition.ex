@@ -134,11 +134,7 @@ defmodule DtCore.Monitor.Partition do
   end
 
   def handle_call({:armed?}, _from, state) do
-    armed = case PartitionFsm.status(state.fsm) do
-      :idle_arm -> true
-      :tripped -> true
-      _ -> false
-    end
+    armed = PartitionFsm.armed?(state.fsm)
     {:reply, armed, state}
   end
 
