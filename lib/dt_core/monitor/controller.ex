@@ -261,7 +261,7 @@ defmodule DtCore.Monitor.Controller do
                   |> cache_sensor
 
     # send the event to all detectors
-    Enum.each(state.detector_workers, fn(pid) ->
+    Enum.each(state.detector_workers, fn({_id, pid}) ->
       Logger.debug fn ->
         "sending event #{inspect ev} to detector #{inspect pid}"
       end
