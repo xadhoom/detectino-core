@@ -196,7 +196,8 @@ defmodule DtCore.Monitor.PartitionFsm do
   # :tripped state callbacks
   #
   # process idle event in tripped state
-  def handle_event(:cast, {_ , dev = %DetectorEv{type: :idle}}, :tripped, data) do
+  def handle_event(:cast, {_ , dev = %DetectorEv{type: idle}}, :tripped, data)
+    when idle in [:idle, :realtime] do
     data = if Enum.empty?(data.alarmed) do
       data
     else
