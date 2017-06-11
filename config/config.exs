@@ -36,7 +36,8 @@ config :phoenix, :generators,
   migration: true,
   binary_id: false
 
-# config :joken, config_module: Guardian.JWT
+# Custom HTTP Error Codes
+config :plug, :statuses, %{555 => "Partition tripped"}
 
 config :guardian, Guardian,
   issuer: "DtWeb",

@@ -33,7 +33,7 @@ defmodule DtWeb.PartitionController do
     case do_arm(params) do
       :ok -> send_resp(conn, 204, StatusCodes.status_code(204))
       {:error, :bad_request} -> send_resp(conn, 400, StatusCodes.status_code(400))
-      {:error, :tripped} -> send_resp(conn, 403, StatusCodes.status_code(403))
+      {:error, :tripped} -> send_resp(conn, 555, StatusCodes.status_code(555))
       {:error, :not_found} -> send_resp(conn, 404, StatusCodes.status_code(404))
     end
   end

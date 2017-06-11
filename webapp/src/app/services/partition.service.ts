@@ -38,7 +38,7 @@ export class PartitionService extends Crud {
       map((res) => {
         return true;
       }).
-      catch(this.handleError);
+      catch(this.handleArmError);
   }
 
   public disarm(p: Partition): Observable<boolean> {
@@ -50,5 +50,20 @@ export class PartitionService extends Crud {
       }).
       catch(this.handleError);
   }
+
+  private handleArmError(error: any) {
+    let errMsg;
+    const errTxt = error.text;
+    if (error.status != 555) {
+      errMsg = (error.message) ? error.message :
+        error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+      if (errTxt && errTxt !== error.statusText) {
+        errMsg = `${errMsg}: ${error.text}`;
+      }
+    } else {
+      errMsg = "Partition is tripped, cannot arm!";
+    }
+    return Observable.throw(new Error(errMsg));
+  };
 
 }
