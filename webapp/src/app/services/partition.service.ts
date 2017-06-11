@@ -54,14 +54,14 @@ export class PartitionService extends Crud {
   private handleArmError(error: any) {
     let errMsg;
     const errTxt = error.text;
-    if (error.status != 555) {
+    if (error.status === 555) {
+      errMsg = 'Partition is tripped, cannot arm!';
+    } else {
       errMsg = (error.message) ? error.message :
         error.status ? `${error.status} - ${error.statusText}` : 'Server error';
       if (errTxt && errTxt !== error.statusText) {
         errMsg = `${errMsg}: ${error.text}`;
       }
-    } else {
-      errMsg = "Partition is tripped, cannot arm!";
     }
     return Observable.throw(new Error(errMsg));
   };
