@@ -11,6 +11,7 @@ defmodule DtCore.Monitor.Detector do
   alias DtWeb.Sensor, as: SensorModel
 
   alias DtCore.Event
+  alias DtCore.EventBridge
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
   alias DtCore.DetectorEntryEv
@@ -174,45 +175,69 @@ defmodule DtCore.Monitor.Detector do
     {:noreply, state}
   end
 
-  def handle_info({:start, ev = %DetectorEv{}}, state) do
+  def handle_info(msg = {:start, ev = %DetectorEv{}}, state) do
     Enum.each(state.listeners, fn(listener) ->
       send listener, {:start, ev}
     end)
+
+    key = %{source: :sensor, address: ev.address, port: ev.port, type: ev.type}
+    EventBridge.dispatch(key, msg)
+
     {:noreply, state}
   end
 
-  def handle_info({:stop, ev = %DetectorEv{}}, state) do
+  def handle_info(msg = {:stop, ev = %DetectorEv{}}, state) do
     Enum.each(state.listeners, fn(listener) ->
       send listener, {:stop, ev}
     end)
+
+    key = %{source: :sensor, address: ev.address, port: ev.port, type: ev.type}
+    EventBridge.dispatch(key, msg)
+
     {:noreply, state}
   end
 
-  def handle_info({:start, ev = %DetectorExitEv{}}, state) do
+  def handle_info(msg = {:start, ev = %DetectorExitEv{}}, state) do
     Enum.each(state.listeners, fn(listener) ->
       send listener, {:start, ev}
     end)
+
+    key = %{source: :sensor, address: ev.address, port: ev.port}
+    EventBridge.dispatch(key, msg)
+
     {:noreply, state}
   end
 
-  def handle_info({:stop, ev = %DetectorExitEv{}}, state) do
+  def handle_info(msg = {:stop, ev = %DetectorExitEv{}}, state) do
     Enum.each(state.listeners, fn(listener) ->
       send listener, {:stop, ev}
     end)
+
+    key = %{source: :sensor, address: ev.address, port: ev.port}
+    EventBridge.dispatch(key, msg)
+
     {:noreply, state}
   end
 
-  def handle_info({:start, ev = %DetectorEntryEv{}}, state) do
+  def handle_info(msg = {:start, ev = %DetectorEntryEv{}}, state) do
     Enum.each(state.listeners, fn(listener) ->
       send listener, {:start, ev}
     end)
+
+    key = %{source: :sensor, address: ev.address, port: ev.port}
+    EventBridge.dispatch(key, msg)
+
     {:noreply, state}
   end
 
-  def handle_info({:stop, ev = %DetectorEntryEv{}}, state) do
+  def handle_info(msg = {:stop, ev = %DetectorEntryEv{}}, state) do
     Enum.each(state.listeners, fn(listener) ->
       send listener, {:stop, ev}
     end)
+
+    key = %{source: :sensor, address: ev.address, port: ev.port}
+    EventBridge.dispatch(key, msg)
+
     {:noreply, state}
   end
 

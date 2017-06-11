@@ -3,6 +3,8 @@ defmodule DtWeb.EventLogType do
 
   alias DtCore.ArmEv
   alias DtCore.DetectorEv
+  alias DtCore.DetectorExitEv
+  alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
   alias DtCore.ExitTimerEv
 
@@ -10,6 +12,8 @@ defmodule DtWeb.EventLogType do
 
   def cast(v = %ArmEv{}), do: {:ok, v}
   def cast(v = %DetectorEv{}), do: {:ok, v}
+  def cast(v = %DetectorEntryEv{}), do: {:ok, v}
+  def cast(v = %DetectorExitEv{}), do: {:ok, v}
   def cast(v = %PartitionEv{}), do: {:ok, v}
   def cast(v = %ExitTimerEv{}), do: {:ok, v}
   def cast(_), do: :error
@@ -19,6 +23,8 @@ defmodule DtWeb.EventLogType do
 
   def dump(ev = %ArmEv{}), do: Poison.encode(ev)
   def dump(ev = %DetectorEv{}), do: Poison.encode(ev)
+  def dump(ev = %DetectorEntryEv{}), do: Poison.encode(ev)
+  def dump(ev = %DetectorExitEv{}), do: Poison.encode(ev)
   def dump(ev = %PartitionEv{}), do: Poison.encode(ev)
   def dump(ev = %ExitTimerEv{}), do: Poison.encode(ev)
   def dump(_), do: :error
@@ -39,7 +45,8 @@ defmodule DtWeb.EventLog do
 
   @required_fields ~w(type operation details)
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
-  @source_types ["arm", "exit_timer", "alarm", "disarm"]
+  @source_types ["arm", "exit_timer", "alarm", "disarm",
+    "detector_exit", "detector_entry"]
 
   def create_changeset(model, params \\ %{}) do
     model

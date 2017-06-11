@@ -5,6 +5,8 @@ defmodule DtCore.Test.Monitor.Partition do
   alias DtCore.Event
   alias DtCore.ExitTimerEv
   alias DtCore.DetectorEv
+  alias DtCore.DetectorExitEv
+  alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
   alias DtCore.EventBridge
   alias DtCore.Monitor.Detector
@@ -19,7 +21,14 @@ defmodule DtCore.Test.Monitor.Partition do
   end
 
   setup do
-    EventBridge.start_listening()
+    EventBridge.start_listening(fn({_key, payload}) ->
+      case payload do
+        {_, %DetectorEv{}} -> false
+        {_, %DetectorExitEv{}} -> false
+        {_, %DetectorEntryEv{}} -> false
+        _ -> true
+      end
+    end)
     on_exit fn ->
       # disconnect from the ev bridge, even if the dead process
       # should remove it automatically
