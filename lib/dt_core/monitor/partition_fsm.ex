@@ -260,6 +260,11 @@ defmodule DtCore.Monitor.PartitionFsm do
     {:next_state, :tripped, data}
   end
 
+  # process arm request in tripped state
+  def handle_event({:call, from}, {:arm, _, _}, :tripped, data) do
+    {:next_state, :tripped, data, {:reply, from, {:error, :tripped}}}
+  end
+
   # process disarm request in tripped state
   def handle_event({:call, from}, :disarm, :tripped, data) do
     Enum.each(data.config.sensors, fn(sensor) ->
