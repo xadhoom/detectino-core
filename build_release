@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# Angular2 stuff
+# Angular stuff
 rm -fR priv/static/*
 pushd webapp
 npm install
-npm run build:prod
+ng build --aot --target=production
 popd
 
 # Elixir Stuff
 mix deps.get --only prod
-mix release.clean
-MIX_ENV=prod mix compile
-MIX_ENV=prod mix release
+MIX_ENV=prod mix do release.clean, compile, release
