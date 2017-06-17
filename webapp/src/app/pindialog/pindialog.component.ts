@@ -29,7 +29,7 @@ export class PindialogComponent implements OnInit {
     this.router.navigateByUrl('/' + path);
   }
 
-  public pinKey(value: string) {
+  public pinKey(value: number) {
     if (this.realpin.length >= 6) { return; }
 
     if (this.realpin === '') {
