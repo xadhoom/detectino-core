@@ -69,8 +69,8 @@ defmodule Detectino.Mixfile do
      {:meck, "~> 0.8", only: [:test]},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
      # release stuff
-     {:distillery, "~> 1.4"}
-
+     {:distillery, "~> 1.4"},
+     {:conform, "~> 2.3"}
    ]
   end
 
