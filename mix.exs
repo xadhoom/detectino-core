@@ -26,7 +26,7 @@ defmodule Detectino.Mixfile do
       :phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
       :phoenix_ecto, :postgrex, :timex, :swoosh, :etimer, :can, :guardian,
       :lager_logger, :exjsx, :comeonin, :ex_link_header, :plug, :dthread,
-      :gen_state_machine]
+      :gen_state_machine, :runtime_tools]
     prod_apps = apps ++ [:gen_smtp]
     case Mix.env do
       :test -> [mod: {Detectino, []}, applications: apps]
