@@ -4,10 +4,14 @@ defmodule Detectino do
   alias DtWeb.ReloadRegistry
   alias DtWeb.Endpoint
 
+  require Logger
+
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
+
+    run_migrations()
 
     basic_children = [
       # Start the endpoint when the application starts
@@ -42,6 +46,17 @@ defmodule Detectino do
   # starting the app on production
   defp run_migrations do
     path = Application.app_dir(:detectino) <> "/priv/repo/migrations"
-    Ecto.Migrator.run(DtWeb.Repo, path, :up, [{:all, true}, {:log, :debug}])
+
+    case Application.get_env(:detectino, :environment) do
+      :prod ->
+        Logger.info "Running database migrations..."
+        {:ok, pid} = DtWeb.Repo.start_link()
+        Ecto.Migrator.run(DtWeb.Repo, path, :up, [{:all, true}, {:log, :debug}])
+        Process.unlink(pid)
+        :ok = DtWeb.Repo.stop(pid)
+      v ->
+        Logger.info "Not production (#{inspect v}, disabling auto database migration"
+    end
   end
+
 end
