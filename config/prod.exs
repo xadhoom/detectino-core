@@ -14,7 +14,7 @@ config :detectino, :environment, :prod
 # which you typically run after static files are built.
 config :detectino, DtWeb.Endpoint,
   http: [port: 8888],
-  url: [host: "example.com"],
+  #url: [host: "example.com"],
   root: ".",
   server: true,
   version: Mix.Project.config[:version]
