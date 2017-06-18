@@ -25,7 +25,8 @@ defmodule Detectino.Mixfile do
     apps = [
       :phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
       :phoenix_ecto, :postgrex, :timex, :swoosh, :etimer, :can, :guardian,
-      :lager_logger, :exjsx, :comeonin, :ex_link_header, :plug]
+      :lager_logger, :exjsx, :comeonin, :ex_link_header, :plug, :dthread,
+      :gen_state_machine]
     prod_apps = apps ++ [:gen_smtp]
     case Mix.env do
       :test -> [mod: {Detectino, []}, applications: apps]
@@ -53,6 +54,7 @@ defmodule Detectino.Mixfile do
      {:guardian, "~> 0.14"},
      {:comeonin, "~> 2.0"},
      {:uuid, "~> 1.1"},
+     {:exjsx, "~> 4.0"},
      {:ex_link_header, "~> 0.0.5"},
      {:timex, "~> 3.1"},
      {:ecto, "~> 2.1"},
