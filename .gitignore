@@ -31,9 +31,6 @@ ttb_last_config
 false
 .*.swp
 
-# release builds
-/rel
-
 # docs
 doc
 
