@@ -61,7 +61,7 @@ defmodule Detectino.Mixfile do
      {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.1"},
      {:swoosh, "~> 0.7"},
      {:gen_smtp, "~> 0.11.0"},
-     {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2"},
+     {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2", manager: :rebar},
      {:lager, git: "https://github.com/basho/lager.git", override: true},
      {:lager_logger, "~> 1.0"},
      {:gen_state_machine, "~> 2.0"},

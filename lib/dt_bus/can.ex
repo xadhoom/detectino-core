@@ -74,7 +74,7 @@ defmodule DtBus.Can do
     :can.start()
     :can_router.attach()
     c_if = Application.get_env(:detectino, :can_interface)
-    :can_router.join({:can_sock, 0, [{:device, c_if}]})
+    :can_sock.start(0, [{:device, c_if}])
     cur_ifs = :can_router.interfaces
     Logger.info fn -> "Started CanBus Interface #{inspect cur_ifs}" end
     {:ok,
