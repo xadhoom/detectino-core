@@ -11,10 +11,12 @@ env:
 language: elixir
 
 elixir:
-  - 1.4.2
+  - 1.4.4
+  - 1.4.5
 
 otp_release:
   - 19.2
+  - 20.0
 
 addons:
   postgresql: "9.4"
