@@ -502,7 +502,7 @@ defmodule DtCore.Test.Monitor.Partition do
   defp assert_eq_wait(a, b) do
     # this assertion depends on messages between processes,
     # so give them time to land :)
-    TimerHelper.wait_until fn ->
+    TimerHelper.wait_until 1000, fn ->
       assert a == b
     end
   end
