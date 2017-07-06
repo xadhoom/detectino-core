@@ -22,7 +22,7 @@
     </div>
 
     <div class="layout-main">
-      <p-messages [value]="notifications" *ngIf="auth.authenticated()"></p-messages>
+      <p-messages [(value)]="notifications" *ngIf="auth.authenticated()"></p-messages>
       <router-outlet></router-outlet>
     </div>
 

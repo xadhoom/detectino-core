@@ -50,6 +50,11 @@ export class NotificationService {
     this._messages$.next(this.messages);
   }
 
+  setMessages(messages: DtMessage[]) {
+    this.messages = messages;
+    this._messages$.next(this.messages);
+  }
+
   private clearMessage(uuid: any) {
     this.messages = this.messages.filter(msg => {
       return msg.id !== uuid;

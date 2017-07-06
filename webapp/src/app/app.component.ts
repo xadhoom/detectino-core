@@ -1,6 +1,6 @@
 import {
   Component, AfterViewInit, ElementRef, Renderer,
-  ViewChild
+  ViewChild, Input
 } from '@angular/core';
 
 import { Router } from '@angular/router';
@@ -26,7 +26,7 @@ export class AppComponent implements AfterViewInit {
 
   subscription: Subscription;
 
-  notifications: Message[] = [];
+  _notifications: Message[] = [];
 
   public time: string;
   public date: string;
@@ -40,12 +40,21 @@ export class AppComponent implements AfterViewInit {
     private socket: PhoenixChannelService, private beeper: BeeperService) {
 
     this.subscription = notificationService.messages$.subscribe(
-      messages => { this.notifications = messages; }
+      messages => { this._notifications = messages; }
     );
   }
 
   ngAfterViewInit() {
     this.startWebSock();
+  }
+
+  @Input() set notifications(value: Message[]) {
+    // the p-messages component call this only to clear
+    this.notificationService.setMessages([]);
+  }
+
+  get notifications(): Message[] {
+    return this._notifications;
   }
 
   startWebSock() {
