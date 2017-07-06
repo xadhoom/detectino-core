@@ -11,7 +11,7 @@ defmodule DtCore.EventLogger do
   alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
   alias DtCore.ExitTimerEv
-  alias DtWeb.EventLog
+  alias DtCtx.Outputs.EventLog
   alias DtWeb.Repo
 
   require Logger

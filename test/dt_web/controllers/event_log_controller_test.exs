@@ -2,7 +2,7 @@ defmodule DtWeb.EventLogControllerTest do
   use DtWeb.ConnCase
 
   alias DtCore.ArmEv
-  alias DtWeb.EventLog
+  alias DtCtx.Outputs.EventLog
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do

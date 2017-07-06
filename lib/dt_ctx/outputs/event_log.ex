@@ -31,7 +31,7 @@ defmodule DtCtx.Outputs.EventLogType do
 
 end
 
-defmodule DtWeb.EventLog do
+defmodule DtCtx.Outputs.EventLog do
   use Ecto.Schema
   import Ecto.Changeset
 

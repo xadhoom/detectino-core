@@ -3,7 +3,7 @@ defmodule DtCore.Test.EventLoggerTest do
 
   alias DtCore.EventBridge
   alias DtCore.EventLogger
-  alias DtWeb.EventLog
+  alias DtCtx.Outputs.EventLog
   alias DtCore.Test.TimerHelper
 
   alias DtCore.ArmEv
