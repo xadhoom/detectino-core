@@ -41,9 +41,9 @@ export class SettingsComponent implements OnInit {
   }
 
   private canOpen(path: string) {
-    let notWhenArmed = ['sensors', 'partitions', 'events', 'outputs'];
+    const notWhenArmed = ['sensors', 'partitions', 'events', 'outputs'];
     if (notWhenArmed.includes(path) && this.isArmed) {
-      let msg = 'Cannot configure when armed!';
+      const msg = 'Cannot configure when armed!';
       this.notificationService.error(msg);
       return false;
     }
