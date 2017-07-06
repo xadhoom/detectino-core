@@ -1,4 +1,4 @@
-defmodule DtWeb.Output do
+defmodule DtCtx.Outputs.Output do
   use DtWeb.Web, :model
 
   @derive {Poison.Encoder, only: [
@@ -8,12 +8,12 @@ defmodule DtWeb.Output do
     field :name, :string
     field :type, :string
     field :enabled, :boolean
-    embeds_one :bus_settings, DtWeb.BusSettings
-    embeds_one :email_settings, DtWeb.EmailSettings
+    embeds_one :bus_settings, DtCtx.Outputs.BusSettings
+    embeds_one :email_settings, DtCtx.Outputs.EmailSettings
 
     timestamps()
 
-    many_to_many :events, DtWeb.Event, join_through: DtWeb.EventOutput
+    many_to_many :events, DtCtx.Outputs.Event, join_through: DtCtx.Outputs.EventOutput
   end
 
   @required_fields ~w(name type enabled)

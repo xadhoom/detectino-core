@@ -1,4 +1,4 @@
-defmodule DtWeb.BusSettings do
+defmodule DtCtx.Outputs.BusSettings do
   use DtWeb.Web, :model
 
   embedded_schema do

@@ -1,7 +1,7 @@
 defmodule DtWeb.OutputTest do
   use DtWeb.ModelCase
 
-  alias DtWeb.Output
+  alias DtCtx.Outputs.Output
 
   test "changeset with invalid type" do
     attrs = %{name: "some content", type: "type", enabled: true}

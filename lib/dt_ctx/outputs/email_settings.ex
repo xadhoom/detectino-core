@@ -1,4 +1,4 @@
-defmodule DtWeb.EmailSettings do
+defmodule DtCtx.Outputs.EmailSettings do
   use DtWeb.Web, :model
 
   embedded_schema do

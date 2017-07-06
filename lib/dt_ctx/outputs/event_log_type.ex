@@ -1,4 +1,4 @@
-defmodule DtWeb.EventLogType do
+defmodule DtCtx.Outputs.EventLogType do
   @behaviour Ecto.Type
 
   alias DtCore.ArmEv
@@ -38,7 +38,7 @@ defmodule DtWeb.EventLog do
     field :type, :string
     field :acked, :boolean
     field :operation, :string
-    field :details, DtWeb.EventLogType
+    field :details, DtCtx.Outputs.EventLogType
 
     timestamps()
   end

@@ -1,4 +1,4 @@
-defmodule DtWeb.EventOutput do
+defmodule DtCtx.Outputs.EventOutput do
   use DtWeb.Web, :model
 
   schema "events_outputs" do

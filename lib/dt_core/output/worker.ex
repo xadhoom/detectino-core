@@ -8,10 +8,10 @@ defmodule DtCore.Output.Worker do
 
   require Logger
   alias DtCore.Output.Utils
-  alias DtWeb.Output, as: OutputModel
-  alias DtWeb.Event, as: EventModel
-  alias DtWeb.Event.SensorEvConf
-  alias DtWeb.Event.PartitionEvConf
+  alias DtCtx.Outputs.Output, as: OutputModel
+  alias DtCtx.Outputs.Event, as: EventModel
+  alias DtCtx.Outputs.Event.SensorEvConf
+  alias DtCtx.Outputs.Event.PartitionEvConf
   alias DtCore.OutputsRegistry
   alias DtCore.DetectorEv
   alias DtCore.DetectorEntryEv

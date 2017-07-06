@@ -2,7 +2,7 @@ defmodule DtCore.Output.Utils do
   @moduledoc """
   Various outputs related utild
   """
-  alias DtWeb.Output, as: OutputModel
+  alias DtCtx.Outputs.Output, as: OutputModel
 
   require Logger
 

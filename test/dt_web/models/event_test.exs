@@ -1,7 +1,7 @@
 defmodule DtWeb.EventTest do
   use DtWeb.ModelCase
 
-  alias DtWeb.Event
+  alias DtCtx.Outputs.Event
 
   test "changeset with invalid source" do
     attrs = %{name: "a name", source: "whatever"}

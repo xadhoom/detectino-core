@@ -2,10 +2,10 @@ defmodule DtCore.Test.Output.Worker do
   use DtCore.EctoCase
 
   alias DtCore.Monitor.Sup
-  alias DtWeb.Output, as: OutputModel
-  alias DtWeb.Event, as: EventModel
-  alias DtWeb.EmailSettings, as: EmailSettingsModel
-  alias DtWeb.BusSettings, as: BusSettingsModel
+  alias DtCtx.Outputs.Output, as: OutputModel
+  alias DtCtx.Outputs.Event, as: EventModel
+  alias DtCtx.Outputs.EmailSettings, as: EmailSettingsModel
+  alias DtCtx.Outputs.BusSettings, as: BusSettingsModel
   alias DtCore.OutputsRegistry
   alias DtCore.Output.Worker
   alias DtCore.Test.TimerHelper

@@ -1,20 +1,20 @@
-defmodule DtWeb.Event.PartitionEvConf do
+defmodule DtCtx.Outputs.Event.PartitionEvConf do
   defstruct name: nil,
     type: nil
 end
 
-defmodule DtWeb.Event.SensorEvConf do
+defmodule DtCtx.Outputs.Event.SensorEvConf do
   defstruct name: nil,
     address: nil,
     port: nil,
     type: nil
 end
 
-defmodule DtWeb.Event do
+defmodule DtCtx.Outputs.Event do
   use DtWeb.Web, :model
 
-  alias DtWeb.Event.SensorEvConf
-  alias DtWeb.Event.PartitionEvConf
+  alias DtCtx.Outputs.Event.SensorEvConf
+  alias DtCtx.Outputs.Event.PartitionEvConf
 
   @derive {Poison.Encoder, only: [:id, :name, :description, :source]}
   schema "events" do
@@ -25,7 +25,7 @@ defmodule DtWeb.Event do
 
     timestamps()
 
-    many_to_many :outputs, DtWeb.Output, join_through: DtWeb.EventOutput
+    many_to_many :outputs, DtCtx.Outputs.Output, join_through: DtCtx.Outputs.EventOutput
   end
 
   @optional_fields ~w(description)

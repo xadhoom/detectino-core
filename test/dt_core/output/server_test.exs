@@ -3,8 +3,8 @@ defmodule DtCore.Test.Output.Server do
 
   alias DtCore.Output.Sup
   alias DtCore.Output.Server
-  alias DtWeb.Event, as: EventModel
-  alias DtWeb.Output, as: OutputModel
+  alias DtCtx.Outputs.Event, as: EventModel
+  alias DtCtx.Outputs.Output, as: OutputModel
   alias DtCore.Test.TimerHelper
   alias DtWeb.ReloadRegistry
 
