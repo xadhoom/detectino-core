@@ -1,7 +1,7 @@
 defmodule DtWeb.UserControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.User
+  alias DtCtx.Accounts.User
   alias DtWeb.ControllerHelperTest, as: Helper
 
   @valid_attrs %{username: "test@local", email: "some content",

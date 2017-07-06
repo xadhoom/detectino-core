@@ -1,7 +1,7 @@
 defmodule DtWeb.SessionControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.User
+  alias DtCtx.Accounts.User
   alias DtWeb.TokenServer
 
   setup %{conn: conn} do

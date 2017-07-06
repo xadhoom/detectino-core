@@ -1,8 +1,8 @@
 defmodule DtWeb.SessionController do
   use DtWeb.Web, :controller
 
-  alias DtWeb.User
-  alias DtWeb.UserQuery
+  alias DtCtx.Accounts.User
+  alias DtCtx.Accounts.UserQuery
   alias DtWeb.TokenServer
   alias DtWeb.StatusCodes
   alias DtWeb.SessionController

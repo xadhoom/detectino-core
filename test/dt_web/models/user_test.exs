@@ -1,7 +1,7 @@
 defmodule DtWeb.UserTest do
   use DtWeb.ModelCase
 
-  alias DtWeb.User
+  alias DtCtx.Accounts.User
 
   @sample_user %User{id: 1, encrypted_password: "$2b$12$YVI.NrsX3O2z5SwD4hOPt.J9yU8xlt3ns2dcMqSm3oYGVygMZQmb6",
     username: "some content", name: "some content", password: "password", pin: "1234", role: "admin"}

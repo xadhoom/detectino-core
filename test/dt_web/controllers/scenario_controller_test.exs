@@ -1,7 +1,7 @@
 defmodule DtWeb.ScenarioControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.User, as: UserModel
+  alias DtCtx.Accounts.User, as: UserModel
   alias DtWeb.Scenario, as: ScenarioModel
   alias DtWeb.Partition, as: PartitionModel
   alias DtWeb.PartitionScenario, as: PartitionScenarioModel

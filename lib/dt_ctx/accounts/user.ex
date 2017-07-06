@@ -1,4 +1,4 @@
-defmodule DtWeb.User do
+defmodule DtCtx.Accounts.User do
   use DtWeb.Web, :model
 
   alias Ecto.Changeset

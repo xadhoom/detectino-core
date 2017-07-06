@@ -9,7 +9,7 @@ defmodule DtWeb.ScenarioController do
   alias DtWeb.Plugs.PinAuthorize
   alias DtWeb.StatusCodes
   alias DtWeb.Scenario
-  alias DtWeb.User
+  alias DtCtx.Accounts.User
   alias DtWeb.Partition
   alias DtCore.Monitor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
