@@ -1,5 +1,5 @@
-defmodule DtWeb.ScenarioTest do
-  use DtWeb.ModelCase
+defmodule DtCtx.ScenarioTest do
+  use DtCtx.DataCase
 
   alias DtCtx.Monitoring.Scenario
 

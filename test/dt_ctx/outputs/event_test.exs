@@ -1,5 +1,5 @@
-defmodule DtWeb.EventTest do
-  use DtWeb.ModelCase
+defmodule DtCtx.EventTest do
+  use DtCtx.DataCase
 
   alias DtCtx.Outputs.Event
 

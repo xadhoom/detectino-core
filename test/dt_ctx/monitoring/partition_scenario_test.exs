@@ -1,5 +1,5 @@
-defmodule DtWeb.PartitionScenarioTest do
-  use DtWeb.ModelCase
+defmodule DtCtx.PartitionScenarioTest do
+  use DtCtx.DataCase
 
   alias DtCtx.Monitoring.PartitionScenario, as: Mut
 

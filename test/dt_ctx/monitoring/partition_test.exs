@@ -1,5 +1,5 @@
-defmodule DtWeb.PartitionTest do
-  use DtWeb.ModelCase
+defmodule DtCtx.PartitionTest do
+  use DtCtx.DataCase
 
   alias DtCtx.Monitoring.Partition
 

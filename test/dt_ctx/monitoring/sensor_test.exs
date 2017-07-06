@@ -1,5 +1,5 @@
-defmodule DtWeb.SensorTest do
-  use DtWeb.ModelCase
+defmodule DtCtx.SensorTest do
+  use DtCtx.DataCase
 
   alias DtCtx.Monitoring.Sensor
 
@@ -27,7 +27,7 @@ defmodule DtWeb.SensorTest do
   end
 
   test "uniqueness on address:port" do
-    # this requires DB access since uniq is enforced by DB constraints 
+    # this requires DB access since uniq is enforced by DB constraints
     %Sensor{}
     |> Sensor.create_changeset(%{address: "10", port: 10, name: "a name", balance: "NC"})
     |> Repo.insert!

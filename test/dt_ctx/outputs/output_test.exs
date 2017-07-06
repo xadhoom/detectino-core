@@ -1,5 +1,5 @@
-defmodule DtWeb.OutputTest do
-  use DtWeb.ModelCase
+defmodule DtCtx.OutputTest do
+  use DtCtx.DataCase
 
   alias DtCtx.Outputs.Output
 
