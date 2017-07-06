@@ -6,8 +6,8 @@ defmodule DtCtx.Monitoring.PartitionScenario do
 
   schema "partitions_scenarios" do
     field :mode, :string
-    belongs_to :partition, Partition
-    belongs_to :scenario, Sensor
+    belongs_to :partition, DtCtx.Monitoring.Partition
+    belongs_to :scenario, DtCtx.Monitoring.Sensor
 
     timestamps()
   end

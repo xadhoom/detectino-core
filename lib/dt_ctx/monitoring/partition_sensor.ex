@@ -3,8 +3,8 @@ defmodule DtCtx.Monitoring.PartitionSensor do
   import Ecto.Changeset
 
   schema "partitions_sensors" do
-    belongs_to :partition, Partition
-    belongs_to :sensor, Sensor
+    belongs_to :partition, DtCtx.Monitoring.Partition
+    belongs_to :sensor, DtCtx.Monitoring.Sensor
 
     timestamps()
   end
