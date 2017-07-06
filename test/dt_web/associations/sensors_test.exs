@@ -4,8 +4,8 @@ defmodule DtWeb.Associations.SensorTest do
   """
   use DtWeb.ConnCase
 
-  alias DtWeb.Partition
-  alias DtWeb.Sensor
+  alias DtCtx.Monitoring.Partition
+  alias DtCtx.Monitoring.Sensor
 
   test "sensors association" do
     sens = Repo.insert!(%Sensor{})

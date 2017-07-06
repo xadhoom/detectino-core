@@ -2,8 +2,8 @@ defmodule DtCore.Monitor.Utils do
   @moduledoc """
   Various sensor related utils
   """
-  alias DtWeb.Sensor, as: SensorModel
-  alias DtWeb.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
 
   require Logger
 

@@ -1,7 +1,7 @@
 defmodule DtWeb.ScenarioTest do
   use DtWeb.ModelCase
 
-  alias DtWeb.Scenario
+  alias DtCtx.Monitoring.Scenario
 
   @valid_attrs %{enabled: true, name: "some content"}
   @invalid_attrs %{}

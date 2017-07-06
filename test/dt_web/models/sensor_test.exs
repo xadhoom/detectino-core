@@ -1,7 +1,7 @@
 defmodule DtWeb.SensorTest do
   use DtWeb.ModelCase
 
-  alias DtWeb.Sensor
+  alias DtCtx.Monitoring.Sensor
 
   @valid_attrs %{address: "some content", port: 1234, name: "mandatory", balance: "NC"}
   @invalid_attrs %{}

@@ -3,8 +3,8 @@ defmodule DtCore.Test.Monitor.Controller do
 
   alias DtCore.Monitor.Sup
   alias DtCore.Monitor.Controller
-  alias DtWeb.Sensor, as: SensorModel
-  alias DtWeb.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtCore.Test.TimerHelper
   alias DtWeb.ReloadRegistry
   alias DtBus.Event, as: BusEvent

@@ -1,9 +1,9 @@
 defmodule DtWeb.SensorControllerTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.Sensor, as: SensorModel
-  alias DtWeb.Partition, as: PartitionModel
-  alias DtWeb.PartitionSensor, as: PartitionSensorModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.PartitionSensor, as: PartitionSensorModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do

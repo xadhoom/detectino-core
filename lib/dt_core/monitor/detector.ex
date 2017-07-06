@@ -8,7 +8,7 @@ defmodule DtCore.Monitor.Detector do
 
   require Logger
 
-  alias DtWeb.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
 
   alias DtCore.Event
   alias DtCore.EventBridge

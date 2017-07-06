@@ -1,6 +1,6 @@
 defmodule DtWeb.PartitionScenarioController do
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtWeb.PartitionScenario]
+  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtCtx.Monitoring.PartitionScenario]
 
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader

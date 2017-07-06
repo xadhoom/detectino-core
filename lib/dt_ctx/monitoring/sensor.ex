@@ -1,4 +1,4 @@
-defmodule DtWeb.Sensor do
+defmodule DtCtx.Monitoring.Sensor do
   use DtWeb.Web, :model
 
   # @derive {Poison.Encoder, only: [:id, :address, :port, :name, :enabled]}
@@ -20,8 +20,8 @@ defmodule DtWeb.Sensor do
 
     timestamps()
 
-    many_to_many :partitions, DtWeb.Partition,
-      join_through: DtWeb.PartitionSensor, on_replace: :delete
+    many_to_many :partitions, DtCtx.Monitoring.Partition,
+      join_through: DtCtx.Monitoring.PartitionSensor, on_replace: :delete
   end
 
   @required_fields ~w(name address port)

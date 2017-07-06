@@ -2,7 +2,7 @@ defmodule DtWeb.PartitionControllerTest do
   use DtWeb.ConnCase
 
   alias DtCore.Monitor.Partition, as: PartitionProcess
-  alias DtWeb.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtWeb.ControllerHelperTest, as: Helper
   alias DtCore.Test.TimerHelper
 

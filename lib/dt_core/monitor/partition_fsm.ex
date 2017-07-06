@@ -9,7 +9,7 @@ defmodule DtCore.Monitor.PartitionFsm do
   alias DtCore.DetectorEv
   alias DtCore.PartitionEv
   alias DtCore.Monitor.Detector
-  alias DtWeb.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
 
   require Logger
 

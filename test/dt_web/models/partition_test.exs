@@ -1,7 +1,7 @@
 defmodule DtWeb.PartitionTest do
   use DtWeb.ModelCase
 
-  alias DtWeb.Partition
+  alias DtCtx.Monitoring.Partition
 
   @valid_attrs %{entry_delay: 42, exit_delay: 42, name: "some content"}
   @invalid_attrs %{}

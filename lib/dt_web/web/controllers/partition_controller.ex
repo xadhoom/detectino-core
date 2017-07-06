@@ -1,11 +1,11 @@
 defmodule DtWeb.PartitionController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, [
-    repo: DtWeb.Repo, model: DtWeb.Partition, orderby: [:name]
+    repo: DtWeb.Repo, model: DtCtx.Monitoring.Partition, orderby: [:name]
   ]
 
   alias DtWeb.StatusCodes
-  alias DtWeb.Partition
+  alias DtCtx.Monitoring.Partition
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize

@@ -11,8 +11,8 @@ defmodule DtCore.Test.Monitor.Partition do
   alias DtCore.EventBridge
   alias DtCore.Monitor.Detector
   alias DtCore.Monitor.Partition
-  alias DtWeb.Sensor, as: SensorModel
-  alias DtWeb.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtCore.Test.TimerHelper
 
   setup_all do

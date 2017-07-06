@@ -1,7 +1,7 @@
 defmodule DtWeb.PartitionScenarioTest do
   use DtWeb.ModelCase
 
-  alias DtWeb.PartitionScenario, as: Mut
+  alias DtCtx.Monitoring.PartitionScenario, as: Mut
 
   @valid_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE", "DISARM", "NONE"]
   @some_invalid_modes ["42", "STAY", "WHATEVER", 1, "EOF"]

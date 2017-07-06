@@ -5,8 +5,8 @@ defmodule DtWeb.Associations.ScenarioTest do
 
   use DtWeb.ConnCase
 
-  alias DtWeb.Partition
-  alias DtWeb.Scenario
+  alias DtCtx.Monitoring.Partition
+  alias DtCtx.Monitoring.Scenario
 
   test "scenarios association" do
     scene = Repo.insert!(%Scenario{})

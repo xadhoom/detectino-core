@@ -1,4 +1,4 @@
-defmodule DtWeb.PartitionScenario do
+defmodule DtCtx.Monitoring.PartitionScenario do
   use DtWeb.Web, :model
 
   @derive {Poison.Encoder, only: [:id, :mode, :partition_id, :scenario_id]}

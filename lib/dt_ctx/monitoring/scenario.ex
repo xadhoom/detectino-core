@@ -1,4 +1,4 @@
-defmodule DtWeb.Scenario do
+defmodule DtCtx.Monitoring.Scenario do
   use DtWeb.Web, :model
 
   @derive {Poison.Encoder, only: [:id, :name, :enabled]}
@@ -9,9 +9,9 @@ defmodule DtWeb.Scenario do
 
     timestamps()
 
-    has_many :partitions_scenarios, DtWeb.PartitionScenario
+    has_many :partitions_scenarios, DtCtx.Monitoring.PartitionScenario
     many_to_many :partitions,
-      DtWeb.Partition, join_through: DtWeb.PartitionScenario
+      DtCtx.Monitoring.Partition, join_through: DtCtx.Monitoring.PartitionScenario
   end
 
   @required_fields ~w(name enabled)

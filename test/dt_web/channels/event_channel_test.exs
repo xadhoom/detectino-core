@@ -6,8 +6,8 @@ defmodule DtWeb.EventChannelTest do
   alias DtCore.Monitor.Partition
   alias DtCore.Monitor.Controller
   alias DtCore.EventBridge
-  alias DtWeb.Sensor, as: SensorModel
-  alias DtWeb.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtCore.Test.TimerHelper
 
   setup_all do

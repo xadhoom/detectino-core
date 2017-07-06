@@ -1,16 +1,16 @@
 defmodule DtWeb.ScenarioController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, [
-    repo: DtWeb.Repo, model: DtWeb.Scenario, orderby: [:name]
+    repo: DtWeb.Repo, model: DtCtx.Monitoring.Scenario, orderby: [:name]
   ]
 
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
   alias DtWeb.StatusCodes
-  alias DtWeb.Scenario
+  alias DtCtx.Monitoring.Scenario
   alias DtCtx.Accounts.User
-  alias DtWeb.Partition
+  alias DtCtx.Monitoring.Partition
   alias DtCore.Monitor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
 

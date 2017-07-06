@@ -6,7 +6,7 @@ defmodule DtCore.Monitor.DetectorFsm do
 
   require Logger
 
-  alias DtWeb.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
 
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv

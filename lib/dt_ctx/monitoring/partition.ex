@@ -1,4 +1,4 @@
-defmodule DtWeb.Partition do
+defmodule DtCtx.Monitoring.Partition do
   use DtWeb.Web, :model
 
   @derive {Poison.Encoder, only: [
@@ -13,9 +13,9 @@ defmodule DtWeb.Partition do
     timestamps()
 
     many_to_many :sensors,
-      DtWeb.Sensor, join_through: DtWeb.PartitionSensor
+      DtCtx.Monitoring.Sensor, join_through: DtCtx.Monitoring.PartitionSensor
     many_to_many :scenarios,
-      DtWeb.Scenario, join_through: DtWeb.PartitionScenario
+      DtCtx.Monitoring.Scenario, join_through: DtCtx.Monitoring.PartitionScenario
   end
 
   @required_fields ~w(name entry_delay exit_delay)

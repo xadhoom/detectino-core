@@ -1,4 +1,4 @@
-defmodule DtWeb.PartitionSensor do
+defmodule DtCtx.Monitoring.PartitionSensor do
   use DtWeb.Web, :model
 
   schema "partitions_sensors" do

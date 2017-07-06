@@ -5,9 +5,9 @@ defmodule DtWeb.Associations.PartitionTest do
 
   use DtWeb.ConnCase
 
-  alias DtWeb.Partition
-  alias DtWeb.Sensor
-  alias DtWeb.Scenario
+  alias DtCtx.Monitoring.Partition
+  alias DtCtx.Monitoring.Sensor
+  alias DtCtx.Monitoring.Scenario
 
   test "sensors association" do
     part = Repo.insert!(%Partition{})

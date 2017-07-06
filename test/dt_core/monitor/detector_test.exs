@@ -7,7 +7,7 @@ defmodule DtCore.Test.Monitor.Detector do
   alias DtCore.DetectorEntryEv
   alias DtCore.Monitor.Detector
 
-  alias DtWeb.Sensor, as: SensorModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
 
   test "idle events does not trigger any event if not armed" do
     {:ok, config, pid} = setup_nc()
