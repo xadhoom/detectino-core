@@ -3,7 +3,7 @@ defmodule DtWeb.EventLogController do
   Controller for manipulating event logs.
   """
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtCtx.Outputs.EventLog]
+  use DtWeb.CrudMacros, [repo: DtCtx.Repo, model: DtCtx.Outputs.EventLog]
 
   alias DtWeb.SessionController
   alias DtCtx.Outputs.EventLog

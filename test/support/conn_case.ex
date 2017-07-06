@@ -20,7 +20,7 @@ defmodule DtWeb.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      alias DtWeb.Repo
+      alias DtCtx.Repo
       import Ecto.Schema
       import Ecto.Query, only: [from: 2, first: 1]
 
@@ -33,8 +33,8 @@ defmodule DtWeb.ConnCase do
 
   setup tags do
     unless tags[:async] do
-      :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtWeb.Repo)
-      Ecto.Adapters.SQL.Sandbox.mode(DtWeb.Repo, {:shared, self()})
+      :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtCtx.Repo)
+      Ecto.Adapters.SQL.Sandbox.mode(DtCtx.Repo, {:shared, self()})
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}

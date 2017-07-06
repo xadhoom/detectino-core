@@ -17,7 +17,7 @@ defmodule Detectino do
       # Start the endpoint when the application starts
       supervisor(Endpoint, []),
       # Start the Ecto repository
-      supervisor(DtWeb.Repo, []),
+      supervisor(DtCtx.Repo, []),
       supervisor(DtBus.CanSup, []),
       supervisor(Registry,
         [:duplicate, ReloadRegistry.registry,
@@ -50,10 +50,10 @@ defmodule Detectino do
     case Application.get_env(:detectino, :environment) do
       :prod ->
         Logger.info "Running database migrations..."
-        {:ok, pid} = DtWeb.Repo.start_link()
-        Ecto.Migrator.run(DtWeb.Repo, path, :up, [{:all, true}, {:log, :debug}])
+        {:ok, pid} = DtCtx.Repo.start_link()
+        Ecto.Migrator.run(DtCtx.Repo, path, :up, [{:all, true}, {:log, :debug}])
         Process.unlink(pid)
-        :ok = DtWeb.Repo.stop(pid)
+        :ok = DtCtx.Repo.stop(pid)
       v ->
         Logger.info "Not production (#{inspect v}, disabling auto database migration"
     end

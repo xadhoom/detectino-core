@@ -1,7 +1,7 @@
 defmodule DtWeb.ScenarioController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, [
-    repo: DtWeb.Repo, model: DtCtx.Monitoring.Scenario, orderby: [:name]
+    repo: DtCtx.Repo, model: DtCtx.Monitoring.Scenario, orderby: [:name]
   ]
 
   alias DtWeb.SessionController

@@ -1,6 +1,6 @@
 defmodule DtWeb.UserController do
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtCtx.Accounts.User]
+  use DtWeb.CrudMacros, [repo: DtCtx.Repo, model: DtCtx.Accounts.User]
 
   alias DtWeb.SessionController
   alias DtWeb.StatusCodes

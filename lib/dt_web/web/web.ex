@@ -20,7 +20,7 @@ defmodule DtWeb.Web do
     quote do
       use Phoenix.Controller
 
-      alias DtWeb.Repo
+      alias DtCtx.Repo
       import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
 
@@ -59,7 +59,7 @@ defmodule DtWeb.Web do
     quote do
       use Phoenix.Channel
 
-      alias DtWeb.Repo
+      alias DtCtx.Repo
       import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
       import DtWeb.Gettext

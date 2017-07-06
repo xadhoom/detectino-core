@@ -2,7 +2,7 @@ defmodule DtWeb.Plugs.PinAuthorize do
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 
-  alias DtWeb.Repo
+  alias DtCtx.Repo
   alias DtCtx.Accounts.User
   alias DtWeb.StatusCodes
 

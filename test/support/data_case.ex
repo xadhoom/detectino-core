@@ -16,7 +16,7 @@ defmodule DtCtx.DataCase do
 
   using do
     quote do
-      alias DtWeb.Repo
+      alias DtCtx.Repo
 
       import Ecto
       import Ecto.Changeset
@@ -26,10 +26,10 @@ defmodule DtCtx.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtWeb.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtCtx.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(DtWeb.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(DtCtx.Repo, {:shared, self()})
     end
 
     :ok

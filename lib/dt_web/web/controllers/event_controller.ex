@@ -5,7 +5,7 @@ defmodule DtWeb.EventController do
   XXX: check if some funs can be merged with sensor_controller
   """
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtCtx.Outputs.Event]
+  use DtWeb.CrudMacros, [repo: DtCtx.Repo, model: DtCtx.Outputs.Event]
 
   alias DtWeb.SessionController
   alias DtCtx.Outputs.Event

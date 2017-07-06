@@ -1,6 +1,6 @@
 defmodule DtWeb.PartitionSensorController do
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros, [repo: DtWeb.Repo, model: DtCtx.Monitoring.Partition]
+  use DtWeb.CrudMacros, [repo: DtCtx.Repo, model: DtCtx.Monitoring.Partition]
 
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader

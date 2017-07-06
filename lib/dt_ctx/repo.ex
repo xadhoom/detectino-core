@@ -1,3 +1,3 @@
-defmodule DtWeb.Repo do
+defmodule DtCtx.Repo do
   use Ecto.Repo, otp_app: :detectino
 end

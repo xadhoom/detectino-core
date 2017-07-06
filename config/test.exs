@@ -11,7 +11,7 @@ config :detectino, DtWeb.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :detectino, DtWeb.Repo,
+config :detectino, DtCtx.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",

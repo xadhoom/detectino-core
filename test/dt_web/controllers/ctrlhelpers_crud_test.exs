@@ -1,7 +1,7 @@
 defmodule DtWeb.CtrlHelpers.CrudTest do
   use DtWeb.ConnCase
 
-  alias DtWeb.Repo
+  alias DtCtx.Repo
   alias DtCtx.Accounts.User
   alias DtWeb.CtrlHelpers.Crud
 

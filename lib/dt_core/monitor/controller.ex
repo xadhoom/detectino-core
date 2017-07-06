@@ -21,7 +21,7 @@ defmodule DtCore.Monitor.Controller do
   alias DtCore.Monitor.Partition
   alias DtCore.Monitor.Detector
 
-  alias DtWeb.Repo
+  alias DtCtx.Repo
   alias DtCtx.Monitoring.Sensor, as: SensorModel
   alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtWeb.ReloadRegistry

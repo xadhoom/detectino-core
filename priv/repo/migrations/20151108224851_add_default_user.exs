@@ -1,4 +1,4 @@
-defmodule DtWeb.Repo.Migrations.AddDefaultUser do
+defmodule DtCtx.Repo.Migrations.AddDefaultUser do
   use Ecto.Migration
 
   def up do

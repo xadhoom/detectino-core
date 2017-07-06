@@ -20,7 +20,7 @@ defmodule DtWeb.ChannelCase do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
 
-      alias DtWeb.Repo
+      alias DtCtx.Repo
       import Ecto.Schema
       import Ecto.Query, only: [from: 2]
 
@@ -32,8 +32,8 @@ defmodule DtWeb.ChannelCase do
 
   setup tags do
     unless tags[:async] do
-      :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtWeb.Repo)
-      Ecto.Adapters.SQL.Sandbox.mode(DtWeb.Repo, {:shared, self()})
+      :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtCtx.Repo)
+      Ecto.Adapters.SQL.Sandbox.mode(DtCtx.Repo, {:shared, self()})
     end
 
     :ok

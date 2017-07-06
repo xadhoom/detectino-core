@@ -1,4 +1,4 @@
-defmodule DtWeb.Repo.Migrations.CreateEventlogs do
+defmodule DtCtx.Repo.Migrations.CreateEventlogs do
   use Ecto.Migration
 
   def change do

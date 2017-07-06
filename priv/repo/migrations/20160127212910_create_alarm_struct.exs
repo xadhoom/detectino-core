@@ -1,4 +1,4 @@
-defmodule DtWeb.Repo.Migrations.CreateAlarmStruct do
+defmodule DtCtx.Repo.Migrations.CreateAlarmStruct do
   use Ecto.Migration
 
   def change do

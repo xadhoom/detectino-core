@@ -1,7 +1,7 @@
 defmodule DtWeb.PartitionController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, [
-    repo: DtWeb.Repo, model: DtCtx.Monitoring.Partition, orderby: [:name]
+    repo: DtCtx.Repo, model: DtCtx.Monitoring.Partition, orderby: [:name]
   ]
 
   alias DtWeb.StatusCodes

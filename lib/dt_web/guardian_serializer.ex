@@ -1,7 +1,7 @@
 defmodule DtWeb.GuardianSerializer do
   @behaviour Guardian.Serializer
 
-  alias DtWeb.Repo
+  alias DtCtx.Repo
   alias DtCtx.Accounts.User
 
   def for_token(user = %User{}), do: {:ok, "User:#{user.id}"}

@@ -10,7 +10,7 @@ defmodule DtCore.EctoCase do
 
   using do
     quote do
-      alias DtWeb.Repo
+      alias DtCtx.Repo
       import Ecto.Schema
       import Ecto.Query, only: [from: 2]
     end
@@ -18,8 +18,8 @@ defmodule DtCore.EctoCase do
 
   setup tags do
     unless tags[:async] do
-      :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtWeb.Repo)
-      Ecto.Adapters.SQL.Sandbox.mode(DtWeb.Repo, {:shared, self()})
+      :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtCtx.Repo)
+      Ecto.Adapters.SQL.Sandbox.mode(DtCtx.Repo, {:shared, self()})
     end
 
     :ok

@@ -324,53 +324,53 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: false,
       to: "detectino.Elixir.DtWeb.Endpoint.secret_key_base"
     ],
-    "detectino.Elixir.DtWeb.Repo.adapter": [
+    "detectino.Elixir.DtCtx.Repo.adapter": [
       commented: false,
       datatype: :atom,
       default: Ecto.Adapters.Postgres,
-      doc: "Provide documentation for detectino.Elixir.DtWeb.Repo.adapter here.",
+      doc: "Provide documentation for detectino.Elixir.DtCtx.Repo.adapter here.",
       hidden: true,
-      to: "detectino.Elixir.DtWeb.Repo.adapter"
+      to: "detectino.Elixir.DtCtx.Repo.adapter"
     ],
-    "detectino.Elixir.DtWeb.Repo.username": [
+    "detectino.Elixir.DtCtx.Repo.username": [
       commented: false,
       datatype: :binary,
       default: "postgres",
-      doc: "Provide documentation for detectino.Elixir.DtWeb.Repo.username here.",
+      doc: "Provide documentation for detectino.Elixir.DtCtx.Repo.username here.",
       hidden: false,
-      to: "detectino.Elixir.DtWeb.Repo.username"
+      to: "detectino.Elixir.DtCtx.Repo.username"
     ],
-    "detectino.Elixir.DtWeb.Repo.password": [
+    "detectino.Elixir.DtCtx.Repo.password": [
       commented: false,
       datatype: :binary,
       default: "postgres",
-      doc: "Provide documentation for detectino.Elixir.DtWeb.Repo.password here.",
+      doc: "Provide documentation for detectino.Elixir.DtCtx.Repo.password here.",
       hidden: false,
-      to: "detectino.Elixir.DtWeb.Repo.password"
+      to: "detectino.Elixir.DtCtx.Repo.password"
     ],
-    "detectino.Elixir.DtWeb.Repo.database": [
+    "detectino.Elixir.DtCtx.Repo.database": [
       commented: false,
       datatype: :binary,
       default: "dt_web_prod",
-      doc: "Provide documentation for detectino.Elixir.DtWeb.Repo.database here.",
+      doc: "Provide documentation for detectino.Elixir.DtCtx.Repo.database here.",
       hidden: false,
-      to: "detectino.Elixir.DtWeb.Repo.database"
+      to: "detectino.Elixir.DtCtx.Repo.database"
     ],
-    "detectino.Elixir.DtWeb.Repo.pool_size": [
+    "detectino.Elixir.DtCtx.Repo.pool_size": [
       commented: false,
       datatype: :integer,
       default: 20,
-      doc: "Provide documentation for detectino.Elixir.DtWeb.Repo.pool_size here.",
+      doc: "Provide documentation for detectino.Elixir.DtCtx.Repo.pool_size here.",
       hidden: false,
-      to: "detectino.Elixir.DtWeb.Repo.pool_size"
+      to: "detectino.Elixir.DtCtx.Repo.pool_size"
     ],
-    "detectino.Elixir.DtWeb.Repo.hostname": [
+    "detectino.Elixir.DtCtx.Repo.hostname": [
       commented: false,
       datatype: :binary,
       default: "localhost",
-      doc: "Provide documentation for detectino.Elixir.DtWeb.Repo.hostname here.",
+      doc: "Provide documentation for detectino.Elixir.DtCtx.Repo.hostname here.",
       hidden: false,
-      to: "detectino.Elixir.DtWeb.Repo.hostname"
+      to: "detectino.Elixir.DtCtx.Repo.hostname"
     ]
   ],
   transforms: [

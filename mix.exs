@@ -85,9 +85,9 @@ defmodule Detectino.Mixfile do
   defp aliases do
     ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
-     "ecto.migrate": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo"],
+     "ecto.migrate": ["ecto.create -r DtCtx.Repo", "ecto.migrate -r DtCtx.Repo"],
      "phoenix.routes": ["phoenix.routes DtWeb.Router"],
-     "test": ["ecto.create -r DtWeb.Repo", "ecto.migrate -r DtWeb.Repo", "test"]]
+     "test": ["ecto.create -r DtCtx.Repo", "ecto.migrate -r DtCtx.Repo", "test"]]
   end
 
 end
