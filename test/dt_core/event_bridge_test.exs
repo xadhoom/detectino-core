@@ -5,7 +5,7 @@ defmodule DtCore.Test.EventBridgeTest do
   alias DtCore.Test.TimerHelper
 
   setup_all do
-    TimerHelper.wait_until 5000, fn ->
+    TimerHelper.wait_until 5000, MatchError, fn ->
       {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
       {:ok, _pid} = EventBridge.start_link()
     end
