@@ -1,5 +1,6 @@
 defmodule DtCtx.Monitoring.Partition do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   @derive {Poison.Encoder, only: [
     :id, :name, :entry_delay, :exit_delay, :armed

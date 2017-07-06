@@ -1,5 +1,6 @@
 defmodule DtCtx.Outputs.BusSettings do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   embedded_schema do
     field :address, :string

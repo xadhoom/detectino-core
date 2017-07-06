@@ -11,7 +11,8 @@ defmodule DtCtx.Outputs.Event.SensorEvConf do
 end
 
 defmodule DtCtx.Outputs.Event do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   alias DtCtx.Outputs.Event.SensorEvConf
   alias DtCtx.Outputs.Event.PartitionEvConf

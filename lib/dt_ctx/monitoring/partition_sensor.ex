@@ -1,5 +1,6 @@
 defmodule DtCtx.Monitoring.PartitionSensor do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "partitions_sensors" do
     belongs_to :partition, Partition

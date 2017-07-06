@@ -1,5 +1,6 @@
 defmodule DtCtx.Outputs.EventOutput do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "events_outputs" do
     belongs_to :event, Event

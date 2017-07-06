@@ -1,5 +1,6 @@
 defmodule DtCtx.Outputs.Output do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   @derive {Poison.Encoder, only: [
     :id, :name, :type, :enabled, :bus_settings, :email_settings

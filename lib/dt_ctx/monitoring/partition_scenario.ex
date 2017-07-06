@@ -1,5 +1,6 @@
 defmodule DtCtx.Monitoring.PartitionScenario do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   @derive {Poison.Encoder, only: [:id, :mode, :partition_id, :scenario_id]}
 

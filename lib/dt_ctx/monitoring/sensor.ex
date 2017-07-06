@@ -1,5 +1,6 @@
 defmodule DtCtx.Monitoring.Sensor do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   # @derive {Poison.Encoder, only: [:id, :address, :port, :name, :enabled]}
   schema "sensors" do

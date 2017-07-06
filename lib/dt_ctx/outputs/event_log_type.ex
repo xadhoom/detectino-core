@@ -32,7 +32,8 @@ defmodule DtCtx.Outputs.EventLogType do
 end
 
 defmodule DtWeb.EventLog do
-  use DtWeb.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "eventlogs" do
     field :type, :string
