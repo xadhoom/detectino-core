@@ -1,5 +1,5 @@
 defmodule DtCore.Test.Output.Worker do
-  use DtCore.EctoCase
+  use DtCtx.DataCase
 
   alias DtCore.Monitor.Sup
   alias DtCtx.Outputs.Output, as: OutputModel

@@ -1,5 +1,5 @@
 defmodule DtCore.Test.Output.Server do
-  use DtCore.EctoCase
+  use DtCtx.DataCase
 
   alias DtCore.Output.Sup
   alias DtCore.Output.Server

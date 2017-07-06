@@ -1,5 +1,5 @@
 defmodule DtCore.Test.EventLoggerTest do
-  use DtCore.EctoCase
+  use DtCtx.DataCase
 
   alias DtCore.EventBridge
   alias DtCore.EventLogger
