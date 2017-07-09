@@ -162,6 +162,11 @@ defmodule DtCore.Monitor.Detector do
   end
 
   @spec handle_info({:event, %Event{}}, detector_state) :: {:noreply, detector_state}
+  def handle_info({:event, ev = %Event{}}, state = %{config: %{enabled: false}}) do
+    Logger.debug fn() -> "Ignoring event #{inspect ev} because I'm disabled" end
+    {:noreply, state}
+  end
+
   def handle_info({:event, ev = %Event{}}, state) do
     case process_event(ev, state) do
       :not_me -> nil
