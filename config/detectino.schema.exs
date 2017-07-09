@@ -375,7 +375,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
   ],
   transforms: [
     "guardian.Elixir.Guardian.ttl": fn(conf) ->
-      v = Conform.Conf.get(conf, "guardian.Elixir.Guardian.ttl")
+      [{k, v}] = Conform.Conf.get(conf, "guardian.Elixir.Guardian.ttl")
       {v, :seconds}
     end
   ],
