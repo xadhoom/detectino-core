@@ -37,7 +37,7 @@ defmodule DtBus.CanHelper do
                     6 => :read_t6,
                     7 => :read_t7,
                     8 => :read_t8,
-                    8 => :read_t9,
+                    9 => :read_t9,
                     10 => :read_t10,
                     11 => :read_t11,
                     12 => :read_t12,
