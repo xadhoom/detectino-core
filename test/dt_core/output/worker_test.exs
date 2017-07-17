@@ -351,16 +351,14 @@ defmodule DtCore.Test.Output.Worker do
 
   defp get_subject(which) when is_atom(which) do
     :detectino
-    |> Application.get_env(EmailConfig)
-    |> Keyword.get(:alarm_subjects)
-    |> Map.get(which)
+    |> Application.get_env(EmailConfig.Alarm)
+    |> Keyword.get(which)
   end
 
   defp get_delayed_subject(which) when is_atom(which) do
     :detectino
-    |> Application.get_env(EmailConfig)
-    |> Keyword.get(:delayed_alarm_subjects)
-    |> Map.get(which)
+    |> Application.get_env(EmailConfig.DelayedAlarm)
+    |> Keyword.get(which)
   end
 
 end

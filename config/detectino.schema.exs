@@ -209,19 +209,69 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "phoenix.serve_endpoints"
     ],
-    "detectino.Elixir.DtCore.Output.Actions.Email.alarm_subjects": [
+    "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_start": [
       commented: false,
       datatype: :binary,
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.alarm_subjects here.",
+      default: "Sensor Alarm started",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_start here.",
       hidden: false,
-      to: "detectino.Elixir.DtCore.Output.Actions.Email.alarm_subjects"
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_start"
     ],
-    "detectino.Elixir.DtCore.Output.Actions.Email.delayed_alarm_subjects": [
+    "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_start": [
       commented: false,
       datatype: :binary,
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.delayed_alarm_subjects here.",
+      default: "Partition Alarm started",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_start here.",
       hidden: false,
-      to: "detectino.Elixir.DtCore.Output.Actions.Email.delayed_alarm_subjects"
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_start"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_end": [
+      commented: false,
+      datatype: :binary,
+      default: "Sensor Alarm recovered",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_end here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_end"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end": [
+      commented: false,
+      datatype: :binary,
+      default: "Partition Alarm recovered",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_start": [
+      commented: false,
+      datatype: :binary,
+      default: "Delayed Sensor Alarm started",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_start here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_start"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_start": [
+      commented: false,
+      datatype: :binary,
+      default: "Delayed Partition Alarm started",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_start here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_start"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_end": [
+      commented: false,
+      datatype: :binary,
+      default: "Delayed Sensor Alarm end",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_end here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_end"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end": [
+      commented: false,
+      datatype: :binary,
+      default: "Delayed Partition Alarm end",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end"
     ],
     "detectino.environment": [
       commented: false,
