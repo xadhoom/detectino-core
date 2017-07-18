@@ -1,6 +1,7 @@
 defmodule DtCore.Test.Output.Worker do
   use DtCtx.DataCase
 
+  alias DtBus.ActionRegistry
   alias DtCore.Monitor.Sup
   alias DtCtx.Outputs.Output, as: OutputModel
   alias DtCtx.Outputs.Event, as: EventModel
@@ -19,7 +20,7 @@ defmodule DtCore.Test.Output.Worker do
     {:ok, _} = Registry.start_link(:duplicate, OutputsRegistry.registry)
     :meck.new(Etimer, [:passthrough])
     :meck.expect(Etimer, :start_timer,
-      fn(_ ,_ ,_ ,_ ) ->
+      fn(_, _, _ , _) ->
         0
       end)
     :ok
@@ -170,7 +171,7 @@ defmodule DtCore.Test.Output.Worker do
     {:ok, pid} = Worker.start_link({output})
     assert :meck.called(Etimer, :start_link, :_)
 
-    DtBus.ActionRegistry.registry
+    ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
 
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5}}
@@ -185,7 +186,7 @@ defmodule DtCore.Test.Output.Worker do
     TimerHelper.wait_until fn ->
       assert :meck.called(
         Etimer, :start_timer,
-        [:_, :_, 30000, {Worker, :timer_expiry, [:mono_expiry, output]}])
+        [:_, :_, 30_000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
     # a stop event should do nothing
@@ -227,7 +228,7 @@ defmodule DtCore.Test.Output.Worker do
     {:ok, pid} = Worker.start_link({output})
     assert :meck.called(Etimer, :start_link, :_)
 
-    DtBus.ActionRegistry.registry
+    ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
 
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5}}
@@ -242,7 +243,7 @@ defmodule DtCore.Test.Output.Worker do
     TimerHelper.wait_until fn ->
       assert :meck.called(
         Etimer, :start_timer,
-        [:_, :_, 30000, {Worker, :timer_expiry, [:mono_expiry, output]}])
+        [:_, :_, 30_000, {Worker, :timer_expiry, [:mono_expiry, output]}])
     end
 
     Worker.timer_expiry({:mono_expiry, output})
@@ -256,7 +257,7 @@ defmodule DtCore.Test.Output.Worker do
     TimerHelper.wait_until fn ->
       assert :meck.called(
         Etimer, :start_timer,
-        [:_, :_, 120000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
+        [:_, :_, 120_000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
     end
 
     # now another event should not run because we're in offtime
@@ -297,7 +298,7 @@ defmodule DtCore.Test.Output.Worker do
     {:ok, pid} = Worker.start_link({output})
     assert :meck.called(Etimer, :start_link, :_)
 
-    DtBus.ActionRegistry.registry
+    ActionRegistry.registry
     |> Registry.register(:bus_commands, [])
 
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5}}
@@ -324,7 +325,7 @@ defmodule DtCore.Test.Output.Worker do
     TimerHelper.wait_until fn ->
       refute :meck.called(
         Etimer, :start_timer,
-        [:_, :_, 120000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
+        [:_, :_, 120_000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
     end
 
     ev = {:stop, %DetectorEv{type: :alarm, address: "10", port: 5}}

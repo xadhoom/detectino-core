@@ -106,7 +106,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     "guardian.Elixir.Guardian.ttl": [
       commented: false,
       datatype: :integer,
-      default: 86400,
+      default: 86_400,
       doc: "Provide documentation for guardian.Elixir.Guardian.ttl here.",
       hidden: false,
       to: "guardian.Elixir.Guardian.ttl"
