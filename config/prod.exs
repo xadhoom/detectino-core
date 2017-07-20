@@ -61,7 +61,7 @@ config :phoenix, :serve_endpoints, true
 #
 
 config :detectino, DtCore.Output.Actions.Email.Mailer,
-  adapter: Swoosh.Adapters.STMP,
+  adapter: Swoosh.Adapters.SMTP,
   relay: "localhost"
 
 config :detectino, :can_interface, "can0"
