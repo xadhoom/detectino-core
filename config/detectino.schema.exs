@@ -284,7 +284,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     "detectino.Elixir.DtCore.Output.Actions.Email.Mailer.adapter": [
       commented: false,
       datatype: :atom,
-      default: Swoosh.Adapters.STMP,
+      default: Swoosh.Adapters.SMTP,
       doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Mailer.adapter here.",
       hidden: true,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Mailer.adapter"
