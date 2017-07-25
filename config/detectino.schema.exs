@@ -289,6 +289,14 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Mailer.adapter"
     ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.Mailer.relay": [
+      commented: false,
+      datatype: :binary,
+      default: "localhost",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Mailer.relay here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.Mailer.relay"
+    ],
     "detectino.can_interface": [
       commented: false,
       datatype: :binary,

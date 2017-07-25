@@ -27,7 +27,7 @@ defmodule DtCore.Output.Actions.Email do
     |> from(config.from)
     |> subject(subject)
     |> text_body(msg)
-    |> Mailer.deliver
+    |> Mailer.deliver(get_mailer_config())
   end
 
   def trigger(ev, config) do
@@ -39,7 +39,7 @@ defmodule DtCore.Output.Actions.Email do
     |> from(config.from)
     |> subject(subject)
     |> text_body(msg)
-    |> Mailer.deliver
+    |> Mailer.deliver(get_mailer_config())
   end
 
   def custom(email, _ev = %DetectorEntryEv{}) do
@@ -103,6 +103,11 @@ defmodule DtCore.Output.Actions.Email do
     :detectino
     |> Application.get_env(Email.DelayedAlarm)
     |> Keyword.get(which)
+  end
+
+  defp get_mailer_config do
+    :detectino
+    |> Application.get_env(Mailer)
   end
 
 end
