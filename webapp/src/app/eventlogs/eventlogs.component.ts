@@ -41,7 +41,7 @@ export class EventlogsComponent implements OnInit {
     if (!this.pinSrv.getPin()) {
       return;
     }
-    let opts = this.lazyGrid.getSortPage();
+    const opts = this.lazyGrid.getSortPage();
     if (!opts.sort) {
       opts.sort = 'inserted_at';
       opts.direction = 'desc';
