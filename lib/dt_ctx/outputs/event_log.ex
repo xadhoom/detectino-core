@@ -1,4 +1,5 @@
 defmodule DtCtx.Outputs.EventLogType do
+  @moduledoc false
   @behaviour Ecto.Type
 
   alias DtCore.ArmEv
