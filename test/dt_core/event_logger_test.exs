@@ -30,7 +30,7 @@ defmodule DtCore.Test.EventLoggerTest do
     assert log.type == "arm"
     assert log.acked == false
     assert log.operation == "start"
-    assert log.details["partial"] == false
+    assert log.details["ev"]["partial"] == false
   end
 
   test "receives and saves a stop arm event" do
@@ -50,7 +50,7 @@ defmodule DtCore.Test.EventLoggerTest do
     assert log.type == "alarm"
     assert log.acked == false
     assert log.operation == "start"
-    assert log.details["type"] == "short"
+    assert log.details["ev"]["type"] == "short"
   end
 
   test "receives and saves a stop alarm event from a sensor" do
@@ -71,7 +71,7 @@ defmodule DtCore.Test.EventLoggerTest do
     assert log.type == "alarm"
     assert log.acked == false
     assert log.operation == "start"
-    assert log.details["type"] == "short"
+    assert log.details["ev"]["type"] == "short"
   end
 
   test "receives and saves a stop alarm event from a partition" do
@@ -91,7 +91,7 @@ defmodule DtCore.Test.EventLoggerTest do
 
     assert log.type == "exit_timer"
     assert log.operation == "stop"
-    assert log.details["name"] == "42"
+    assert log.details["ev"]["name"] == "42"
   end
 
   test "receives and saves a stop event from exit timer" do
