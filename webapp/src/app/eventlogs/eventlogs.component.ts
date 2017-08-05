@@ -112,9 +112,9 @@ export class EventlogsComponent implements OnInit {
 
   private getDetails(eventlog: Eventlog): Iterable<Object> {
     const res = [];
-    for (const detail in eventlog.details) {
-      if (eventlog.details.hasOwnProperty(detail)) {
-        res.push({ detail: detail, value: eventlog.details[detail] });
+    for (const detail in eventlog.details.ev) {
+      if (eventlog.details.ev.hasOwnProperty(detail)) {
+        res.push({ detail: detail, value: eventlog.details.ev[detail] });
       }
     }
     return res;
