@@ -22,13 +22,19 @@ defmodule DtCtx.Outputs.EventLogType do
   def load({:ok, json}), do: {:ok, json}
   def load(value), do: load(Poison.decode(value))
 
-  def dump(ev = %ArmEv{}), do: Poison.encode(ev)
-  def dump(ev = %DetectorEv{}), do: Poison.encode(ev)
-  def dump(ev = %DetectorEntryEv{}), do: Poison.encode(ev)
-  def dump(ev = %DetectorExitEv{}), do: Poison.encode(ev)
-  def dump(ev = %PartitionEv{}), do: Poison.encode(ev)
-  def dump(ev = %ExitTimerEv{}), do: Poison.encode(ev)
+  def dump(ev = %ArmEv{}), do: encode(ev, :arm)
+  def dump(ev = %DetectorEv{}), do: encode(ev, :detector)
+  def dump(ev = %DetectorEntryEv{}), do: encode(ev, :detector_entry)
+  def dump(ev = %DetectorExitEv{}), do: encode(ev, :detector_exit)
+  def dump(ev = %PartitionEv{}), do: encode(ev, :partition)
+  def dump(ev = %ExitTimerEv{}), do: encode(ev, :exit_timer)
   def dump(_), do: :error
+
+  defp encode(ev, source) when is_atom(source) do
+    %{"source" => Atom.to_string(source),
+      "ev" => ev}
+    |> Poison.encode
+  end
 
 end
 
