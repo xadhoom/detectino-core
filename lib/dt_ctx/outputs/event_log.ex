@@ -46,6 +46,7 @@ defmodule DtCtx.Outputs.EventLog do
     field :type, :string
     field :acked, :boolean
     field :operation, :string
+    field :correlation_id, :string
     field :details, DtCtx.Outputs.EventLogType
 
     timestamps()

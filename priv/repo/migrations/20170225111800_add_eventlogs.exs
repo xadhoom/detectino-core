@@ -8,6 +8,7 @@ defmodule DtCtx.Repo.Migrations.CreateEventlogs do
       add :type, :string
       add :acked, :boolean, default: false
       add :operation, :string
+      add :correlation_id, :string
       add :details, :map
 
       timestamps()
@@ -21,6 +22,7 @@ defmodule DtCtx.Repo.Migrations.CreateEventlogs do
     execute "CREATE INDEX details_gin_idx ON eventlogs USING gin (details);"
 
     create index(:eventlogs, [:type])
+    create index(:eventlogs, [:correlation_id])
   end
 
 end
