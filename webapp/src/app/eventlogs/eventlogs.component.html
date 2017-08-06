@@ -15,6 +15,7 @@
           [totalRecords]="lazyGrid.getTotalRecords()" [rows]="lazyGrid.getPerPage()" selectionMode="single" [(selection)]="selected"
           (onRowSelect)="onRowSelect($event)" [responsive]="true">
           <header>Event logs</header>
+          <p-column field="details.source" header="Source" [sortable]="false" [filter]="true" filterPlaceholder="Search"></p-column>
           <p-column field="type" header="Type" [sortable]="false" [filter]="true" filterPlaceholder="Search"></p-column>
           <p-column field="acked" header="Acked" [sortable]="false"></p-column>
           <p-column field="operation" header="Operation" [sortable]="false"></p-column>
