@@ -11,6 +11,7 @@ defmodule DtCore.Test.Monitor.Partition do
   alias DtCore.EventBridge
   alias DtCore.Monitor.Detector
   alias DtCore.Monitor.Partition
+  alias DtCore.Monitor.Utils
   alias DtCtx.Monitoring.Sensor, as: SensorModel
   alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtCore.Test.TimerHelper
@@ -638,22 +639,26 @@ defmodule DtCore.Test.Monitor.Partition do
   end
 
   defp send_idle_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :idle, address: "1", port: 1}}
+    ev = {op, %DetectorEv{type: :idle, address: "1", port: 1,
+      id: Utils.random_id()}}
     send pid, ev
   end
 
   defp send_tamper_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :short, address: "1", port: 1}}
+    ev = {op, %DetectorEv{type: :short, address: "1", port: 1,
+      id: Utils.random_id()}}
     send pid, ev
   end
 
   defp send_realtime_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :realtime, address: "1", port: 1}}
+    ev = {op, %DetectorEv{type: :realtime, address: "1", port: 1,
+      id: Utils.random_id()}}
     send pid, ev
   end
 
   defp send_alarm_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :alarm, address: "1", port: 1}}
+    ev = {op, %DetectorEv{type: :alarm, address: "1", port: 1,
+      id: Utils.random_id()}}
     send pid, ev
   end
 

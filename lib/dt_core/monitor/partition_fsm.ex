@@ -9,6 +9,7 @@ defmodule DtCore.Monitor.PartitionFsm do
   alias DtCore.DetectorEv
   alias DtCore.PartitionEv
   alias DtCore.Monitor.Detector
+  alias DtCore.Monitor.Utils
   alias DtCtx.Monitoring.Partition, as: PartitionModel
 
   require Logger
@@ -61,6 +62,7 @@ defmodule DtCore.Monitor.PartitionFsm do
       armed: false,
       config: config,
       receiver: receiver,
+      last_event_id: Utils.random_id(),
       tampered: [],
       alarmed: []}
     }
@@ -89,7 +91,7 @@ defmodule DtCore.Monitor.PartitionFsm do
     pev = build_partition_ev(:tamper, data.config)
     send data.receiver, {:start, pev}
     data = add_tripped(:tampered, dev, data)
-    {:next_state, :tripped, data}
+    {:next_state, :tripped, %{data | last_event_id: pev.id}}
   end
 
   # process realtime event in idle state
@@ -104,7 +106,7 @@ defmodule DtCore.Monitor.PartitionFsm do
     pev = build_partition_ev(:alarm, data.config)
     send data.receiver, {:start, pev}
     data = add_tripped(:alarmed, dev, data)
-    {:next_state, :tripped, data}
+    {:next_state, :tripped, %{data | last_event_id: pev.id}}
   end
 
   # process arm request in idle state
@@ -125,9 +127,10 @@ defmodule DtCore.Monitor.PartitionFsm do
         if mode in [:stay, :normal] do
           arm_sensors(data, mode)
           send data.receiver, {:start, arm_ev}
-          send data.receiver, {:start, %ExitTimerEv{name: data.config.name}}
+          ex_ev = %ExitTimerEv{name: data.config.name, id: Utils.random_id()}
+          send data.receiver, {:start, ex_ev}
           # move to exit_wait state and send back :ok
-          {:next_state, :exit_wait, %{data | armed: true}, [
+          {:next_state, :exit_wait, %{data | armed: true, last_event_id: ex_ev.id}, [
             {:reply, from, :ok},
             {:state_timeout, exit_timeout, :exit_timer_expired}
             ]}
@@ -170,25 +173,30 @@ defmodule DtCore.Monitor.PartitionFsm do
 
   # process timer expire event in exit_wait state
   def handle_event(:state_timeout, :exit_timer_expired, :exit_wait, data) do
-    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name}}
+    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name,
+      id: data.last_event_id}}
     {:next_state, :idle_arm, data}
   end
 
   # process alarm event in exit_wait state
   def handle_event(:cast,  {_ , dev = %DetectorEv{type: :alarm}}, :exit_wait, data) do
-    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name}}
-    send data.receiver, {:start, build_partition_ev(:alarm, data.config)}
+    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name,
+      id: data.last_event_id}}
+    ev = build_partition_ev(:alarm, data.config)
+    send data.receiver, {:start, ev}
     data = add_tripped(:alarmed, dev, data)
-    {:next_state, :tripped, data}
+    {:next_state, :tripped, %{data | last_event_id: ev.id}}
   end
 
   # process tamper event in exit_wait state
   def handle_event(:cast, {_ , dev = %DetectorEv{type: tamper}}, :exit_wait, data)
     when tamper in [:short, :tamper, :fault] do
-    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name}}
-    send data.receiver, {:start, build_partition_ev(:tamper, data.config)}
+    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name,
+      id: data.last_event_id}}
+    ev = build_partition_ev(:tamper, data.config)
+    send data.receiver, {:start, ev}
     data = add_tripped(:tampered, dev, data)
-    {:next_state, :tripped, data}
+    {:next_state, :tripped, %{data | last_event_id: ev.id}}
   end
 
   # process disarm request in exit_wait state
@@ -196,7 +204,8 @@ defmodule DtCore.Monitor.PartitionFsm do
     Enum.each(data.config.sensors, fn(sensor) ->
       :ok = Detector.disarm({sensor})
     end)
-    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name}}
+    send data.receiver, {:stop, %ExitTimerEv{name: data.config.name,
+      id: data.last_event_id}}
     send data.receiver, {:stop, %ArmEv{name: data.config.name}}
     {:next_state, :idle, %{data | armed: false}, {:reply, from, :ok}}
   end
@@ -212,7 +221,8 @@ defmodule DtCore.Monitor.PartitionFsm do
     else
       newdata = drop_tripped(:alarmed, dev, data)
       if Enum.empty?(newdata.alarmed) do
-        send newdata.receiver, {:stop, build_partition_ev(:alarm, newdata.config)}
+        send newdata.receiver, {:stop, build_partition_ev(:alarm, newdata.config,
+          data.last_event_id)}
       end
       newdata
     end
@@ -222,7 +232,8 @@ defmodule DtCore.Monitor.PartitionFsm do
     else
       newdata = drop_tripped(:tampered, dev, data)
       if Enum.empty?(newdata.tampered) do
-        send newdata.receiver, {:stop, build_partition_ev(:tamper, newdata.config)}
+        send newdata.receiver, {:stop, build_partition_ev(:tamper, newdata.config,
+          data.last_event_id)}
       end
       newdata
     end
@@ -243,21 +254,29 @@ defmodule DtCore.Monitor.PartitionFsm do
 
   # process alarm event in tripped state
   def handle_event(:cast, {_ , dev = %DetectorEv{type: :alarm}}, :tripped, data) do
-    if Enum.empty?(data.alarmed) do
-      send data.receiver, {:start, build_partition_ev(:alarm, data.config)}
+    ev_id = if Enum.empty?(data.alarmed) do
+      ev = build_partition_ev(:alarm, data.config)
+      send data.receiver, {:start, ev}
+      ev.id
+    else
+      data.last_event_id
     end
     data = add_tripped(:alarmed, dev, data)
-    {:next_state, :tripped, data}
+    {:next_state, :tripped, %{data | last_event_id: ev_id}}
   end
 
   # process tamper event in tripped state
   def handle_event(:cast, {_ , dev = %DetectorEv{type: tamper}}, :tripped, data)
     when tamper in [:short, :tamper, :fault] do
-    if Enum.empty?(data.tampered) do
-      send data.receiver, {:start, build_partition_ev(:tamper, data.config)}
+    ev_id = if Enum.empty?(data.tampered) do
+      ev = build_partition_ev(:tamper, data.config)
+      send data.receiver, {:start, ev}
+      ev.id
+    else
+      data.last_event_id
     end
     data = add_tripped(:tampered, dev, data)
-    {:next_state, :tripped, data}
+    {:next_state, :tripped, %{data | last_event_id: ev_id}}
   end
 
   # process arm request in tripped state
@@ -275,14 +294,16 @@ defmodule DtCore.Monitor.PartitionFsm do
     alarmed = if Enum.empty?(data.alarmed) do
       []
     else
-      send data.receiver, {:stop, build_partition_ev(:alarm, data.config)}
+      send data.receiver, {:stop, build_partition_ev(:alarm, data.config,
+        data.last_event_id)}
       []
     end
 
     tampered = if Enum.empty?(data.tampered) do
       []
     else
-      send data.receiver, {:stop, build_partition_ev(:tamper, data.config)}
+      send data.receiver, {:stop, build_partition_ev(:tamper, data.config,
+        data.last_event_id)}
       []
     end
 
@@ -297,7 +318,11 @@ defmodule DtCore.Monitor.PartitionFsm do
   #
 
   defp build_partition_ev(type, conf = %PartitionModel{}) when is_atom(type) do
-    %PartitionEv{type: type, name: conf.name}
+    %PartitionEv{type: type, name: conf.name, id: Utils.random_id()}
+  end
+
+  defp build_partition_ev(type, conf = %PartitionModel{}, id) when is_atom(type) do
+    %PartitionEv{type: type, name: conf.name, id: id}
   end
 
   defp add_tripped(:tampered, ev = %DetectorEv{}, data) do

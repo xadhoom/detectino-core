@@ -65,7 +65,7 @@ defmodule DtCore.PartitionEv do
 
     type values: same as %DtCore.DetectorEv{} type field
   """
-  #@enforce_keys [:id]
+  @enforce_keys [:id]
   defstruct name: nil,
     type: nil,
     id: nil
@@ -91,6 +91,8 @@ defmodule DtCore.ExitTimerEv do
     name: the partition name, binary()
 
   """
-  defstruct name: nil
+  @enforce_keys [:id]
+  defstruct name: nil,
+    id: nil
 
 end

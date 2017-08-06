@@ -3,6 +3,7 @@ defmodule DtCore.Test.EventLoggerTest do
 
   alias DtCore.EventBridge
   alias DtCore.EventLogger
+  alias DtCore.Monitor.Utils
   alias DtCtx.Outputs.EventLog
   alias DtCore.Test.TimerHelper
 
@@ -42,7 +43,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves an alarm event from a sensor" do
-    {:start, %DetectorEv{type: :short}}
+    {:start, %DetectorEv{type: :short, id: Utils.random_id()}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -54,7 +55,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves a stop alarm event from a sensor" do
-    {:stop, %DetectorEv{type: :short}}
+    {:stop, %DetectorEv{type: :short, id: Utils.random_id()}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -63,7 +64,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves an alarm event from a partition" do
-    {:start, %PartitionEv{type: :short}}
+    {:start, %PartitionEv{type: :short, id: Utils.random_id()}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -75,7 +76,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves a stop alarm event from a partition" do
-    {:stop, %PartitionEv{type: :short}}
+    {:stop, %PartitionEv{type: :short, id: Utils.random_id()}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -84,7 +85,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves an event from exit timer" do
-    {:stop, %ExitTimerEv{name: "42"}}
+    {:stop, %ExitTimerEv{name: "42", id: Utils.random_id()}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
@@ -95,7 +96,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves a stop event from exit timer" do
-    {:stop, %ExitTimerEv{name: "42"}}
+    {:stop, %ExitTimerEv{name: "42", id: Utils.random_id()}}
     |> dispatch()
 
     log = Repo.one!(EventLog)
