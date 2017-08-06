@@ -353,7 +353,8 @@ defmodule DtCore.Monitor.Detector do
     %DetectorEv{
       type: type,
       address: address,
-      port: port
+      port: port,
+      id: nil
     }
   end
 

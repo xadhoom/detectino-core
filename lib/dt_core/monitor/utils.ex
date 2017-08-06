@@ -50,4 +50,9 @@ defmodule DtCore.Monitor.Utils do
     {:ok, {:global, name}} = sensor_server_name(sensor)
     :global.whereis_name name
   end
+
+  def random_id do
+    Base.hex_encode32(:crypto.strong_rand_bytes(20), case: :lower)
+  end
+
 end

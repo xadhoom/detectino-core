@@ -68,37 +68,37 @@ defmodule DtCore.Test.Monitor.Detector do
     assert :tampered == Detector.status({config})
     {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :short, address: "3", port: 3}}
+    {:start, %DetectorEv{type: :short, address: "3", port: 3, id: short_ev_id}}
     |> assert_receive(5000)
 
     ev = %Event{address: "3", port: 3, value: 15}
     :ok = Process.send(pid, {:event, ev}, [])
     assert :idle == Detector.status({config})
-    {:stop, %DetectorEv{type: :short, address: "3", port: 3}}
+    {:stop, %DetectorEv{type: :short, address: "3", port: 3, id: ^short_ev_id}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :idle, address: "3", port: 3}}
+    {:start, %DetectorEv{type: :idle, address: "3", port: 3, id: idle_ev_id}}
     |> assert_receive(5000)
 
     ev = %Event{address: "3", port: 3, value: 25}
     :ok = Process.send(pid, {:event, ev}, [])
     assert :realtime == Detector.status({config})
-    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3, id: ^idle_ev_id}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :realtime, address: "3", port: 3}}
+    {:start, %DetectorEv{type: :realtime, address: "3", port: 3, id: rt_ev_id}}
     |> assert_receive(5000)
 
     ev = %Event{address: "3", port: 3, value: 35}
     :ok = Process.send(pid, {:event, ev}, [])
     assert :tampered == Detector.status({config})
-    {:stop, %DetectorEv{type: :realtime, address: "3", port: 3}}
+    {:stop, %DetectorEv{type: :realtime, address: "3", port: 3, id: ^rt_ev_id}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :fault, address: "3", port: 3}}
+    {:start, %DetectorEv{type: :fault, address: "3", port: 3, id: fault_ev_id}}
     |> assert_receive(5000)
 
     ev = %Event{address: "3", port: 3, value: 45}
     :ok = Process.send(pid, {:event, ev}, [])
     assert :tampered == Detector.status({config})
-    {:stop, %DetectorEv{type: :fault, address: "3", port: 3}}
+    {:stop, %DetectorEv{type: :fault, address: "3", port: 3, id: ^fault_ev_id}}
     |> assert_receive(5000)
     {:start, %DetectorEv{type: :tamper, address: "3", port: 3}}
     |> assert_receive(5000)
@@ -184,14 +184,14 @@ defmodule DtCore.Test.Monitor.Detector do
     # check
     {:stop, %DetectorEv{type: :idle, address: "4", port: 4}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    {:start, %DetectorEv{type: :tamper, address: "4", port: 4, id: tamp_ev_id}}
     |> assert_receive(5000)
 
     ev = %Event{address: "4", port: 4, value: 25}
     :ok = Process.send(pid, {:event, ev}, [])
     assert :realtime == Detector.status({config})
 
-    {:stop, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    {:stop, %DetectorEv{type: :tamper, address: "4", port: 4, id: ^tamp_ev_id}}
     |> assert_receive(5000)
     {:start, %DetectorEv{type: :realtime, address: "4", port: 4}}
     |> assert_receive(5000)
@@ -210,14 +210,14 @@ defmodule DtCore.Test.Monitor.Detector do
     # check
     {:stop, %DetectorEv{type: :idle, address: "4", port: 4}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    {:start, %DetectorEv{type: :tamper, address: "4", port: 4, id: tamp_ev_id}}
     |> assert_receive(5000)
 
     ev = %Event{address: "4", port: 4, value: 25}
     :ok = Process.send(pid, {:event, ev}, [])
     assert :alarmed == Detector.status({config})
 
-    {:stop, %DetectorEv{type: :tamper, address: "4", port: 4}}
+    {:stop, %DetectorEv{type: :tamper, address: "4", port: 4, id: ^tamp_ev_id}}
     |> assert_receive(5000)
     {:start, %DetectorEv{type: :alarm, address: "4", port: 4}}
     |> assert_receive(5000)
@@ -309,10 +309,12 @@ defmodule DtCore.Test.Monitor.Detector do
     :ok = Process.send(pid, {:event, ev}, [])
     assert :idle == Detector.status({config})
 
-    {:stop, %DetectorEv{type: :alarm, address: "4", port: 4}}
+    {:stop, %DetectorEv{type: :alarm, address: "4", port: 4, id: alm_stop_id}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :idle, address: "4", port: 4}}
+    {:start, %DetectorEv{type: :idle, address: "4", port: 4, id: alm_start_id}}
     |> assert_receive(5000)
+
+    refute alm_stop_id == alm_start_id
 
     refute_receive _
   end
@@ -344,10 +346,12 @@ defmodule DtCore.Test.Monitor.Detector do
     :ok = Process.send(pid, {:event, ev}, [])
     assert :tampered_arm == Detector.status({config})
 
-    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3, id: idle_ev_id}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :short, address: "3", port: 3}}
+    {:start, %DetectorEv{type: :short, address: "3", port: 3, id: short_ev_id}}
     |> assert_receive(5000)
+
+    refute idle_ev_id == short_ev_id
 
     refute_receive _
   end
@@ -361,10 +365,12 @@ defmodule DtCore.Test.Monitor.Detector do
     :ok = Process.send(pid, {:event, ev}, [])
     assert :alarmed_arm == Detector.status({config})
 
-    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3, id: idle_ev_id}}
     |> assert_receive(5000)
-    {:start, %DetectorEv{type: :alarm, address: "3", port: 3}}
+    {:start, %DetectorEv{type: :alarm, address: "3", port: 3, id: alarm_ev_id}}
     |> assert_receive(5000)
+
+    refute idle_ev_id == alarm_ev_id
 
     refute_receive _
   end
@@ -378,10 +384,13 @@ defmodule DtCore.Test.Monitor.Detector do
     :ok = Process.send(pid, {:event, ev}, [])
     assert :entry_wait == Detector.status({config})
 
-    {:stop, %DetectorEv{type: :idle, address: "3", port: 3}}
+    {:stop, %DetectorEv{type: :idle, address: "3", port: 3, id: idle_ev_id}}
     |> assert_receive(5000)
-    {:start, %DetectorEntryEv{address: "3", port: 3}}
+    {:start, %DetectorEntryEv{address: "3", port: 3, id: entry_ev_id}}
     |> assert_receive(5000)
+
+    refute idle_ev_id == entry_ev_id
+    refute entry_ev_id == nil
 
     refute_receive _
   end

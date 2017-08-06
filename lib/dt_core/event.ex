@@ -34,19 +34,25 @@ defmodule DtCore.DetectorEv do
       :fault
       :tamper
   """
+  @enforce_keys [:id]
   defstruct type: nil,
     address: nil,
-    port: nil
+    port: nil,
+    id: nil
 end
 
 defmodule DtCore.DetectorExitEv do
+  @enforce_keys [:id]
   defstruct address: nil,
-    port: nil
+    port: nil,
+    id: nil
 end
 
 defmodule DtCore.DetectorEntryEv do
+  @enforce_keys [:id]
   defstruct address: nil,
-    port: nil
+    port: nil,
+    id: nil
 end
 
 defmodule DtCore.PartitionEv do
@@ -59,8 +65,10 @@ defmodule DtCore.PartitionEv do
 
     type values: same as %DtCore.DetectorEv{} type field
   """
+  #@enforce_keys [:id]
   defstruct name: nil,
-    type: nil
+    type: nil,
+    id: nil
 end
 
 defmodule DtCore.ArmEv do
