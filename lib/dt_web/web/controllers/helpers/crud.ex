@@ -15,7 +15,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
   @spec all(Plug.Conn.t, map, {module, module, [atom] | nil}, [atom]) ::
     {:ok, Plug.Conn.t, list} | {:error, Plug.Conn.t, pos_integer}
   def all(conn, params, {repo, model, sortdefs}, assocs \\ []) do
-    filter = :fields
+    filters = :fields
     |> model.__schema__
     |> build_filter(params)
 
@@ -31,16 +31,16 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     try do
       q = from m in model,
-        where: ^filter,
         limit: ^per_page,
         offset: ^((page - 1) * per_page),
         order_by: ^order_by,
         preload: ^assocs
+      q = q |> add_ilike_filters(filters)
       items = repo.all(q)
 
       qc = from m in model,
-        select: count(m.id),
-        where: ^filter
+        select: count(m.id)
+      qc = qc |> add_ilike_filters(filters)
       total = repo.one(qc)
 
       total_s = total
@@ -217,6 +217,13 @@ defmodule DtWeb.CtrlHelpers.Crud do
       {:error, _changeset} ->
         {:error, conn, 400}
     end
+  end
+
+  defp add_ilike_filters(q, filters) do
+    Enum.reduce(filters, q, fn({k, v}, query) ->
+      new_v = "%" <> v <> "%"
+      from q in query, where: ilike(field(q, ^k), ^new_v)
+    end)
   end
 
 end
