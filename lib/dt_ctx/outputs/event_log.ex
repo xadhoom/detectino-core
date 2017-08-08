@@ -62,18 +62,24 @@ defmodule DtCtx.Outputs.EventLog do
     |> cast(params, @required_fields)
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @source_types)
+    |> add_id
   end
 
-  def update_changeset(model, params \\ %{}) do
-    model
-    |> cast(params, @required_fields)
-    |> validate_required(@validate_required)
-    |> validate_inclusion(:type, @source_types)
+  def update_changeset(_model, _params \\ %{}) do
+    raise Ecto.ChangeError, message: "Cannot update an event log"
   end
 
   def ack(struct) do
     struct
     |> cast(%{acked: true}, [:acked])
+  end
+
+  defp add_id(changeset) do
+    id = changeset
+    |> get_change(:details)
+    |> Map.get(:id)
+
+    put_change(changeset, :correlation_id, id)
   end
 
 end
