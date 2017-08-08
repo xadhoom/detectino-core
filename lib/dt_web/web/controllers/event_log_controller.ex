@@ -8,7 +8,6 @@ defmodule DtWeb.EventLogController do
   alias DtWeb.SessionController
   alias DtCtx.Outputs.EventLog
   alias DtWeb.StatusCodes
-  alias DtWeb.CtrlHelpers.Crud
   alias DtWeb.Plugs.PinAuthorize
   alias Guardian.Plug.EnsureAuthenticated
 
