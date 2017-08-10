@@ -110,6 +110,18 @@ export class EventlogsComponent implements OnInit {
     );
   };
 
+  public toolTip(eventlog: Eventlog) {
+    const header = [];
+    const head = eventlog.details.source + ' ' + eventlog.operation;
+    header.push(head);
+    const fields = this.getDetails(eventlog) as Array<{ detail: string, value: string }>;
+    const res = fields.map(field => {
+      const entry = field.detail + ':' + field.value;
+      return entry;
+    });
+    return header.concat(res).join('<br/>');
+  }
+
   private getDetails(eventlog: Eventlog): Iterable<Object> {
     const res = [];
     for (const detail in eventlog.details.ev) {
