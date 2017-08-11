@@ -44,7 +44,8 @@ export class LazyGrid {
     for (const key in event.filters) {
       if (event.filters.hasOwnProperty(key)) {
         const value = event.filters[key].value;
-        this.sortPage.addFilter(key, value);
+        const match = event.filters[key].matchMode;
+        this.sortPage.addFilter(key, value, match);
       }
     }
 

@@ -24,7 +24,7 @@
           <p-column field="type" header="Type" [sortable]="false" [filter]="true" filterPlaceholder="Search"></p-column>
           <p-column field="details.ev.type" header="Subtype" [sortable]="false" [filter]="true" filterPlaceholder="Search"></p-column>
           <p-column field="acked" header="Acked" [sortable]="false"></p-column>
-          <p-column field="correlation_id" header="Cid" [sortable]="false" [filter]="true" filterPlaceholder="Search"> </p-column>
+          <p-column field="correlation_id" header="Cid" [sortable]="false" [filter]="true" filterPlaceholder="Search" filterMatchMode="contains"> </p-column>
           <p-column field="inserted_at" header="Timestamp" [sortable]="true"></p-column>
         </p-dataTable>
 

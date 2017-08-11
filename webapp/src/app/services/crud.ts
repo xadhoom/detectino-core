@@ -11,9 +11,11 @@ const LinkHeader = require('http-link-header');
 export class Filter {
   key: string;
   value: string;
-  constructor({key, value}) {
+  mode: string;
+  constructor({ key, value, mode }) {
     this.key = key;
     this.value = value;
+    this.mode = mode;
   }
 }
 
@@ -31,7 +33,7 @@ export class PageSortFilter {
   direction: string;
   filters: Filter[];
 
-  constructor({page, per_page, sort, direction}: PageSortFilterArgs) {
+  constructor({ page, per_page, sort, direction }: PageSortFilterArgs) {
     this.page = page;
     this.per_page = per_page;
     this.sort = sort;
@@ -39,8 +41,8 @@ export class PageSortFilter {
     this.filters = [];
   }
 
-  public addFilter(k, v): Filter[] {
-    const filter = new Filter({ 'key': k, 'value': v });
+  public addFilter(k, v, mode): Filter[] {
+    const filter = new Filter({ 'key': k, 'value': v, 'mode': mode });
     if (this.filters.indexOf(filter) < 0) {
       this.filters.push(filter);
     }
@@ -232,7 +234,29 @@ export class Crud {
     }
 
     search.set(needle, filter.value);
+    search.set(needle + 'MatchMode', this.getMatchMode(filter.mode));
     return search;
+  }
+
+  private getMatchMode(matchmode: string): string {
+    /*
+      Valid match modes:
+      "startsWith", "contains", "endsWith", "equals" and "in" (from primeNG)
+      will be translated to: starts, contains, ends, equals and in
+    */
+    if (matchmode == 'startsWith') {
+      return 'starts'
+    } else if (matchmode == 'endsWith') {
+      return 'ends';
+    } else if (matchmode == 'contains') {
+      return 'contains';
+    } else if (matchmode == 'equals') {
+      return 'equals';
+    } else if (matchmode == 'in') {
+      return 'in';
+    } else {
+      return 'starts';
+    }
   }
 
 }
