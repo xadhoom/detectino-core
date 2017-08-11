@@ -4,6 +4,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
   """
   use Phoenix.Controller
 
+  require Logger
+
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 
@@ -35,12 +37,12 @@ defmodule DtWeb.CtrlHelpers.Crud do
         offset: ^((page - 1) * per_page),
         order_by: ^order_by,
         preload: ^assocs
-      q = q |> add_ilike_filters(filters)
+      q = q |> add_query_filters(filters)
       items = repo.all(q)
 
       qc = from m in model,
         select: count(m.id)
-      qc = qc |> add_ilike_filters(filters)
+      qc = qc |> add_query_filters(filters)
       total = repo.one(qc)
 
       total_s = total
@@ -204,9 +206,25 @@ defmodule DtWeb.CtrlHelpers.Crud do
     fn(field) ->
       search_field = Atom.to_string(field)
       value = Map.get(params, search_field)
-      {field, value}
+      match = get_match_mode(params, search_field)
+      {field, value, match}
     end
     )
+  end
+
+  defp get_match_mode(params, field) do
+    case Map.get(params, field <> "MatchMode", "equals") do
+      "equals" -> :equals
+      "contains" -> :contains
+      "in" -> :in
+      "starts" -> :starts
+      "ends" -> :ends
+      v ->
+        Logger.error fn() ->
+          "Invalid match mode #{inspect v}, falling back to default"
+        end
+        :equals
+    end
   end
 
   defp perform_update(changeset, repo, conn) do
@@ -219,10 +237,15 @@ defmodule DtWeb.CtrlHelpers.Crud do
     end
   end
 
-  defp add_ilike_filters(q, filters) do
-    Enum.reduce(filters, q, fn({k, v}, query) ->
-      new_v = "%" <> v <> "%"
-      from q in query, where: ilike(field(q, ^k), ^new_v)
+  defp add_query_filters(q, filters) do
+    Enum.reduce(filters, q, fn({k, v, match}, query) ->
+      case match do
+        :contains ->
+          new_v = "%" <> v <> "%"
+          from q in query, where: ilike(field(q, ^k), ^new_v)
+        :equals ->
+          from q in query, where: field(q, ^k) == ^v
+      end
     end)
   end
 
