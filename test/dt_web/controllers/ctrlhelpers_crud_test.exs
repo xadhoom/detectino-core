@@ -50,6 +50,38 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert first.name == "a"
   end
 
+  test "Get with id filter" do
+    add_users()
+    conn = Phoenix.ConnTest.build_conn
+
+    {:ok, _conn, items} = Crud.all(conn, %{"id" => "1"}, {Repo, User, nil})
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).name == "admin"
+  end
+
+  test "Get with field filter" do
+    add_users()
+    conn = Phoenix.ConnTest.build_conn
+
+    {:ok, _conn, items} = Crud.all(conn, %{"name" => "admin"}, {Repo, User, nil})
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).name == "admin"
+  end
+
+  test "Get with field filter and contains match mode" do
+    add_users()
+    conn = Phoenix.ConnTest.build_conn
+
+    {:ok, _conn, items} = Crud.all(conn, %{
+      "name" => "ad", "nameMatchMode" => "contains"}, {Repo, User, nil})
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).name == "admin"
+
+    {:ok, _conn, items} = Crud.all(conn, %{
+      "name" => "a", "nameMatchMode" => "contains"}, {Repo, User, nil})
+    assert Enum.count(items) == 2
+  end
+
   test "link header" do
     conn = Phoenix.ConnTest.build_conn
     Crud.links(conn, 2, 5, 26)
@@ -100,6 +132,12 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert links.next.params == %{page: "2", per_page: "2"}
     assert links.last.params == %{page: "2", per_page: "2"}
 
+  end
+
+  defp add_users do
+    Repo.insert!(@user3)
+    Repo.insert!(@user2)
+    Repo.insert!(@user1)
   end
 
 end
