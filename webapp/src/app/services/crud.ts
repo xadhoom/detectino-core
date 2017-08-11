@@ -244,15 +244,15 @@ export class Crud {
       "startsWith", "contains", "endsWith", "equals" and "in" (from primeNG)
       will be translated to: starts, contains, ends, equals and in
     */
-    if (matchmode == 'startsWith') {
-      return 'starts'
-    } else if (matchmode == 'endsWith') {
+    if (matchmode === 'startsWith') {
+      return 'starts';
+    } else if (matchmode === 'endsWith') {
       return 'ends';
-    } else if (matchmode == 'contains') {
+    } else if (matchmode === 'contains') {
       return 'contains';
-    } else if (matchmode == 'equals') {
+    } else if (matchmode === 'equals') {
       return 'equals';
-    } else if (matchmode == 'in') {
+    } else if (matchmode === 'in') {
       return 'in';
     } else {
       return 'starts';
