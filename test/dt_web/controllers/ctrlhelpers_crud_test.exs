@@ -82,6 +82,42 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert Enum.count(items) == 2
   end
 
+  test "Get within a json field" do
+    alias DtCtx.Outputs.EventLog
+    alias DtCore.DetectorEv
+
+    %EventLog{type: "alarm", operation: "start",
+      details: %DetectorEv{
+        id: "yadda",
+        type: "idle",
+        address: "10",
+        port: 5
+        }}
+    |> Repo.insert!
+
+    conn = Phoenix.ConnTest.build_conn
+
+    {:ok, _conn, items} = Crud.all(conn, %{
+      "details.source" => "ete", "details.sourceMatchMode" => "contains"}, {Repo, EventLog, nil})
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+
+    {:ok, _conn, items} = Crud.all(conn, %{
+      "details.source" => "det", "details.sourceMatchMode" => "starts"}, {Repo, EventLog, nil})
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+
+    {:ok, _conn, items} = Crud.all(conn, %{
+      "details.ev.id" => "yadda"}, {Repo, EventLog, nil})
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+
+    {:ok, _conn, items} = Crud.all(conn, %{
+      "details.ev.id" => "adda", "details.ev.idMatchMode" => "ends"}, {Repo, EventLog, nil})
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+  end
+
   test "link header" do
     conn = Phoenix.ConnTest.build_conn
     Crud.links(conn, 2, 5, 26)

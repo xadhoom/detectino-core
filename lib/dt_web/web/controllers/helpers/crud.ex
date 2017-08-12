@@ -165,7 +165,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
     case Map.get(params, "sort") do
       f when is_binary(f) ->
         field = String.to_existing_atom(f)
-        dir = Map.get(params, "direction") |> dir_to_atom()
+        dir = params |> Map.get("direction") |> dir_to_atom()
         Keyword.new([{dir, field}])
       nil ->
         []
@@ -185,7 +185,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
         default
     end
 
-    dir = Map.get(params, "direction") |> dir_to_atom()
+    dir = params |> Map.get("direction") |> dir_to_atom()
 
     Keyword.new([{dir, field}])
   end
@@ -199,17 +199,26 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   defp build_filter(fields, params) do
-    Enum.filter_map(fields, fn(field) ->
-      field = Atom.to_string(field)
-      Map.has_key?(params, field)
+    Enum.filter_map(params, fn({param, _value}) ->
+      param_is_model_field?(param, fields)
     end,
-    fn(field) ->
-      search_field = Atom.to_string(field)
-      value = Map.get(params, search_field)
-      match = get_match_mode(params, search_field)
-      {field, value, match}
-    end
-    )
+    fn({param, value}) ->
+      match = get_match_mode(params, param)
+      {param, value, match}
+    end)
+  end
+
+  defp param_is_model_field?(param, fields) do
+    fields
+    |> Enum.any?(fn(field) ->
+      field = Atom.to_string(field)
+      {:ok, regex} = Regex.compile("^" <> field <> "(?!.*MatchMode)")
+      cond do
+        String.match?(param, regex) -> true
+        param == field -> true
+        true -> false
+      end
+    end)
   end
 
   defp get_match_mode(params, field) do
@@ -242,11 +251,71 @@ defmodule DtWeb.CtrlHelpers.Crud do
       case match do
         :contains ->
           new_v = "%" <> v <> "%"
-          from q in query, where: ilike(field(q, ^k), ^new_v)
+          add_ilike(query, k, new_v)
+        :starts ->
+          new_v = v <> "%"
+          add_ilike(query, k, new_v)
+        :ends ->
+          new_v = "%" <> v
+          add_ilike(query, k, new_v)
         :equals ->
-          from q in query, where: field(q, ^k) == ^v
+          add_equal(query, k, v)
       end
     end)
+  end
+
+  defp add_equal(query, key, value) do
+    case String.contains?(key, ".") do
+      false ->
+        col = String.to_existing_atom(key)
+        from q in query, where: field(q, ^col) == ^value
+      true ->
+        equal_jsonb_fragment(query, key, value)
+    end
+  end
+
+  defp add_ilike(query, key, value) do
+    case String.contains?(key, ".") do
+      false ->
+        col = String.to_existing_atom(key)
+        from q in query, where: ilike(field(q, ^col), ^value)
+      true ->
+        ilike_jsonb_fragment(query, key, value)
+    end
+  end
+
+  defp ilike_jsonb_fragment(query, field, value) do
+    case String.split(field, ".") do
+      [field, key] -> ilike_jsonb_fragment(query, field, key, value)
+      [field, key1, key2] -> ilike_jsonb_fragment(query, field, key1, key2, value)
+    end
+  end
+
+  defp ilike_jsonb_fragment(query, field, key, value) do
+    field = String.to_existing_atom(field)
+    from q in query, where: fragment("?->>? ILIKE ?", field(q, ^field), ^key, ^value)
+  end
+
+  defp ilike_jsonb_fragment(query, field, key1, key2, value) do
+    field = String.to_existing_atom(field)
+    from q in query, where: fragment("?->?->>? ILIKE ?", field(q, ^field), ^key1, ^key2, ^value)
+  end
+
+  defp equal_jsonb_fragment(query, field, value) do
+    case String.split(field, ".") do
+      [field, key] -> equal_jsonb_fragment(query, field, key, value)
+      [field, key1, key2] -> equal_jsonb_fragment(query, field, key1, key2, value)
+    end
+  end
+
+  defp equal_jsonb_fragment(query, field, key, value) do
+    field = String.to_existing_atom(field)
+    from q in query, where: fragment("?->>? = ?", field(q, ^field), ^key, ^value)
+  end
+
+  defp equal_jsonb_fragment(query, field, key1, key2, value) do
+    field = String.to_existing_atom(field)
+    from q in query, where: fragment("?->?->>? = ?", field(q, ^field), ^key1, ^key2, ^value)
   end
 
 end
