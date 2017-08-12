@@ -9,7 +9,7 @@ defmodule DtCtx.Outputs.EventLogType do
   alias DtCore.PartitionEv
   alias DtCore.ExitTimerEv
 
-  def type, do: :json
+  def type, do: :jsonb
 
   def cast(v = %ArmEv{}), do: {:ok, v}
   def cast(v = %DetectorEv{}), do: {:ok, v}
@@ -20,7 +20,7 @@ defmodule DtCtx.Outputs.EventLogType do
   def cast(_), do: :error
 
   def load({:ok, json}), do: {:ok, json}
-  def load(value), do: load(Poison.decode(value))
+  def load(value), do: {:ok, value}
 
   def dump(ev = %ArmEv{}), do: encode(ev, :arm)
   def dump(ev = %DetectorEv{}), do: encode(ev, :detector)
@@ -31,9 +31,9 @@ defmodule DtCtx.Outputs.EventLogType do
   def dump(_), do: :error
 
   defp encode(ev, source) when is_atom(source) do
-    %{"source" => Atom.to_string(source),
-      "ev" => ev}
-    |> Poison.encode
+    data = %{"source" => Atom.to_string(source),
+      "ev" => Map.from_struct(ev)}
+    {:ok, data}
   end
 
 end
