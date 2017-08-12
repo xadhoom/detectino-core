@@ -287,35 +287,41 @@ defmodule DtWeb.CtrlHelpers.Crud do
   defp ilike_jsonb_fragment(query, field, value) do
     case String.split(field, ".") do
       [field, key] -> ilike_jsonb_fragment(query, field, key, value)
-      [field, key1, key2] -> ilike_jsonb_fragment(query, field, key1, key2, value)
+      [field, key1, key2] -> ilike_jsonb_fragment(query, field,
+        key1, key2, value)
     end
   end
 
   defp ilike_jsonb_fragment(query, field, key, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->>? ILIKE ?", field(q, ^field), ^key, ^value)
+    from q in query, where: fragment("?->>? ILIKE ?", field(q, ^field),
+      ^key, ^value)
   end
 
   defp ilike_jsonb_fragment(query, field, key1, key2, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->?->>? ILIKE ?", field(q, ^field), ^key1, ^key2, ^value)
+    from q in query, where: fragment("?->?->>? ILIKE ?", field(q, ^field),
+      ^key1, ^key2, ^value)
   end
 
   defp equal_jsonb_fragment(query, field, value) do
     case String.split(field, ".") do
       [field, key] -> equal_jsonb_fragment(query, field, key, value)
-      [field, key1, key2] -> equal_jsonb_fragment(query, field, key1, key2, value)
+      [field, key1, key2] -> equal_jsonb_fragment(query, field,
+        key1, key2, value)
     end
   end
 
   defp equal_jsonb_fragment(query, field, key, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->>? = ?", field(q, ^field), ^key, ^value)
+    from q in query, where: fragment("?->>? = ?", field(q, ^field),
+      ^key, ^value)
   end
 
   defp equal_jsonb_fragment(query, field, key1, key2, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->?->>? = ?", field(q, ^field), ^key1, ^key2, ^value)
+    from q in query, where: fragment("?->?->>? = ?", field(q, ^field),
+      ^key1, ^key2, ^value)
   end
 
 end
