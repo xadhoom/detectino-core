@@ -18,8 +18,15 @@ defmodule DtWeb.Plugs.PinAuthorize do
       q = from u in User, where: u.pin == ^pin
       case Repo.one(q) do
         nil -> conn |> handle_error
-        _u -> conn
+        u -> conn |> put_private(:dt_pin, u)
       end
+    end
+  end
+
+  def username(conn) do
+    case conn.private[:dt_pin] do
+      nil -> nil
+      u -> u.username
     end
   end
 

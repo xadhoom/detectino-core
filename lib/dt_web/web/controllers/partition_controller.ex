@@ -24,13 +24,13 @@ defmodule DtWeb.PartitionController do
         part
         |> Partition.disarm
         |> Repo.update!
-        |> PartitionProcess.disarm()
+        |> PartitionProcess.disarm(PinAuthorize.username(conn))
         send_resp(conn, 204, StatusCodes.status_code(204))
     end
   end
 
   def arm(conn, params) do
-    case do_arm(params) do
+    case do_arm(params, conn) do
       :ok -> send_resp(conn, 204, StatusCodes.status_code(204))
       {:error, :bad_request} -> send_resp(conn, 400, StatusCodes.status_code(400))
       {:error, :tripped} -> send_resp(conn, 555, StatusCodes.status_code(555))
@@ -38,7 +38,7 @@ defmodule DtWeb.PartitionController do
     end
   end
 
-  defp do_arm(%{"id" => id, "mode" => mode}) do
+  defp do_arm(%{"id" => id, "mode" => mode}, conn) do
     amode = mode_str_to_atom(mode)
     if amode == :error do
       {:error, :bad_request}
@@ -47,18 +47,18 @@ defmodule DtWeb.PartitionController do
         nil ->
           {:error, :not_found}
         part ->
-          part |> Partition.arm(mode) |> arm_transaction(amode)
+          part |> Partition.arm(mode) |> arm_transaction(amode, conn)
       end
     end
   end
 
-  defp arm_transaction(cset, mode) do
+  defp arm_transaction(cset, mode, conn) do
     {_, result} = Repo.transaction(fn ->
       case cset.valid? do
         true ->
           res = cset
           |> Repo.update!
-          |> PartitionProcess.arm(mode)
+          |> PartitionProcess.arm(PinAuthorize.username(conn), mode)
           case res do
             :ok -> :ok
             {:error, :tripped} -> Repo.rollback({:error, :tripped})

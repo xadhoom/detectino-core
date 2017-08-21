@@ -33,7 +33,7 @@ defmodule DtWeb.EventLogControllerTest do
 
   test "retrieve events", %{conn: conn} do
     params = %{type: "alarm", acked: false,
-      operation: "start", details: %ArmEv{}}
+      operation: "start", details: get_arm_ev()}
     EventLog.create_changeset(%EventLog{}, params)
     |> Repo.insert!
 
@@ -50,7 +50,7 @@ defmodule DtWeb.EventLogControllerTest do
 
   test "ack events", %{conn: conn} do
     params = %{type: "alarm", acked: false,
-      operation: "start", details: %ArmEv{}}
+      operation: "start", details: get_arm_ev()}
     eventlog = EventLog.create_changeset(%EventLog{}, params)
     |> Repo.insert!
 
@@ -65,9 +65,9 @@ defmodule DtWeb.EventLogControllerTest do
 
   test "ack all events", %{conn: conn} do
     [%{type: "alarm", acked: false,
-      operation: "start", details: %ArmEv{}},
+      operation: "start", details: get_arm_ev()},
     %{type: "alarm", acked: false,
-      operation: "start", details: %ArmEv{}}]
+      operation: "start", details: get_arm_ev()}]
     |> Enum.each(fn(ev) ->
       EventLog.create_changeset(%EventLog{}, ev)
       |> Repo.insert!
@@ -85,6 +85,10 @@ defmodule DtWeb.EventLogControllerTest do
     Enum.each(eventlogs, fn(eventlog) ->
       assert eventlog.acked == true
     end)
+  end
+
+  defp get_arm_ev do
+    %ArmEv{id: "yadda", initiator: "baz"}
   end
 
 end

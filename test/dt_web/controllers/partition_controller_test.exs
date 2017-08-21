@@ -9,8 +9,8 @@ defmodule DtWeb.PartitionControllerTest do
   setup_all do
     TimerHelper.wait_until 1000, ErlangError, fn ->
       :meck.new(PartitionProcess)
-      :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _) -> :ok end)
-      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}) -> :ok end)
+      :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _, _) -> :ok end)
+      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, _) -> :ok end)
     end
   end
 
@@ -152,7 +152,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARM"
 
-    assert :meck.called(PartitionProcess, :arm, [part, :normal])
+    assert :meck.called(PartitionProcess, :arm, [part, :_, :normal])
   end
 
   test "arm a partition, stay mode", %{conn: conn} do
@@ -170,7 +170,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARMSTAY"
 
-    assert :meck.called(PartitionProcess, :arm, [part, :stay])
+    assert :meck.called(PartitionProcess, :arm, [part, :_, :stay])
   end
 
   test "arm a partition, immediate stay", %{conn: conn} do
@@ -188,7 +188,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "ARMSTAYIMMEDIATE"
 
-    assert :meck.called(PartitionProcess, :arm, [part, :immediate])
+    assert :meck.called(PartitionProcess, :arm, [part, :_, :immediate])
   end
 
   test "arm a partition, invalid mode", %{conn: conn} do
@@ -221,7 +221,7 @@ defmodule DtWeb.PartitionControllerTest do
     part = Repo.one!(PartitionModel)
     assert part.armed == "DISARM"
 
-    assert :meck.called(PartitionProcess, :disarm, [part])
+    assert :meck.called(PartitionProcess, :disarm, [part, :_])
   end
 
   test "disarm invalid partition", %{conn: conn} do

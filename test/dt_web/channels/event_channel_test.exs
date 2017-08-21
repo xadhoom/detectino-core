@@ -74,7 +74,7 @@ defmodule DtWeb.EventChannelTest do
     {:ok, _, _socket} = socket()
     |> subscribe_and_join(ChannelEvent, "event:exit_timer", %{})
 
-    :ok = Partition.arm(part)
+    :ok = Partition.arm(part, "foo")
 
     assert_push "start", %{partition: "prot"}, 5000
     assert_push "stop", %{partition: "prot"}, 5000
@@ -87,7 +87,7 @@ defmodule DtWeb.EventChannelTest do
   defp start_alarmed_partition do
     {:ok, part} = start_partition()
 
-    :ok = Partition.arm(part)
+    :ok = Partition.arm(part, "foo")
 
     Controller.get_sensors()
     |> Enum.each(fn(pid) ->

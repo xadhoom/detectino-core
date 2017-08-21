@@ -66,23 +66,23 @@ defmodule DtCore.Monitor.Partition do
     |> GenServer.call({:count_sensors})
   end
 
-  def arm(config = %PartitionModel{}) do
+  def arm(config = %PartitionModel{}, initiator) do
     config
     |> Utils.partition_server_pid
-    |> GenServer.call(:arm)
+    |> GenServer.call({:arm, initiator})
   end
 
-  def arm(config = %PartitionModel{}, mode)
+  def arm(config = %PartitionModel{}, initiator, mode)
     when mode in [:normal, :stay, :immediate] do
     config
     |> Utils.partition_server_pid
-    |> GenServer.call({:arm, mode})
+    |> GenServer.call({:arm, initiator, mode})
   end
 
-  def disarm(config = %PartitionModel{}) do
+  def disarm(config = %PartitionModel{}, initiator) do
     config
     |> Utils.partition_server_pid
-    |> GenServer.call(:disarm)
+    |> GenServer.call({:disarm, initiator})
   end
 
   def alarm_status(config = %PartitionModel{}) do
@@ -120,13 +120,13 @@ defmodule DtCore.Monitor.Partition do
     exit_delay = compute_exit_delay(state)
     case config.armed do
       "ARM" ->
-        :ok = PartitionFsm.arm(state.fsm, exit_delay)
+        :ok = PartitionFsm.arm(state.fsm, "sys", exit_delay)
       "ARMSTAY" ->
         # fake immediate state, because is likely we're recovering
         # from a process crash
-        :ok = PartitionFsm.arm(state.fsm, :immediate, exit_delay)
+        :ok = PartitionFsm.arm(state.fsm, "sys", :immediate, exit_delay)
       "ARMSTAYIMMEDIATE" ->
-        :ok = PartitionFsm.arm(state.fsm, :immediate, exit_delay)
+        :ok = PartitionFsm.arm(state.fsm, "sys", :immediate, exit_delay)
       _ -> nil
     end
 
@@ -151,26 +151,26 @@ defmodule DtCore.Monitor.Partition do
     {:reply, status, state}
   end
 
-  def handle_call(:arm, _from, state) do
+  def handle_call({:arm, initiator}, _from, state) do
     exit_delay = compute_exit_delay(state)
-    res = PartitionFsm.arm(state.fsm, exit_delay)
+    res = PartitionFsm.arm(state.fsm, initiator, exit_delay)
     {:reply, res, state}
   end
 
-  def handle_call({:arm, :normal}, _from, state) do
+  def handle_call({:arm, initiator, :normal}, _from, state) do
     exit_delay = compute_exit_delay(state)
-    res = PartitionFsm.arm(state.fsm, exit_delay)
+    res = PartitionFsm.arm(state.fsm, initiator, exit_delay)
     {:reply, res, state}
   end
 
-  def handle_call({:arm, mode}, _from, state) when mode in [:stay, :immediate] do
+  def handle_call({:arm, initiator, mode}, _from, state) when mode in [:stay, :immediate] do
     exit_delay = compute_exit_delay(state)
-    res = PartitionFsm.arm(state.fsm, mode, exit_delay)
+    res = PartitionFsm.arm(state.fsm, initiator, mode, exit_delay)
     {:reply, res, state}
   end
 
-  def handle_call(:disarm, _from, state) do
-    res = PartitionFsm.disarm(state.fsm)
+  def handle_call({:disarm, initiator}, _from, state) do
+    res = PartitionFsm.disarm(state.fsm, initiator)
     {:reply, res, state}
   end
 

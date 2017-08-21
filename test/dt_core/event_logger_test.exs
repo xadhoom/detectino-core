@@ -24,7 +24,8 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves an arm event" do
-    {:start, %ArmEv{name: "test", partial: false}} |> dispatch()
+    {:start, %ArmEv{name: "test", partial: false,
+      id: "yadda", initiator: "foo"}} |> dispatch()
 
     log = Repo.one!(EventLog)
 
@@ -35,7 +36,8 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves a stop arm event" do
-    {:stop, %ArmEv{name: "test", partial: false}} |> dispatch()
+    {:stop, %ArmEv{name: "test", partial: false,
+      id: "yadda", initiator: "foo"}} |> dispatch()
 
     log = Repo.one!(EventLog)
 

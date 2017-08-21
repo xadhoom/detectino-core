@@ -77,10 +77,14 @@ defmodule DtCore.ArmEv do
 
     name: the partition name, binary()
     partial: whether is a partial arming, boolean()
+    initiator: username of the user initiating the request, binary()
 
   """
+  @enforce_keys [:id, :initiator]
   defstruct name: nil,
-    partial: nil
+    partial: nil,
+    initiator: nil,
+    id: nil
 
 end
 

@@ -113,11 +113,11 @@ defmodule DtCore.Test.Monitor.Partition do
     assert :idle == Partition.status({partition})
     assert :idle == Detector.status(s_pid)
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
 
     assert :idle_arm == Partition.status({partition})
     assert :idle_arm == Detector.status(s_pid)
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
 
     refute_receive _
   end
@@ -132,7 +132,7 @@ defmodule DtCore.Test.Monitor.Partition do
     :ok = Process.send(s_pid, {:event, ev}, [])
     assert_eq_wait :realtime, Detector.status({sensor})
 
-    assert {:error, :tripped} == Partition.arm(partition)
+    assert {:error, :tripped} == Partition.arm(partition, "foo")
 
     assert :realtime == Detector.status({sensor})
     assert :idle == Partition.status({partition})
@@ -145,11 +145,11 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, _p_pid} = start_partition(0, 30, [sensor])
     assert :idle == Partition.status({partition})
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
     assert :exit_wait == Partition.status({partition})
     assert :exit_wait == Detector.status({sensor})
 
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
     assert_recv_exitev(:start, partition.name)
 
     refute_receive _
@@ -160,11 +160,11 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, _p_pid} = start_partition(0, 1, [sensor])
     assert :idle == Partition.status({partition})
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
     assert :exit_wait == Partition.status({partition})
     assert :exit_wait == Detector.status({sensor})
 
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
     assert_recv_exitev(:start, partition.name)
     assert_recv_exitev(:stop, partition.name)
     assert :idle_arm == Partition.status({partition})
@@ -178,11 +178,11 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, _p_pid} = start_partition(0, 30, [sensor])
     assert :idle == Partition.status({partition})
 
-    :ok = Partition.arm(partition, :stay)
+    :ok = Partition.arm(partition, "foo", :stay)
     assert :exit_wait == Partition.status({partition})
     assert :idle == Detector.status({sensor})
 
-    assert_recv_armev(:start, true, partition.name)
+    assert_recv_armev("foo", :start, true, partition.name)
     assert_recv_exitev(:start, partition.name)
 
     refute_receive _
@@ -193,11 +193,11 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, _p_pid} = start_partition(0, 30, [sensor])
     assert :idle == Partition.status({partition})
 
-    :ok = Partition.arm(partition, :immediate)
+    :ok = Partition.arm(partition, "foo", :immediate)
     assert :idle_arm == Partition.status({partition})
     assert :idle == Detector.status({sensor})
 
-    assert_recv_armev(:start, true, partition.name)
+    assert_recv_armev("foo", :start, true, partition.name)
     assert :idle_arm == Partition.status({partition})
     assert :idle == Detector.status({sensor})
 
@@ -211,16 +211,16 @@ defmodule DtCore.Test.Monitor.Partition do
     assert :idle == Partition.status({partition})
     assert :idle == Detector.status(s_pid)
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
     assert :idle_arm == Partition.status({partition})
     assert :idle_arm == Detector.status(s_pid)
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
 
     # disarm
-    :ok = Partition.disarm(partition)
+    :ok = Partition.disarm(partition, "baz")
     assert :idle == Partition.status({partition})
     assert :idle == Detector.status(s_pid)
-    assert_recv_armev(:stop, nil, partition.name)
+    assert_recv_armev("baz", :stop, false, partition.name)
 
     refute_receive _
   end
@@ -229,9 +229,9 @@ defmodule DtCore.Test.Monitor.Partition do
     {:ok, sensor, s_pid} = setup_teol_sensor()
     {partition, _p_pid} = start_partition(0, 30, [sensor])
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
     assert :exit_wait == Partition.status({partition})
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
     assert_recv_exitev(:start, partition.name)
 
     # send an alarm event
@@ -250,9 +250,9 @@ defmodule DtCore.Test.Monitor.Partition do
     {:ok, sensor, s_pid} = setup_teol_sensor()
     {partition, _p_pid} = start_partition(0, 30, [sensor])
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
     assert :exit_wait == Partition.status({partition})
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
     assert_recv_exitev(:start, partition.name)
 
     # send a tamper event
@@ -271,19 +271,19 @@ defmodule DtCore.Test.Monitor.Partition do
     {:ok, sensor, _s_pid} = setup_teol_sensor({0, 30})
     {partition, _p_pid} = start_partition(0, 30, [sensor])
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
     assert :exit_wait == Detector.status({sensor})
     assert :exit_wait == Partition.status({partition})
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
     assert_recv_exitev(:start, partition.name)
 
     # disarm the partition
-    :ok = Partition.disarm(partition)
+    :ok = Partition.disarm(partition, "bar")
     # check
     assert :idle == Partition.status({partition})
     assert :idle == Detector.status({sensor})
     assert_recv_exitev(:stop, partition.name)
-    assert_recv_armev(:stop, nil, partition.name)
+    assert_recv_armev("bar", :stop, false, partition.name)
 
     refute_receive _
   end
@@ -295,10 +295,10 @@ defmodule DtCore.Test.Monitor.Partition do
     assert :idle == Partition.status({partition})
     assert :idle == Detector.status(s_pid)
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "foo")
     assert :idle_arm == Partition.status({partition})
     assert :idle_arm == Detector.status(s_pid)
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("foo", :start, false, partition.name)
 
     # send an alarm event, will cause an entry delay
     ev = %Event{address: sensor.address, port: sensor.port, value: 25}
@@ -323,7 +323,7 @@ defmodule DtCore.Test.Monitor.Partition do
     assert_eq_wait :tripped, Partition.status({partition})
 
     # check events
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("bob", :start, false, partition.name)
     assert_recv_partev(:start, :alarm, partition.name)
 
     # now send an idle event
@@ -348,7 +348,7 @@ defmodule DtCore.Test.Monitor.Partition do
     assert_eq_wait :tripped, Partition.status({partition})
 
     # check events
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("bob", :start, false, partition.name)
     assert_recv_partev(:start, :tamper, partition.name)
 
     # now send an idle event
@@ -370,7 +370,7 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, sensors, _p_pid, s_pids} = start_m_tripped_partion(:alarm)
 
     # check events
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("alice", :start, false, partition.name)
     assert_recv_partev(:start, :alarm, partition.name)
 
     # should be tripped
@@ -407,7 +407,7 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, sensors, _p_pid, s_pids} = start_m_tripped_partion(:tamper)
 
     # check events
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("alice", :start, false, partition.name)
     assert_recv_partev(:start, :tamper, partition.name)
 
     # should be tripped
@@ -443,7 +443,7 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, sensors, _p_pid, s_pids} = start_mixed_tripped_partion()
 
     # check events
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("cat", :start, false, partition.name)
     assert_recv_partev(:start, :alarm, partition.name)
     assert_recv_partev(:start, :tamper, partition.name)
 
@@ -483,12 +483,12 @@ defmodule DtCore.Test.Monitor.Partition do
     assert_eq_wait :tripped, Partition.status({partition})
 
     # check events
-    assert_recv_armev(:start, false, partition.name)
+    assert_recv_armev("bob", :start, false, partition.name)
     assert_recv_partev(:start, :alarm, partition.name)
 
-    :ok = Partition.disarm(partition)
+    :ok = Partition.disarm(partition, "alice")
     assert_recv_partev(:stop, :alarm, partition.name)
-    assert_recv_armev(:stop, nil, partition.name)
+    assert_recv_armev("alice", :stop, false, partition.name)
     assert :idle == Partition.status({partition})
 
     refute_receive _
@@ -508,9 +508,10 @@ defmodule DtCore.Test.Monitor.Partition do
     end
   end
 
-  defp assert_recv_armev(operation, partial, name) when operation in [:start, :stop]
+  defp assert_recv_armev(initiator, operation, partial, name) when operation in [:start, :stop]
     and partial in [true, false, nil] do
-      {:bridge_ev, _, {^operation, %ArmEv{partial: ^partial, name: ^name}}}
+      {:bridge_ev, _, {^operation, %ArmEv{partial: ^partial, name: ^name,
+        id: _, initiator: ^initiator}}}
       |> assert_receive(5000)
   end
 
@@ -546,7 +547,7 @@ defmodule DtCore.Test.Monitor.Partition do
     {:ok, sensor, s_pid} = setup_teol_sensor()
     {partition, p_pid} = start_partition([sensor])
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "bob")
 
     assert :idle_arm == Partition.status({partition})
     assert :idle_arm == Detector.status({sensor})
@@ -583,7 +584,7 @@ defmodule DtCore.Test.Monitor.Partition do
 
     {partition, p_pid} = start_partition([sensor1, sensor2])
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "alice")
 
     assert :idle_arm == Partition.status({partition})
     assert :idle_arm == Detector.status({sensor1})
@@ -623,7 +624,7 @@ defmodule DtCore.Test.Monitor.Partition do
 
     {partition, p_pid} = start_partition([sensor1, sensor2])
 
-    :ok = Partition.arm(partition)
+    :ok = Partition.arm(partition, "cat")
 
     assert :idle_arm == Partition.status({partition})
     assert :idle_arm == Detector.status({sensor1})

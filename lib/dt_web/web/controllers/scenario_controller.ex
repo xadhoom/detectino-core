@@ -41,7 +41,7 @@ defmodule DtWeb.ScenarioController do
       nil -> 404
       record ->
         record
-        |> check_user(pin) # TODO: why? the PinAuthorize should do that for us.
+        |> check_user(pin)
         |> run_scenario()
     end
     send_resp(conn, code, StatusCodes.status_code(code))
@@ -53,13 +53,13 @@ defmodule DtWeb.ScenarioController do
 
     case u do
       nil -> nil
-      _ ->
-        scenario
-        |> Repo.preload(:partitions_scenarios)
+      user ->
+        newscenario = Repo.preload(scenario, :partitions_scenarios)
+        {newscenario, user}
     end
   end
 
-  defp run_scenario(scenario) do
+  defp run_scenario({scenario, user}) do
     case scenario do
       nil -> 401
       x ->
@@ -67,7 +67,7 @@ defmodule DtWeb.ScenarioController do
           0 -> 403
           _ ->
             {ret, _any} = x.partitions_scenarios
-            |> run_scenario_in_txn()
+            |> run_scenario_in_txn(user)
             case ret do
               :ok -> 204
               _ -> 500
@@ -76,7 +76,7 @@ defmodule DtWeb.ScenarioController do
     end
   end
 
-  defp run_scenario_in_txn(partitions_scenarios) do
+  defp run_scenario_in_txn(partitions_scenarios, user) do
     Repo.transaction(fn ->
       partitions_scenarios
       |> Enum.all?(fn(partition_scenario) ->
@@ -85,7 +85,7 @@ defmodule DtWeb.ScenarioController do
         |> Repo.update
         case ret do
           :ok ->
-            arm_disarm_partition_proc(struct_or_cset)
+            arm_disarm_partition_proc(struct_or_cset, user)
             true
           :error ->
             Logger.error("Cannot update: #{inspect struct_or_cset}")
@@ -96,12 +96,12 @@ defmodule DtWeb.ScenarioController do
     end)
   end
 
-  defp arm_disarm_partition_proc(partition) do
+  defp arm_disarm_partition_proc(partition, user) do
     case partition.armed do
       "DISARM" ->
-        PartitionProcess.disarm(partition)
+        PartitionProcess.disarm(partition, user.username)
       v ->
-        PartitionProcess.arm(partition, v)
+        PartitionProcess.arm(partition, user.username, v)
     end
   end
 

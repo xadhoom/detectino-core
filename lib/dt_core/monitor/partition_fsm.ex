@@ -29,21 +29,21 @@ defmodule DtCore.Monitor.PartitionFsm do
     #
   end
 
-  def arm(server) do
-    GenStateMachine.call(server, {:arm, false, 0})
+  def arm(server, initiator) do
+    GenStateMachine.call(server, {:arm, initiator, false, 0})
   end
 
-  def arm(server, exit_timeout) when is_integer(exit_timeout) do
-    GenStateMachine.call(server, {:arm, :normal, exit_timeout})
+  def arm(server, initiator, exit_timeout) when is_integer(exit_timeout) do
+    GenStateMachine.call(server, {:arm, initiator, :normal, exit_timeout})
   end
 
-  def arm(server, mode, exit_timeout)
+  def arm(server, initiator, mode, exit_timeout)
     when mode in [:stay, :immediate] and is_integer(exit_timeout) do
-    GenStateMachine.call(server, {:arm, mode, exit_timeout})
+    GenStateMachine.call(server, {:arm, initiator, mode, exit_timeout})
   end
 
-  def disarm(server) do
-    GenStateMachine.call(server, :disarm)
+  def disarm(server, initiator) do
+    GenStateMachine.call(server, {:disarm, initiator})
   end
 
   def status(server) do
@@ -63,6 +63,7 @@ defmodule DtCore.Monitor.PartitionFsm do
       config: config,
       receiver: receiver,
       last_event_id: Utils.random_id(),
+      last_arm_event: nil,
       tampered: [],
       alarmed: []}
     }
@@ -110,12 +111,14 @@ defmodule DtCore.Monitor.PartitionFsm do
   end
 
   # process arm request in idle state
-  def handle_event({:call, from}, {:arm, mode, exit_timeout}, :idle, data)
-    when mode in [:stay, :immediate, :normal] and is_integer(exit_timeout) do
+  def handle_event({:call, from}, {:arm, initiator, mode, exit_timeout}, :idle, data)
+    when mode in [:stay, :immediate, :normal] and is_integer(exit_timeout)
+    and is_binary(initiator) do
 
     # prepare a new arm ev var to be sent later
     partial = mode in [:stay, :immediate]
-    arm_ev = %ArmEv{name: data.config.name, partial: partial}
+    arm_ev = %ArmEv{name: data.config.name, partial: partial,
+      initiator: initiator, id: Utils.random_id()}
 
     # check all sensors status
     all_idle = Enum.all?(data.config.sensors, fn(sensor) ->
@@ -130,7 +133,8 @@ defmodule DtCore.Monitor.PartitionFsm do
           ex_ev = %ExitTimerEv{name: data.config.name, id: Utils.random_id()}
           send data.receiver, {:start, ex_ev}
           # move to exit_wait state and send back :ok
-          {:next_state, :exit_wait, %{data | armed: true, last_event_id: ex_ev.id}, [
+          {:next_state, :exit_wait, %{data | armed: true,
+            last_event_id: ex_ev.id, last_arm_event: arm_ev}, [
             {:reply, from, :ok},
             {:state_timeout, exit_timeout, :exit_timer_expired}
             ]}
@@ -138,13 +142,15 @@ defmodule DtCore.Monitor.PartitionFsm do
           arm_sensors(data, mode)
           send data.receiver, {:start, arm_ev}
           # move to idle_arm state and send back :ok
-          {:next_state, :idle_arm, %{data | armed: true}, {:reply, from, :ok}}
+          {:next_state, :idle_arm, %{data | armed: true,
+            last_arm_event: arm_ev}, {:reply, from, :ok}}
         end
       else
         arm_sensors(data, mode)
         send data.receiver, {:start, arm_ev}
         # move to idle_arm state and send back :ok
-        {:next_state, :idle_arm, %{data | armed: true}, {:reply, from, :ok}}
+        {:next_state, :idle_arm, %{data | armed: true,
+          last_arm_event: arm_ev}, {:reply, from, :ok}}
       end
     else
       # blah blah keep state and send back {:error, :tripped}
@@ -155,11 +161,11 @@ defmodule DtCore.Monitor.PartitionFsm do
   end
 
   # process disarm request in idle_arm state
-  def handle_event({:call, from}, :disarm, :idle_arm, data) do
+  def handle_event({:call, from}, {:disarm, initiator}, :idle_arm, data) do
     Enum.each(data.config.sensors, fn(sensor) ->
       :ok = Detector.disarm({sensor})
     end)
-    send data.receiver, {:stop, %ArmEv{name: data.config.name}}
+    send data.receiver, {:stop, %{data.last_arm_event | initiator: initiator}}
     {:next_state, :idle, %{data | armed: false}, {:reply, from, :ok}}
   end
 
@@ -200,13 +206,13 @@ defmodule DtCore.Monitor.PartitionFsm do
   end
 
   # process disarm request in exit_wait state
-  def handle_event({:call, from}, :disarm, :exit_wait, data) do
+  def handle_event({:call, from}, {:disarm, initiator}, :exit_wait, data) do
     Enum.each(data.config.sensors, fn(sensor) ->
       :ok = Detector.disarm({sensor})
     end)
     send data.receiver, {:stop, %ExitTimerEv{name: data.config.name,
       id: data.last_event_id}}
-    send data.receiver, {:stop, %ArmEv{name: data.config.name}}
+    send data.receiver, {:stop, %{data.last_arm_event | initiator: initiator}}
     {:next_state, :idle, %{data | armed: false}, {:reply, from, :ok}}
   end
 
@@ -285,7 +291,7 @@ defmodule DtCore.Monitor.PartitionFsm do
   end
 
   # process disarm request in tripped state
-  def handle_event({:call, from}, :disarm, :tripped, data) do
+  def handle_event({:call, from}, {:disarm, initiator}, :tripped, data) do
     Enum.each(data.config.sensors, fn(sensor) ->
       :ok = Detector.disarm({sensor})
     end)
@@ -307,7 +313,7 @@ defmodule DtCore.Monitor.PartitionFsm do
       []
     end
 
-    send data.receiver, {:stop, %ArmEv{name: data.config.name}}
+    send data.receiver, {:stop, %{data.last_arm_event | initiator: initiator}}
 
     newdata = %{data | alarmed: alarmed, tampered: tampered, armed: false}
     {:next_state, :idle, newdata, {:reply, from, :ok}}
