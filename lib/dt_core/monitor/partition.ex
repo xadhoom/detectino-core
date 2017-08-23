@@ -96,7 +96,8 @@ defmodule DtCore.Monitor.Partition do
   end
 
   def status({config = %PartitionModel{}}) do
-    Utils.partition_server_pid(config)
+    config
+    |> Utils.partition_server_pid()
     |> GenServer.call(:status)
   end
   def status(server) when is_pid(server) do

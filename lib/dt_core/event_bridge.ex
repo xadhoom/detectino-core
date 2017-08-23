@@ -32,7 +32,7 @@ defmodule DtCore.EventBridge do
     GenServer.call(__MODULE__, {:start_listening, self(), filter_fun})
   end
 
-  def stop_listening() do
+  def stop_listening do
     GenServer.call(__MODULE__, {:stop_listening, self()})
   end
 

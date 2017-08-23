@@ -73,7 +73,6 @@ defmodule DtWeb.StatusCodes do
     end)
     |> Enum.into(%{})
 
-
   def status_code(code) when is_integer(code), do: Map.fetch!(@http_status_codes, code)
   def status_code(atom) when is_atom(atom), do: Map.fetch!(@atom_to_status_code, atom)
 

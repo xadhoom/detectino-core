@@ -16,7 +16,7 @@ defmodule DtCore.EventLogger do
 
   require Logger
 
-  def start_link() do
+  def start_link do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
@@ -101,7 +101,8 @@ defmodule DtCore.EventLogger do
   end
 
   defp save_eventlog(params) do
-    EventLog.create_changeset(%EventLog{}, params)
+    %EventLog{}
+    |> EventLog.create_changeset(params)
     |> Repo.insert!
   end
 

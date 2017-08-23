@@ -40,7 +40,8 @@ defmodule DtCore.Monitor.Detector do
   end
 
   def link({config = %SensorModel{}}) do
-    Utils.sensor_server_pid(config)
+    config
+    |> Utils.sensor_server_pid()
     |> Process.link
   end
 

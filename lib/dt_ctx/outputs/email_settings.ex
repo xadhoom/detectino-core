@@ -13,7 +13,6 @@ defmodule DtCtx.Outputs.EmailSettings do
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
   @email_re ~r/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
 
-
   def changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)

@@ -16,7 +16,6 @@ defmodule DtWeb.EventLogController do
   plug EnsureAuthenticated, [handler: SessionController]
   plug PinAuthorize
 
-
   def create(conn, _params) do
     send_resp(conn, 501, StatusCodes.status_code(501))
   end
@@ -37,10 +36,11 @@ defmodule DtWeb.EventLogController do
     send_resp(conn, code, StatusCodes.status_code(code))
   end
 
-  def ackall_txn() do
+  def ackall_txn do
     q = from e in EventLog,
       where: [acked: false]
-    Repo.all(q)
+    q
+    |> Repo.all()
     |> Enum.each(fn(ev) ->
       case do_ack(ev) do
         204 -> nil
@@ -61,7 +61,7 @@ defmodule DtWeb.EventLogController do
     case eventlog do
       nil -> 401
       x ->
-        {ret, _} = EventLog.ack(x) |> Repo.update
+        {ret, _} = x |> EventLog.ack() |> Repo.update
         case ret do
           :ok -> 204
           _ -> 500

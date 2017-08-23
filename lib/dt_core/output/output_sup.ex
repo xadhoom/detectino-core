@@ -6,7 +6,7 @@ defmodule DtCore.Output.OutputSup do
   use Supervisor
   require Logger
 
-  def start_link() do
+  def start_link do
     Supervisor.start_link(__MODULE__, [], [name: __MODULE__])
   end
 
