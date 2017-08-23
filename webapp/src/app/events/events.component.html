@@ -51,6 +51,7 @@
         <div class="ui-g-12" [ngSwitch]="event.source">
           <app-sensor-config *ngSwitchCase="'sensor'" [strconfig]="event.source_config" #sensorconfig> </app-sensor-config>
           <app-partition-config *ngSwitchCase="'partition'" [strconfig]="event.source_config" #partitionconfig> </app-partition-config>
+          <app-arming-config *ngSwitchCase="'arming'" [strconfig]="event.source_config" #armingconfig> </app-arming-config>
         </div>
 
       </div>

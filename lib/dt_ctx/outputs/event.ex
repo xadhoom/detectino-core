@@ -1,3 +1,8 @@
+defmodule DtCtx.Outputs.Event.ArmEvConf do
+  defstruct name: nil,
+    initiator: nil
+end
+
 defmodule DtCtx.Outputs.Event.PartitionEvConf do
   defstruct name: nil,
     type: nil
@@ -14,6 +19,7 @@ defmodule DtCtx.Outputs.Event do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias DtCtx.Outputs.Event.ArmEvConf
   alias DtCtx.Outputs.Event.SensorEvConf
   alias DtCtx.Outputs.Event.PartitionEvConf
 
@@ -32,7 +38,7 @@ defmodule DtCtx.Outputs.Event do
   @optional_fields ~w(description)
   @required_fields ~w(name source source_config)
   @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
-  @source_types ["sensor", "partition"]
+  @source_types ["sensor", "partition", "arming"]
 
   def create_changeset(model, params \\ %{}) do
     model
@@ -71,6 +77,9 @@ defmodule DtCtx.Outputs.Event do
       {_, "partition"} ->
         ret = Poison.decode(change, as: %PartitionEvConf{})
         validate_config(changeset, ret)
+      {_, "arming"} ->
+        ret = Poison.decode(change, as: %ArmEvConf{})
+        validate_config(changeset, ret)
       _ ->
         add_error(changeset, :source, "invalid")
     end
@@ -108,6 +117,15 @@ defmodule DtCtx.Outputs.Event do
   end
 
   defp validate_config(changeset, {:ok, %PartitionEvConf{}}) do
+    changeset
+  end
+
+  defp validate_config(changeset, {:ok, %ArmEvConf{name: nil}}) do
+    add_error(changeset, :source_config,
+      "invalid arming config format: name")
+  end
+
+  defp validate_config(changeset, {:ok, %ArmEvConf{}}) do
     changeset
   end
 end

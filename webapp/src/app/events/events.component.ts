@@ -4,6 +4,7 @@ import { Event } from '../models/event';
 import { Output } from '../models/output';
 import { SensorConfigComponent } from './sensor-config/sensor-config.component';
 import { PartitionConfigComponent } from './partition-config/partition-config.component';
+import { ArmingConfigComponent } from './arming-config/arming-config.component';
 import { SelectItem } from 'primeng/primeng';
 
 @Component({
@@ -19,6 +20,9 @@ export class EventsComponent implements OnInit {
   @ViewChild('partitionconfig')
   partitionconfig: PartitionConfigComponent;
 
+  @ViewChild('armingconfig')
+  armingconfig: ArmingConfigComponent;
+
   event: Event;
 
   events: Event[];
@@ -32,6 +36,7 @@ export class EventsComponent implements OnInit {
   displayDialog: boolean;
   showSensorConfig: boolean;
   showPartitionConfig: boolean;
+  showArmingConfig: boolean;
 
   newEvent: boolean;
 
@@ -45,6 +50,7 @@ export class EventsComponent implements OnInit {
     this.sources = [{ label: 'Select a source', value: null }];
     this.sources.push({ label: 'Sensor', value: 'sensor' });
     this.sources.push({ label: 'Partition', value: 'partition' });
+    this.sources.push({ label: 'Arming', value: 'arming' });
     this.all();
   };
 
@@ -73,6 +79,8 @@ export class EventsComponent implements OnInit {
       this.event.source_config = this.sensorconfig.get();
     } else if (this.event.source === 'partition') {
       this.event.source_config = this.partitionconfig.get();
+    } else if (this.event.source === 'arming') {
+      this.event.source_config = this.armingconfig.get();
     } else {
       this.event.source_config = null;
     }

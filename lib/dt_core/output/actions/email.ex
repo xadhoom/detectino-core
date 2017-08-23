@@ -12,6 +12,7 @@ defmodule DtCore.Output.Actions.Email do
   """
   import Swoosh.Email
 
+  alias DtCore.ArmEv
   alias DtCore.DetectorEv
   alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
@@ -53,12 +54,20 @@ defmodule DtCore.Output.Actions.Email do
   end
   def custom(email, _ev) do email end
 
+  def build_subject({:on, _ev = %ArmEv{}}) do
+    get_subject(:arm_start)
+  end
+
   def build_subject({:on, _ev = %DetectorEv{}}) do
     get_subject(:sensor_start)
   end
 
   def build_subject({:on, _ev = %PartitionEv{}}) do
     get_subject(:partition_start)
+  end
+
+  def build_subject({:off, _ev = %ArmEv{}}) do
+    get_subject(:arm_end)
   end
 
   def build_subject({:off, _ev = %DetectorEv{}}) do
@@ -75,6 +84,10 @@ defmodule DtCore.Output.Actions.Email do
 
   def build_subject({:off, _ev = %DetectorEntryEv{}}) do
     get_delayed_subject(:sensor_end)
+  end
+
+  def build_msg(ev = %ArmEv{}) do
+    ev.name <> " arming by: " <> ev.initiator
   end
 
   def build_msg(ev = %DetectorEv{}) do

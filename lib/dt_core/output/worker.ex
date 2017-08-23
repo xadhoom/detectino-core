@@ -12,10 +12,12 @@ defmodule DtCore.Output.Worker do
   alias DtCtx.Outputs.Event, as: EventModel
   alias DtCtx.Outputs.Event.SensorEvConf
   alias DtCtx.Outputs.Event.PartitionEvConf
+  alias DtCtx.Outputs.Event.ArmEvConf
   alias DtCore.OutputsRegistry
   alias DtCore.DetectorEv
   alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
+  alias DtCore.ArmEv
   alias DtCore.Output.Actions.Bus
   alias DtCore.Output.Actions.Email
 
@@ -65,6 +67,11 @@ defmodule DtCore.Output.Worker do
     {:reply, :ok, state}
   end
 
+  def handle_info({:start, ev = %ArmEv{}}, state) do
+    run_on_action(ev, state)
+    {:noreply, state}
+  end
+
   def handle_info({:start, ev = %DetectorEv{}}, state) do
     run_on_action(ev, state)
     {:noreply, state}
@@ -77,6 +84,11 @@ defmodule DtCore.Output.Worker do
 
   def handle_info({:start, ev = %PartitionEv{}}, state) do
     run_on_action(ev, state)
+    {:noreply, state}
+  end
+
+  def handle_info({:stop, ev = %ArmEv{}}, state) do
+    run_recover_action(ev, state)
     {:noreply, state}
   end
 
@@ -140,6 +152,10 @@ defmodule DtCore.Output.Worker do
         event.source_config
         |> Poison.decode!(as: %PartitionEvConf{})
         |> get_sub_key
+      "arming" ->
+        event.source_config
+        |> Poison.decode!(as: %ArmEvConf{})
+        |> get_sub_key
       _ -> nil
     end
 
@@ -162,6 +178,12 @@ defmodule DtCore.Output.Worker do
     %{
       source: :partition, name: conf.name,
       type: alm_str_type_to_atom(conf.type)
+    }
+  end
+
+  defp get_sub_key(conf = %ArmEvConf{}) do
+    %{
+      source: :arming, name: conf.name
     }
   end
 

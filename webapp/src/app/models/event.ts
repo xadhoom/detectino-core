@@ -21,3 +21,7 @@ export class EventPartitionConfig {
   name: string;
   type: string;
 }
+
+export class EventArmingConfig {
+  name: string;
+}

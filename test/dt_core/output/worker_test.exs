@@ -14,6 +14,7 @@ defmodule DtCore.Test.Output.Worker do
   alias DtCore.DetectorEv
   alias DtCore.DetectorEntryEv
   alias DtCore.PartitionEv
+  alias DtCore.ArmEv
   alias Swoosh.Email
   alias DtCore.Output.Actions.Email, as: EmailConfig
 
@@ -66,6 +67,12 @@ defmodule DtCore.Test.Output.Worker do
   test "worker listens to associated events" do
     events = [
       %EventModel{
+        source: "arming",
+        source_config: Poison.encode!(%{
+          name: "area one"
+        })
+      },
+      %EventModel{
         source: "partition",
         source_config: Poison.encode!(%{
           name: "area one", type: "alarm"
@@ -83,7 +90,7 @@ defmodule DtCore.Test.Output.Worker do
     {:ok, pid} = Worker.start_link({output})
 
     listeners = Registry.keys(OutputsRegistry.registry, pid)
-    assert Enum.count(listeners) == 2
+    assert Enum.count(listeners) == 3
 
     key = %{source: :partition, name: "area one", type: :alarm}
     listeners = Registry.lookup(OutputsRegistry.registry, key)
@@ -92,10 +99,20 @@ defmodule DtCore.Test.Output.Worker do
     key = %{source: :sensor, address: "10", port: 5, type: :alarm}
     listeners = Registry.lookup(OutputsRegistry.registry, key)
     assert Enum.count(listeners) == 1
+
+    key = %{source: :arming, name: "area one"}
+    listeners = Registry.lookup(OutputsRegistry.registry, key)
+    assert Enum.count(listeners) == 1
   end
 
-  test "emails are sent after an alarm event" do
+  test "emails are sent on alarm event" do
     events = [
+      %EventModel{
+        source: "arming",
+        source_config: Poison.encode!(%{
+          name: "area one"
+        })
+      },
       %EventModel{
         source: "partition",
         source_config: Poison.encode!(%{
@@ -129,6 +146,8 @@ defmodule DtCore.Test.Output.Worker do
     p_ev = {:start, %PartitionEv{type: :alarm, name: "area one", id: Utils.random_id()}}
     s_ev_end = {:stop, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
     p_ev_end = {:stop, %PartitionEv{type: :alarm, name: "area one", id: Utils.random_id()}}
+    arm_start = {:start, %ArmEv{name: "area one", initiator: "admin", id: Utils.random_id()}}
+    arm_stop = {:stop, %ArmEv{name: "area one", initiator: "admin", id: Utils.random_id()}}
 
     s_ev_delayed = {:start,
       %DetectorEntryEv{address: "10", port: 5, id: Utils.random_id()}}
@@ -147,6 +166,14 @@ defmodule DtCore.Test.Output.Worker do
 
     Worker.handle_info(s_ev_delayed, state)
     get_delayed_subject(:sensor_start) |> assert_email(true)
+
+    Worker.handle_info(arm_start, state)
+    subj = get_subject(:arm_start)
+    assert_received {:email, %Email{subject: ^subj}}
+
+    Worker.handle_info(arm_stop, state)
+    subj = get_subject(:arm_end)
+    assert_received {:email, %Email{subject: ^subj}}
   end
 
   test "monostable output on time" do

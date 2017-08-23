@@ -37,6 +37,7 @@ import { SettingsComponent } from './settings/settings.component';
 import { IntrusionComponent } from './intrusion/intrusion.component';
 import { PartitionConfigComponent } from './events/partition-config/partition-config.component';
 import { SensorConfigComponent } from './events/sensor-config/sensor-config.component';
+import { ArmingConfigComponent } from './events/arming-config/arming-config.component';
 import { PartitionsScenariosComponent } from './scenarios/partitions-scenarios/partitions-scenarios.component';
 import { PindialogComponent } from './pindialog/pindialog.component';
 import { EventlogsComponent } from './eventlogs/eventlogs.component';
@@ -69,6 +70,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
     IntrusionComponent,
     PartitionConfigComponent,
     SensorConfigComponent,
+    ArmingConfigComponent,
     ScenarioslistComponent,
     PartitionsScenariosComponent,
     PindialogComponent,
