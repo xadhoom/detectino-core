@@ -65,6 +65,8 @@ defmodule DtCtx.Outputs.EventLog do
     |> add_id
   end
 
+  @spec update_changeset(any) :: no_return
+  @spec update_changeset(any, any) :: no_return
   def update_changeset(_model, _params \\ %{}) do
     raise Ecto.ChangeError, message: "Cannot update an event log"
   end
