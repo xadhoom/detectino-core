@@ -67,7 +67,7 @@ defmodule Detectino.Mixfile do
      {:gen_state_machine, "~> 2.0"},
      # devel stuff
      {:credo, "~> 0.8", only: [:dev, :test]},
-     {:excoveralls, "~> 0.5", only: [:dev, :test]},
+     {:excoveralls, "~> 0.7", only: [:dev, :test]},
      {:meck, git: "https://github.com/eproxus/meck.git", only: [:test]},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
      # release stuff
