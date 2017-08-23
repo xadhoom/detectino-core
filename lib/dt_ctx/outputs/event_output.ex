@@ -3,8 +3,8 @@ defmodule DtCtx.Outputs.EventOutput do
   import Ecto.Changeset
 
   schema "events_outputs" do
-    belongs_to :event, Event
-    belongs_to :output, Output
+    belongs_to :event, DtCtx.Outputs.Event
+    belongs_to :output, DtCtx.Outputs.Output
 
     timestamps()
   end
