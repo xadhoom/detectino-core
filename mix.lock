@@ -11,7 +11,7 @@
   "credo": {:hex, :credo, "0.8.2", "aa410c8f27c5fab00cab24f8477782bde9100b73d31debdce46625f097cc0e32", [:mix], [{:bunt, "~> 0.2.0", [hex: :bunt, repo: "hexpm", optional: false]}], "hexpm"},
   "db_connection": {:hex, :db_connection, "1.1.2", "2865c2a4bae0714e2213a0ce60a1b12d76a6efba0c51fbda59c9ab8d1accc7a8", [:mix], [{:connection, "~> 1.0.2", [hex: :connection, repo: "hexpm", optional: false]}, {:poolboy, "~> 1.5", [hex: :poolboy, repo: "hexpm", optional: true]}, {:sbroker, "~> 1.0", [hex: :sbroker, repo: "hexpm", optional: true]}], "hexpm"},
   "decimal": {:hex, :decimal, "1.4.0", "fac965ce71a46aab53d3a6ce45662806bdd708a4a95a65cde8a12eb0124a1333", [:mix], [], "hexpm"},
-  "dialyxir": {:hex, :dialyxir, "0.5.0", "5bc543f9c28ecd51b99cc1a685a3c2a1a93216990347f259406a910cf048d1d7", [:mix], [], "hexpm"},
+  "dialyxir": {:hex, :dialyxir, "0.5.1", "b331b091720fd93e878137add264bac4f644e1ddae07a70bf7062c7862c4b952", [:mix], [], "hexpm"},
   "distillery": {:hex, :distillery, "1.4.1", "546d851bf27ae8fe0727e10e4fc4e146ad836eecee138263a60431e688044ed3", [:mix], [], "hexpm"},
   "dthread": {:git, "https://github.com/tonyrog/dthread.git", "d763748f1d2af31762682772e28e412906b8fef5", []},
   "earmark": {:hex, :earmark, "1.2.2", "f718159d6b65068e8daeef709ccddae5f7fdc770707d82e7d126f584cd925b74", [:mix], [], "hexpm"},
