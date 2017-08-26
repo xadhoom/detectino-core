@@ -37,7 +37,8 @@ config :detectino, DtCtx.Repo,
   password: "postgres",
   database: "dt_web_dev",
   hostname: "localhost",
-  pool_size: 10
+  pool_size: 10,
+  loggers: []
 
 config :detectino, DtCore.Output.Actions.Email.Mailer,
   adapter: Swoosh.Adapters.Local
