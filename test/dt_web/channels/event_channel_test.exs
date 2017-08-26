@@ -6,6 +6,7 @@ defmodule DtWeb.EventChannelTest do
   alias DtCore.Monitor.Partition
   alias DtCore.Monitor.Controller
   alias DtCore.EventBridge
+  alias DtCore.EventLogger
   alias DtCtx.Monitoring.Sensor, as: SensorModel
   alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtCore.Test.TimerHelper
@@ -78,6 +79,17 @@ defmodule DtWeb.EventChannelTest do
 
     assert_push "start", %{partition: "prot"}, 5000
     assert_push "stop", %{partition: "prot"}, 5000
+  end
+
+  test "gets unacked alarm events" do
+    {:ok, _} = EventLogger.start_link()
+
+    start_alarmed_partition()
+
+    {:ok, _, _socket} = socket()
+    |> subscribe_and_join(ChannelEvent, "event:alarm_events", %{})
+
+    assert_push "alarm_events", %{events: 6}, 2000
   end
 
   defp start_idle_partition do

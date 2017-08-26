@@ -2,6 +2,7 @@ defmodule DtCore.StatusTracker do
   @moduledoc """
   Helper module to get alarm status on partitions and sensors.
   """
+  alias DtCtx.Outputs
   alias DtCore.Monitor.Partition
   alias DtCore.Monitor.Controller
 
@@ -23,6 +24,12 @@ defmodule DtCore.StatusTracker do
   @spec armed?() :: boolean
   def armed? do
     Controller.get_partitions() |> any_armed?
+  end
+
+  @doc "Return the number of unacked events"
+  @spec unacked_events() :: non_neg_integer()
+  def unacked_events do
+    Outputs.unacked_log_events()
   end
 
   defp in_alarm?(pids) do

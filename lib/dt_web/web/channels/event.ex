@@ -18,6 +18,11 @@ defmodule DtWeb.Channels.Event do
     {:ok, socket}
   end
 
+  def join("event:alarm_events", _message, socket) do
+    send(self(), :after_join_alarm_events)
+    {:ok, socket}
+  end
+
   def join("event:exit_timer", _message, socket) do
     EventBridge.start_listening(fn (ev) ->
       case ev do
@@ -47,6 +52,12 @@ defmodule DtWeb.Channels.Event do
   def handle_info(:after_join_alarm, socket) do
     Etimer.start_link(socket)
     push_alarm_status(socket)
+    {:noreply, socket}
+  end
+
+  def handle_info(:after_join_alarm_events, socket) do
+    Etimer.start_link(socket)
+    push_unacked_ev_status(socket)
     {:noreply, socket}
   end
 
@@ -82,6 +93,14 @@ defmodule DtWeb.Channels.Event do
     push socket, "alarm", %{alarmed: alarmed}
     Etimer.start_timer(socket, :time, 1000,
       {__MODULE__, :push_alarm_status, [socket]}
+    )
+  end
+
+  def push_unacked_ev_status(socket) do
+    events = StatusTracker.unacked_events()
+    push socket, "alarm_events", %{events: events}
+    Etimer.start_timer(socket, :time, 2_000,
+      {__MODULE__, :push_unacked_ev_status, [socket]}
     )
   end
 
