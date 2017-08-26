@@ -25,9 +25,6 @@ config :detectino, DtWeb.Endpoint,
 #    ]
 #  ]
 
-# Do not include metadata nor timestamps in development logs
-config :logger, :console, metadata: [:pid]
-
 # Set a higher stacktrace during development.
 # Do not configure such in production as keeping
 # and calculating stacktraces is usually expensive.

@@ -15,9 +15,16 @@ config :detectino, DtWeb.Endpoint,
            adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
+config :logger,
+  backends: [:console, {LoggerFileBackend, :file_log}]
+
+config :logger, :file_log,
+  path: "/tmp/detectino.log",
+  metadata: [:pid]
+
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  metadata: [:request_id, :pid]
 
 # Stop lager redirecting :error_logger messages
 config :lager, :error_logger_redirect, false
