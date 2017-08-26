@@ -143,6 +143,42 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "guardian.Elixir.Guardian.hooks"
     ],
+    "logger.backends": [
+      commented: false,
+      datatype: [
+        list: [
+          :atom,
+          atom: :atom
+        ]
+      ],
+      default: [
+        :console,
+        "LoggerFileBackend": :file_log
+      ],
+      doc: "Provide documentation for logger.backends here.",
+      hidden: true,
+      to: "logger.backends"
+    ],
+    "logger.file_log.path": [
+      commented: false,
+      datatype: :binary,
+      default: "/tmp/detectino.log",
+      doc: "Provide documentation for logger.file_log.path here.",
+      hidden: false,
+      to: "logger.file_log.path"
+    ],
+    "logger.file_log.metadata": [
+      commented: false,
+      datatype: [
+        list: :atom
+      ],
+      default: [
+        :pid
+      ],
+      doc: "Provide documentation for logger.file_log.metadata here.",
+      hidden: true,
+      to: "logger.file_log.metadata"
+    ],
     "logger.console.format": [
       commented: false,
       datatype: :binary,
@@ -159,7 +195,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         list: :atom
       ],
       default: [
-        :request_id
+        :request_id,
+        :pid
       ],
       doc: "Provide documentation for logger.console.metadata here.",
       hidden: true,
@@ -172,18 +209,6 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       doc: "Provide documentation for logger.level here.",
       hidden: false,
       to: "logger.level"
-    ],
-    "logger.metadata": [
-      commented: false,
-      datatype: [
-        list: :atom
-      ],
-      default: [
-        :pid
-      ],
-      doc: "Provide documentation for logger.metadata here.",
-      hidden: true,
-      to: "logger.metadata"
     ],
     "phoenix.generators.migration": [
       commented: false,
@@ -240,6 +265,22 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_start": [
+      commented: false,
+      datatype: :binary,
+      default: "Partition armed",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_start here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_start"
+    ],
+    "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_end": [
+      commented: false,
+      datatype: :binary,
+      default: "Partition disarmed",
+      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_end here.",
+      hidden: false,
+      to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_end"
     ],
     "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_start": [
       commented: false,
