@@ -32,6 +32,7 @@ export class AppComponent implements AfterViewInit {
   public date: string;
 
   public isArmed: boolean;
+  public unAckedAlarms: boolean;
 
   constructor(private el: ElementRef, public router: Router,
     public auth: AuthService,
@@ -64,6 +65,7 @@ export class AppComponent implements AfterViewInit {
     this.socket.subscribe('event:exit_timer', 'stop', (ev) => this.stopExitTimerEv(ev));
     this.socket.subscribe('event:entry_timer', 'start', (ev) => this.startEntryTimerEv(ev));
     this.socket.subscribe('event:entry_timer', 'stop', (ev) => this.stopEntryTimerEv(ev));
+    this.socket.subscribe('event:alarm_events', 'alarm_events', (ev) => this.onAlarmEvents(ev));
   }
 
   updateArmState(isarmed) {
@@ -92,6 +94,14 @@ export class AppComponent implements AfterViewInit {
   stopEntryTimerEv(ev) {
     console.log(ev);
     this.beeper.stop_beeping();
+  };
+
+  onAlarmEvents(ev) {
+    if (ev.events > 0) {
+      this.unAckedAlarms = true;
+      return;
+    }
+    this.unAckedAlarms = false;
   };
 
   updateTime(time) {

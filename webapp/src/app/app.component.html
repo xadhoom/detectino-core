@@ -12,6 +12,9 @@
         <div class="date">{{date}}</div>
       </div>
       <div class="topbar-right">
+        <a *ngIf="unAckedAlarms">
+          <i class="material-icons dt-topbar-icons" [style.color]="'red'">priority_high</i>
+        </a>
         <a (click)="pinSrv.resetPin()" *ngIf="pinSrv.getPin()">
           <i class="material-icons dt-topbar-icons">warning</i>
         </a>
