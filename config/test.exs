@@ -8,7 +8,9 @@ config :detectino, DtWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger,
+  backends: [:console]
+  level: :warn
 
 # Configure your database
 config :detectino, DtCtx.Repo,
