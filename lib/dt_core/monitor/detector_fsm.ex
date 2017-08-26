@@ -280,6 +280,11 @@ defmodule DtCore.Monitor.DetectorFsm do
     {:next_state, :tampered_arm, %{data | last_event: new_ev}}
   end
 
+  # process alarm event in exit_wait state
+  def handle_event(:cast, _ev = %DetectorEv{type: :alarm}, :exit_wait, _data) do
+    :keep_state_and_data
+  end
+
   # process timeout exit event in exit_wait state
   def handle_event(:state_timeout, :exit_timer_expired, :exit_wait, data) do
     idle_ev = %DetectorEv{port: data.config.port, address: data.config.address,
