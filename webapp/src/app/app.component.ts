@@ -62,6 +62,8 @@ export class AppComponent implements AfterViewInit {
     this.socket.subscribe('event:arm', 'arm', (isarmed) => this.updateArmState(isarmed));
     this.socket.subscribe('event:exit_timer', 'start', (ev) => this.startExitTimerEv(ev));
     this.socket.subscribe('event:exit_timer', 'stop', (ev) => this.stopExitTimerEv(ev));
+    this.socket.subscribe('event:entry_timer', 'start', (ev) => this.startEntryTimerEv(ev));
+    this.socket.subscribe('event:entry_timer', 'stop', (ev) => this.stopEntryTimerEv(ev));
   }
 
   updateArmState(isarmed) {
@@ -74,14 +76,22 @@ export class AppComponent implements AfterViewInit {
 
   startExitTimerEv(ev) {
     console.log(ev);
-    const name = ev.partition;
-    this.beeper.start_beeping(name);
+    this.beeper.start_beeping();
   };
 
   stopExitTimerEv(ev) {
     console.log(ev);
-    const name = ev.partition;
-    this.beeper.stop_beeping(name);
+    this.beeper.stop_beeping();
+  };
+
+  startEntryTimerEv(ev) {
+    console.log(ev);
+    this.beeper.start_fast_beeping();
+  };
+
+  stopEntryTimerEv(ev) {
+    console.log(ev);
+    this.beeper.stop_beeping();
   };
 
   updateTime(time) {

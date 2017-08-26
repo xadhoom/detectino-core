@@ -2,29 +2,40 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class BeeperService {
-  private beepers: { [key: string]: any };
-  private interval: Number;
+  private interval: number;
   private audioContext: any;
+  private beeping: boolean;
+  private timer: any;
 
   constructor() {
-    this.beepers = {};
+    this.beeping = false;
+    this.timer = null;
     this.interval = 0.5 * 1000;
     this.audioContext = new AudioContext;
   }
 
-  public start_beeping(name: string) {
-    if (this.beepers[name]) {
-      return; // beeper is already running
+  public start_beeping() {
+    if (this.beeping) {
+      this.stop_beeping();
     }
-    const timer = setInterval(() => this.beep(), this.interval);
-    this.beepers[name] = timer;
+    this.timer = setInterval(() => this.beep(), this.interval);
+    this.beeping = true;
   }
 
-  public stop_beeping(name: string) {
-    const timer = this.beepers[name];
-    if (timer) {
-      clearInterval(timer);
-      this.beepers[name] = null;
+  public start_fast_beeping() {
+    if (this.beeping) {
+      this.stop_beeping();
+    }
+    const newInterval = this.interval / 2;
+    this.timer = setInterval(() => this.beep(), newInterval);
+    this.beeping = true;
+  }
+
+  public stop_beeping() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+      this.beeping = false;
     }
   }
 

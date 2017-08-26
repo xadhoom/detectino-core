@@ -4,6 +4,7 @@ defmodule DtWeb.Channels.Event do
   alias DtCore.StatusTracker
   alias DtCore.EventBridge
   alias DtCore.ExitTimerEv
+  alias DtCore.DetectorEntryEv
 
   require Logger
 
@@ -18,7 +19,22 @@ defmodule DtWeb.Channels.Event do
   end
 
   def join("event:exit_timer", _message, socket) do
-    EventBridge.start_listening()
+    EventBridge.start_listening(fn (ev) ->
+      case ev do
+        {_, {_, %ExitTimerEv{}}} -> true
+        _ -> false
+      end
+    end)
+    {:ok, socket}
+  end
+
+  def join("event:entry_timer", _message, socket) do
+    EventBridge.start_listening(fn (ev) ->
+      case ev do
+        {_, {_, %DetectorEntryEv{}}} -> true
+        _ -> false
+      end
+    end)
     {:ok, socket}
   end
 
@@ -34,13 +50,18 @@ defmodule DtWeb.Channels.Event do
     {:noreply, socket}
   end
 
-  def handle_info({:bridge_ev, _, {:start, ev = %ExitTimerEv{}}}, socket) do
-    push socket, "start", %{partition: ev.name}
+  def handle_info({:bridge_ev, _, {action, ev = %ExitTimerEv{}}}, socket)
+      when action in [:start, :stop] do
+    str_action = Atom.to_string(action)
+    push socket, str_action, %{source: :ExitTimerEv, partition: ev.name}
     {:noreply, socket}
   end
 
-  def handle_info({:bridge_ev, _, {:stop, ev = %ExitTimerEv{}}}, socket) do
-    push socket, "stop", %{partition: ev.name}
+  def handle_info({:bridge_ev, _, {action, ev = %DetectorEntryEv{}}}, socket)
+      when action in [:start, :stop] do
+    str_action = Atom.to_string(action)
+    push socket, str_action, %{
+      source: :DetectorEntryEv, address: ev.address, port: ev.port}
     {:noreply, socket}
   end
 
