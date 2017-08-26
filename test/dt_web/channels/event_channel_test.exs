@@ -89,7 +89,7 @@ defmodule DtWeb.EventChannelTest do
     {:ok, _, _socket} = socket()
     |> subscribe_and_join(ChannelEvent, "event:alarm_events", %{})
 
-    assert_push "alarm_events", %{events: 6}, 2000
+    assert_push "alarm_events", %{events: 3}, 5000
   end
 
   defp start_idle_partition do

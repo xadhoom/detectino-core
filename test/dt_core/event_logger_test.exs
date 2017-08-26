@@ -30,7 +30,7 @@ defmodule DtCore.Test.EventLoggerTest do
     log = Repo.one!(EventLog)
 
     assert log.type == "arm"
-    assert log.acked == false
+    assert log.acked == true
     assert log.operation == "start"
     assert log.details["ev"]["partial"] == false
   end
