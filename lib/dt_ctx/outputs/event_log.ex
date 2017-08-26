@@ -63,6 +63,7 @@ defmodule DtCtx.Outputs.EventLog do
     |> validate_required(@validate_required)
     |> validate_inclusion(:type, @source_types)
     |> add_id
+    |> set_ack
   end
 
   @spec update_changeset(any) :: no_return
@@ -82,6 +83,14 @@ defmodule DtCtx.Outputs.EventLog do
     |> Map.get(:id)
 
     put_change(changeset, :correlation_id, id)
+  end
+
+  defp set_ack(changeset) do
+    acked = case get_change(changeset, :type) do
+      "alarm" -> false
+      _ -> true
+    end
+    put_change(changeset, :acked, acked)
   end
 
 end
