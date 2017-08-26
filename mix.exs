@@ -65,6 +65,7 @@ defmodule Detectino.Mixfile do
      {:lager, git: "https://github.com/basho/lager.git", override: true},
      {:lager_logger, "~> 1.0"},
      {:gen_state_machine, "~> 2.0"},
+     {:logger_file_backend, "~> 0.0.10"},
      # devel stuff
      {:credo, "~> 0.8", only: [:dev, :test]},
      {:excoveralls, "~> 0.7", only: [:dev, :test]},
