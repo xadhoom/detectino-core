@@ -9,7 +9,7 @@ config :detectino, DtWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger,
-  backends: [:console]
+  backends: [:console],
   level: :warn
 
 # Configure your database
