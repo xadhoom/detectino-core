@@ -17,7 +17,7 @@ defmodule DtCtx.Accounts.User do
 
   def create_changeset(model, params \\ %{}) do
     model
-    |> cast(params, ~w(name username password role pin))
+    |> cast(params, ~w(name username password role pin pin_expire))
     |> validate_required([:name, :username, :password, :role])
     |> unique_constraint(:username)
     |> unique_constraint(:pin)
@@ -26,7 +26,7 @@ defmodule DtCtx.Accounts.User do
 
   def update_changeset(model, params \\ %{}) do
     model
-    |> cast(params, ~w(id name username password role pin))
+    |> cast(params, ~w(id name username password role pin pin_expire))
     |> validate_required([:id, :name, :username, :role])
     |> unique_constraint(:username)
     |> unique_constraint(:pin)
