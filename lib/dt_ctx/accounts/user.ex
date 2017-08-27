@@ -19,6 +19,7 @@ defmodule DtCtx.Accounts.User do
     model
     |> cast(params, ~w(name username password role pin pin_expire))
     |> validate_required([:name, :username, :password, :role])
+    |> validate_pin_expire()
     |> unique_constraint(:username)
     |> unique_constraint(:pin)
     |> maybe_update_password
@@ -28,6 +29,7 @@ defmodule DtCtx.Accounts.User do
     model
     |> cast(params, ~w(id name username password role pin pin_expire))
     |> validate_required([:id, :name, :username, :role])
+    |> validate_pin_expire()
     |> unique_constraint(:username)
     |> unique_constraint(:pin)
     |> maybe_update_password
@@ -48,6 +50,12 @@ defmodule DtCtx.Accounts.User do
 
   def valid_password?(password, crypted) do
     Bcrypt.checkpw(password, crypted)
+  end
+
+  defp validate_pin_expire(changeset) do
+    changeset
+    |> validate_number(:pin_expire, less_than_or_equal_to: 120_000)
+    |> validate_number(:pin_expire, greater_than_or_equal_to: 15_000)
   end
 
   defp validate_password(changeset) do
