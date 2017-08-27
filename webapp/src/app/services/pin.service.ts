@@ -26,6 +26,7 @@ export class PinService {
     return this.http.post('/api/users/check_pin',
       body, { headers: contentHeaders })
       .map(response => {
+        this.expireValue = response.json()['expire'];
         this.startExpireTimer();
         this.pin.next(pin);
       }).catch(this.handleError);
