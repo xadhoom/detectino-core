@@ -55,6 +55,13 @@
         </div>
 
         <div class="ui-g-12">
+          <label for="acPinExpire">Pin timeout (in milliseconds)</label>
+        </div>
+        <div class="ui-g-12">
+          <p-spinner id="acPinExpire" [(ngModel)]="user.pin_expire" [min]="15000" [max]="120000"></p-spinner>
+        </div>
+
+        <div class="ui-g-12">
           <label for="acPassword">Password</label>
         </div>
         <div class="ui-g-12">
