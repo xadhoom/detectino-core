@@ -21,12 +21,12 @@ defmodule DtWeb.UserController do
   end
 
   def check_pin(conn, %{"pin" => pin}) do
-    q = from u in User, where: u.pin == ^pin
+    q = from u in User, where: u.pin == ^pin, select: u.pin_expire
     case Repo.one(q) do
       nil ->
         send_resp(conn, 404, StatusCodes.status_code(404))
-      _ ->
-        send_resp(conn, 200, StatusCodes.status_code(200))
+      v ->
+        render(conn, :check_pin, expire: v)
     end
   end
 

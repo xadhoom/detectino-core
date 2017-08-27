@@ -4,4 +4,8 @@ defmodule DtWeb.UserView do
 
   @model :user
 
+  def render("check_pin.json", %{expire: v}) do
+    %{expire: v}
+  end
+
 end

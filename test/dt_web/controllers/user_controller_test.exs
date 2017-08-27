@@ -179,4 +179,13 @@ defmodule DtWeb.UserControllerTest do
     |> post(user_path(conn, :check_pin), %{pin: "666666"})
     response(conn, 200)
   end
+
+  test "pin check return it's expiry value", %{conn: conn}  do
+    conn = conn
+    |> Helper.login()
+    |> post(user_path(conn, :check_pin), %{pin: "666666"})
+    json = json_response(conn, 200)
+
+    assert json["expire"] == 60_000
+  end
 end
