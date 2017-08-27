@@ -10,6 +10,7 @@ defmodule DtCtx.Accounts.User do
     field :password, :string
     field :role, :string
     field :pin, :string
+    field :pin_expire, :integer
 
     timestamps()
   end
