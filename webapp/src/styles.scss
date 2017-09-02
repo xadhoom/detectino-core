@@ -3,11 +3,16 @@
 
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 
+.dashboard .colorbox i {
+  font-size: 200px;
+}
+
 .colorbox .fullname {
-  font-size: 1.5em;
+  font-size: 3em;
   color: #ffffff;
   //font-size: 36px;
   margin-top: 10px;
+  padding-bottom: 10px;
   line-height: 1;
   display: inline-block;
   text-transform: capitalize;
