@@ -15,11 +15,13 @@ defmodule DtWeb.EventController do
   alias DtWeb.Controllers.Helpers.Utils
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.Plugs.CheckPermissions
   alias Guardian.Plug.EnsureAuthenticated
 
   require Logger
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug CheckPermissions, [roles: [:admin]]
   plug PinAuthorize
   plug CoreReloader, nil when not action in [:index, :show]
 

@@ -7,6 +7,7 @@ defmodule DtWeb.ScenarioController do
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.Plugs.CheckPermissions
   alias DtWeb.StatusCodes
   alias DtCtx.Monitoring.Scenario
   alias DtCtx.Accounts.User
@@ -17,6 +18,7 @@ defmodule DtWeb.ScenarioController do
   require Logger
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug CheckPermissions, [roles: [:admin]] when not action in [:get_available, :run]
   plug PinAuthorize when not action in [:get_available]
   plug CoreReloader, nil when not action in [
     :index, :show, :get_available, :run]

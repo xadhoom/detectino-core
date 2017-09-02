@@ -5,11 +5,13 @@ defmodule DtWeb.UserController do
   alias DtWeb.SessionController
   alias DtWeb.StatusCodes
   alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.Plugs.CheckPermissions
   alias DtCtx.Accounts.User
 
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
+  plug CheckPermissions, [roles: [:admin]] when not action in [:check_pin]
   plug PinAuthorize when not action in [:check_pin]
 
   def delete(conn, %{"id" => "1"}) do

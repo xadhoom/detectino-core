@@ -9,11 +9,13 @@ defmodule DtWeb.PartitionController do
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.Plugs.CheckPermissions
   alias DtCore.Monitor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
 
   plug EnsureAuthenticated, [handler: SessionController]
   plug CoreReloader, nil when not action in [:index, :show, :arm, :disarm]
+  plug CheckPermissions, [roles: [:admin]] when not action in [:index, :arm, :disarm]
   plug PinAuthorize
 
   def disarm(conn, %{"id" => id}) do

@@ -6,9 +6,11 @@ defmodule DtWeb.OutputController do
   alias Guardian.Plug.EnsureAuthenticated
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.Plugs.CheckPermissions
 
   plug EnsureAuthenticated, [handler: SessionController]
   plug CoreReloader, nil when not action in [:index, :show]
+  plug CheckPermissions, [roles: [:admin]]
   plug PinAuthorize
 
 end
