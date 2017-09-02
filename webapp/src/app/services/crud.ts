@@ -179,12 +179,14 @@ export class Crud {
   };
 
   protected handleError(error: any) {
+    console.warn(error);
+
     const errTxt = error.text;
-    let errMsg = (error.message) ? error.message :
+    const errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-    if (errTxt && errTxt !== error.statusText) {
-      errMsg = `${errMsg}: ${error.text}`;
-    }
+    // if (errTxt && errTxt !== error.statusText) {
+    //   errMsg = `${errMsg}`;
+    // }
     return Observable.throw(new Error(errMsg));
   };
 
