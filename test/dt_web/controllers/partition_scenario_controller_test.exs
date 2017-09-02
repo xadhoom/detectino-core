@@ -25,8 +25,7 @@ defmodule DtWeb.PartitionScenarioControllerTest do
     }
     |> Repo.insert!
 
-    conn = Helper.login(conn)
-    conn = conn |> Helper.newconn
+    conn = Helper.login(conn) |> put_req_header("p-dt-pin", "666666")
     |> get(scenario_partition_scenario_path(conn, :index, scenario.id))
     json = json_response(conn, 200)
     assert Enum.count(json) == 1
