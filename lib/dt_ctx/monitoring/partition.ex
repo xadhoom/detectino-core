@@ -63,4 +63,13 @@ defmodule DtCtx.Monitoring.Partition do
     |> cast(%{armed: "DISARM"}, [:armed])
   end
 
+  def arm_mode_str_to_atom(mode) do
+    case mode do
+      "ARM" -> :normal
+      "ARMSTAY" -> :stay
+      "ARMSTAYIMMEDIATE" -> :immediate
+      _ -> :error
+    end
+  end
+
 end

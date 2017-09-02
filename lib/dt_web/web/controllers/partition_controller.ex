@@ -41,7 +41,7 @@ defmodule DtWeb.PartitionController do
   end
 
   defp do_arm(%{"id" => id, "mode" => mode}, conn) do
-    amode = mode_str_to_atom(mode)
+    amode = Partition.arm_mode_str_to_atom(mode)
     if amode == :error do
       {:error, :bad_request}
     else
@@ -70,15 +70,6 @@ defmodule DtWeb.PartitionController do
       end
     end)
     result
-  end
-
-  defp mode_str_to_atom(mode) do
-    case mode do
-      "ARM" -> :normal
-      "ARMSTAY" -> :stay
-      "ARMSTAYIMMEDIATE" -> :immediate
-      _ -> :error
-    end
   end
 
 end

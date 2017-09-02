@@ -103,7 +103,8 @@ defmodule DtWeb.ScenarioController do
       "DISARM" ->
         PartitionProcess.disarm(partition, user.username)
       v ->
-        PartitionProcess.arm(partition, user.username, v)
+        mode = Partition.arm_mode_str_to_atom(v)
+        PartitionProcess.arm(partition, user.username, mode)
     end
   end
 

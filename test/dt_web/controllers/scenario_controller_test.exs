@@ -127,7 +127,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "ARM"
 
-    assert :meck.called(PartitionProcess, :arm, [record, :_, "ARM"])
+    assert :meck.called(PartitionProcess, :arm, [record, :_, :normal])
   end
 
   test "run a scenario with partial modes", %{conn: conn} do
@@ -155,7 +155,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "ARMSTAY"
 
-    assert :meck.called(PartitionProcess, :arm, [record, :_, "ARMSTAY"])
+    assert :meck.called(PartitionProcess, :arm, [record, :_, :stay])
   end
 
   test "arm a scenario with partial modes, but immediate", %{conn: conn} do
@@ -183,7 +183,7 @@ defmodule DtWeb.ScenarioControllerTest do
     record = Repo.one(PartitionModel)
     assert record.armed == "ARMSTAYIMMEDIATE"
 
-    assert :meck.called(PartitionProcess, :arm, [record, :_, "ARMSTAYIMMEDIATE"])
+    assert :meck.called(PartitionProcess, :arm, [record, :_, :immediate])
   end
 
   test "run a scenario with disarm partition", %{conn: conn} do
@@ -269,9 +269,9 @@ defmodule DtWeb.ScenarioControllerTest do
     assert Enum.any?(records, fn(x) -> x.armed == "ARMSTAYIMMEDIATE" end)
 
     assert :meck.called(PartitionProcess, :disarm, [:_, :_])
-    assert :meck.called(PartitionProcess, :arm, [:_, :_, "ARM"])
-    assert :meck.called(PartitionProcess, :arm, [:_, :_, "ARMSTAY"])
-    assert :meck.called(PartitionProcess, :arm, [:_, :_, "ARMSTAYIMMEDIATE"])
+    assert :meck.called(PartitionProcess, :arm, [:_, :_, :normal])
+    assert :meck.called(PartitionProcess, :arm, [:_, :_, :stay])
+    assert :meck.called(PartitionProcess, :arm, [:_, :_, :immediate])
   end
 
   test "auth: get all scenarios", %{conn: conn} do
