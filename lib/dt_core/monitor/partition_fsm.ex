@@ -161,6 +161,11 @@ defmodule DtCore.Monitor.PartitionFsm do
   end
 
   # process disarm request in idle_arm state
+  def handle_event({:call, from}, {:disarm, _initiator}, :idle, _data) do
+    {:keep_state_and_data, [{:reply, from, :ok}]}
+  end
+
+  # process disarm request in idle_arm state
   def handle_event({:call, from}, {:disarm, initiator}, :idle_arm, data) do
     Enum.each(data.config.sensors, fn(sensor) ->
       :ok = Detector.disarm({sensor})

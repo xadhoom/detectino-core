@@ -119,6 +119,11 @@ defmodule DtCore.Monitor.DetectorFsm do
    end
   end
 
+  # process disarm request event in idle state
+  def handle_event({:call, from}, :disarm, :idle, _data) do
+    {:keep_state_and_data, [{:reply, from, :ok}]}
+  end
+
   #
   # :tampered state callbacks
   #
@@ -255,7 +260,7 @@ defmodule DtCore.Monitor.DetectorFsm do
     end
   end
 
-  # process disarm request event in alarmed state
+  # process disarm request event in idle_arm state
   def handle_event({:call, from}, :disarm, :idle_arm, data) do
     send data.receiver, {:start, data.last_event} # TODO needs a new event id?
     {:next_state, :idle, data, [{:reply, from, :ok}]}
