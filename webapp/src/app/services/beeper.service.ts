@@ -10,7 +10,7 @@ export class BeeperService {
   constructor() {
     this.beeping = false;
     this.timer = null;
-    this.interval = 0.5 * 1000;
+    this.interval = 1 * 1000;
     this.audioContext = new AudioContext;
   }
 
@@ -42,10 +42,10 @@ export class BeeperService {
   private beep() {
     const context = this.audioContext;
     const oscillator = context.createOscillator();
-    oscillator.frequency.value = 1750;
+    oscillator.frequency.value = 1000;
     oscillator.connect(context.destination);
     oscillator.start(0);
-    oscillator.stop(context.currentTime + 0.2);
+    oscillator.stop(context.currentTime + 0.3);
   }
 
 }
