@@ -143,22 +143,6 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "guardian.Elixir.Guardian.hooks"
     ],
-    "logger.backends": [
-      commented: false,
-      datatype: [
-        list: [
-          :atom,
-          atom: :atom
-        ]
-      ],
-      default: [
-        :console,
-        "LoggerFileBackend": :file_log
-      ],
-      doc: "Provide documentation for logger.backends here.",
-      hidden: true,
-      to: "logger.backends"
-    ],
     "logger.file_log.path": [
       commented: false,
       datatype: :binary,

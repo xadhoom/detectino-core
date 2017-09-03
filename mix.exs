@@ -23,7 +23,8 @@ defmodule Detectino.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     apps = [
-      :phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
+      :logger, :logger_file_backend,
+      :phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :gettext,
       :phoenix_ecto, :postgrex, :timex, :swoosh, :etimer, :can, :guardian,
       :lager_logger, :exjsx, :comeonin, :ex_link_header, :plug, :dthread,
       :gen_state_machine, :runtime_tools]
@@ -72,7 +73,7 @@ defmodule Detectino.Mixfile do
      {:meck, git: "https://github.com/eproxus/meck.git", only: [:test]},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
      # release stuff
-     {:distillery, "~> 1.4"},
+     {:distillery, "~> 1.5"},
      {:conform, "~> 2.3"}
    ]
   end
