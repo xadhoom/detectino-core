@@ -106,7 +106,8 @@ defmodule DtCore.Monitor.Controller do
         sensors: [],
         detector_workers: [],
         partition_workers: [],
-        started: false
+        started: false,
+        debug: false
       }
     }
   end
@@ -255,6 +256,12 @@ defmodule DtCore.Monitor.Controller do
     {:noreply, state}
   end
 
+  def handle_info({:more_debug, v}, state) when is_boolean(v) do
+    Logger.info fn() -> "Setting controller more debug at #{inspect v}" end
+    newstate = %{state | debug: v}
+    {:noreply, newstate}
+  end
+
   defp dispatch_event({ev = %BusEvent{}, state}) do
     {ev, state} = {ev, state}
                   |> normalize_event
@@ -262,9 +269,9 @@ defmodule DtCore.Monitor.Controller do
 
     # send the event to all detectors
     Enum.each(state.detector_workers, fn({_id, pid}) ->
-      Logger.debug fn ->
+      debug_log(fn() ->
         "sending event #{inspect ev} to detector #{inspect pid}"
-      end
+      end, state)
       send pid, {:event, ev}
     end)
 
@@ -334,6 +341,13 @@ defmodule DtCore.Monitor.Controller do
   defp stop_partition({id, _pid}, state) do
     :ok = Supervisor.terminate_child(state.sup, id)
     Supervisor.delete_child(state.sup, id)
+  end
+
+  defp debug_log(what, state) do
+    case state.debug do
+      true -> Logger.debug what
+      _ -> nil
+    end
   end
 
 end

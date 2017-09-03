@@ -27,6 +27,7 @@ defmodule DtCore.Monitor.Detector do
   }
   defstruct config: nil,
     fsm: nil,
+    debug: false,
     listeners: [],
     exit_timeout: 100_000, # TODO: find a better way
     entry_timeout: 100_000 # TODO: find a better way
@@ -89,7 +90,7 @@ defmodule DtCore.Monitor.Detector do
   @spec init({%SensorModel{}}) :: {:ok, detector_state}
   def init({config}) do
     {:ok, fsm} = DetectorFsm.start_link({config, self()})
-    {:ok, %__MODULE__{fsm: fsm, config: config}}
+    {:ok, %__MODULE__{fsm: fsm, config: config, debug: false}}
   end
 
   def handle_call(:status, _from, state) do
@@ -164,7 +165,9 @@ defmodule DtCore.Monitor.Detector do
 
   @spec handle_info({:event, %Event{}}, detector_state) :: {:noreply, detector_state}
   def handle_info({:event, ev = %Event{}}, state = %{config: %{enabled: false}}) do
-    Logger.debug fn() -> "Ignoring event #{inspect ev} because I'm disabled" end
+    debug_log(fn() ->
+      "Ignoring event #{inspect ev} because I'm disabled"
+    end, state)
     {:noreply, state}
   end
 
@@ -252,6 +255,12 @@ defmodule DtCore.Monitor.Detector do
       pid == listener
     end)
     {:noreply, %{state | listeners: listeners}}
+  end
+
+  def handle_info({:more_debug, v}, state) when is_boolean(v) do
+    Logger.info fn() -> "Setting detector more debug at #{inspect v}" end
+    newstate = %{state | debug: v}
+    {:noreply, newstate}
   end
 
   defp process_event(%Event{address: a, port: p, value: v}, _state)
@@ -357,6 +366,13 @@ defmodule DtCore.Monitor.Detector do
       port: port,
       id: nil
     }
+  end
+
+  defp debug_log(what, state) do
+    case state.debug do
+      true -> Logger.debug what
+      _ -> nil
+    end
   end
 
 end
