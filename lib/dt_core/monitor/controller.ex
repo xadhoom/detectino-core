@@ -251,7 +251,7 @@ defmodule DtCore.Monitor.Controller do
   Basically a sort of autodiscovery
   """
   def handle_info({:event, ev = %BusEvent{}}, state) do
-    Logger.debug fn -> "Received event #{inspect ev} from bus" end
+    debug_log(fn -> "Received event #{inspect ev} from bus" end, state)
     {:ok, state} = dispatch_event({ev, state})
     {:noreply, state}
   end

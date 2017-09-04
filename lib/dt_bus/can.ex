@@ -29,7 +29,8 @@ defmodule DtBus.Can do
   require Logger
 
   defstruct listeners: %{},
-    ping: %{}
+    ping: %{},
+    debug: false
 
   #
   # Client APIs
@@ -150,8 +151,14 @@ defmodule DtBus.Can do
     {:noreply, state}
   end
 
+  def handle_info({:more_debug, v}, state) when is_boolean(v) do
+    Logger.info fn() -> "Setting can more debug at #{inspect v}" end
+    newstate = %{state | debug: v}
+    {:noreply, newstate}
+  end
+
   def handle_info(what, state) do
-    Logger.debug fn -> "Got info message #{inspect what}" end
+    debug_log(fn -> "Got info message #{inspect what}" end, state)
 
     {:ok, state} = case what do
       {:can_frame, _msgid, _len, _data, _intf, _ts} ->
@@ -173,10 +180,10 @@ defmodule DtBus.Can do
   defp handle_canframe({:can_frame, msgid, len, data, _intf, _ts}, state) do
     {:ok, state} = case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
-        Logger.debug fn -> "Got command:#{command}, " <>
+        debug_log(fn -> "Got command:#{command}, " <>
         "subcommand:#{subcommand} " <>
         "from id:#{src_node_id} to id:#{dst_node_id} " <>
-        "datalen:#{inspect len} payload:#{inspect data}" end
+        "datalen:#{inspect len} payload:#{inspect data}" end, state)
 
         if dst_node_id == 0 do
           case command do
@@ -216,6 +223,13 @@ defmodule DtBus.Can do
       {from, pingrq} ->
         GenServer.reply from, data
         {:ok,  %{state | ping: pingrq}}
+    end
+  end
+
+  defp debug_log(what, state) do
+    case state.debug do
+      true -> Logger.debug what
+      _ -> nil
     end
   end
 
