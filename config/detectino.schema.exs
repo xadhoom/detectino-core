@@ -83,7 +83,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     "lager.handlers.Elixir.LagerLogger.level": [
       commented: false,
       datatype: :atom,
-      default: :debug,
+      default: :info,
       doc: "Provide documentation for lager.handlers.Elixir.LagerLogger.level here.",
       hidden: true,
       to: "lager.handlers.Elixir.LagerLogger.level"
