@@ -95,8 +95,9 @@ defmodule DtCore.Monitor.PartitionFsm do
     {:next_state, :tripped, %{data | last_event_id: pev.id}}
   end
 
-  # process realtime event in idle state
-  def handle_event(:cast, {_ , dev = %DetectorEv{type: :realtime}}, :idle, data) do
+  # process realtime event in idle/idle_arm state
+  def handle_event(:cast, {_ , dev = %DetectorEv{type: :realtime}}, idle, data)
+    when idle in [:idle, :idle_arm] do
     data = drop_tripped(:alarmed, dev, data)
     {:next_state, :idle, data}
   end
