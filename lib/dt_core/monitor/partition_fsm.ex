@@ -183,6 +183,11 @@ defmodule DtCore.Monitor.PartitionFsm do
     :keep_state_and_data
   end
 
+  # process idle event in exit_wait state
+  def handle_event(:cast, {_ , _ = %DetectorEv{type: :realtime}}, :exit_wait, _data) do
+    :keep_state_and_data
+  end
+
   # process timer expire event in exit_wait state
   def handle_event(:state_timeout, :exit_timer_expired, :exit_wait, data) do
     send data.receiver, {:stop, %ExitTimerEv{name: data.config.name,
