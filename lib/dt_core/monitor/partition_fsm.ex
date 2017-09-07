@@ -99,7 +99,7 @@ defmodule DtCore.Monitor.PartitionFsm do
   def handle_event(:cast, {_ , dev = %DetectorEv{type: :realtime}}, idle, data)
     when idle in [:idle, :idle_arm] do
     data = drop_tripped(:alarmed, dev, data)
-    {:next_state, :idle, data}
+    {:next_state, idle, data}
   end
 
   # process alarm event in idle/idle_arm state
