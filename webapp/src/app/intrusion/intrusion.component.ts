@@ -3,7 +3,7 @@ import {
   PartitionService, NotificationService,
   PinService
 } from '../services';
-import { MdIconRegistry } from '@angular/material';
+import { MatIconRegistry } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Partition } from '../models/partition';
 
@@ -22,7 +22,7 @@ export class IntrusionComponent implements OnInit {
 
   constructor(private partitionService: PartitionService,
     private notificationService: NotificationService,
-    public pinSrv: PinService, iconRegistry: MdIconRegistry,
+    public pinSrv: PinService, iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer) {
     this.selectedPartition = null;
     this.showArmDialog = false;

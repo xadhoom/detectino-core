@@ -21,7 +21,7 @@ import {
   InputSwitchModule, PaginatorModule, TooltipModule
 } from 'primeng/primeng';
 
-import { MdIconModule, MdIconRegistry } from '@angular/material';
+import { MatIconModule, MatIconRegistry } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -85,7 +85,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
     DialogModule, InputTextModule, DropdownModule, PasswordModule,
     DataTableModule, SpinnerModule, CheckboxModule, PickListModule,
     InputSwitchModule, PaginatorModule, TooltipModule,
-    JsonpModule, MdIconModule
+    JsonpModule, MatIconModule
   ],
   providers: [{
     provide: AuthHttp,
@@ -95,7 +95,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
     provide: AuthService,
     useClass: AuthService,
     deps: [Http, AuthHttp, Router, PhoenixChannelService]
-  }, MdIconRegistry, NotificationService,
+  }, MatIconRegistry, NotificationService,
     UserService,
     SensorService,
     ScenarioService,
