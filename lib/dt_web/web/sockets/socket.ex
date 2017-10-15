@@ -7,8 +7,8 @@ defmodule DtWeb.Sockets.Socket do
   channel "event:*", DtWeb.Channels.Event
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
-  transport :longpoll, Phoenix.Transports.LongPoll
+  transport :websocket, Phoenix.Transports.WebSocket,
+    check_origin: false
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
