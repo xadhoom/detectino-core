@@ -12,8 +12,7 @@ defmodule DtCore.Sup do
   def init(_) do
     children = [
       supervisor(Registry,
-        [:duplicate, OutputsRegistry.registry,
-          [partitions: System.schedulers_online]],
+        [:duplicate, OutputsRegistry.registry],
         restart: :permanent),
       worker(DtCore.EventBridge, [], restart: :permanent),
       worker(DtCore.EventLogger, [], restart: :permanent),

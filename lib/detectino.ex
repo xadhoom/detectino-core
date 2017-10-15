@@ -20,8 +20,7 @@ defmodule Detectino do
       supervisor(DtCtx.Repo, []),
       supervisor(DtBus.CanSup, []),
       supervisor(Registry,
-        [:duplicate, ReloadRegistry.registry,
-          [partitions: System.schedulers_online]],
+        [:duplicate, ReloadRegistry.registry],
         restart: :permanent),
       worker(DtWeb.TokenServer, [], restart: :permanent)
     ]
@@ -31,7 +30,7 @@ defmodule Detectino do
       _ -> basic_children ++ [supervisor(DtCore.Sup, [])]
     end
 
-    opts = [strategy: :one_for_one, name: DtWeb.Supervisor]
+    opts = [strategy: :one_for_one, name: Detectino.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
