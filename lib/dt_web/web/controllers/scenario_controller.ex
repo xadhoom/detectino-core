@@ -101,10 +101,11 @@ defmodule DtWeb.ScenarioController do
   defp arm_disarm_partition_proc(partition, user) do
     case partition.armed do
       "DISARM" ->
-        PartitionProcess.disarm(partition, user.username)
+        :ok = PartitionProcess.disarm(partition, user.username)
       v ->
+        :ok = PartitionProcess.disarm(partition, user.username)
         mode = Partition.arm_mode_str_to_atom(v)
-        PartitionProcess.arm(partition, user.username, mode)
+        :ok = PartitionProcess.arm(partition, user.username, mode)
     end
   end
 
