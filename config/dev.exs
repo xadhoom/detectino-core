@@ -44,3 +44,7 @@ config :detectino, DtCore.Output.Actions.Email.Mailer,
   adapter: Swoosh.Adapters.Local
 
 config :detectino, :can_interface, "vcan0"
+
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id, :pid]

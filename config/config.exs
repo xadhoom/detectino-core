@@ -19,11 +19,12 @@ config :logger,
   backends: [:console, {LoggerFileBackend, :file_log}]
 
 config :logger, :file_log,
+  format: "$date $time $metadata[$level] $message\n",
   path: "/tmp/detectino.log",
   metadata: [:pid]
 
 config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
+  format: "$date $time $metadata[$level] $message\n",
   metadata: [:request_id, :pid]
 
 # Stop lager redirecting :error_logger messages

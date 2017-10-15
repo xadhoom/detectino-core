@@ -143,6 +143,16 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "guardian.Elixir.Guardian.hooks"
     ],
+    "logger.file_log.format": [
+      commented: false,
+      datatype: :binary,
+      default: """
+      $date $time $metadata[$level] $message
+      """,
+      doc: "Provide documentation for logger.file_log.format here.",
+      hidden: true,
+      to: "logger.file_log.format"
+    ],
     "logger.file_log.path": [
       commented: false,
       datatype: :binary,
@@ -167,7 +177,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: """
-      $time $metadata[$level] $message
+      $date $time $metadata[$level] $message
       """,
       doc: "Provide documentation for logger.console.format here.",
       hidden: true,
@@ -297,6 +307,18 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end"
+    ],
+    "detectino.ecto_repos": [
+      commented: false,
+      datatype: [
+        list: :atom
+      ],
+      default: [
+        DtCtx.Repo
+      ],
+      doc: "Provide documentation for detectino.ecto_repos here.",
+      hidden: true,
+      to: "detectino.ecto_repos"
     ],
     "detectino.environment": [
       commented: false,
