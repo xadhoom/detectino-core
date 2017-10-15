@@ -161,7 +161,12 @@ defmodule DtCore.Monitor.PartitionFsm do
     end
   end
 
-  # process disarm request in idle_arm state
+  # process arm request in idle_arm state
+  def handle_event({:call, from}, {:arm, _, _, _}, :idle_arm, _) do
+    {:keep_state_and_data, {:reply, from, {:error, :armed}}}
+  end
+
+  # process disarm request in idle state
   def handle_event({:call, from}, {:disarm, _initiator}, :idle, _data) do
     {:keep_state_and_data, [{:reply, from, :ok}]}
   end
@@ -214,6 +219,11 @@ defmodule DtCore.Monitor.PartitionFsm do
     send data.receiver, {:start, ev}
     data = add_tripped(:tampered, dev, data)
     {:next_state, :tripped, %{data | last_event_id: ev.id}}
+  end
+
+  # process arm request in exit_wait state
+  def handle_event({:call, from}, {:arm, _, _, _}, :exit_wait, _) do
+    {:keep_state_and_data, {:reply, from, {:error, :arming}}}
   end
 
   # process disarm request in exit_wait state
