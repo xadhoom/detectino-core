@@ -14,7 +14,7 @@ The project is made by 3 parts:
 * self
 
 Detectino Core is the software part that will run over a RaspberryPi B+
-and handles all events sent by alarm sensors over CAN bus (intermediated
+and handles all events sent by alarm sensors over CAN bus (mediated
 by the Arduino Detectino piggy back board).
 
 Core provides all the logic to handle alarms, trigger notifications
@@ -28,6 +28,11 @@ Detectino is born to create a professional grade alarm system, for 2 main reason
 * be able to use commercial alarm sensors, because they're the ones that just work;
 * learn something new: basic hardware skills and Elixir (http://elixir-lang.org/).
 
-Right now this project is just a skeleton, and I'm working on it :)
-Only the hardware part is completed and verified working.
+Right now this project is running in my home with 4 outdoor sensors and 1 indoor.
+
+All alarms are reported by email (for now).
+
+A tablet in kiosk mode fixed on a wall provides the access to the web frontend.
+
+TODO: add some nice pics and some more docs
 
