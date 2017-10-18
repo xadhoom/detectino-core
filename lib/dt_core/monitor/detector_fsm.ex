@@ -194,6 +194,11 @@ defmodule DtCore.Monitor.DetectorFsm do
       {:keep_state_and_data, [{:reply, from, {:error, :tripped}}]}
   end
 
+  # process disarm request event in realtime state
+  def handle_event({:call, from}, :disarm, :realtime, _data) do
+    {:keep_state_and_data, [{:reply, from, :ok}]}
+  end
+
   #
   # :alarmed state callbacks
   #

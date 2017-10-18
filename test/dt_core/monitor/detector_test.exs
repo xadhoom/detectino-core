@@ -274,6 +274,16 @@ defmodule DtCore.Test.Monitor.Detector do
     refute_receive _
   end
 
+  test "disarm sensor while is in realtime state" do
+    {:ok, config, _pid} = setup_deol_realtime()
+
+    # send disarm request
+    :ok = Detector.disarm({config})
+    assert :realtime == Detector.status({config})
+
+    refute_receive _
+  end
+
   test "alarm event in alarmed state" do
     {:ok, config, pid} = setup_deol_alarmed()
 
