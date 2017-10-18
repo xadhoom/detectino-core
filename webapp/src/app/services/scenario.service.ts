@@ -45,7 +45,16 @@ export class ScenarioService extends Crud {
       map((res) => {
         return true;
       }).
-      catch(this.handleError);
+      catch(this.handleRunError);
   }
+
+  private handleRunError(error: any) {
+    if (error.status === 555) {
+      const errMsg = 'Some Partition is tripped, cannot arm!';
+      return Observable.throw(new Error(errMsg));
+    } else {
+      return this.handleError(error);
+    }
+  };
 
 }

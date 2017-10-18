@@ -68,10 +68,11 @@ defmodule DtWeb.ScenarioController do
         case Enum.count(x.partitions_scenarios) do
           0 -> 403
           _ ->
-            {ret, _any} = x.partitions_scenarios
+            x.partitions_scenarios
             |> run_scenario_in_txn(user)
-            case ret do
-              :ok -> 204
+            |> case do
+              {:ok, _} -> 204
+              {:error, :tripped} -> 555
               _ -> 500
             end
         end
@@ -85,14 +86,16 @@ defmodule DtWeb.ScenarioController do
         {ret, struct_or_cset} = partition_scenario
         |> run_arm_disarm_op()
         |> Repo.update
-        case ret do
-          :ok ->
-            arm_disarm_partition_proc(struct_or_cset, user)
-            true
+        with :ok <- ret,
+          :ok <- arm_disarm_partition_proc(struct_or_cset, user) do
+            :ok
+        else
+          {:error, :tripped} ->
+            Logger.error("Cannot arm, tripped sensor: #{inspect struct_or_cset}")
+            Repo.rollback(:tripped)
           :error ->
             Logger.error("Cannot update: #{inspect struct_or_cset}")
             Repo.rollback(:cannot_arm_partition)
-            false
         end
       end)
     end)
@@ -105,7 +108,7 @@ defmodule DtWeb.ScenarioController do
       v ->
         :ok = PartitionProcess.disarm(partition, user.username)
         mode = Partition.arm_mode_str_to_atom(v)
-        :ok = PartitionProcess.arm(partition, user.username, mode)
+        PartitionProcess.arm(partition, user.username, mode)
     end
   end
 
