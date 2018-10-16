@@ -37,7 +37,7 @@ defmodule DtWeb.TokenServerTest do
 
     tokens = TokenServer.all(:e)
 
-    assert Enum.count(tokens) == 0
+    assert Enum.empty?(tokens)
     assert :not_running == Etimer.stop_timer(:e, "token")
   end
 
@@ -62,6 +62,6 @@ defmodule DtWeb.TokenServerTest do
     TokenServer.expire({:token, "token"}, :f)
 
     tokens = TokenServer.all(:f)
-    assert Enum.count(tokens) == 0
+    assert Enum.empty?(tokens)
   end
 end

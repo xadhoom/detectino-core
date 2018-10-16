@@ -68,7 +68,7 @@ defmodule DtCore.Test.Output.Worker do
     {:ok, pid} = Worker.start_link({output})
 
     listeners = Registry.keys(OutputsRegistry.registry(), pid)
-    assert Enum.count(listeners) == 0
+    assert Enum.empty?(listeners)
   end
 
   test "worker listens to associated events" do

@@ -35,7 +35,7 @@ defmodule DtWeb.ScenarioControllerTest do
 
     conn = get(conn, scenario_path(conn, :get_available))
     json = json_response(conn, 200)
-    assert Enum.count(json) == 0
+    assert Enum.empty?(json)
 
     %ScenarioModel{name: "scenario"}
     |> Repo.insert!()
@@ -46,7 +46,7 @@ defmodule DtWeb.ScenarioControllerTest do
       |> get(scenario_path(conn, :get_available))
 
     json = json_response(conn, 200)
-    assert Enum.count(json) == 0
+    assert Enum.empty?(json)
 
     scenario =
       %ScenarioModel{name: "scenario2"}
@@ -68,7 +68,7 @@ defmodule DtWeb.ScenarioControllerTest do
       |> get(scenario_path(conn, :get_available))
 
     json = json_response(conn, 200)
-    assert Enum.count(json) == 0
+    assert Enum.empty?(json)
 
     scenario =
       %ScenarioModel{name: "scenario3", enabled: true}
