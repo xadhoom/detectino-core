@@ -17,7 +17,7 @@
   "dthread": {:git, "https://github.com/tonyrog/dthread.git", "d763748f1d2af31762682772e28e412906b8fef5", []},
   "earmark": {:hex, :earmark, "1.2.3", "206eb2e2ac1a794aa5256f3982de7a76bf4579ff91cb28d0e17ea2c9491e46a4", [:mix], [], "hexpm"},
   "ecto": {:hex, :ecto, "2.2.11", "4bb8f11718b72ba97a2696f65d247a379e739a0ecabf6a13ad1face79844791c", [:mix], [{:db_connection, "~> 1.1", [hex: :db_connection, repo: "hexpm", optional: true]}, {:decimal, "~> 1.2", [hex: :decimal, repo: "hexpm", optional: false]}, {:mariaex, "~> 0.8.0", [hex: :mariaex, repo: "hexpm", optional: true]}, {:poison, "~> 2.2 or ~> 3.0", [hex: :poison, repo: "hexpm", optional: true]}, {:poolboy, "~> 1.5", [hex: :poolboy, repo: "hexpm", optional: false]}, {:postgrex, "~> 0.13.0", [hex: :postgrex, repo: "hexpm", optional: true]}, {:sbroker, "~> 1.0", [hex: :sbroker, repo: "hexpm", optional: true]}], "hexpm"},
-  "etimer": {:git, "https://github.com/xadhoom/etimer", "b4186f2066ed2a47c2f4d2e1c04dd131fe7f0e81", [tag: "0.1.1"]},
+  "etimer": {:git, "https://github.com/xadhoom/etimer", "dd83d0cf7e1905e69ec153248793396ec99a65f7", [tag: "0.2.0"]},
   "ex_doc": {:hex, :ex_doc, "0.16.3", "cd2a4cfe5d26e37502d3ec776702c72efa1adfa24ed9ce723bb565f4c30bd31a", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}], "hexpm"},
   "ex_link_header": {:hex, :ex_link_header, "0.0.5", "d46a71fc8b473ad324a498c70f76ce778bf185beb2467550be0df0f41b1bdf15", [:mix], [], "hexpm"},
   "excoveralls": {:hex, :excoveralls, "0.10.1", "407d50ac8fc63dfee9175ccb4548e6c5512b5052afa63eedb9cd452a32a91495", [:mix], [{:hackney, "~> 1.13", [hex: :hackney, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm"},

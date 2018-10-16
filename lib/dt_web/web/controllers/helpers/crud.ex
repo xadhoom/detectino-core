@@ -70,8 +70,6 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   def links(conn, page, per_page, total) do
-    next_p = nil
-
     float_p = total / per_page
 
     last_p =
@@ -234,16 +232,14 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   defp build_filter(fields, params) do
-    Enum.filter_map(
-      params,
-      fn {param, _value} ->
-        param_is_model_field?(param, fields)
-      end,
-      fn {param, value} ->
-        match = get_match_mode(params, param)
-        {param, value, match}
-      end
-    )
+    params
+    |> Enum.filter(fn {param, _value} ->
+      param_is_model_field?(param, fields)
+    end)
+    |> Enum.map(fn {param, value} ->
+      match = get_match_mode(params, param)
+      {param, value, match}
+    end)
   end
 
   defp param_is_model_field?(param, fields) do

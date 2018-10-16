@@ -27,6 +27,7 @@ defmodule Detectino.Mixfile do
   #
   # Type `mix help compile.app` for more information.
   def application do
+    # TODO: this long list should is not needed anymore
     apps = [
       :logger,
       :logger_file_backend,
@@ -85,7 +86,7 @@ defmodule Detectino.Mixfile do
       {:ex_link_header, "~> 0.0.5"},
       {:timex, "~> 3.1"},
       {:ecto, "~> 2.1"},
-      {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.1.1"},
+      {:etimer, git: "https://github.com/xadhoom/etimer", tag: "0.2.0"},
       {:swoosh, "~> 0.9"},
       {:gen_smtp, "~> 0.12"},
       {:can, git: "https://github.com/tonyrog/can.git", tag: "1.2", manager: :rebar},
