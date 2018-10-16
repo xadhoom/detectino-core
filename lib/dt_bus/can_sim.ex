@@ -14,9 +14,9 @@ defmodule DtBus.CanSim do
   #
   # Client APIs
   #
-  def start_link(myid, sender_fn \\ &:can_router.send(&1))
+  def start_link(myid, sender_fun \\ &:can_router.send(&1))
       when is_integer(myid) and myid > 0 and myid < 127 do
-    GenServer.start_link(__MODULE__, {myid, sender_fn}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, {myid, sender_fun}, name: __MODULE__)
   end
 
   def flood do
@@ -51,9 +51,9 @@ defmodule DtBus.CanSim do
   #
   # GenServer Callbacks
   #
-  def init({myid, sender_fn}) do
+  def init({myid, sender_fun}) do
     :can_router.attach()
-    {:ok, %{myid: myid, sender_fn: sender_fn, flood: false, running: nil}}
+    {:ok, %{myid: myid, sender_fun: sender_fun, flood: false, running: nil}}
   end
 
   def handle_call({:flood}, _f, state) do
@@ -113,13 +113,13 @@ defmodule DtBus.CanSim do
 
           case command do
             :ping ->
-              handle_ping(state.myid, src_node_id, data, state.sender_fn)
+              handle_ping(state.myid, src_node_id, data, state.sender_fun)
 
             :read ->
-              handle_read(state.myid, subcommand, src_node_id, state.sender_fn)
+              handle_read(state.myid, subcommand, src_node_id, state.sender_fun)
 
             :readd ->
-              handle_readd(state.myid, subcommand, src_node_id, state.sender_fn)
+              handle_readd(state.myid, subcommand, src_node_id, state.sender_fun)
 
             unh ->
               Logger.warn(fn -> "Unhandled can command #{inspect(unh)}" end)
@@ -152,12 +152,12 @@ defmodule DtBus.CanSim do
     {:noreply, state}
   end
 
-  defp handle_ping(myid, src_node_id, data, sender_fn) do
+  defp handle_ping(myid, src_node_id, data, sender_fun) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :pong, :reply)
-    sender_fn.({:can_frame, msgid, 8, data, 0, -1})
+    sender_fun.({:can_frame, msgid, 8, data, 0, -1})
   end
 
-  defp handle_read(myid, :read_all, src_node_id, sender_fn) do
+  defp handle_read(myid, :read_all, src_node_id, sender_fun) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_all)
 
     Enum.each(1..8, fn index ->
@@ -166,11 +166,11 @@ defmodule DtBus.CanSim do
       msb = band(val >>> 8, 0xFF)
       lsb = band(val, 0xFF)
       payload = <<0, 0, 0, 0, 0, index, msb, lsb>>
-      sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
+      sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
     end)
   end
 
-  defp handle_read(myid, terminal, src_node_id, sender_fn) do
+  defp handle_read(myid, terminal, src_node_id, sender_fun) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_one)
     # random reading, for now
     val = Enum.random(1..1024)
@@ -178,10 +178,10 @@ defmodule DtBus.CanSim do
     lsb = band(val, 0xFF)
     subcommand = Canhelper.tosubcommand_read(terminal)
     payload = <<0, 0, 0, 0, 0, subcommand, msb, lsb>>
-    sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
+    sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
   end
 
-  defp handle_readd(myid, :read_all, src_node_id, sender_fn) do
+  defp handle_readd(myid, :read_all, src_node_id, sender_fun) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_all)
 
     Enum.each(1..8, fn index ->
@@ -190,11 +190,11 @@ defmodule DtBus.CanSim do
       msb = band(val >>> 8, 0xFF)
       lsb = band(val, 0xFF)
       payload = <<0, 0, 0, 0, index, 0, msb, lsb>>
-      sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
+      sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
     end)
   end
 
-  defp handle_readd(myid, terminal, src_node_id, sender_fn) do
+  defp handle_readd(myid, terminal, src_node_id, sender_fun) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :event, :read_one)
     # random reading, for now
     val = Enum.random(1..1024)
@@ -202,7 +202,7 @@ defmodule DtBus.CanSim do
     lsb = band(val, 0xFF)
     subcommand = Canhelper.tosubcommand_read(terminal)
     payload = <<0, 0, 0, 0, subcommand, 0, msb, lsb>>
-    sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
+    sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
   end
 
   defp send_analog_can_message(value, port, state) do
@@ -210,6 +210,6 @@ defmodule DtBus.CanSim do
     msb = band(value >>> 8, 0xFF)
     lsb = band(value, 0xFF)
     payload = <<0, 0, 0, 0, 0, port, msb, lsb>>
-    state.sender_fn.({:can_frame, msgid, 8, payload, 0, -1})
+    state.sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
   end
 end
