@@ -13,13 +13,13 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^4.0.3",
+    "@angular/cdk": "^2.0.0-beta.8",
     "@angular/common": "^4.0.3",
     "@angular/compiler": "^4.0.3",
     "@angular/core": "^4.0.3",
     "@angular/forms": "^4.0.3",
     "@angular/http": "^4.0.3",
     "@angular/material": "^2.0.0-beta.8",
-    "@angular/cdk": "^2.0.0-beta.8",
     "@angular/platform-browser": "^4.0.3",
     "@angular/platform-browser-dynamic": "^4.0.3",
     "@angular/router": "^4.0.3",
@@ -35,7 +35,7 @@
     "nanoscroller": "^0.8.7",
     "primeng": "4.0.3",
     "quill": "^1.2.0",
-    "rxjs": "^5.1.0",
+    "rxjs": "^5.5.6",
     "ts-helpers": "^1.1.1",
     "zone.js": "^0.8.4"
   },
