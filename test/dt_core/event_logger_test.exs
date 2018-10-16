@@ -13,7 +13,7 @@ defmodule DtCore.Test.EventLoggerTest do
   alias DtCore.ExitTimerEv
 
   setup_all do
-    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry())
+    {:ok, _} = Registry.start_link(keys: :duplicate, name: DtCore.OutputsRegistry.registry())
     {:ok, _} = EventBridge.start_link()
     :ok
   end

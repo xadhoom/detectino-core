@@ -19,7 +19,7 @@ defmodule DtCore.Test.Output.Worker do
   alias DtCore.Output.Actions.Email, as: EmailConfig
 
   setup_all do
-    {:ok, _} = Registry.start_link(:duplicate, OutputsRegistry.registry())
+    {:ok, _} = Registry.start_link(keys: :duplicate, name: OutputsRegistry.registry())
     :meck.new(Etimer, [:passthrough])
 
     :meck.expect(Etimer, :start_timer, fn _, _, _, _ ->
