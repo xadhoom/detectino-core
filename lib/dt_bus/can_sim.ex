@@ -154,7 +154,9 @@ defmodule DtBus.CanSim do
 
   defp handle_ping(myid, src_node_id, data, sender_fun) do
     msgid = Canhelper.build_msgid(myid, src_node_id, :pong, :reply)
-    sender_fun.({:can_frame, msgid, 8, data, 0, -1})
+
+    {:can_frame, msgid, 8, data, 0, -1}
+    |> sender_fun.()
   end
 
   defp handle_read(myid, :read_all, src_node_id, sender_fun) do
@@ -166,7 +168,9 @@ defmodule DtBus.CanSim do
       msb = band(val >>> 8, 0xFF)
       lsb = band(val, 0xFF)
       payload = <<0, 0, 0, 0, 0, index, msb, lsb>>
-      sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
+
+      {:can_frame, msgid, 8, payload, 0, -1}
+      |> sender_fun.()
     end)
   end
 
@@ -178,7 +182,9 @@ defmodule DtBus.CanSim do
     lsb = band(val, 0xFF)
     subcommand = Canhelper.tosubcommand_read(terminal)
     payload = <<0, 0, 0, 0, 0, subcommand, msb, lsb>>
-    sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
+
+    {:can_frame, msgid, 8, payload, 0, -1}
+    |> sender_fun.()
   end
 
   defp handle_readd(myid, :read_all, src_node_id, sender_fun) do
@@ -190,7 +196,9 @@ defmodule DtBus.CanSim do
       msb = band(val >>> 8, 0xFF)
       lsb = band(val, 0xFF)
       payload = <<0, 0, 0, 0, index, 0, msb, lsb>>
-      sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
+
+      {:can_frame, msgid, 8, payload, 0, -1}
+      |> sender_fun.()
     end)
   end
 
@@ -202,7 +210,9 @@ defmodule DtBus.CanSim do
     lsb = band(val, 0xFF)
     subcommand = Canhelper.tosubcommand_read(terminal)
     payload = <<0, 0, 0, 0, subcommand, 0, msb, lsb>>
-    sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
+
+    {:can_frame, msgid, 8, payload, 0, -1}
+    |> sender_fun.()
   end
 
   defp send_analog_can_message(value, port, state) do
@@ -210,6 +220,8 @@ defmodule DtBus.CanSim do
     msb = band(value >>> 8, 0xFF)
     lsb = band(value, 0xFF)
     payload = <<0, 0, 0, 0, 0, port, msb, lsb>>
-    state.sender_fun.({:can_frame, msgid, 8, payload, 0, -1})
+
+    {:can_frame, msgid, 8, payload, 0, -1}
+    |> state.sender_fun.()
   end
 end
