@@ -9,7 +9,7 @@ defmodule DtWeb.OutputController do
   alias DtWeb.Plugs.CheckPermissions
 
   plug(EnsureAuthenticated, handler: SessionController)
-  plug(CoreReloader, nil when not (action in [:index, :show]))
+  plug(CoreReloader, nil when action not in [:index, :show])
   plug(CheckPermissions, roles: [:admin])
   plug(PinAuthorize)
 end

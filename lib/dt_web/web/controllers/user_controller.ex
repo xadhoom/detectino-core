@@ -11,8 +11,8 @@ defmodule DtWeb.UserController do
   alias Guardian.Plug.EnsureAuthenticated
 
   plug(EnsureAuthenticated, handler: SessionController)
-  plug(CheckPermissions, [roles: [:admin]] when not (action in [:check_pin]))
-  plug(PinAuthorize when not (action in [:check_pin]))
+  plug(CheckPermissions, [roles: [:admin]] when action not in [:check_pin])
+  plug(PinAuthorize when action not in [:check_pin])
 
   def delete(conn, %{"id" => "1"}) do
     send_resp(conn, 403, StatusCodes.status_code(403))

@@ -23,7 +23,7 @@ defmodule DtWeb.EventController do
   plug(EnsureAuthenticated, handler: SessionController)
   plug(CheckPermissions, roles: [:admin])
   plug(PinAuthorize)
-  plug(CoreReloader, nil when not (action in [:index, :show]))
+  plug(CoreReloader, nil when action not in [:index, :show])
 
   def index(conn, params) do
     order = [:name]

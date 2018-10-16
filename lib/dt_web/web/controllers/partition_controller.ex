@@ -12,8 +12,8 @@ defmodule DtWeb.PartitionController do
   alias Guardian.Plug.EnsureAuthenticated
 
   plug(EnsureAuthenticated, handler: SessionController)
-  plug(CoreReloader, nil when not (action in [:index, :show, :arm, :disarm]))
-  plug(CheckPermissions, [roles: [:admin]] when not (action in [:index, :arm, :disarm]))
+  plug(CoreReloader, nil when action not in [:index, :show, :arm, :disarm])
+  plug(CheckPermissions, [roles: [:admin]] when action not in [:index, :arm, :disarm])
   plug(PinAuthorize)
 
   def disarm(conn, %{"id" => id}) do

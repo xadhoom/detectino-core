@@ -16,9 +16,9 @@ defmodule DtWeb.ScenarioController do
   require Logger
 
   plug(EnsureAuthenticated, handler: SessionController)
-  plug(CheckPermissions, [roles: [:admin]] when not (action in [:get_available, :run]))
-  plug(PinAuthorize when not (action in [:get_available]))
-  plug(CoreReloader, nil when not (action in [:index, :show, :get_available, :run]))
+  plug(CheckPermissions, [roles: [:admin]] when action not in [:get_available, :run])
+  plug(PinAuthorize when action not in [:get_available])
+  plug(CoreReloader, nil when action not in [:index, :show, :get_available, :run])
 
   def get_available(conn, _params) do
     q = from(s in Scenario, where: s.enabled == true)

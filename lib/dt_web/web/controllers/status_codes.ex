@@ -1,4 +1,6 @@
 defmodule DtWeb.StatusCodes do
+  # TODO: drop me and use Plug status codes
+
   @http_status_codes %{
     100 => "Continue",
     101 => "Switching Protocols",
