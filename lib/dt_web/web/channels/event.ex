@@ -24,22 +24,24 @@ defmodule DtWeb.Channels.Event do
   end
 
   def join("event:exit_timer", _message, socket) do
-    EventBridge.start_listening(fn (ev) ->
+    EventBridge.start_listening(fn ev ->
       case ev do
         {_, {_, %ExitTimerEv{}}} -> true
         _ -> false
       end
     end)
+
     {:ok, socket}
   end
 
   def join("event:entry_timer", _message, socket) do
-    EventBridge.start_listening(fn (ev) ->
+    EventBridge.start_listening(fn ev ->
       case ev do
         {_, {_, %DetectorEntryEv{}}} -> true
         _ -> false
       end
     end)
+
     {:ok, socket}
   end
 
@@ -64,15 +66,14 @@ defmodule DtWeb.Channels.Event do
   def handle_info({:bridge_ev, _, {action, ev = %ExitTimerEv{}}}, socket)
       when action in [:start, :stop] do
     str_action = Atom.to_string(action)
-    push socket, str_action, %{source: :ExitTimerEv, partition: ev.name}
+    push(socket, str_action, %{source: :ExitTimerEv, partition: ev.name})
     {:noreply, socket}
   end
 
   def handle_info({:bridge_ev, _, {action, ev = %DetectorEntryEv{}}}, socket)
       when action in [:start, :stop] do
     str_action = Atom.to_string(action)
-    push socket, str_action, %{
-      source: :DetectorEntryEv, address: ev.address, port: ev.port}
+    push(socket, str_action, %{source: :DetectorEntryEv, address: ev.address, port: ev.port})
     {:noreply, socket}
   end
 
@@ -82,26 +83,19 @@ defmodule DtWeb.Channels.Event do
 
   def push_arm_status(socket) do
     armed = StatusTracker.armed?()
-    push socket, "arm", %{armed: armed}
-    Etimer.start_timer(socket, :time, 1000,
-      {__MODULE__, :push_arm_status, [socket]}
-    )
+    push(socket, "arm", %{armed: armed})
+    Etimer.start_timer(socket, :time, 1000, {__MODULE__, :push_arm_status, [socket]})
   end
 
   def push_alarm_status(socket) do
     alarmed = StatusTracker.alarmed?()
-    push socket, "alarm", %{alarmed: alarmed}
-    Etimer.start_timer(socket, :time, 1000,
-      {__MODULE__, :push_alarm_status, [socket]}
-    )
+    push(socket, "alarm", %{alarmed: alarmed})
+    Etimer.start_timer(socket, :time, 1000, {__MODULE__, :push_alarm_status, [socket]})
   end
 
   def push_unacked_ev_status(socket) do
     events = StatusTracker.unacked_events()
-    push socket, "alarm_events", %{events: events}
-    Etimer.start_timer(socket, :time, 2_000,
-      {__MODULE__, :push_unacked_ev_status, [socket]}
-    )
+    push(socket, "alarm_events", %{events: events})
+    Etimer.start_timer(socket, :time, 2_000, {__MODULE__, :push_unacked_ev_status, [socket]})
   end
-
 end

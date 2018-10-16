@@ -7,5 +7,4 @@ defmodule DtWeb.OutputView do
   def render(_, %{output: item}) do
     item
   end
-
 end

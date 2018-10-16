@@ -7,7 +7,7 @@ defmodule DtWeb.Plugs.CheckPermissions do
 
   def init(opts) do
     opts = Enum.into(opts, %{})
-    roles = Enum.map(opts.roles, fn(role) -> Atom.to_string(role) end)
+    roles = Enum.map(opts.roles, fn role -> Atom.to_string(role) end)
     %{opts | roles: roles}
   end
 
@@ -15,6 +15,7 @@ defmodule DtWeb.Plugs.CheckPermissions do
     case Guardian.Plug.claims(conn) do
       {:ok, claims} ->
         check_role(conn, claims, opts)
+
       _ ->
         conn |> unauthorized()
     end
@@ -26,6 +27,7 @@ defmodule DtWeb.Plugs.CheckPermissions do
     case Enum.member?(opts.roles, role) do
       false ->
         conn |> forbidden()
+
       true ->
         conn
     end
@@ -42,5 +44,4 @@ defmodule DtWeb.Plugs.CheckPermissions do
     |> halt
     |> send_resp(401, StatusCodes.status_code(401))
   end
-
 end

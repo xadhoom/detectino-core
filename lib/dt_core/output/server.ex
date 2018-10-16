@@ -18,7 +18,7 @@ defmodule DtCore.Output.Server do
   # Client APIs
   #
   def start_link(sup) do
-    GenServer.start_link(__MODULE__, sup, [name: @name])
+    GenServer.start_link(__MODULE__, sup, name: @name)
   end
 
   @doc """
@@ -37,13 +37,14 @@ defmodule DtCore.Output.Server do
   # GenServer callbacks
   #
   def init(sup) do
-    Logger.info fn -> "Supervisor #{inspect sup} starting Output Server" end
-    send self(), :start
-    {:ok, %{
-      sup: sup,
-      output_sup: nil
-      }
-    }
+    Logger.info(fn -> "Supervisor #{inspect(sup)} starting Output Server" end)
+    send(self(), :start)
+
+    {:ok,
+     %{
+       sup: sup,
+       output_sup: nil
+     }}
   end
 
   def handle_call({:reload}, _from, state) do
@@ -67,16 +68,16 @@ defmodule DtCore.Output.Server do
   outputs from the DB
   """
   def handle_info(:start, state) do
-    case Supervisor.start_child(state.sup, supervisor(OutputSup, [],
-                                restart: :temporary)) do
+    case Supervisor.start_child(state.sup, supervisor(OutputSup, [], restart: :temporary)) do
       {:ok, pid} ->
-        Process.monitor pid
+        Process.monitor(pid)
         state = %{state | output_sup: pid}
         start_outputs(state)
-        Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
+        Registry.register(ReloadRegistry.registry(), ReloadRegistry.key(), [])
         {:noreply, state}
+
       {:error, err} ->
-        Logger.error fn -> "Error starting Outputs Sup #{inspect err}" end
+        Logger.error(fn -> "Error starting Outputs Sup #{inspect(err)}" end)
         {:stop, err, state}
     end
   end
@@ -93,12 +94,12 @@ defmodule DtCore.Output.Server do
   Handle :normal :DOWN messages from our worker sup
   """
   def handle_info({:DOWN, _ref, _process, _pid, :normal}, state) do
-    Logger.info "Outputs supervisor down, normal"
+    Logger.info("Outputs supervisor down, normal")
     {:noreply, state}
   end
 
   def handle_info({:DOWN, _ref, _process, _pid, :shutdown}, state) do
-    Logger.info "Outputs supervisor down, shutdown"
+    Logger.info("Outputs supervisor down, shutdown")
     {:noreply, state}
   end
 
@@ -108,30 +109,36 @@ defmodule DtCore.Output.Server do
   """
   def handle_info({:DOWN, _ref, _process, pid, reason}, state) do
     sup = state.output_sup
+
     case pid do
       ^sup ->
-        Logger.error fn ->
-          "Outputs Sup died with reason #{inspect reason}, I quit!"
-        end
+        Logger.error(fn ->
+          "Outputs Sup died with reason #{inspect(reason)}, I quit!"
+        end)
+
         {:stop, reason, state}
+
       any ->
-        Logger.info fn -> "Got :DOWN message from #{inspect any} " <>
-          "but is not my outputs worker supervisor, ignoring...." end
+        Logger.info(fn ->
+          "Got :DOWN message from #{inspect(any)} " <>
+            "but is not my outputs worker supervisor, ignoring...."
+        end)
+
         {:noreply, state}
     end
   end
 
   defp do_reload(state) do
     :ok = Supervisor.stop(state.output_sup, :normal)
-    send self(), :start
+    send(self(), :start)
     {:ok, %{state | output_sup: nil}}
   end
 
   defp start_outputs(state) do
     OutputModel
-    |> Repo.all
+    |> Repo.all()
     |> Repo.preload(:events)
-    |> Enum.each(fn(output) ->
+    |> Enum.each(fn output ->
       case Enum.empty?(output.events) do
         false -> start_output(output, state)
         _ -> nil
@@ -141,15 +148,18 @@ defmodule DtCore.Output.Server do
 
   defp start_output(output, state) do
     id = output.name
-    case Supervisor.start_child(state.output_sup,
-          worker(Worker, [{output}],
-            restart: :transient, id: id)) do
+
+    case Supervisor.start_child(
+           state.output_sup,
+           worker(Worker, [{output}], restart: :transient, id: id)
+         ) do
       {:ok, pid} ->
-        Logger.info fn -> "Started output worker with pid #{inspect pid}" end
+        Logger.info(fn -> "Started output worker with pid #{inspect(pid)}" end)
+
       {:error, err} ->
-        Logger.error fn -> "Cannot start output worker: " <>
-          "#{inspect err} #{inspect output}" end
+        Logger.error(fn ->
+          "Cannot start output worker: " <> "#{inspect(err)} #{inspect(output)}"
+        end)
     end
   end
-
 end

@@ -11,8 +11,7 @@ config :detectino, DtWeb.Endpoint,
   root: Path.dirname(__DIR__),
   secret_key_base: "8usHTvLjCzv3Qm+xXkKfqXnxosWMTbu6idGkv7xYRXMtBmu7SJDBfj5OZjGVGtur",
   render_errors: [accepts: ~w(html json)],
-  pubsub: [name: DtWeb.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: DtWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger,
@@ -63,4 +62,4 @@ config :detectino, ecto_repos: [DtCtx.Repo]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"

@@ -21,11 +21,11 @@ defmodule DtCore.Monitor.Partition do
   # Internal types
 
   @typep part_state :: %__MODULE__{
-    config: %PartitionModel{},
-    fsm: pid
-  }
+           config: %PartitionModel{},
+           fsm: pid
+         }
   defstruct config: nil,
-    fsm: nil
+            fsm: nil
 
   #
   # Client APIs
@@ -38,7 +38,7 @@ defmodule DtCore.Monitor.Partition do
 
   def arming_status(config = %PartitionModel{}) do
     config
-    |> Utils.partition_server_pid
+    |> Utils.partition_server_pid()
     |> GenServer.call({:arming_status})
   end
 
@@ -47,47 +47,49 @@ defmodule DtCore.Monitor.Partition do
   end
 
   def alive?(config = %PartitionModel{}) do
-    pid = config
-    |> Utils.partition_server_pid
+    pid =
+      config
+      |> Utils.partition_server_pid()
+
     case pid do
       :undefined -> false
-      pid -> pid |> Process.alive?
+      pid -> pid |> Process.alive?()
     end
   end
 
   def get_pid(config = %PartitionModel{}) do
     config
-    |> Utils.partition_server_pid
+    |> Utils.partition_server_pid()
   end
 
   def count_sensors(config = %PartitionModel{}) do
     config
-    |> Utils.partition_server_pid
+    |> Utils.partition_server_pid()
     |> GenServer.call({:count_sensors})
   end
 
   def arm(config = %PartitionModel{}, initiator) do
     config
-    |> Utils.partition_server_pid
+    |> Utils.partition_server_pid()
     |> GenServer.call({:arm, initiator})
   end
 
   def arm(config = %PartitionModel{}, initiator, mode)
-    when mode in [:normal, :stay, :immediate] do
+      when mode in [:normal, :stay, :immediate] do
     config
-    |> Utils.partition_server_pid
+    |> Utils.partition_server_pid()
     |> GenServer.call({:arm, initiator, mode})
   end
 
   def disarm(config = %PartitionModel{}, initiator) do
     config
-    |> Utils.partition_server_pid
+    |> Utils.partition_server_pid()
     |> GenServer.call({:disarm, initiator})
   end
 
   def alarm_status(config = %PartitionModel{}) do
     config
-    |> Utils.partition_server_pid
+    |> Utils.partition_server_pid()
     |> GenServer.call({:alarm_status?})
   end
 
@@ -100,6 +102,7 @@ defmodule DtCore.Monitor.Partition do
     |> Utils.partition_server_pid()
     |> GenServer.call(:status)
   end
+
   def status(server) when is_pid(server) do
     GenServer.call(server, :status)
   end
@@ -109,26 +112,32 @@ defmodule DtCore.Monitor.Partition do
   #
   @spec init({%PartitionModel{}}) :: {:ok, part_state}
   def init({config}) do
-    Logger.debug fn -> "Starting partition worker with " <>
-      "#{inspect config} config" end
+    Logger.debug(fn -> "Starting partition worker with " <> "#{inspect(config)} config" end)
     {:ok, fsm} = PartitionFsm.start_link({config, self()})
+
     state = %__MODULE__{
       config: config,
       fsm: fsm
     }
+
     subscribe_sensors({config})
 
     exit_delay = compute_exit_delay(state)
+
     case config.armed do
       "ARM" ->
         :ok = PartitionFsm.arm(state.fsm, "sys", exit_delay)
+
       "ARMSTAY" ->
         # fake immediate state, because is likely we're recovering
         # from a process crash
         :ok = PartitionFsm.arm(state.fsm, "sys", :immediate, exit_delay)
+
       "ARMSTAYIMMEDIATE" ->
         :ok = PartitionFsm.arm(state.fsm, "sys", :immediate, exit_delay)
-      _ -> nil
+
+      _ ->
+        nil
     end
 
     {:ok, state}
@@ -145,10 +154,12 @@ defmodule DtCore.Monitor.Partition do
   end
 
   def handle_call({:alarm_status?}, _from, state) do
-    status = case PartitionFsm.status(state.fsm) do
-      :tripped -> :alarm
-      _ -> :idle
-    end
+    status =
+      case PartitionFsm.status(state.fsm) do
+        :tripped -> :alarm
+        _ -> :idle
+      end
+
     {:reply, status, state}
   end
 
@@ -211,14 +222,15 @@ defmodule DtCore.Monitor.Partition do
   end
 
   def handle_info(any, state) do
-    Logger.warn fn() -> "Unhandled info message #{inspect any}" end
+    Logger.warn(fn -> "Unhandled info message #{inspect(any)}" end)
     {:noreply, state}
   end
 
   defp subscribe_sensors({config = %PartitionModel{}}) do
-    Enum.each(config.sensors, fn(sensor) ->
+    Enum.each(config.sensors, fn sensor ->
       :ok = Detector.subscribe({sensor}, {config.entry_delay, config.exit_delay})
-      true = Detector.link({sensor}) # TODO figure out later when sup tree is ready
+      # TODO figure out later when sup tree is ready
+      true = Detector.link({sensor})
     end)
   end
 

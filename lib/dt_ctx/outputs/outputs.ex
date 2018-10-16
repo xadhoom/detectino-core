@@ -13,9 +13,12 @@ defmodule DtCtx.Outputs do
   @doc "Return the number of unacked logged events"
   @spec unacked_log_events() :: non_neg_integer()
   def unacked_log_events do
-    q = from e in EventLog,
-      select: count(e.id),
-      where: e.acked == false
+    q =
+      from(e in EventLog,
+        select: count(e.id),
+        where: e.acked == false
+      )
+
     Repo.one(q)
   end
 end

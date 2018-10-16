@@ -12,6 +12,7 @@ defmodule DtWeb.GuardianHooks do
     case TokenServer.get(jwt) do
       {:ok, _} ->
         {:ok, {claims, jwt}}
+
       _ ->
         {:error, :token_not_found}
     end
@@ -19,9 +20,11 @@ defmodule DtWeb.GuardianHooks do
 
   def after_encode_and_sign(resource, type, claims, jwt) do
     expiry = claims["exp"] - claims["iat"]
+
     case TokenServer.put(jwt, expiry) do
       {:ok, _} ->
         {:ok, {resource, type, claims, jwt}}
+
       _ ->
         {:error, :token_storage_failure}
     end
@@ -31,9 +34,9 @@ defmodule DtWeb.GuardianHooks do
     case TokenServer.delete(jwt) do
       :ok ->
         {:ok, {claims, jwt}}
+
       _ ->
         {:error, :token_delete_failure}
     end
   end
-
 end

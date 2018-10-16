@@ -3,12 +3,11 @@ defmodule DtWeb.Sockets.Socket do
   use Guardian.Phoenix.Socket
 
   ## Channels
-  channel "timer:*", DtWeb.Channels.Timer
-  channel "event:*", DtWeb.Channels.Event
+  channel("timer:*", DtWeb.Channels.Timer)
+  channel("event:*", DtWeb.Channels.Event)
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket,
-    check_origin: false
+  transport(:websocket, Phoenix.Transports.WebSocket, check_origin: false)
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

@@ -9,5 +9,4 @@ defmodule DtWeb.GuardianSerializer do
 
   def from_token("User:" <> id), do: {:ok, Repo.get(User, String.to_integer(id))}
   def from_token(_thing), do: {:error, "Unknown resource type"}
-
 end

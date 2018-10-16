@@ -21,5 +21,4 @@ config :detectino, DtCtx.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
-config :detectino, DtCore.Output.Actions.Email.Mailer,
-  adapter: Swoosh.Adapters.Test
+config :detectino, DtCore.Output.Actions.Email.Mailer, adapter: Swoosh.Adapters.Test

@@ -10,7 +10,7 @@ defmodule DtWeb.ErrorHelpers do
   """
   def error_tag(form, field) do
     if error = form.errors[field] do
-      content_tag :span, translate_error(error), class: "help-block"
+      content_tag(:span, translate_error(error), class: "help-block")
     end
   end
 
@@ -26,14 +26,15 @@ defmodule DtWeb.ErrorHelpers do
     #
     #     dngettext "errors", "1 file", "%{count} files", count
     #
-    Enum.reduce opts, msg, fn {k, v}, acc ->
+    Enum.reduce(opts, msg, fn {k, v}, acc ->
       String.replace(acc, "%{#{k}}", to_string(v))
-    end
-    #Gettext.dngettext(DtWeb.Gettext, "errors", msg, msg, opts[:count], opts)
+    end)
+
+    # Gettext.dngettext(DtWeb.Gettext, "errors", msg, msg, opts[:count], opts)
   end
 
   def translate_error(msg) do
     msg
-    #Gettext.dgettext(DtWeb.Gettext, "errors", msg)
+    # Gettext.dgettext(DtWeb.Gettext, "errors", msg)
   end
 end

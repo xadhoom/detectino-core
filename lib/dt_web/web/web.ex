@@ -45,7 +45,6 @@ defmodule DtWeb.Web do
       import DtWeb.Router.Helpers
       import DtWeb.ErrorHelpers
       import DtWeb.Gettext
-
     end
   end
 

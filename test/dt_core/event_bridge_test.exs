@@ -5,10 +5,11 @@ defmodule DtCore.Test.EventBridgeTest do
   alias DtCore.Test.TimerHelper
 
   setup_all do
-    TimerHelper.wait_until 5000, MatchError, fn ->
-      {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
+    TimerHelper.wait_until(5000, MatchError, fn ->
+      {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry())
       {:ok, _pid} = EventBridge.start_link()
-    end
+    end)
+
     :ok
   end
 
@@ -22,10 +23,11 @@ defmodule DtCore.Test.EventBridgeTest do
   end
 
   test "subscribe and receives a message, with filter" do
-    EventBridge.start_listening(fn({key, _payload}) ->
+    EventBridge.start_listening(fn {key, _payload} ->
       case key do
         %{"passes" => true} ->
           true
+
         _ ->
           false
       end
@@ -50,5 +52,4 @@ defmodule DtCore.Test.EventBridgeTest do
     {:ok, pid} = EventBridge.stop_listening()
     assert pid == self()
   end
-
 end

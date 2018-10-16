@@ -6,20 +6,22 @@ defmodule DtCore.Sup do
   alias DtCore.OutputsRegistry
 
   def start_link do
-    Supervisor.start_link(__MODULE__, nil, [name: __MODULE__])
+    Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def init(_) do
     children = [
-      supervisor(Registry,
-        [:duplicate, OutputsRegistry.registry],
-        restart: :permanent),
+      supervisor(
+        Registry,
+        [:duplicate, OutputsRegistry.registry()],
+        restart: :permanent
+      ),
       worker(DtCore.EventBridge, [], restart: :permanent),
       worker(DtCore.EventLogger, [], restart: :permanent),
       supervisor(DtCore.Monitor.Sup, [], restart: :permanent),
       supervisor(DtCore.Output.Sup, [], restart: :permanent)
     ]
+
     supervise(children, strategy: :one_for_all)
   end
-
 end

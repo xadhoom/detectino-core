@@ -1,18 +1,18 @@
 defmodule DtCtx.Outputs.Event.ArmEvConf do
   defstruct name: nil,
-    initiator: nil
+            initiator: nil
 end
 
 defmodule DtCtx.Outputs.Event.PartitionEvConf do
   defstruct name: nil,
-    type: nil
+            type: nil
 end
 
 defmodule DtCtx.Outputs.Event.SensorEvConf do
   defstruct name: nil,
-    address: nil,
-    port: nil,
-    type: nil
+            address: nil,
+            port: nil,
+            type: nil
 end
 
 defmodule DtCtx.Outputs.Event do
@@ -25,19 +25,19 @@ defmodule DtCtx.Outputs.Event do
 
   @derive {Poison.Encoder, only: [:id, :name, :description, :source]}
   schema "events" do
-    field :name, :string
-    field :description, :string
-    field :source, :string
-    field :source_config, :string
+    field(:name, :string)
+    field(:description, :string)
+    field(:source, :string)
+    field(:source_config, :string)
 
     timestamps()
 
-    many_to_many :outputs, DtCtx.Outputs.Output, join_through: DtCtx.Outputs.EventOutput
+    many_to_many(:outputs, DtCtx.Outputs.Output, join_through: DtCtx.Outputs.EventOutput)
   end
 
   @optional_fields ~w(description)
   @required_fields ~w(name source source_config)
-  @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
+  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
   @source_types ["sensor", "partition", "arming"]
 
   def create_changeset(model, params \\ %{}) do
@@ -60,8 +60,10 @@ defmodule DtCtx.Outputs.Event do
     case fetch_field(changeset, :source_config) do
       :error ->
         add_error(changeset, :source_config, "invalid")
+
       {_, field} when is_nil(field) ->
         add_error(changeset, :source_config, "invalid")
+
       {_, field} ->
         cast_config(changeset, field)
     end
@@ -71,15 +73,19 @@ defmodule DtCtx.Outputs.Event do
     case fetch_field(changeset, :source) do
       :error ->
         add_error(changeset, :source, "invalid")
+
       {_, "sensor"} ->
         ret = Poison.decode(change, as: %SensorEvConf{})
         validate_config(changeset, ret)
+
       {_, "partition"} ->
         ret = Poison.decode(change, as: %PartitionEvConf{})
         validate_config(changeset, ret)
+
       {_, "arming"} ->
         ret = Poison.decode(change, as: %ArmEvConf{})
         validate_config(changeset, ret)
+
       _ ->
         add_error(changeset, :source, "invalid")
     end
@@ -90,11 +96,10 @@ defmodule DtCtx.Outputs.Event do
   end
 
   defp validate_config(changeset, {:ok, %SensorEvConf{address: nil}}) do
-    add_error(changeset, :source_config,
-      "invalid sensor config format: address")
+    add_error(changeset, :source_config, "invalid sensor config format: address")
   end
 
-  defp validate_config(changeset, {:ok,  %SensorEvConf{port: nil}}) do
+  defp validate_config(changeset, {:ok, %SensorEvConf{port: nil}}) do
     add_error(changeset, :source_config, "invalid sensor config format: port")
   end
 
@@ -107,13 +112,11 @@ defmodule DtCtx.Outputs.Event do
   end
 
   defp validate_config(changeset, {:ok, %PartitionEvConf{name: nil}}) do
-    add_error(changeset, :source_config,
-      "invalid partition config format: name")
+    add_error(changeset, :source_config, "invalid partition config format: name")
   end
 
   defp validate_config(changeset, {:ok, %PartitionEvConf{type: nil}}) do
-    add_error(changeset, :source_config,
-      "invalid partition config format: type")
+    add_error(changeset, :source_config, "invalid partition config format: type")
   end
 
   defp validate_config(changeset, {:ok, %PartitionEvConf{}}) do
@@ -121,8 +124,7 @@ defmodule DtCtx.Outputs.Event do
   end
 
   defp validate_config(changeset, {:ok, %ArmEvConf{name: nil}}) do
-    add_error(changeset, :source_config,
-      "invalid arming config format: name")
+    add_error(changeset, :source_config, "invalid arming config format: name")
   end
 
   defp validate_config(changeset, {:ok, %ArmEvConf{}}) do

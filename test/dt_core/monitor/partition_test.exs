@@ -17,13 +17,13 @@ defmodule DtCore.Test.Monitor.Partition do
   alias DtCore.Test.TimerHelper
 
   setup_all do
-    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
+    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry())
     {:ok, _} = EventBridge.start_link()
     :ok
   end
 
   setup do
-    EventBridge.start_listening(fn({_key, payload}) ->
+    EventBridge.start_listening(fn {_key, payload} ->
       case payload do
         {_, %DetectorEv{}} -> false
         {_, %DetectorExitEv{}} -> false
@@ -31,19 +31,28 @@ defmodule DtCore.Test.Monitor.Partition do
         _ -> true
       end
     end)
-    on_exit fn ->
+
+    on_exit(fn ->
       # disconnect from the ev bridge, even if the dead process
       # should remove it automatically
       EventBridge.stop_listening()
-    end
+    end)
+
     :ok
   end
 
   test "on startup a partition subscribes to its sensors" do
-    sensor = %SensorModel{name: "NC", balance: "NC", th1: 10,
-      partitions: [], enabled: true, address: "1", port: 1}
-    partition = %PartitionModel{name: "prot", armed: "DISARM",
-      sensors: [sensor]}
+    sensor = %SensorModel{
+      name: "NC",
+      balance: "NC",
+      th1: 10,
+      partitions: [],
+      enabled: true,
+      address: "1",
+      port: 1
+    }
+
+    partition = %PartitionModel{name: "prot", armed: "DISARM", sensors: [sensor]}
 
     {:ok, sensor_pid} = Detector.start_link({sensor})
     {:ok, p_pid} = Partition.start_link(partition)
@@ -130,7 +139,7 @@ defmodule DtCore.Test.Monitor.Partition do
     # send an alarm event to sensor
     ev = %Event{address: sensor.address, port: sensor.port, value: 25}
     :ok = Process.send(s_pid, {:event, ev}, [])
-    assert_eq_wait :realtime, Detector.status({sensor})
+    assert_eq_wait(:realtime, Detector.status({sensor}))
 
     assert {:error, :tripped} == Partition.arm(partition, "foo")
 
@@ -237,8 +246,8 @@ defmodule DtCore.Test.Monitor.Partition do
     # send an alarm event
     ev = %Event{address: sensor.address, port: sensor.port, value: 25}
     :ok = Process.send(s_pid, {:event, ev}, [])
-    assert_eq_wait :alarmed_arm, Detector.status({sensor})
-    assert_eq_wait :tripped, Partition.status({partition})
+    assert_eq_wait(:alarmed_arm, Detector.status({sensor}))
+    assert_eq_wait(:tripped, Partition.status({partition}))
 
     assert_recv_exitev(:stop, partition.name)
     assert_recv_partev(:start, :alarm, partition.name)
@@ -258,8 +267,8 @@ defmodule DtCore.Test.Monitor.Partition do
     # send a tamper event
     ev = %Event{address: sensor.address, port: sensor.port, value: 5}
     :ok = Process.send(s_pid, {:event, ev}, [])
-    assert_eq_wait :tampered_arm, Detector.status({sensor})
-    assert_eq_wait :tripped, Partition.status({partition})
+    assert_eq_wait(:tampered_arm, Detector.status({sensor}))
+    assert_eq_wait(:tripped, Partition.status({partition}))
 
     assert_recv_exitev(:stop, partition.name)
     assert_recv_partev(:start, :tamper, partition.name)
@@ -303,8 +312,8 @@ defmodule DtCore.Test.Monitor.Partition do
     # send an alarm event, will cause an entry delay
     ev = %Event{address: sensor.address, port: sensor.port, value: 25}
     :ok = Process.send(s_pid, {:event, ev}, [])
-    assert_eq_wait :entry_wait, Detector.status({sensor})
-    assert_eq_wait :idle_arm, Partition.status({partition})
+    assert_eq_wait(:entry_wait, Detector.status({sensor}))
+    assert_eq_wait(:idle_arm, Partition.status({partition}))
 
     assert_recv_partev(:start, :alarm, partition.name)
     assert :alarmed_arm == Detector.status({sensor})
@@ -319,8 +328,8 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, sensor, _p_pid, s_pid} = start_tripped_partion(:alarm)
 
     # premilinary checks
-    assert_eq_wait :alarmed_arm, Detector.status({sensor})
-    assert_eq_wait :tripped, Partition.status({partition})
+    assert_eq_wait(:alarmed_arm, Detector.status({sensor}))
+    assert_eq_wait(:tripped, Partition.status({partition}))
 
     # check events
     assert_recv_armev("bob", :start, false, partition.name)
@@ -331,8 +340,8 @@ defmodule DtCore.Test.Monitor.Partition do
     :ok = Process.send(s_pid, {:event, ev}, [])
 
     # check that system goes back to idle (armed)
-    assert_eq_wait :idle_arm, Detector.status({sensor})
-    assert_eq_wait :idle_arm, Partition.status({partition})
+    assert_eq_wait(:idle_arm, Detector.status({sensor}))
+    assert_eq_wait(:idle_arm, Partition.status({partition}))
     assert_recv_partev(:stop, :alarm, partition.name)
 
     refute_receive _
@@ -344,8 +353,8 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, sensor, _p_pid, s_pid} = start_tripped_partion(:tamper)
 
     # premilinary checks
-    assert_eq_wait :tampered_arm, Detector.status({sensor})
-    assert_eq_wait :tripped, Partition.status({partition})
+    assert_eq_wait(:tampered_arm, Detector.status({sensor}))
+    assert_eq_wait(:tripped, Partition.status({partition}))
 
     # check events
     assert_recv_armev("bob", :start, false, partition.name)
@@ -356,8 +365,8 @@ defmodule DtCore.Test.Monitor.Partition do
     :ok = Process.send(s_pid, {:event, ev}, [])
 
     # check that system goes back to idle (armed)
-    assert_eq_wait :idle_arm, Detector.status({sensor})
-    assert_eq_wait :idle_arm, Partition.status({partition})
+    assert_eq_wait(:idle_arm, Detector.status({sensor}))
+    assert_eq_wait(:idle_arm, Partition.status({partition}))
 
     assert_recv_partev(:stop, :tamper, partition.name)
 
@@ -382,8 +391,8 @@ defmodule DtCore.Test.Monitor.Partition do
     :ok = Process.send(Enum.at(s_pids, 0), {:event, ev}, [])
 
     # check that system stays in tripped state
-    assert_eq_wait :idle_arm, Detector.status({Enum.at(sensors, 0)})
-    assert_eq_wait :alarmed_arm, Detector.status({Enum.at(sensors, 1)})
+    assert_eq_wait(:idle_arm, Detector.status({Enum.at(sensors, 0)}))
+    assert_eq_wait(:alarmed_arm, Detector.status({Enum.at(sensors, 1)}))
     assert :tripped == Partition.status({partition})
 
     # idle also second sensor
@@ -392,9 +401,9 @@ defmodule DtCore.Test.Monitor.Partition do
     :ok = Process.send(Enum.at(s_pids, 1), {:event, ev}, [])
 
     # check that system stays in tripped state
-    assert_eq_wait :idle_arm, Detector.status({Enum.at(sensors, 0)})
-    assert_eq_wait :idle_arm, Detector.status({Enum.at(sensors, 1)})
-    assert_eq_wait :idle_arm, Partition.status({partition})
+    assert_eq_wait(:idle_arm, Detector.status({Enum.at(sensors, 0)}))
+    assert_eq_wait(:idle_arm, Detector.status({Enum.at(sensors, 1)}))
+    assert_eq_wait(:idle_arm, Partition.status({partition}))
 
     assert_recv_partev(:stop, :alarm, partition.name)
 
@@ -419,9 +428,9 @@ defmodule DtCore.Test.Monitor.Partition do
     :ok = Process.send(Enum.at(s_pids, 0), {:event, ev}, [])
 
     # check that system stays in tripped state
-    assert_eq_wait :idle_arm, Detector.status({Enum.at(sensors, 0)})
-    assert_eq_wait :tampered_arm, Detector.status({Enum.at(sensors, 1)})
-    assert_eq_wait :tripped, Partition.status({partition})
+    assert_eq_wait(:idle_arm, Detector.status({Enum.at(sensors, 0)}))
+    assert_eq_wait(:tampered_arm, Detector.status({Enum.at(sensors, 1)}))
+    assert_eq_wait(:tripped, Partition.status({partition}))
 
     # idle also second sensor
     sensor = Enum.at(sensors, 1)
@@ -429,9 +438,9 @@ defmodule DtCore.Test.Monitor.Partition do
     :ok = Process.send(Enum.at(s_pids, 1), {:event, ev}, [])
 
     # check that system goes back to idle
-    assert_eq_wait :idle_arm, Detector.status({Enum.at(sensors, 0)})
-    assert_eq_wait :idle_arm, Detector.status({Enum.at(sensors, 1)})
-    assert_eq_wait :idle_arm, Partition.status({partition})
+    assert_eq_wait(:idle_arm, Detector.status({Enum.at(sensors, 0)}))
+    assert_eq_wait(:idle_arm, Detector.status({Enum.at(sensors, 1)}))
+    assert_eq_wait(:idle_arm, Partition.status({partition}))
 
     assert_recv_partev(:stop, :tamper, partition.name)
 
@@ -479,8 +488,8 @@ defmodule DtCore.Test.Monitor.Partition do
     {partition, sensor, _p_pid, _s_pid} = start_tripped_partion(:alarm)
 
     # premilinary checks
-    assert_eq_wait :alarmed_arm, Detector.status({sensor})
-    assert_eq_wait :tripped, Partition.status({partition})
+    assert_eq_wait(:alarmed_arm, Detector.status({sensor}))
+    assert_eq_wait(:tripped, Partition.status({partition}))
 
     # check events
     assert_recv_armev("bob", :start, false, partition.name)
@@ -494,51 +503,55 @@ defmodule DtCore.Test.Monitor.Partition do
     refute_receive _
   end
 
-  defp assert_recv_partev(operation, type, name) when operation in [:start, :stop]
-    and is_atom(type) do
-      {:bridge_ev, _, {^operation, %PartitionEv{type: ^type, name: ^name}}}
-      |> assert_receive(5000)
+  defp assert_recv_partev(operation, type, name)
+       when operation in [:start, :stop] and is_atom(type) do
+    {:bridge_ev, _, {^operation, %PartitionEv{type: ^type, name: ^name}}}
+    |> assert_receive(5000)
   end
 
   defp assert_eq_wait(a, b) do
     # this assertion depends on messages between processes,
     # so give them time to land :)
-    TimerHelper.wait_until 5000, fn ->
+    TimerHelper.wait_until(5000, fn ->
       assert a == b
-    end
+    end)
   end
 
-  defp assert_recv_armev(initiator, operation, partial, name) when operation in [:start, :stop]
-    and partial in [true, false, nil] do
-      {:bridge_ev, _, {^operation, %ArmEv{partial: ^partial, name: ^name,
-        id: _, initiator: ^initiator}}}
-      |> assert_receive(5000)
+  defp assert_recv_armev(initiator, operation, partial, name)
+       when operation in [:start, :stop] and partial in [true, false, nil] do
+    {:bridge_ev, _,
+     {^operation, %ArmEv{partial: ^partial, name: ^name, id: _, initiator: ^initiator}}}
+    |> assert_receive(5000)
   end
 
   defp assert_recv_exitev(operation, name) when operation in [:start, :stop] do
-      {:bridge_ev, _, {^operation, %ExitTimerEv{name: ^name}}}
-      |> assert_receive(5000)
+    {:bridge_ev, _, {^operation, %ExitTimerEv{name: ^name}}}
+    |> assert_receive(5000)
   end
 
   defp start_partition(sensors \\ []) when is_list(sensors) do
-    partition = %PartitionModel{name: UUID.uuid4(), armed: "DISARM",
-      sensors: sensors}
+    partition = %PartitionModel{name: UUID.uuid4(), armed: "DISARM", sensors: sensors}
     {:ok, p_pid} = Partition.start_link(partition)
     {partition, p_pid}
   end
 
-  defp start_armed_partition(mode, sensors \\ []) when is_list(sensors) and
-    mode in ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"] do
-    partition = %PartitionModel{name: UUID.uuid4(), armed: mode,
-      sensors: sensors}
+  defp start_armed_partition(mode, sensors \\ [])
+       when is_list(sensors) and mode in ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE"] do
+    partition = %PartitionModel{name: UUID.uuid4(), armed: mode, sensors: sensors}
     {:ok, p_pid} = Partition.start_link(partition)
     {partition, p_pid}
   end
 
   defp start_partition(entry_delay, exit_delay, sensors)
-    when is_integer(entry_delay) and is_integer(exit_delay) do
-    partition = %PartitionModel{name: UUID.uuid4(), armed: "DISARM",
-      entry_delay: entry_delay, exit_delay: exit_delay,sensors: sensors}
+       when is_integer(entry_delay) and is_integer(exit_delay) do
+    partition = %PartitionModel{
+      name: UUID.uuid4(),
+      armed: "DISARM",
+      entry_delay: entry_delay,
+      exit_delay: exit_delay,
+      sensors: sensors
+    }
+
     {:ok, p_pid} = Partition.start_link(partition)
     {partition, p_pid}
   end
@@ -553,11 +566,13 @@ defmodule DtCore.Test.Monitor.Partition do
     assert :idle_arm == Detector.status({sensor})
 
     # send a tripping event to sensor
-    value = case type do
-      :alarm -> 25
-      :tamper -> 5
-      _ -> 25
-    end
+    value =
+      case type do
+        :alarm -> 25
+        :tamper -> 5
+        _ -> 25
+      end
+
     ev = %Event{address: sensor.address, port: sensor.port, value: value}
     :ok = Process.send(s_pid, {:event, ev}, [])
 
@@ -575,9 +590,11 @@ defmodule DtCore.Test.Monitor.Partition do
       entry_delay: false,
       exit_delay: false,
       partitions: [],
-      address: "3", port: 3,
+      address: "3",
+      port: 3,
       enabled: true
     }
+
     sensor2 = %SensorModel{sensor1 | name: UUID.uuid4(), port: 4}
     {:ok, s_pid1} = Detector.start_link({sensor1})
     {:ok, s_pid2} = Detector.start_link({sensor2})
@@ -591,11 +608,13 @@ defmodule DtCore.Test.Monitor.Partition do
     assert :idle_arm == Detector.status({sensor2})
 
     # send a tripping event to sensors
-    value = case type do
-      :alarm -> 25
-      :tamper -> 5
-      _ -> 25
-    end
+    value =
+      case type do
+        :alarm -> 25
+        :tamper -> 5
+        _ -> 25
+      end
+
     ev1 = %Event{address: sensor1.address, port: sensor1.port, value: value}
     ev2 = %Event{address: sensor2.address, port: sensor2.port, value: value}
     :ok = Process.send(s_pid1, {:event, ev1}, [])
@@ -615,9 +634,11 @@ defmodule DtCore.Test.Monitor.Partition do
       entry_delay: false,
       exit_delay: false,
       partitions: [],
-      address: "3", port: 3,
+      address: "3",
+      port: 3,
       enabled: true
     }
+
     sensor2 = %SensorModel{sensor1 | name: UUID.uuid4(), port: 4}
     {:ok, s_pid1} = Detector.start_link({sensor1})
     {:ok, s_pid2} = Detector.start_link({sensor2})
@@ -640,27 +661,23 @@ defmodule DtCore.Test.Monitor.Partition do
   end
 
   defp send_idle_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :idle, address: "1", port: 1,
-      id: Utils.random_id()}}
-    send pid, ev
+    ev = {op, %DetectorEv{type: :idle, address: "1", port: 1, id: Utils.random_id()}}
+    send(pid, ev)
   end
 
   defp send_tamper_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :short, address: "1", port: 1,
-      id: Utils.random_id()}}
-    send pid, ev
+    ev = {op, %DetectorEv{type: :short, address: "1", port: 1, id: Utils.random_id()}}
+    send(pid, ev)
   end
 
   defp send_realtime_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :realtime, address: "1", port: 1,
-      id: Utils.random_id()}}
-    send pid, ev
+    ev = {op, %DetectorEv{type: :realtime, address: "1", port: 1, id: Utils.random_id()}}
+    send(pid, ev)
   end
 
   defp send_alarm_event(pid, op \\ :start) when op in [:start, :stop] do
-    ev = {op, %DetectorEv{type: :alarm, address: "1", port: 1,
-      id: Utils.random_id()}}
-    send pid, ev
+    ev = {op, %DetectorEv{type: :alarm, address: "1", port: 1, id: Utils.random_id()}}
+    send(pid, ev)
   end
 
   defp setup_teol_sensor({entry_delay, exit_delay} \\ {0, 0}) do
@@ -674,9 +691,11 @@ defmodule DtCore.Test.Monitor.Partition do
       entry_delay: is_integer(entry_delay) and entry_delay > 0,
       exit_delay: is_integer(exit_delay) and exit_delay > 0,
       partitions: [],
-      address: "3", port: 3,
+      address: "3",
+      port: 3,
       enabled: true
     }
+
     {:ok, pid} = Detector.start_link({sensor})
     {:ok, sensor, pid}
   end
@@ -692,12 +711,13 @@ defmodule DtCore.Test.Monitor.Partition do
       entry_delay: is_integer(entry_delay) and entry_delay > 0,
       exit_delay: is_integer(exit_delay) and exit_delay > 0,
       partitions: [],
-      address: "3", port: 3,
+      address: "3",
+      port: 3,
       enabled: true,
       internal: true
     }
+
     {:ok, pid} = Detector.start_link({sensor})
     {:ok, sensor, pid}
   end
-
 end

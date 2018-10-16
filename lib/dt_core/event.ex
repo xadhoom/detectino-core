@@ -15,10 +15,10 @@ defmodule DtCore.Event do
   """
 
   defstruct address: nil,
-    port: nil,
-    type: nil,
-    subtype: nil,
-    value: nil
+            port: nil,
+            type: nil,
+            subtype: nil,
+            value: nil
 end
 
 defmodule DtCore.DetectorEv do
@@ -36,23 +36,23 @@ defmodule DtCore.DetectorEv do
   """
   @enforce_keys [:id]
   defstruct type: nil,
-    address: nil,
-    port: nil,
-    id: nil
+            address: nil,
+            port: nil,
+            id: nil
 end
 
 defmodule DtCore.DetectorExitEv do
   @enforce_keys [:id]
   defstruct address: nil,
-    port: nil,
-    id: nil
+            port: nil,
+            id: nil
 end
 
 defmodule DtCore.DetectorEntryEv do
   @enforce_keys [:id]
   defstruct address: nil,
-    port: nil,
-    id: nil
+            port: nil,
+            id: nil
 end
 
 defmodule DtCore.PartitionEv do
@@ -67,8 +67,8 @@ defmodule DtCore.PartitionEv do
   """
   @enforce_keys [:id]
   defstruct name: nil,
-    type: nil,
-    id: nil
+            type: nil,
+            id: nil
 end
 
 defmodule DtCore.ArmEv do
@@ -82,10 +82,9 @@ defmodule DtCore.ArmEv do
   """
   @enforce_keys [:id, :initiator]
   defstruct name: nil,
-    partial: nil,
-    initiator: nil,
-    id: nil
-
+            partial: nil,
+            initiator: nil,
+            id: nil
 end
 
 defmodule DtCore.ExitTimerEv do
@@ -97,6 +96,5 @@ defmodule DtCore.ExitTimerEv do
   """
   @enforce_keys [:id]
   defstruct name: nil,
-    id: nil
-
+            id: nil
 end

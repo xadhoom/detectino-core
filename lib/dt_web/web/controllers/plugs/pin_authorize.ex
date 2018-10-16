@@ -12,10 +12,12 @@ defmodule DtWeb.Plugs.PinAuthorize do
 
   def call(conn, _params) do
     pin = conn |> get_req_header("p-dt-pin") |> Enum.at(0, nil)
+
     if is_nil(pin) do
       conn |> handle_error
     else
-      q = from u in User, where: u.pin == ^pin
+      q = from(u in User, where: u.pin == ^pin)
+
       case Repo.one(q) do
         nil -> conn |> handle_error
         u -> conn |> put_private(:dt_pin, u)
@@ -35,5 +37,4 @@ defmodule DtWeb.Plugs.PinAuthorize do
     |> halt
     |> send_resp(401, StatusCodes.status_code(401))
   end
-
 end

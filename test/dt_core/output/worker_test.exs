@@ -19,24 +19,25 @@ defmodule DtCore.Test.Output.Worker do
   alias DtCore.Output.Actions.Email, as: EmailConfig
 
   setup_all do
-    {:ok, _} = Registry.start_link(:duplicate, OutputsRegistry.registry)
+    {:ok, _} = Registry.start_link(:duplicate, OutputsRegistry.registry())
     :meck.new(Etimer, [:passthrough])
-    :meck.expect(Etimer, :start_timer,
-      fn(_, _, _ , _) ->
-        0
-      end)
+
+    :meck.expect(Etimer, :start_timer, fn _, _, _, _ ->
+      0
+    end)
+
     :ok
   end
 
   setup do
     {:ok, _pid} = Sup.start_link()
 
-    on_exit fn ->
-      TimerHelper.wait_until fn ->
+    on_exit(fn ->
+      TimerHelper.wait_until(fn ->
         assert Process.whereis(:output_server) == nil
         assert Process.whereis(Sup) == nil
-      end
-    end
+      end)
+    end)
 
     :ok
   end
@@ -45,22 +46,28 @@ defmodule DtCore.Test.Output.Worker do
     events = [
       %EventModel{
         source: "partition",
-        source_config: Poison.encode!(%{
-          name: "area one", type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            name: "area one",
+            type: "alarm"
+          })
       },
       %EventModel{
         source: "sensor",
-        source_config: Poison.encode!(%{
-          address: "10", port: 5, type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            address: "10",
+            port: 5,
+            type: "alarm"
+          })
       }
     ]
+
     output = %OutputModel{name: "another output", events: events, enabled: false}
 
     {:ok, pid} = Worker.start_link({output})
 
-    listeners = Registry.keys(OutputsRegistry.registry, pid)
+    listeners = Registry.keys(OutputsRegistry.registry(), pid)
     assert Enum.count(listeners) == 0
   end
 
@@ -68,40 +75,47 @@ defmodule DtCore.Test.Output.Worker do
     events = [
       %EventModel{
         source: "arming",
-        source_config: Poison.encode!(%{
-          name: "area one"
-        })
+        source_config:
+          Poison.encode!(%{
+            name: "area one"
+          })
       },
       %EventModel{
         source: "partition",
-        source_config: Poison.encode!(%{
-          name: "area one", type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            name: "area one",
+            type: "alarm"
+          })
       },
       %EventModel{
         source: "sensor",
-        source_config: Poison.encode!(%{
-          address: "10", port: 5, type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            address: "10",
+            port: 5,
+            type: "alarm"
+          })
       }
     ]
+
     output = %OutputModel{name: "an output", events: events, enabled: true}
 
     {:ok, pid} = Worker.start_link({output})
 
-    listeners = Registry.keys(OutputsRegistry.registry, pid)
+    listeners = Registry.keys(OutputsRegistry.registry(), pid)
     assert Enum.count(listeners) == 3
 
     key = %{source: :partition, name: "area one", type: :alarm}
-    listeners = Registry.lookup(OutputsRegistry.registry, key)
+    listeners = Registry.lookup(OutputsRegistry.registry(), key)
     assert Enum.count(listeners) == 1
 
     key = %{source: :sensor, address: "10", port: 5, type: :alarm}
-    listeners = Registry.lookup(OutputsRegistry.registry, key)
+    listeners = Registry.lookup(OutputsRegistry.registry(), key)
     assert Enum.count(listeners) == 1
 
     key = %{source: :arming, name: "area one"}
-    listeners = Registry.lookup(OutputsRegistry.registry, key)
+    listeners = Registry.lookup(OutputsRegistry.registry(), key)
     assert Enum.count(listeners) == 1
   end
 
@@ -109,23 +123,30 @@ defmodule DtCore.Test.Output.Worker do
     events = [
       %EventModel{
         source: "arming",
-        source_config: Poison.encode!(%{
-          name: "area one"
-        })
+        source_config:
+          Poison.encode!(%{
+            name: "area one"
+          })
       },
       %EventModel{
         source: "partition",
-        source_config: Poison.encode!(%{
-          name: "area one", type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            name: "area one",
+            type: "alarm"
+          })
       },
       %EventModel{
         source: "sensor",
-        source_config: Poison.encode!(%{
-          address: "10", port: 5, type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            address: "10",
+            port: 5,
+            type: "alarm"
+          })
       }
     ]
+
     output = %OutputModel{
       name: "email test output",
       events: events,
@@ -149,8 +170,7 @@ defmodule DtCore.Test.Output.Worker do
     arm_start = {:start, %ArmEv{name: "area one", initiator: "admin", id: Utils.random_id()}}
     arm_stop = {:stop, %ArmEv{name: "area one", initiator: "admin", id: Utils.random_id()}}
 
-    s_ev_delayed = {:start,
-      %DetectorEntryEv{address: "10", port: 5, id: Utils.random_id()}}
+    s_ev_delayed = {:start, %DetectorEntryEv{address: "10", port: 5, id: Utils.random_id()}}
 
     Worker.handle_info(s_ev, state)
     get_subject(:sensor_start) |> assert_email
@@ -180,11 +200,15 @@ defmodule DtCore.Test.Output.Worker do
     events = [
       %EventModel{
         source: "sensor",
-        source_config: Poison.encode!(%{
-          address: "10", port: 5, type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            address: "10",
+            port: 5,
+            type: "alarm"
+          })
       }
     ]
+
     output = %OutputModel{
       name: "an output",
       events: events,
@@ -193,13 +217,15 @@ defmodule DtCore.Test.Output.Worker do
       bus_settings: %BusSettingsModel{
         type: "monostable",
         mono_ontime: 30,
-        address: "addr", port: 42
+        address: "addr",
+        port: 42
       }
     }
+
     {:ok, pid} = Worker.start_link({output})
     assert :meck.called(Etimer, :start_link, :_)
 
-    ActionRegistry.registry
+    ActionRegistry.registry()
     |> Registry.register(:bus_commands, [])
 
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
@@ -207,15 +233,19 @@ defmodule DtCore.Test.Output.Worker do
 
     %DtBus.OutputAction{
       command: :on,
-      address: "addr", port: 42
+      address: "addr",
+      port: 42
     }
     |> assert_receive(5000)
 
-    TimerHelper.wait_until fn ->
-      assert :meck.called(
-        Etimer, :start_timer,
-        [:_, :_, 30_000, {Worker, :timer_expiry, [:mono_expiry, output]}])
-    end
+    TimerHelper.wait_until(fn ->
+      assert :meck.called(Etimer, :start_timer, [
+               :_,
+               :_,
+               30_000,
+               {Worker, :timer_expiry, [:mono_expiry, output]}
+             ])
+    end)
 
     # a stop event should do nothing
     ev = {:stop, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
@@ -226,21 +256,25 @@ defmodule DtCore.Test.Output.Worker do
 
     %DtBus.OutputAction{
       command: :off,
-      address: "addr", port: 42
+      address: "addr",
+      port: 42
     }
     |> assert_receive(5000)
-
   end
 
   test "monostable output off time" do
     events = [
       %EventModel{
         source: "sensor",
-        source_config: Poison.encode!(%{
-          address: "10", port: 5, type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            address: "10",
+            port: 5,
+            type: "alarm"
+          })
       }
     ]
+
     output = %OutputModel{
       name: "an output",
       events: events,
@@ -250,13 +284,15 @@ defmodule DtCore.Test.Output.Worker do
         type: "monostable",
         mono_ontime: 30,
         mono_offtime: 120,
-        address: "addr", port: 42
+        address: "addr",
+        port: 42
       }
     }
+
     {:ok, pid} = Worker.start_link({output})
     assert :meck.called(Etimer, :start_link, :_)
 
-    ActionRegistry.registry
+    ActionRegistry.registry()
     |> Registry.register(:bus_commands, [])
 
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
@@ -264,33 +300,42 @@ defmodule DtCore.Test.Output.Worker do
 
     %DtBus.OutputAction{
       command: :on,
-      address: "addr", port: 42
+      address: "addr",
+      port: 42
     }
     |> assert_receive(5000)
 
-    TimerHelper.wait_until fn ->
-      assert :meck.called(
-        Etimer, :start_timer,
-        [:_, :_, 30_000, {Worker, :timer_expiry, [:mono_expiry, output]}])
-    end
+    TimerHelper.wait_until(fn ->
+      assert :meck.called(Etimer, :start_timer, [
+               :_,
+               :_,
+               30_000,
+               {Worker, :timer_expiry, [:mono_expiry, output]}
+             ])
+    end)
 
     Worker.timer_expiry({:mono_expiry, output})
 
     %DtBus.OutputAction{
       command: :off,
-      address: "addr", port: 42
+      address: "addr",
+      port: 42
     }
     |> assert_receive(5000)
 
-    TimerHelper.wait_until fn ->
-      assert :meck.called(
-        Etimer, :start_timer,
-        [:_, :_, 120_000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
-    end
+    TimerHelper.wait_until(fn ->
+      assert :meck.called(Etimer, :start_timer, [
+               :_,
+               :_,
+               120_000,
+               {Worker, :timer_expiry, [:mono_off_expiry, output]}
+             ])
+    end)
 
     # now another event should not run because we're in offtime
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
     Process.send(pid, ev, [])
+
     %DtBus.OutputAction{}
     |> refute_receive(1000)
 
@@ -298,6 +343,7 @@ defmodule DtCore.Test.Output.Worker do
 
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
     Process.send(pid, ev, [])
+
     %DtBus.OutputAction{}
     |> assert_receive(1000)
   end
@@ -306,11 +352,15 @@ defmodule DtCore.Test.Output.Worker do
     events = [
       %EventModel{
         source: "sensor",
-        source_config: Poison.encode!(%{
-          address: "10", port: 5, type: "alarm"
-        })
+        source_config:
+          Poison.encode!(%{
+            address: "10",
+            port: 5,
+            type: "alarm"
+          })
       }
     ]
+
     output = %OutputModel{
       name: "an output",
       events: events,
@@ -320,13 +370,15 @@ defmodule DtCore.Test.Output.Worker do
         type: "bistable",
         mono_ontime: 1,
         mono_offtime: 120,
-        address: "addr", port: 42
+        address: "addr",
+        port: 42
       }
     }
+
     {:ok, pid} = Worker.start_link({output})
     assert :meck.called(Etimer, :start_link, :_)
 
-    ActionRegistry.registry
+    ActionRegistry.registry()
     |> Registry.register(:bus_commands, [])
 
     ev = {:start, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
@@ -334,34 +386,43 @@ defmodule DtCore.Test.Output.Worker do
 
     %DtBus.OutputAction{
       command: :on,
-      address: "addr", port: 42
+      address: "addr",
+      port: 42
     }
     |> assert_receive(5000)
 
-    TimerHelper.wait_until fn ->
-      refute :meck.called(
-        Etimer, :start_timer,
-        [:_, :_, 1000, {Worker, :timer_expiry, [:mono_expiry, output]}])
-    end
+    TimerHelper.wait_until(fn ->
+      refute :meck.called(Etimer, :start_timer, [
+               :_,
+               :_,
+               1000,
+               {Worker, :timer_expiry, [:mono_expiry, output]}
+             ])
+    end)
 
     %DtBus.OutputAction{
       command: :off,
-      address: "addr", port: 42
+      address: "addr",
+      port: 42
     }
     |> refute_receive(1000)
 
-    TimerHelper.wait_until fn ->
-      refute :meck.called(
-        Etimer, :start_timer,
-        [:_, :_, 120_000, {Worker, :timer_expiry, [:mono_off_expiry, output]}])
-    end
+    TimerHelper.wait_until(fn ->
+      refute :meck.called(Etimer, :start_timer, [
+               :_,
+               :_,
+               120_000,
+               {Worker, :timer_expiry, [:mono_off_expiry, output]}
+             ])
+    end)
 
     ev = {:stop, %DetectorEv{type: :alarm, address: "10", port: 5, id: Utils.random_id()}}
     Process.send(pid, ev, [])
 
     %DtBus.OutputAction{
       command: :off,
-      address: "addr", port: 42
+      address: "addr",
+      port: 42
     }
     |> assert_receive(5000)
   end
@@ -389,5 +450,4 @@ defmodule DtCore.Test.Output.Worker do
     |> Application.get_env(EmailConfig.DelayedAlarm)
     |> Keyword.get(which)
   end
-
 end

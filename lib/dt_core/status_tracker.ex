@@ -34,7 +34,7 @@ defmodule DtCore.StatusTracker do
 
   defp in_alarm?(pids) do
     pids
-    |> Enum.any?(fn(pid) ->
+    |> Enum.any?(fn pid ->
       case Partition.alarm_status(pid) do
         :alarm -> true
         _ -> false
@@ -44,9 +44,8 @@ defmodule DtCore.StatusTracker do
 
   defp any_armed?(pids) do
     pids
-    |> Enum.any?(fn(pid) ->
+    |> Enum.any?(fn pid ->
       Partition.armed?(pid)
     end)
   end
-
 end

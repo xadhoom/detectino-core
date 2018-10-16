@@ -8,20 +8,19 @@ defmodule DtCtx.PartitionScenarioTest do
 
   test "allow valid insert mode" do
     @valid_modes
-    |> Enum.each(fn(mode) ->
+    |> Enum.each(fn mode ->
       attrs = %{mode: mode, partition_id: 1, scenario_id: 1}
       changeset = Mut.create_changeset(%Mut{}, attrs)
       assert changeset.valid?
-      end)
+    end)
   end
 
   test "block valid insert mode" do
     @some_invalid_modes
-    |> Enum.each(fn(mode) ->
+    |> Enum.each(fn mode ->
       attrs = %{mode: mode, partition_id: 1, scenario_id: 1}
       changeset = Mut.create_changeset(%Mut{}, attrs)
       refute changeset.valid?
-      end)
+    end)
   end
-
 end

@@ -7,5 +7,4 @@ defmodule DtWeb.PartitionSensorView do
   def render(_, %{partition_sensor: item}) do
     item
   end
-
 end

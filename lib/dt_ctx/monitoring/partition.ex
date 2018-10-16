@@ -2,26 +2,38 @@ defmodule DtCtx.Monitoring.Partition do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Poison.Encoder, only: [
-    :id, :name, :entry_delay, :exit_delay, :armed
-  ]}
+  @derive {Poison.Encoder,
+           only: [
+             :id,
+             :name,
+             :entry_delay,
+             :exit_delay,
+             :armed
+           ]}
   schema "partitions" do
-    field :name, :string
-    field :entry_delay, :integer
-    field :exit_delay, :integer
-    field :armed, :string
+    field(:name, :string)
+    field(:entry_delay, :integer)
+    field(:exit_delay, :integer)
+    field(:armed, :string)
 
     timestamps()
 
-    many_to_many :sensors,
-      DtCtx.Monitoring.Sensor, join_through: DtCtx.Monitoring.PartitionSensor
-    many_to_many :scenarios,
-      DtCtx.Monitoring.Scenario, join_through: DtCtx.Monitoring.PartitionScenario
+    many_to_many(
+      :sensors,
+      DtCtx.Monitoring.Sensor,
+      join_through: DtCtx.Monitoring.PartitionSensor
+    )
+
+    many_to_many(
+      :scenarios,
+      DtCtx.Monitoring.Scenario,
+      join_through: DtCtx.Monitoring.PartitionScenario
+    )
   end
 
   @required_fields ~w(name entry_delay exit_delay)
   @optional_fields ~w(armed)
-  @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
+  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
   @valid_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE", "DISARM"]
 
   @doc """
@@ -71,5 +83,4 @@ defmodule DtCtx.Monitoring.Partition do
       _ -> :error
     end
   end
-
 end

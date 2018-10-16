@@ -136,5 +136,4 @@ defmodule DtLib.Test.Delayer do
     {:ok, pid} = Delayer.start_link()
     assert is_pid(pid)
   end
-
 end

@@ -7,5 +7,4 @@ defmodule DtWeb.PartitionView do
   def render(_, %{partition: item}) do
     item
   end
-
 end

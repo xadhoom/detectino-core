@@ -6,13 +6,14 @@ defmodule DtWeb.EventLogControllerTest do
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do
-    DtWeb.ReloadRegistry.registry
-    |> Registry.register(DtWeb.ReloadRegistry.key, [])
+    DtWeb.ReloadRegistry.registry()
+    |> Registry.register(DtWeb.ReloadRegistry.key(), [])
+
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   test "anon: get all event logs", %{conn: conn} do
-    conn = get conn, event_log_path(conn, :index)
+    conn = get(conn, event_log_path(conn, :index))
     response(conn, 401)
   end
 
@@ -20,8 +21,10 @@ defmodule DtWeb.EventLogControllerTest do
     conn = Helper.login(conn)
 
     # create without pin should be 401
-    conn = conn
-    |> post(event_log_path(conn, :create), %{})
+    conn =
+      conn
+      |> post(event_log_path(conn, :create), %{})
+
     response(conn, 401)
 
     # even with the pin
@@ -32,14 +35,16 @@ defmodule DtWeb.EventLogControllerTest do
   end
 
   test "retrieve events", %{conn: conn} do
-    params = %{type: "alarm", acked: false,
-      operation: "start", details: get_arm_ev()}
-    EventLog.create_changeset(%EventLog{}, params)
-    |> Repo.insert!
+    params = %{type: "alarm", acked: false, operation: "start", details: get_arm_ev()}
 
-    conn = Helper.login(conn)
-    |> put_req_header("p-dt-pin", "666666")
-    |> get(event_log_path(conn, :index))
+    EventLog.create_changeset(%EventLog{}, params)
+    |> Repo.insert!()
+
+    conn =
+      Helper.login(conn)
+      |> put_req_header("p-dt-pin", "666666")
+      |> get(event_log_path(conn, :index))
+
     json = json_response(conn, 200)
 
     assert Enum.count(json) == 1
@@ -49,10 +54,11 @@ defmodule DtWeb.EventLogControllerTest do
   end
 
   test "ack events", %{conn: conn} do
-    params = %{type: "alarm", acked: false,
-      operation: "start", details: get_arm_ev()}
-    eventlog = EventLog.create_changeset(%EventLog{}, params)
-    |> Repo.insert!
+    params = %{type: "alarm", acked: false, operation: "start", details: get_arm_ev()}
+
+    eventlog =
+      EventLog.create_changeset(%EventLog{}, params)
+      |> Repo.insert!()
 
     Helper.login(conn)
     |> put_req_header("p-dt-pin", "666666")
@@ -64,13 +70,13 @@ defmodule DtWeb.EventLogControllerTest do
   end
 
   test "ack all events", %{conn: conn} do
-    [%{type: "alarm", acked: false,
-      operation: "start", details: get_arm_ev()},
-    %{type: "alarm", acked: false,
-      operation: "start", details: get_arm_ev()}]
-    |> Enum.each(fn(ev) ->
+    [
+      %{type: "alarm", acked: false, operation: "start", details: get_arm_ev()},
+      %{type: "alarm", acked: false, operation: "start", details: get_arm_ev()}
+    ]
+    |> Enum.each(fn ev ->
       EventLog.create_changeset(%EventLog{}, ev)
-      |> Repo.insert!
+      |> Repo.insert!()
     end)
 
     Helper.login(conn)
@@ -82,7 +88,7 @@ defmodule DtWeb.EventLogControllerTest do
 
     assert Enum.count(eventlogs) == 2
 
-    Enum.each(eventlogs, fn(eventlog) ->
+    Enum.each(eventlogs, fn eventlog ->
       assert eventlog.acked == true
     end)
   end
@@ -90,5 +96,4 @@ defmodule DtWeb.EventLogControllerTest do
   defp get_arm_ev do
     %ArmEv{id: "yadda", initiator: "baz"}
   end
-
 end

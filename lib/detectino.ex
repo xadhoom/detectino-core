@@ -19,16 +19,19 @@ defmodule Detectino do
       # Start the Ecto repository
       supervisor(DtCtx.Repo, []),
       supervisor(DtBus.CanSup, []),
-      supervisor(Registry,
-        [:duplicate, ReloadRegistry.registry],
-        restart: :permanent),
+      supervisor(
+        Registry,
+        [:duplicate, ReloadRegistry.registry()],
+        restart: :permanent
+      ),
       worker(DtWeb.TokenServer, [], restart: :permanent)
     ]
 
-    children = case Application.get_env(:detectino, :environment) do
-      :test -> basic_children
-      _ -> basic_children ++ [supervisor(DtCore.Sup, [])]
-    end
+    children =
+      case Application.get_env(:detectino, :environment) do
+        :test -> basic_children
+        _ -> basic_children ++ [supervisor(DtCore.Sup, [])]
+      end
 
     opts = [strategy: :one_for_one, name: Detectino.Supervisor]
     Supervisor.start_link(children, opts)
@@ -48,14 +51,14 @@ defmodule Detectino do
 
     case Application.get_env(:detectino, :environment) do
       :prod ->
-        Logger.info "Running database migrations..."
+        Logger.info("Running database migrations...")
         {:ok, pid} = DtCtx.Repo.start_link()
         Ecto.Migrator.run(DtCtx.Repo, path, :up, [{:all, true}, {:log, :debug}])
         Process.unlink(pid)
         :ok = DtCtx.Repo.stop(pid)
+
       v ->
-        Logger.info "Not production (#{inspect v}, disabling auto database migration"
+        Logger.info("Not production (#{inspect(v)}, disabling auto database migration")
     end
   end
-
 end

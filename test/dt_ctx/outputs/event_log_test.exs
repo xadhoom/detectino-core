@@ -8,8 +8,7 @@ defmodule DtCtx.EventLog do
 
   test "detector event changeset" do
     ev = %DetectorEv{id: "yadda"}
-    attrs = %{type: "alarm", operation: "start",
-      details: ev}
+    attrs = %{type: "alarm", operation: "start", details: ev}
 
     changeset = EventLog.create_changeset(%EventLog{}, attrs)
     assert changeset.valid?
@@ -19,13 +18,11 @@ defmodule DtCtx.EventLog do
 
   test "partition event changeset" do
     ev = %PartitionEv{id: "yadda"}
-    attrs = %{type: "alarm", operation: "start",
-      details: ev}
+    attrs = %{type: "alarm", operation: "start", details: ev}
 
     changeset = EventLog.create_changeset(%EventLog{}, attrs)
     assert changeset.valid?
 
     assert Changeset.get_change(changeset, :correlation_id) == "yadda"
   end
-
 end

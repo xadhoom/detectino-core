@@ -31,11 +31,9 @@ defmodule DtCtx.Outputs.EventLogType do
   def dump(_), do: :error
 
   defp encode(ev, source) when is_atom(source) do
-    data = %{"source" => Atom.to_string(source),
-      "ev" => Map.from_struct(ev)}
+    data = %{"source" => Atom.to_string(source), "ev" => Map.from_struct(ev)}
     {:ok, data}
   end
-
 end
 
 defmodule DtCtx.Outputs.EventLog do
@@ -43,19 +41,18 @@ defmodule DtCtx.Outputs.EventLog do
   import Ecto.Changeset
 
   schema "eventlogs" do
-    field :type, :string
-    field :acked, :boolean
-    field :operation, :string
-    field :correlation_id, :string
-    field :details, DtCtx.Outputs.EventLogType
+    field(:type, :string)
+    field(:acked, :boolean)
+    field(:operation, :string)
+    field(:correlation_id, :string)
+    field(:details, DtCtx.Outputs.EventLogType)
 
     timestamps()
   end
 
   @required_fields ~w(type operation details)
-  @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
-  @source_types ["arm", "exit_timer", "alarm", "disarm",
-    "detector_exit", "detector_entry"]
+  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @source_types ["arm", "exit_timer", "alarm", "disarm", "detector_exit", "detector_entry"]
 
   def create_changeset(model, params \\ %{}) do
     model
@@ -78,19 +75,21 @@ defmodule DtCtx.Outputs.EventLog do
   end
 
   defp add_id(changeset) do
-    id = changeset
-    |> get_change(:details)
-    |> Map.get(:id)
+    id =
+      changeset
+      |> get_change(:details)
+      |> Map.get(:id)
 
     put_change(changeset, :correlation_id, id)
   end
 
   defp set_ack(changeset) do
-    acked = case get_change(changeset, :type) do
-      "alarm" -> false
-      _ -> true
-    end
+    acked =
+      case get_change(changeset, :type) do
+        "alarm" -> false
+        _ -> true
+      end
+
     put_change(changeset, :acked, acked)
   end
-
 end

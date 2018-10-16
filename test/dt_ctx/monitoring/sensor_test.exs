@@ -30,7 +30,7 @@ defmodule DtCtx.SensorTest do
     # this requires DB access since uniq is enforced by DB constraints
     %Sensor{}
     |> Sensor.create_changeset(%{address: "10", port: 10, name: "a name", balance: "NC"})
-    |> Repo.insert!
+    |> Repo.insert!()
 
     sensor2 =
       %Sensor{}
@@ -40,29 +40,40 @@ defmodule DtCtx.SensorTest do
   end
 
   test "internal sensor" do
-    changeset = Sensor.create_changeset(%Sensor{}, %{
-      address: "some content", port: 1234, name: "mandatory", internal: true})
+    changeset =
+      Sensor.create_changeset(%Sensor{}, %{
+        address: "some content",
+        port: 1234,
+        name: "mandatory",
+        internal: true
+      })
+
     assert changeset.valid?
 
-    changeset = Sensor.create_changeset(%Sensor{}, %{
-      address: "some content", port: 1234, name: "mandatory", internal: false})
+    changeset =
+      Sensor.create_changeset(%Sensor{}, %{
+        address: "some content",
+        port: 1234,
+        name: "mandatory",
+        internal: false
+      })
+
     assert changeset.valid?
   end
 
   test "valid balance types" do
     ["NC", "NO", "EOL", "DEOL", "TEOL"]
-    |> Enum.each(fn(type) ->
-        changeset = Sensor.create_changeset(%Sensor{}, %{@valid_attrs | balance: type})
-        assert changeset.valid?
-      end)
+    |> Enum.each(fn type ->
+      changeset = Sensor.create_changeset(%Sensor{}, %{@valid_attrs | balance: type})
+      assert changeset.valid?
+    end)
   end
 
   test "invalid balance types" do
     ["some", "someother"]
-    |> Enum.each(fn(type) ->
-        changeset = Sensor.create_changeset(%Sensor{}, %{@valid_attrs | balance: type})
-        refute changeset.valid?
-      end)
+    |> Enum.each(fn type ->
+      changeset = Sensor.create_changeset(%Sensor{}, %{@valid_attrs | balance: type})
+      refute changeset.valid?
+    end)
   end
-
 end

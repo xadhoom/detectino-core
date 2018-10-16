@@ -21,18 +21,19 @@ defmodule DtCore.EventLogger do
   end
 
   def init(_) do
-    Logger.info "Starting Event Logger"
+    Logger.info("Starting Event Logger")
     EventBridge.start_listening(fn ev -> filter(ev) end)
     {:ok, nil}
   end
 
   def handle_info(msg = {:bridge_ev, _, e}, state) do
-    Logger.info fn() -> "EVENT: #{inspect e}" end
+    Logger.info(fn -> "EVENT: #{inspect(e)}" end)
     on_info(msg, state)
   end
 
   defp on_info({:bridge_ev, _, {op, ev = %ArmEv{}}}, state) do
     operation = Atom.to_string(op)
+
     %{type: "arm", operation: operation, details: ev}
     |> save_eventlog()
 
@@ -41,6 +42,7 @@ defmodule DtCore.EventLogger do
 
   defp on_info({:bridge_ev, _, {op, ev = %ExitTimerEv{}}}, state) do
     operation = Atom.to_string(op)
+
     %{type: "exit_timer", operation: operation, details: ev}
     |> save_eventlog()
 
@@ -48,12 +50,13 @@ defmodule DtCore.EventLogger do
   end
 
   defp on_info({:bridge_ev, _, {_, %DetectorEv{type: type}}}, state)
-      when type in [:idle, :realtime] do
+       when type in [:idle, :realtime] do
     {:noreply, state}
   end
 
   defp on_info({:bridge_ev, _, {op, ev = %DetectorEv{}}}, state) do
     operation = Atom.to_string(op)
+
     %{type: "alarm", operation: operation, details: ev}
     |> save_eventlog()
 
@@ -62,6 +65,7 @@ defmodule DtCore.EventLogger do
 
   defp on_info({:bridge_ev, _, {op, ev = %DetectorExitEv{}}}, state) do
     operation = Atom.to_string(op)
+
     %{type: "detector_exit", operation: operation, details: ev}
     |> save_eventlog()
 
@@ -70,6 +74,7 @@ defmodule DtCore.EventLogger do
 
   defp on_info({:bridge_ev, _, {op, ev = %DetectorEntryEv{}}}, state) do
     operation = Atom.to_string(op)
+
     %{type: "detector_entry", operation: operation, details: ev}
     |> save_eventlog()
 
@@ -109,7 +114,6 @@ defmodule DtCore.EventLogger do
   defp save_eventlog(params) do
     %EventLog{}
     |> EventLog.create_changeset(params)
-    |> Repo.insert!
+    |> Repo.insert!()
   end
-
 end

@@ -10,13 +10,14 @@ config :detectino, :environment, :dev
 config :detectino, DtWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
-  #code_reloader: true,
+  # code_reloader: true,
   cache_static_lookup: false,
   check_origin: false
-  #watchers: [sh: ["watcher"]]
+
+# watchers: [sh: ["watcher"]]
 
 # Watch static and templates for browser reloading.
-#config :detectino, DtWeb.Endpoint,
+# config :detectino, DtWeb.Endpoint,
 #  live_reload: [
 #    patterns: [
 #      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
@@ -40,8 +41,7 @@ config :detectino, DtCtx.Repo,
   pool_size: 10,
   loggers: []
 
-config :detectino, DtCore.Output.Actions.Email.Mailer,
-  adapter: Swoosh.Adapters.Local
+config :detectino, DtCore.Output.Actions.Email.Mailer, adapter: Swoosh.Adapters.Local
 
 config :detectino, :can_interface, "vcan0"
 

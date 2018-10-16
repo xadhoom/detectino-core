@@ -16,6 +16,6 @@ defmodule DtBus.OutputAction do
   and dispatched via DtBus.ActionRegistry
   """
   defstruct command: nil,
-  address: nil,
-  port: nil
+            address: nil,
+            port: nil
 end

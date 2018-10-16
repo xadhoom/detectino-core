@@ -13,7 +13,7 @@ defmodule DtCore.Test.EventLoggerTest do
   alias DtCore.ExitTimerEv
 
   setup_all do
-    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry)
+    {:ok, _} = Registry.start_link(:duplicate, DtCore.OutputsRegistry.registry())
     {:ok, _} = EventBridge.start_link()
     :ok
   end
@@ -24,8 +24,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves an arm event" do
-    {:start, %ArmEv{name: "test", partial: false,
-      id: "yadda", initiator: "foo"}} |> dispatch()
+    {:start, %ArmEv{name: "test", partial: false, id: "yadda", initiator: "foo"}} |> dispatch()
 
     log = Repo.one!(EventLog)
 
@@ -36,8 +35,7 @@ defmodule DtCore.Test.EventLoggerTest do
   end
 
   test "receives and saves a stop arm event" do
-    {:stop, %ArmEv{name: "test", partial: false,
-      id: "yadda", initiator: "foo"}} |> dispatch()
+    {:stop, %ArmEv{name: "test", partial: false, id: "yadda", initiator: "foo"}} |> dispatch()
 
     log = Repo.one!(EventLog)
 
@@ -108,10 +106,10 @@ defmodule DtCore.Test.EventLoggerTest do
 
   defp dispatch(ev) do
     EventBridge.dispatch(%{}, ev)
-    TimerHelper.wait_until 1000, Ecto.NoResultsError, fn ->
+
+    TimerHelper.wait_until(1000, Ecto.NoResultsError, fn ->
       # all async here, may not be on db immediately
       Repo.one!(EventLog)
-    end
+    end)
   end
-
 end

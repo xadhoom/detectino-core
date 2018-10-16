@@ -5,11 +5,10 @@ defmodule DtWeb.ScenarioView do
   @model :scenario
 
   def render("get_available.json", %{items: items}) do
-    render_many(items, __MODULE__, "#{Atom.to_string @model}.json")
+    render_many(items, __MODULE__, "#{Atom.to_string(@model)}.json")
   end
 
   def render(_, %{scenario: item}) do
     item
   end
-
 end

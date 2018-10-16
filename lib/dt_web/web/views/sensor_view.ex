@@ -4,8 +4,7 @@ defmodule DtWeb.SensorView do
 
   @model :sensor
 
-  #def render(_, %{sensor: item}) do
-  #	item
-  #end
-
+  # def render(_, %{sensor: item}) do
+  # 	item
+  # end
 end

@@ -3,9 +3,9 @@ defmodule DtLib.Delayer.Unit do
   Struct used to encapsulate requests used by DtLib.Delayer
   """
   defstruct ref: nil,
-    term: nil,
-    delay: nil,
-    started_at: nil
+            term: nil,
+            delay: nil,
+            started_at: nil
 end
 
 defmodule DtLib.Delayer do
@@ -23,11 +23,12 @@ defmodule DtLib.Delayer do
   alias DtLib.Delayer.Unit
 
   defstruct terms: [],
-    offset: 0,
-    recipient: nil,
-    timer: nil
+            offset: 0,
+            recipient: nil,
+            timer: nil
 
-  @granularity 10 # in msecs
+  # in msecs
+  @granularity 10
 
   @spec start_link :: {:ok, pid()}
   def start_link do
@@ -94,40 +95,44 @@ defmodule DtLib.Delayer do
   end
 
   @doc false
-  @spec handle_call({:cancel, reference()}, any(),
-    %Delayer{}) :: {:reply, {:ok, any()}, %Delayer{}}
+  @spec handle_call({:cancel, reference()}, any(), %Delayer{}) ::
+          {:reply, {:ok, any()}, %Delayer{}}
   def handle_call({:cancel, ref}, _from, state) do
-    expunged = state.terms
-    |> Enum.find(fn(x) ->
-      ref == x.ref
-    end)
-    |> Map.get(:term)
+    expunged =
+      state.terms
+      |> Enum.find(fn x ->
+        ref == x.ref
+      end)
+      |> Map.get(:term)
 
-    terms = state.terms
-    |> Enum.reject(fn(x) ->
-      ref == x.ref
-    end)
+    terms =
+      state.terms
+      |> Enum.reject(fn x ->
+        ref == x.ref
+      end)
+
     state = %{state | terms: terms}
     {:reply, {:ok, expunged}, state}
   end
 
   @doc false
-  @spec handle_call({:stop_all}, any(),
-    %Delayer{}) :: {:reply, {:ok, [any(), ...]}, %Delayer{}}
+  @spec handle_call({:stop_all}, any(), %Delayer{}) :: {:reply, {:ok, [any(), ...]}, %Delayer{}}
   def handle_call({:stop_all}, _from, state) do
-    terms = Enum.map(state.terms, fn(x) ->
-      Map.get(x, :term)
-    end)
+    terms =
+      Enum.map(state.terms, fn x ->
+        Map.get(x, :term)
+      end)
+
     {:reply, {:ok, terms}, %{state | terms: []}}
   end
 
   @doc false
-  @spec handle_call({:warp}, any(),
-    %Delayer{}) :: {:reply, :warped, %Delayer{}}
+  @spec handle_call({:warp}, any(), %Delayer{}) :: {:reply, :warped, %Delayer{}}
   def handle_call({:warp, offset}, _from, state) do
     with tref when is_reference(tref) <- state.timer do
       Process.cancel_timer(tref)
     end
+
     state = %{state | offset: offset}
     terms = process_entries(state)
     tref = reschedule_tick()
@@ -136,15 +141,11 @@ defmodule DtLib.Delayer do
   end
 
   @doc false
-  @spec handle_call({:put, any(), non_neg_integer()}, any(),
-    %Delayer{}) :: {:reply, {:ok, reference()}, %Delayer{}}
+  @spec handle_call({:put, any(), non_neg_integer()}, any(), %Delayer{}) ::
+          {:reply, {:ok, reference()}, %Delayer{}}
   def handle_call({:put, term, delay}, _from, state) do
     ref = make_ref()
-    entry = %Unit{ref: ref,
-      term: term,
-      delay: delay,
-      started_at: System.monotonic_time()
-    }
+    entry = %Unit{ref: ref, term: term, delay: delay, started_at: System.monotonic_time()}
     terms = [entry | state.terms]
     {:reply, {:ok, ref}, %{state | terms: terms}}
   end
@@ -158,7 +159,7 @@ defmodule DtLib.Delayer do
   end
 
   defp process_entries(state) do
-    Enum.reject(state.terms, fn(term) ->
+    Enum.reject(state.terms, fn term ->
       check_expired(term, state)
     end)
   end
@@ -170,8 +171,7 @@ defmodule DtLib.Delayer do
   defp check_expired(term, state) do
     delay = term.delay
     now = System.monotonic_time()
-    delta = System.convert_time_unit(now - term.started_at,
-      :native, :millisecond)
+    delta = System.convert_time_unit(now - term.started_at, :native, :millisecond)
     # we may have an offset, so apply it
     offset_delta = delta + state.offset
 
@@ -179,6 +179,7 @@ defmodule DtLib.Delayer do
       v when delay <= v ->
         release_term(term, state)
         true
+
       _ ->
         false
     end
@@ -187,5 +188,4 @@ defmodule DtLib.Delayer do
   defp release_term(term, state) do
     send(state.recipient, term.term)
   end
-
 end

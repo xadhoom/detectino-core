@@ -15,11 +15,12 @@ defmodule DtCore.Output.Utils do
       :output,
       name: output.name
     }
+
     {:ok, {:global, name}}
   end
 
   def output_server_pid(output = %OutputModel{}) do
     {:ok, {:global, name}} = output_server_name(output)
-    :global.whereis_name name
+    :global.whereis_name(name)
   end
 end

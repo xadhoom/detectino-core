@@ -14,11 +14,12 @@ config :detectino, :environment, :prod
 # which you typically run after static files are built.
 config :detectino, DtWeb.Endpoint,
   http: [port: 8888],
-  #url: [host: "example.com"],
+  # url: [host: "example.com"],
   root: ".",
   server: true,
-  version: Mix.Project.config[:version]
-  #cache_static_manifest: "priv/static/manifest.json"
+  version: Mix.Project.config()[:version]
+
+# cache_static_manifest: "priv/static/manifest.json"
 
 # Do not print debug messages in production
 config :logger, level: :info

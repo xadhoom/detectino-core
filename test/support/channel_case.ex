@@ -24,7 +24,6 @@ defmodule DtWeb.ChannelCase do
       import Ecto.Schema
       import Ecto.Query, only: [from: 2]
 
-
       # The default endpoint for testing
       @endpoint DtWeb.Endpoint
     end

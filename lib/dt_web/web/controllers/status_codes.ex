@@ -1,5 +1,4 @@
 defmodule DtWeb.StatusCodes do
-
   @http_status_codes %{
     100 => "Continue",
     101 => "Switching Protocols",
@@ -62,18 +61,15 @@ defmodule DtWeb.StatusCodes do
     555 => "Partition tripped"
   }
 
-  @atom_to_status_code \
-    @http_status_codes
-    |> Enum.map(fn {code, message} ->
-     {message
-       |> String.downcase
-       |> String.replace(~r/[\s-]/, "_")
-       |> String.to_atom,
-      code}
-    end)
-    |> Enum.into(%{})
+  @atom_to_status_code @http_status_codes
+                       |> Enum.map(fn {code, message} ->
+                         {message
+                          |> String.downcase()
+                          |> String.replace(~r/[\s-]/, "_")
+                          |> String.to_atom(), code}
+                       end)
+                       |> Enum.into(%{})
 
   def status_code(code) when is_integer(code), do: Map.fetch!(@http_status_codes, code)
   def status_code(atom) when is_atom(atom), do: Map.fetch!(@atom_to_status_code, atom)
-
 end

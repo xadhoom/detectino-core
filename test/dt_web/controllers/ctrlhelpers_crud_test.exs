@@ -10,7 +10,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
   @user3 %User{name: "c", username: "c"}
 
   test "Get all" do
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
     {:ok, conn, _items} = Crud.all(conn, %{}, {Repo, User, nil})
     total_h = get_resp_header(conn, "x-total-count")
 
@@ -22,7 +22,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     Repo.insert!(@user2)
     Repo.insert!(@user1)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
 
     filt = %{"name" => "b"}
     {:ok, conn, items} = Crud.all(conn, filt, {Repo, User, nil})
@@ -39,7 +39,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     Repo.insert!(@user2)
     Repo.insert!(@user1)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
 
     {:ok, _conn, items} = Crud.all(conn, %{}, {Repo, User, nil})
     first = Enum.at(items, 0)
@@ -52,7 +52,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
 
   test "Get with id filter" do
     add_users()
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
 
     {:ok, _conn, items} = Crud.all(conn, %{"id" => "1"}, {Repo, User, nil})
     assert Enum.count(items) == 1
@@ -61,7 +61,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
 
   test "Get with field filter" do
     add_users()
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
 
     {:ok, _conn, items} = Crud.all(conn, %{"name" => "admin"}, {Repo, User, nil})
     assert Enum.count(items) == 1
@@ -70,15 +70,17 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
 
   test "Get with field filter and contains match mode" do
     add_users()
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
 
-    {:ok, _conn, items} = Crud.all(conn, %{
-      "name" => "ad", "nameMatchMode" => "contains"}, {Repo, User, nil})
+    {:ok, _conn, items} =
+      Crud.all(conn, %{"name" => "ad", "nameMatchMode" => "contains"}, {Repo, User, nil})
+
     assert Enum.count(items) == 1
     assert Enum.at(items, 0).name == "admin"
 
-    {:ok, _conn, items} = Crud.all(conn, %{
-      "name" => "a", "nameMatchMode" => "contains"}, {Repo, User, nil})
+    {:ok, _conn, items} =
+      Crud.all(conn, %{"name" => "a", "nameMatchMode" => "contains"}, {Repo, User, nil})
+
     assert Enum.count(items) == 2
   end
 
@@ -86,42 +88,60 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     alias DtCtx.Outputs.EventLog
     alias DtCore.DetectorEv
 
-    %EventLog{type: "alarm", operation: "start",
+    %EventLog{
+      type: "alarm",
+      operation: "start",
       details: %DetectorEv{
         id: "yadda",
         type: "idle",
         address: "10",
         port: 5
-        }}
-    |> Repo.insert!
+      }
+    }
+    |> Repo.insert!()
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
 
-    {:ok, _conn, items} = Crud.all(conn, %{
-      "details.source" => "ete", "details.sourceMatchMode" => "contains"}, {Repo, EventLog, nil})
+    {:ok, _conn, items} =
+      Crud.all(
+        conn,
+        %{"details.source" => "ete", "details.sourceMatchMode" => "contains"},
+        {Repo, EventLog, nil}
+      )
+
     assert Enum.count(items) == 1
-    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+    assert Enum.at(items, 0).details["ev"]["id"] == "yadda"
 
-    {:ok, _conn, items} = Crud.all(conn, %{
-      "details.source" => "det", "details.sourceMatchMode" => "starts"}, {Repo, EventLog, nil})
-    assert Enum.count(items) == 1
-    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+    {:ok, _conn, items} =
+      Crud.all(
+        conn,
+        %{"details.source" => "det", "details.sourceMatchMode" => "starts"},
+        {Repo, EventLog, nil}
+      )
 
-    {:ok, _conn, items} = Crud.all(conn, %{
-      "details.ev.id" => "yadda"}, {Repo, EventLog, nil})
     assert Enum.count(items) == 1
-    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+    assert Enum.at(items, 0).details["ev"]["id"] == "yadda"
 
-    {:ok, _conn, items} = Crud.all(conn, %{
-      "details.ev.id" => "adda", "details.ev.idMatchMode" => "ends"}, {Repo, EventLog, nil})
+    {:ok, _conn, items} = Crud.all(conn, %{"details.ev.id" => "yadda"}, {Repo, EventLog, nil})
     assert Enum.count(items) == 1
-    assert Enum.at(items, 0).details["ev"]  ["id"] == "yadda"
+    assert Enum.at(items, 0).details["ev"]["id"] == "yadda"
+
+    {:ok, _conn, items} =
+      Crud.all(
+        conn,
+        %{"details.ev.id" => "adda", "details.ev.idMatchMode" => "ends"},
+        {Repo, EventLog, nil}
+      )
+
+    assert Enum.count(items) == 1
+    assert Enum.at(items, 0).details["ev"]["id"] == "yadda"
   end
 
   test "link header" do
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
+
     Crud.links(conn, 2, 5, 26)
-    |> ExLinkHeader.parse!
+    |> ExLinkHeader.parse!()
   end
 
   test "pagination contains all users" do
@@ -129,7 +149,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     Repo.insert!(@user2)
     Repo.insert!(@user3)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
     params = %{"per_page" => "10"}
     {:ok, conn, items} = Crud.all(conn, params, {Repo, User, nil})
     total_h = get_resp_header(conn, "x-total-count")
@@ -137,14 +157,14 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert total_h == ["4"]
     assert Enum.count(items) == 4
 
-    links = get_resp_header(conn, "link")
-    |> Enum.at(0)
-    |> ExLinkHeader.parse!
+    links =
+      get_resp_header(conn, "link")
+      |> Enum.at(0)
+      |> ExLinkHeader.parse!()
 
     assert links.first.params == %{page: "1", per_page: "10"}
     assert links.next == nil
     assert links.last.params == %{page: "1", per_page: "10"}
-
   end
 
   test "pagination does not contains all users" do
@@ -152,7 +172,7 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     Repo.insert!(@user2)
     Repo.insert!(@user3)
 
-    conn = Phoenix.ConnTest.build_conn
+    conn = Phoenix.ConnTest.build_conn()
     params = %{"per_page" => "2"}
     {:ok, conn, items} = Crud.all(conn, params, {Repo, User, nil})
     total_h = get_resp_header(conn, "x-total-count")
@@ -160,14 +180,14 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert total_h == ["4"]
     assert Enum.count(items) == 2
 
-    links = get_resp_header(conn, "link")
-    |> Enum.at(0)
-    |> ExLinkHeader.parse!
+    links =
+      get_resp_header(conn, "link")
+      |> Enum.at(0)
+      |> ExLinkHeader.parse!()
 
     assert links.first.params == %{page: "1", per_page: "2"}
     assert links.next.params == %{page: "2", per_page: "2"}
     assert links.last.params == %{page: "2", per_page: "2"}
-
   end
 
   defp add_users do
@@ -175,6 +195,4 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     Repo.insert!(@user2)
     Repo.insert!(@user1)
   end
-
 end
-

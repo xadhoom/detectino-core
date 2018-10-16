@@ -3,14 +3,14 @@ defmodule DtCtx.Monitoring.PartitionSensor do
   import Ecto.Changeset
 
   schema "partitions_sensors" do
-    belongs_to :partition, DtCtx.Monitoring.Partition
-    belongs_to :sensor, DtCtx.Monitoring.Sensor
+    belongs_to(:partition, DtCtx.Monitoring.Partition)
+    belongs_to(:sensor, DtCtx.Monitoring.Sensor)
 
     timestamps()
   end
 
   @required_fields ~w(partition_id sensor_id)
-  @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
+  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
 
   def changeset(model, params \\ %{}) do
     model

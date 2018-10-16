@@ -16,12 +16,12 @@ defmodule DtWeb.Associations.ScenarioTest do
     scene
     |> Repo.preload(:partitions)
     |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:partitions, [part1, part2]) 
-    |> Repo.update!
+    |> Ecto.Changeset.put_assoc(:partitions, [part1, part2])
+    |> Repo.update!()
 
     s = Repo.one!(Scenario) |> Repo.preload(:partitions)
     assert Enum.count(s.partitions) == 2
-    
+
     tmp = Enum.at(s.partitions, 0)
     assert tmp.id == part1.id
 
@@ -37,12 +37,12 @@ defmodule DtWeb.Associations.ScenarioTest do
     scene
     |> Repo.preload(:partitions)
     |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:partitions, [part1, part2]) 
-    |> Repo.update!
+    |> Ecto.Changeset.put_assoc(:partitions, [part1, part2])
+    |> Repo.update!()
 
     s = Repo.one!(Scenario) |> Repo.preload(:partitions_scenarios)
     assert Enum.count(s.partitions_scenarios) == 2
-    
+
     tmp = Enum.at(s.partitions_scenarios, 0)
     assert tmp.partition_id == part1.id
 

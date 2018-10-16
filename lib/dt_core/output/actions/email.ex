@@ -22,6 +22,7 @@ defmodule DtCore.Output.Actions.Email do
   def recover(ev, config) do
     subject = build_subject({:off, ev})
     msg = build_msg(ev)
+
     new()
     |> custom(ev)
     |> to(config.to)
@@ -34,6 +35,7 @@ defmodule DtCore.Output.Actions.Email do
   def trigger(ev, config) do
     subject = build_subject({:on, ev})
     msg = build_msg(ev)
+
     new()
     |> custom(ev)
     |> to(config.to)
@@ -46,13 +48,18 @@ defmodule DtCore.Output.Actions.Email do
   def custom(email, _ev = %DetectorEntryEv{}) do
     put_private(email, :delayed_event, true)
   end
+
   def custom(email, _ev = %DetectorEv{}) do
     put_private(email, :delayed_event, false)
   end
+
   def custom(email, _ev = %PartitionEv{}) do
     put_private(email, :delayed_event, false)
   end
-  def custom(email, _ev) do email end
+
+  def custom(email, _ev) do
+    email
+  end
 
   def build_subject({:on, _ev = %ArmEv{}}) do
     get_subject(:arm_start)
@@ -122,5 +129,4 @@ defmodule DtCore.Output.Actions.Email do
     :detectino
     |> Application.get_env(Mailer)
   end
-
 end

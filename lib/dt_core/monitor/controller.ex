@@ -32,7 +32,7 @@ defmodule DtCore.Monitor.Controller do
   # Client APIs
   #
   def start_link(sup) do
-    GenServer.start_link(__MODULE__, sup, [name: :sensors_controller])
+    GenServer.start_link(__MODULE__, sup, name: :sensors_controller)
   end
 
   @doc """
@@ -98,18 +98,19 @@ defmodule DtCore.Monitor.Controller do
   # GenServer callbacks
   #
   def init(sup) do
-    Logger.info fn -> "Supervisor #{inspect sup} started Sensor Controller" end
-    {:ok, _myself} = Bus.start_listening
-    send self(), :start
-    {:ok, %{
-        sup: sup,
-        sensors: [],
-        detector_workers: [],
-        partition_workers: [],
-        started: false,
-        debug: false
-      }
-    }
+    Logger.info(fn -> "Supervisor #{inspect(sup)} started Sensor Controller" end)
+    {:ok, _myself} = Bus.start_listening()
+    send(self(), :start)
+
+    {:ok,
+     %{
+       sup: sup,
+       sensors: [],
+       detector_workers: [],
+       partition_workers: [],
+       started: false,
+       debug: false
+     }}
   end
 
   @doc false
@@ -124,9 +125,11 @@ defmodule DtCore.Monitor.Controller do
   end
 
   def handle_call({:get_partitions}, _from, state) do
-    pids = Enum.map(state.partition_workers, fn({_, pid}) ->
-      pid
-    end)
+    pids =
+      Enum.map(state.partition_workers, fn {_, pid} ->
+        pid
+      end)
+
     {:reply, pids, state}
   end
 
@@ -142,74 +145,90 @@ defmodule DtCore.Monitor.Controller do
   end
 
   def handle_call({:get_sensors}, _from, state) do
-    pids = Enum.map(state.detector_workers, fn({_, pid}) ->
-      pid
-    end)
+    pids =
+      Enum.map(state.detector_workers, fn {_, pid} ->
+        pid
+      end)
+
     {:reply, pids, state}
   end
 
   @doc false
   def handle_call({:known_sensor, ev = %BusEvent{}}, _from, state) do
-    {ev, state} = {ev, state}
-                  |> normalize_event
+    {ev, state} =
+      {ev, state}
+      |> normalize_event
+
     known = Enum.member?(state.sensors, %{address: ev.address, port: ev.port})
     {:reply, known, state}
   end
 
   def handle_call({:stop_workers}, _from, state) do
-    Logger.info "Stopping all controller workers"
+    Logger.info("Stopping all controller workers")
 
-    Enum.each(state.partition_workers, fn(worker) ->
+    Enum.each(state.partition_workers, fn worker ->
       stop_partition(worker, state)
     end)
-    Enum.each(state.detector_workers, fn(worker) ->
+
+    Enum.each(state.detector_workers, fn worker ->
       stop_detector(worker, state)
     end)
 
-    {:reply, :ok, %{state | started: false,
-      partition_workers: [], detector_workers: []}}
+    {:reply, :ok, %{state | started: false, partition_workers: [], detector_workers: []}}
   end
 
   def handle_call({:start, {sensors, partitions}}, _from, state) do
     Logger.info("Reloading processes with injected config!")
 
-    Enum.each(state.partition_workers, fn(worker) ->
+    Enum.each(state.partition_workers, fn worker ->
       stop_partition(worker, state)
     end)
-    Enum.each(state.detector_workers, fn(worker) ->
+
+    Enum.each(state.detector_workers, fn worker ->
       stop_detector(worker, state)
     end)
 
-    detector_workers = Enum.map(sensors, fn(sensor) ->
-      {:ok, id, pid} = start_detector(sensor, state)
-      {id, pid}
-    end)
+    detector_workers =
+      Enum.map(sensors, fn sensor ->
+        {:ok, id, pid} = start_detector(sensor, state)
+        {id, pid}
+      end)
 
-    partition_workers = Enum.map(partitions, fn(partition) ->
-      {:ok, id, pid} = start_partition(partition, state)
-      {id, pid}
-    end)
+    partition_workers =
+      Enum.map(partitions, fn partition ->
+        {:ok, id, pid} = start_partition(partition, state)
+        {id, pid}
+      end)
 
-    Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
-    {:reply, :ok, %{state | detector_workers: detector_workers,
-      partition_workers: partition_workers, started: true}}
+    Registry.register(ReloadRegistry.registry(), ReloadRegistry.key(), [])
+
+    {:reply, :ok,
+     %{
+       state
+       | detector_workers: detector_workers,
+         partition_workers: partition_workers,
+         started: true
+     }}
   end
 
   def handle_cast({:reload}, state = %{started: false}) do
     {:noreply, state}
   end
+
   def handle_cast({:reload}, state) do
     Logger.info("Reloading processes!")
-    Enum.each(state.partition_workers, fn(worker) ->
+
+    Enum.each(state.partition_workers, fn worker ->
       stop_partition(worker, state)
     end)
-    Enum.each(state.detector_workers, fn(worker) ->
+
+    Enum.each(state.detector_workers, fn worker ->
       stop_detector(worker, state)
     end)
-    send self(), :start
 
-    {:noreply, %{state | started: false,
-      partition_workers: [], detector_workers: []}}
+    send(self(), :start)
+
+    {:noreply, %{state | started: false, partition_workers: [], detector_workers: []}}
   end
 
   def handle_info({:reload}, state) do
@@ -222,25 +241,33 @@ defmodule DtCore.Monitor.Controller do
   partitions subscribe to sensors, they must be started
   after detectors.
   """
-  def handle_info(:start, state =  %{started: false}) do
-    detector_workers = SensorModel
-    |> Repo.all
-    |> Enum.map(fn(sensor) ->
-      {:ok, id, pid} = start_detector(sensor, state)
-      {id, pid}
-    end)
+  def handle_info(:start, state = %{started: false}) do
+    detector_workers =
+      SensorModel
+      |> Repo.all()
+      |> Enum.map(fn sensor ->
+        {:ok, id, pid} = start_detector(sensor, state)
+        {id, pid}
+      end)
 
-    partition_workers = PartitionModel
-    |> Repo.all
-    |> Repo.preload(:sensors)
-    |> Enum.map(fn(partition) ->
-      {:ok, id, pid} = start_partition(partition, state)
-      {id, pid}
-    end)
+    partition_workers =
+      PartitionModel
+      |> Repo.all()
+      |> Repo.preload(:sensors)
+      |> Enum.map(fn partition ->
+        {:ok, id, pid} = start_partition(partition, state)
+        {id, pid}
+      end)
 
-    Registry.register(ReloadRegistry.registry, ReloadRegistry.key, [])
-    {:noreply, %{state | detector_workers: detector_workers,
-      partition_workers: partition_workers, started: true}}
+    Registry.register(ReloadRegistry.registry(), ReloadRegistry.key(), [])
+
+    {:noreply,
+     %{
+       state
+       | detector_workers: detector_workers,
+         partition_workers: partition_workers,
+         started: true
+     }}
   end
 
   @doc """
@@ -251,28 +278,33 @@ defmodule DtCore.Monitor.Controller do
   Basically a sort of autodiscovery
   """
   def handle_info({:event, ev = %BusEvent{}}, state) do
-    debug_log(fn -> "Received event #{inspect ev} from bus" end, state)
+    debug_log(fn -> "Received event #{inspect(ev)} from bus" end, state)
     {:ok, state} = dispatch_event({ev, state})
     {:noreply, state}
   end
 
   def handle_info({:more_debug, v}, state) when is_boolean(v) do
-    Logger.info fn() -> "Setting controller more debug at #{inspect v}" end
+    Logger.info(fn -> "Setting controller more debug at #{inspect(v)}" end)
     newstate = %{state | debug: v}
     {:noreply, newstate}
   end
 
   defp dispatch_event({ev = %BusEvent{}, state}) do
-    {ev, state} = {ev, state}
-                  |> normalize_event
-                  |> cache_sensor
+    {ev, state} =
+      {ev, state}
+      |> normalize_event
+      |> cache_sensor
 
     # send the event to all detectors
-    Enum.each(state.detector_workers, fn({_id, pid}) ->
-      debug_log(fn() ->
-        "sending event #{inspect ev} to detector #{inspect pid}"
-      end, state)
-      send pid, {:event, ev}
+    Enum.each(state.detector_workers, fn {_id, pid} ->
+      debug_log(
+        fn ->
+          "sending event #{inspect(ev)} to detector #{inspect(pid)}"
+        end,
+        state
+      )
+
+      send(pid, {:event, ev})
     end)
 
     {:ok, state}
@@ -280,8 +312,7 @@ defmodule DtCore.Monitor.Controller do
 
   # translate from a Bus Event to a Core event
   defp normalize_event({ev = %BusEvent{}, state}) do
-    ev = struct(Event, Map.from_struct (
-      %BusEvent{ev | address: to_string(ev.address)}))
+    ev = struct(Event, Map.from_struct(%BusEvent{ev | address: to_string(ev.address)}))
     {ev, state}
   end
 
@@ -295,11 +326,15 @@ defmodule DtCore.Monitor.Controller do
 
   # check if the event is from one sensor on the repo, if yes add to local cache
   defp maybe_on_repo({ev = %Event{}, state}) do
-    q = from s in SensorModel,
-             where: s.address == ^ev.address and s.port == ^ev.port
+    q =
+      from(s in SensorModel,
+        where: s.address == ^ev.address and s.port == ^ev.port
+      )
 
     case Repo.one(q) do
-      nil -> add_on_repo({ev, state})
+      nil ->
+        add_on_repo({ev, state})
+
       _record ->
         ss = [%{address: ev.address, port: ev.port} | state.sensors]
         {ev, %{state | sensors: ss}}
@@ -310,18 +345,25 @@ defmodule DtCore.Monitor.Controller do
   defp add_on_repo({ev = %Event{}, state}) do
     %SensorModel{}
     |> SensorModel.create_changeset(%{
-      address: ev.address, port: ev.port, name: "AUTO"
+      address: ev.address,
+      port: ev.port,
+      name: "AUTO"
     })
-    |> Repo.insert!
+    |> Repo.insert!()
+
     ss = [%{address: ev.address, port: ev.port} | state.sensors]
     {ev, %{state | sensors: ss}}
   end
 
   defp start_detector(sensor, state) do
     {:ok, id} = Utils.sensor_server_name(sensor)
-    {:ok, pid} = Supervisor.start_child(state.sup,
-      worker(Detector, [{sensor}],
-      restart: :transient, id: id))
+
+    {:ok, pid} =
+      Supervisor.start_child(
+        state.sup,
+        worker(Detector, [{sensor}], restart: :transient, id: id)
+      )
+
     {:ok, id, pid}
   end
 
@@ -332,9 +374,13 @@ defmodule DtCore.Monitor.Controller do
 
   defp start_partition(partition, state) do
     {:ok, id} = Utils.partition_server_name(partition)
-    {:ok, pid} = Supervisor.start_child(state.sup,
-      worker(Partition, [partition],
-      restart: :transient, id: id))
+
+    {:ok, pid} =
+      Supervisor.start_child(
+        state.sup,
+        worker(Partition, [partition], restart: :transient, id: id)
+      )
+
     {:ok, id, pid}
   end
 
@@ -345,9 +391,8 @@ defmodule DtCore.Monitor.Controller do
 
   defp debug_log(what, state) do
     case state.debug do
-      true -> Logger.debug what
+      true -> Logger.debug(what)
       _ -> nil
     end
   end
-
 end

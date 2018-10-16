@@ -14,39 +14,49 @@ defmodule DtWeb.CtrlHelpers.Crud do
   # also in delete, show, update...
   #
 
-  @spec all(Plug.Conn.t, map, {module, module, [atom] | nil}, [atom]) ::
-    {:ok, Plug.Conn.t, list} | {:error, Plug.Conn.t, pos_integer}
+  @spec all(Plug.Conn.t(), map, {module, module, [atom] | nil}, [atom]) ::
+          {:ok, Plug.Conn.t(), list} | {:error, Plug.Conn.t(), pos_integer}
   def all(conn, params, {repo, model, sortdefs}, assocs \\ []) do
-    filters = :fields
-    |> model.__schema__
-    |> build_filter(params)
+    filters =
+      :fields
+      |> model.__schema__
+      |> build_filter(params)
 
-    page = params
-    |> Map.get("page", "1")
-    |> String.to_integer
+    page =
+      params
+      |> Map.get("page", "1")
+      |> String.to_integer()
 
-    per_page = params
-    |> Map.get("per_page", "10")
-    |> String.to_integer
+    per_page =
+      params
+      |> Map.get("per_page", "10")
+      |> String.to_integer()
 
     order_by = build_sorting_with_def(params, sortdefs)
 
     try do
-      q = from m in model,
-        limit: ^per_page,
-        offset: ^((page - 1) * per_page),
-        order_by: ^order_by,
-        preload: ^assocs
+      q =
+        from(m in model,
+          limit: ^per_page,
+          offset: ^((page - 1) * per_page),
+          order_by: ^order_by,
+          preload: ^assocs
+        )
+
       q = q |> add_query_filters(filters)
       items = repo.all(q)
 
-      qc = from m in model,
-        select: count(m.id)
+      qc =
+        from(m in model,
+          select: count(m.id)
+        )
+
       qc = qc |> add_query_filters(filters)
       total = repo.one(qc)
 
-      total_s = total
-      |> Integer.to_string
+      total_s =
+        total
+        |> Integer.to_string()
 
       conn = put_resp_header(conn, "x-total-count", total_s)
 
@@ -62,10 +72,12 @@ defmodule DtWeb.CtrlHelpers.Crud do
   def links(conn, page, per_page, total) do
     next_p = nil
 
-    float_p = (total / per_page)
-    last_p = float_p
-    |> Float.ceil
-    |> trunc
+    float_p = total / per_page
+
+    last_p =
+      float_p
+      |> Float.ceil()
+      |> trunc
 
     link = %ExLinkHeader{
       self: %ExLinkHeaderEntry{
@@ -89,20 +101,25 @@ defmodule DtWeb.CtrlHelpers.Crud do
       }
     }
 
-    lh = if total > (page * per_page) do
-      next_p = page + 1
-      %ExLinkHeader{link | next: %ExLinkHeaderEntry{
-          scheme: conn.scheme,
-          host: conn.host,
-          path: conn.request_path,
-          params: %{per_page: per_page, page: next_p}
-      }}
-    else
-      link
-    end
-    lh
-    |> ExLinkHeader.build
+    lh =
+      if total > page * per_page do
+        next_p = page + 1
 
+        %ExLinkHeader{
+          link
+          | next: %ExLinkHeaderEntry{
+              scheme: conn.scheme,
+              host: conn.host,
+              path: conn.request_path,
+              params: %{per_page: per_page, page: next_p}
+            }
+        }
+      else
+        link
+      end
+
+    lh
+    |> ExLinkHeader.build()
   end
 
   def create(conn, params, module, repo, path_fn, assocs \\ []) do
@@ -110,16 +127,23 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
     case repo.insert(changeset) do
       {:ok, record} ->
-        record = assocs
-        |> Enum.reduce(record, fn(assoc, _acc) ->
-          repo.preload(record, assoc)
-        end)
+        record =
+          assocs
+          |> Enum.reduce(record, fn assoc, _acc ->
+            repo.preload(record, assoc)
+          end)
+
         path = apply(DtWeb.Router.Helpers, path_fn, [conn, :show, record])
-        conn = conn
-                |> put_resp_header("location", path)
-                |> put_status(201)
+
+        conn =
+          conn
+          |> put_resp_header("location", path)
+          |> put_status(201)
+
         {:ok, conn, record}
-      {:error, changeset} -> {:error, conn, 400, changeset}
+
+      {:error, changeset} ->
+        {:error, conn, 400, changeset}
     end
   end
 
@@ -132,10 +156,14 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
   def update(conn, params, repo, model) do
     case Map.get(params, "id") do
-      :nil -> {:error, conn, 400}
+      nil ->
+        {:error, conn, 400}
+
       id ->
         case repo.get(model, id) do
-          nil -> {:error, conn, 404}
+          nil ->
+            {:error, conn, 404}
+
           record ->
             record
             |> model.update_changeset(params)
@@ -148,12 +176,16 @@ defmodule DtWeb.CtrlHelpers.Crud do
     case Map.get(params, "id") do
       id when is_binary(id) ->
         case repo.get(model, id) do
-          nil -> {:error, conn, 404}
+          nil ->
+            {:error, conn, 404}
+
           record ->
             repo.delete!(record)
             {:response, conn, 204}
         end
-      _ -> {:error, conn, 403}
+
+      _ ->
+        {:error, conn, 403}
     end
   end
 
@@ -167,6 +199,7 @@ defmodule DtWeb.CtrlHelpers.Crud do
         field = String.to_existing_atom(f)
         dir = params |> Map.get("direction") |> dir_to_atom()
         Keyword.new([{dir, field}])
+
       nil ->
         []
     end
@@ -178,12 +211,14 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   defp build_sorting_with_def(params, default) when is_atom(default) do
-    field = case Map.get(params, "sort") do
-      f when is_binary(f) ->
-        String.to_existing_atom(f)
-      nil ->
-        default
-    end
+    field =
+      case Map.get(params, "sort") do
+        f when is_binary(f) ->
+          String.to_existing_atom(f)
+
+        nil ->
+          default
+      end
 
     dir = params |> Map.get("direction") |> dir_to_atom()
 
@@ -199,20 +234,24 @@ defmodule DtWeb.CtrlHelpers.Crud do
   end
 
   defp build_filter(fields, params) do
-    Enum.filter_map(params, fn({param, _value}) ->
-      param_is_model_field?(param, fields)
-    end,
-    fn({param, value}) ->
-      match = get_match_mode(params, param)
-      {param, value, match}
-    end)
+    Enum.filter_map(
+      params,
+      fn {param, _value} ->
+        param_is_model_field?(param, fields)
+      end,
+      fn {param, value} ->
+        match = get_match_mode(params, param)
+        {param, value, match}
+      end
+    )
   end
 
   defp param_is_model_field?(param, fields) do
     fields
-    |> Enum.any?(fn(field) ->
+    |> Enum.any?(fn field ->
       field = Atom.to_string(field)
       {:ok, regex} = Regex.compile("^" <> field <> "(?!.*MatchMode)")
+
       cond do
         String.match?(param, regex) -> true
         param == field -> true
@@ -223,15 +262,26 @@ defmodule DtWeb.CtrlHelpers.Crud do
 
   defp get_match_mode(params, field) do
     case Map.get(params, field <> "MatchMode", "equals") do
-      "equals" -> :equals
-      "contains" -> :contains
-      "in" -> :in
-      "starts" -> :starts
-      "ends" -> :ends
+      "equals" ->
+        :equals
+
+      "contains" ->
+        :contains
+
+      "in" ->
+        :in
+
+      "starts" ->
+        :starts
+
+      "ends" ->
+        :ends
+
       v ->
-        Logger.error fn() ->
-          "Invalid match mode #{inspect v}, falling back to default"
-        end
+        Logger.error(fn ->
+          "Invalid match mode #{inspect(v)}, falling back to default"
+        end)
+
         :equals
     end
   end
@@ -241,23 +291,27 @@ defmodule DtWeb.CtrlHelpers.Crud do
       {:ok, record} ->
         conn = put_status(conn, 200)
         {:ok, conn, record}
+
       {:error, _changeset} ->
         {:error, conn, 400}
     end
   end
 
   defp add_query_filters(q, filters) do
-    Enum.reduce(filters, q, fn({k, v, match}, query) ->
+    Enum.reduce(filters, q, fn {k, v, match}, query ->
       case match do
         :contains ->
           new_v = "%" <> v <> "%"
           add_ilike(query, k, new_v)
+
         :starts ->
           new_v = v <> "%"
           add_ilike(query, k, new_v)
+
         :ends ->
           new_v = "%" <> v
           add_ilike(query, k, new_v)
+
         :equals ->
           add_equal(query, k, v)
       end
@@ -268,7 +322,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
     case String.contains?(key, ".") do
       false ->
         col = String.to_existing_atom(key)
-        from q in query, where: field(q, ^col) == ^value
+        from(q in query, where: field(q, ^col) == ^value)
+
       true ->
         equal_jsonb_fragment(query, key, value)
     end
@@ -278,7 +333,8 @@ defmodule DtWeb.CtrlHelpers.Crud do
     case String.contains?(key, ".") do
       false ->
         col = String.to_existing_atom(key)
-        from q in query, where: ilike(field(q, ^col), ^value)
+        from(q in query, where: ilike(field(q, ^col), ^value))
+
       true ->
         ilike_jsonb_fragment(query, key, value)
     end
@@ -287,41 +343,34 @@ defmodule DtWeb.CtrlHelpers.Crud do
   defp ilike_jsonb_fragment(query, field, value) do
     case String.split(field, ".") do
       [field, key] -> ilike_jsonb_fragment(query, field, key, value)
-      [field, key1, key2] -> ilike_jsonb_fragment(query, field,
-        key1, key2, value)
+      [field, key1, key2] -> ilike_jsonb_fragment(query, field, key1, key2, value)
     end
   end
 
   defp ilike_jsonb_fragment(query, field, key, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->>? ILIKE ?", field(q, ^field),
-      ^key, ^value)
+    from(q in query, where: fragment("?->>? ILIKE ?", field(q, ^field), ^key, ^value))
   end
 
   defp ilike_jsonb_fragment(query, field, key1, key2, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->?->>? ILIKE ?", field(q, ^field),
-      ^key1, ^key2, ^value)
+    from(q in query, where: fragment("?->?->>? ILIKE ?", field(q, ^field), ^key1, ^key2, ^value))
   end
 
   defp equal_jsonb_fragment(query, field, value) do
     case String.split(field, ".") do
       [field, key] -> equal_jsonb_fragment(query, field, key, value)
-      [field, key1, key2] -> equal_jsonb_fragment(query, field,
-        key1, key2, value)
+      [field, key1, key2] -> equal_jsonb_fragment(query, field, key1, key2, value)
     end
   end
 
   defp equal_jsonb_fragment(query, field, key, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->>? = ?", field(q, ^field),
-      ^key, ^value)
+    from(q in query, where: fragment("?->>? = ?", field(q, ^field), ^key, ^value))
   end
 
   defp equal_jsonb_fragment(query, field, key1, key2, value) do
     field = String.to_existing_atom(field)
-    from q in query, where: fragment("?->?->>? = ?", field(q, ^field),
-      ^key1, ^key2, ^value)
+    from(q in query, where: fragment("?->?->>? = ?", field(q, ^field), ^key1, ^key2, ^value))
   end
-
 end

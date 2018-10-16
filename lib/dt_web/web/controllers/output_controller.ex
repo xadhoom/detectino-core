@@ -1,6 +1,6 @@
 defmodule DtWeb.OutputController do
   use DtWeb.Web, :controller
-  use DtWeb.CrudMacros, [repo: DtCtx.Repo, model: DtCtx.Outputs.Output]
+  use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Outputs.Output
 
   alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
@@ -8,9 +8,8 @@ defmodule DtWeb.OutputController do
   alias DtWeb.Plugs.PinAuthorize
   alias DtWeb.Plugs.CheckPermissions
 
-  plug EnsureAuthenticated, [handler: SessionController]
-  plug CoreReloader, nil when not action in [:index, :show]
-  plug CheckPermissions, [roles: [:admin]]
-  plug PinAuthorize
-
+  plug(EnsureAuthenticated, handler: SessionController)
+  plug(CoreReloader, nil when not (action in [:index, :show]))
+  plug(CheckPermissions, roles: [:admin])
+  plug(PinAuthorize)
 end

@@ -7,5 +7,4 @@ defmodule DtWeb.PartitionScenarioView do
   def render(_, %{partition_scenario: item}) do
     item
   end
-
 end

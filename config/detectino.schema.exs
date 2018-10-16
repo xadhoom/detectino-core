@@ -232,7 +232,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Sensor Alarm started",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_start here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_start here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_start"
     ],
@@ -240,7 +241,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Partition Alarm started",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_start here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_start here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_start"
     ],
@@ -248,7 +250,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Sensor Alarm recovered",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_end here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_end here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.sensor_end"
     ],
@@ -256,7 +259,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Partition Alarm recovered",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.partition_end"
     ],
@@ -264,7 +268,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Partition armed",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_start here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_start here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_start"
     ],
@@ -272,7 +277,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Partition disarmed",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_end here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_end here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Alarm.arm_end"
     ],
@@ -280,7 +286,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Delayed Sensor Alarm started",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_start here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_start here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_start"
     ],
@@ -288,7 +295,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Delayed Partition Alarm started",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_start here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_start here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_start"
     ],
@@ -296,7 +304,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Delayed Sensor Alarm end",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_end here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_end here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.sensor_end"
     ],
@@ -304,7 +313,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Delayed Partition Alarm end",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.DelayedAlarm.partition_end"
     ],
@@ -332,7 +342,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: Swoosh.Adapters.SMTP,
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Mailer.adapter here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Mailer.adapter here.",
       hidden: true,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Mailer.adapter"
     ],
@@ -340,7 +351,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "localhost",
-      doc: "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Mailer.relay here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtCore.Output.Actions.Email.Mailer.relay here.",
       hidden: false,
       to: "detectino.Elixir.DtCore.Output.Actions.Email.Mailer.relay"
     ],
@@ -369,7 +381,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         "html",
         "json"
       ],
-      doc: "Provide documentation for detectino.Elixir.DtWeb.Endpoint.render_errors.accepts here.",
+      doc:
+        "Provide documentation for detectino.Elixir.DtWeb.Endpoint.render_errors.accepts here.",
       hidden: true,
       to: "detectino.Elixir.DtWeb.Endpoint.render_errors.accepts"
     ],
@@ -479,7 +492,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     ]
   ],
   transforms: [
-    "guardian.Elixir.Guardian.ttl": fn(conf) ->
+    "guardian.Elixir.Guardian.ttl": fn conf ->
       [{k, v}] = Conform.Conf.get(conf, "guardian.Elixir.Guardian.ttl")
       {v, :seconds}
     end

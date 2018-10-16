@@ -17,13 +17,12 @@ defmodule DtWeb.Associations.PartitionTest do
     part
     |> Repo.preload(:sensors)
     |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:sensors, [sens1, sens2]) 
-    |> Repo.update!
-
+    |> Ecto.Changeset.put_assoc(:sensors, [sens1, sens2])
+    |> Repo.update!()
 
     p = Repo.one!(Partition) |> Repo.preload(:sensors)
     assert Enum.count(p.sensors) == 2
-    
+
     tmp = Enum.at(p.sensors, 0)
     assert tmp.id == sens1.id
 
@@ -39,13 +38,12 @@ defmodule DtWeb.Associations.PartitionTest do
     part
     |> Repo.preload(:scenarios)
     |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:scenarios, [scene1, scene2]) 
-    |> Repo.update!
-
+    |> Ecto.Changeset.put_assoc(:scenarios, [scene1, scene2])
+    |> Repo.update!()
 
     p = Repo.one!(Partition) |> Repo.preload(:scenarios)
     assert Enum.count(p.scenarios) == 2
-    
+
     tmp = Enum.at(p.scenarios, 0)
     assert tmp.id == scene1.id
 

@@ -5,19 +5,23 @@ defmodule DtCtx.Monitoring.Scenario do
   @derive {Poison.Encoder, only: [:id, :name, :enabled]}
 
   schema "scenarios" do
-    field :name, :string
-    field :enabled, :boolean, default: false
+    field(:name, :string)
+    field(:enabled, :boolean, default: false)
 
     timestamps()
 
-    has_many :partitions_scenarios, DtCtx.Monitoring.PartitionScenario
-    many_to_many :partitions,
-      DtCtx.Monitoring.Partition, join_through: DtCtx.Monitoring.PartitionScenario
+    has_many(:partitions_scenarios, DtCtx.Monitoring.PartitionScenario)
+
+    many_to_many(
+      :partitions,
+      DtCtx.Monitoring.Partition,
+      join_through: DtCtx.Monitoring.PartitionScenario
+    )
   end
 
   @required_fields ~w(name enabled)
   @optional_fields ~w()
-  @validate_required Enum.map(@required_fields, fn(x) -> String.to_atom(x) end)
+  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
 
   def create_changeset(model, params \\ %{}) do
     model
@@ -32,5 +36,4 @@ defmodule DtCtx.Monitoring.Scenario do
     |> validate_required(@validate_required)
     |> unique_constraint(:name)
   end
-
 end

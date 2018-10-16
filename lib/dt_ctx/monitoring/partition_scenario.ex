@@ -5,9 +5,9 @@ defmodule DtCtx.Monitoring.PartitionScenario do
   @derive {Poison.Encoder, only: [:id, :mode, :partition_id, :scenario_id]}
 
   schema "partitions_scenarios" do
-    field :mode, :string
-    belongs_to :partition, DtCtx.Monitoring.Partition
-    belongs_to :scenario, DtCtx.Monitoring.Sensor
+    field(:mode, :string)
+    belongs_to(:partition, DtCtx.Monitoring.Partition)
+    belongs_to(:scenario, DtCtx.Monitoring.Sensor)
 
     timestamps()
   end
@@ -32,5 +32,4 @@ defmodule DtCtx.Monitoring.PartitionScenario do
     changeset
     |> validate_inclusion(:mode, @valid_modes)
   end
-
 end

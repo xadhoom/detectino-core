@@ -5,14 +5,14 @@ defmodule DtCore.Monitor.Sup do
   use Supervisor
 
   def start_link do
-    Supervisor.start_link(__MODULE__, nil, [name: __MODULE__])
+    Supervisor.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def init(_) do
     children = [
       worker(DtCore.Monitor.Controller, [self()], restart: :permanent)
     ]
+
     supervise(children, strategy: :one_for_all)
   end
-
 end

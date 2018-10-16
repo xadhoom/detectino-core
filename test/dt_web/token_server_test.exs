@@ -43,15 +43,20 @@ defmodule DtWeb.TokenServerTest do
 
   test "expires a token" do
     :meck.new(Etimer, [:passthrough])
-    :meck.expect(Etimer, :start_timer, fn(_, _, _, _) -> 42 end)
+    :meck.expect(Etimer, :start_timer, fn _, _, _, _ -> 42 end)
 
     {:ok, _pid} = TokenServer.start_link(:f)
     TokenServer.put("token", 3600, :f)
     tokens = TokenServer.all(:f)
     assert Enum.count(tokens) == 1
 
-    assert :meck.called(Etimer, :start_timer, [:_, "token", 3600*1000,
-      {:_, :expire, [{:token, "token"}, :f]}])
+    assert :meck.called(Etimer, :start_timer, [
+             :_,
+             "token",
+             3600 * 1000,
+             {:_, :expire, [{:token, "token"}, :f]}
+           ])
+
     :meck.unload(Etimer)
 
     TokenServer.expire({:token, "token"}, :f)
@@ -59,5 +64,4 @@ defmodule DtWeb.TokenServerTest do
     tokens = TokenServer.all(:f)
     assert Enum.count(tokens) == 0
   end
-
 end

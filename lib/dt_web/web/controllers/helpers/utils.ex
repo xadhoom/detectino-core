@@ -10,8 +10,9 @@ defmodule DtWeb.Controllers.Helpers.Utils do
       {:ok, record} ->
         conn = put_status(conn, 200)
         {:ok, conn, record}
+
       {:error, changeset} ->
-        Logger.error "Got error in update changeset: #{inspect changeset}"
+        Logger.error("Got error in update changeset: #{inspect(changeset)}")
         {:error, conn, 400}
     end
   end

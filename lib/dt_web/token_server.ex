@@ -38,6 +38,7 @@ defmodule DtWeb.TokenServer do
       server_name: name,
       timer_server: name
     }
+
     Etimer.start_link(state.timer_server)
     {:ok, state}
   end
@@ -52,18 +53,24 @@ defmodule DtWeb.TokenServer do
   end
 
   def handle_call({:put, token, expiry}, _from, state) do
-    Etimer.start_timer(state.timer_server, token, expiry * 1000,
-      {__MODULE__, :expire, [{:token, token}, state.server_name]})
+    Etimer.start_timer(
+      state.timer_server,
+      token,
+      expiry * 1000,
+      {__MODULE__, :expire, [{:token, token}, state.server_name]}
+    )
 
     tokens = Map.put(state.tokens, token, expiry)
     {:reply, {:ok, token}, %{state | tokens: tokens}}
   end
 
   def handle_call({:get, token}, _from, state) do
-    res = case Map.get(state.tokens, token) do
-      nil -> {:error, :not_found}
-      _ -> {:ok, token}
-    end
+    res =
+      case Map.get(state.tokens, token) do
+        nil -> {:error, :not_found}
+        _ -> {:ok, token}
+      end
+
     {:reply, res, state}
   end
 

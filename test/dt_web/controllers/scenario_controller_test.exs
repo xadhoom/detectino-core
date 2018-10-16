@@ -11,64 +11,84 @@ defmodule DtWeb.ScenarioControllerTest do
   alias DtCore.Test.TimerHelper
 
   setup_all do
-    TimerHelper.wait_until 1000, ErlangError, fn ->
+    TimerHelper.wait_until(1000, ErlangError, fn ->
       :meck.new(PartitionProcess)
-      :meck.expect(PartitionProcess, :arm, fn(%PartitionModel{}, _, _) -> :ok end)
-      :meck.expect(PartitionProcess, :disarm, fn(%PartitionModel{}, _) -> :ok end)
-    end
+      :meck.expect(PartitionProcess, :arm, fn %PartitionModel{}, _, _ -> :ok end)
+      :meck.expect(PartitionProcess, :disarm, fn %PartitionModel{}, _ -> :ok end)
+    end)
   end
 
   setup %{conn: conn} do
-    DtWeb.ReloadRegistry.registry
-    |> Registry.register(ReloadRegistry.key, [])
+    DtWeb.ReloadRegistry.registry()
+    |> Registry.register(ReloadRegistry.key(), [])
+
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   test "anon: get all scenarios", %{conn: conn} do
-    conn = get conn, scenario_path(conn, :index)
+    conn = get(conn, scenario_path(conn, :index))
     response(conn, 401)
   end
 
   test "get all scenarios that can be run", %{conn: conn} do
     conn = Helper.login(conn)
 
-    conn = get conn, scenario_path(conn, :get_available)
+    conn = get(conn, scenario_path(conn, :get_available))
     json = json_response(conn, 200)
     assert Enum.count(json) == 0
 
     %ScenarioModel{name: "scenario"}
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn = conn |> Helper.newconn
-    |> get(scenario_path(conn, :get_available))
+    conn =
+      conn
+      |> Helper.newconn()
+      |> get(scenario_path(conn, :get_available))
+
     json = json_response(conn, 200)
     assert Enum.count(json) == 0
 
-    scenario = %ScenarioModel{name: "scenario2"}
-    |> Repo.insert!
-    partition = %PartitionModel{name: "partition"}
-    |> Repo.insert!
-    %PartitionScenarioModel{
-      partition_id: partition.id, scenario_id: scenario.id
-    }
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario2"}
+      |> Repo.insert!()
 
-    conn = conn |> Helper.newconn
-    |> get(scenario_path(conn, :get_available))
+    partition =
+      %PartitionModel{name: "partition"}
+      |> Repo.insert!()
+
+    %PartitionScenarioModel{
+      partition_id: partition.id,
+      scenario_id: scenario.id
+    }
+    |> Repo.insert!()
+
+    conn =
+      conn
+      |> Helper.newconn()
+      |> get(scenario_path(conn, :get_available))
+
     json = json_response(conn, 200)
     assert Enum.count(json) == 0
 
-    scenario = %ScenarioModel{name: "scenario3", enabled: true}
-    |> Repo.insert!
-    partition = %PartitionModel{name: "partition2"}
-    |> Repo.insert!
-    %PartitionScenarioModel{
-      partition_id: partition.id, scenario_id: scenario.id
-    }
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario3", enabled: true}
+      |> Repo.insert!()
 
-    conn = conn |> Helper.newconn
-    |> get(scenario_path(conn, :get_available))
+    partition =
+      %PartitionModel{name: "partition2"}
+      |> Repo.insert!()
+
+    %PartitionScenarioModel{
+      partition_id: partition.id,
+      scenario_id: scenario.id
+    }
+    |> Repo.insert!()
+
+    conn =
+      conn
+      |> Helper.newconn()
+      |> get(scenario_path(conn, :get_available))
+
     json = json_response(conn, 200)
     assert Enum.count(json) == 1
   end
@@ -76,18 +96,21 @@ defmodule DtWeb.ScenarioControllerTest do
   test "cannot run a scenario without partitions", %{conn: conn} do
     conn = Helper.login(conn)
 
-    scenario = %ScenarioModel{name: "scenario"}
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario"}
+      |> Repo.insert!()
 
     %UserModel{username: "test@local", pin: "230477"}
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn = conn
-    |> post(scenario_path(conn, :run, scenario))
+    conn =
+      conn
+      |> post(scenario_path(conn, :run, scenario))
+
     response(conn, 401)
 
     conn
-    |> Helper.newconn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :run, scenario))
     |> response(403)
@@ -96,30 +119,39 @@ defmodule DtWeb.ScenarioControllerTest do
   test "run a scenario with an ARM partition", %{conn: conn} do
     conn = Helper.login(conn)
 
-    scenario = %ScenarioModel{name: "scenario"}
-    |> Repo.insert!
-    partition = %PartitionModel{name: "partition", armed: "DISARM"}
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario"}
+      |> Repo.insert!()
+
+    partition =
+      %PartitionModel{name: "partition", armed: "DISARM"}
+      |> Repo.insert!()
+
     %PartitionScenarioModel{
-      partition_id: partition.id, scenario_id: scenario.id,
+      partition_id: partition.id,
+      scenario_id: scenario.id,
       mode: "ARM"
     }
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn = conn
-    |> put_req_header("p-dt-pin", "230477")
-    |> post(scenario_path(conn, :run, scenario))
+    conn =
+      conn
+      |> put_req_header("p-dt-pin", "230477")
+      |> post(scenario_path(conn, :run, scenario))
+
     response(conn, 401)
 
     %UserModel{username: "test@local", pin: "230477"}
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn |> Helper.newconn
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "123456")
     |> post(scenario_path(conn, :run, scenario))
     |> response(401)
 
-    conn |> Helper.newconn
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :run, scenario), %{pin: "230477"})
     |> response(204)
@@ -133,21 +165,26 @@ defmodule DtWeb.ScenarioControllerTest do
   test "run a scenario with partial modes", %{conn: conn} do
     conn = Helper.login(conn)
 
-    scenario = %ScenarioModel{name: "scenario"}
-    |> Repo.insert!
-    partition = %PartitionModel{name: "partition", armed: "DISARM"}
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario"}
+      |> Repo.insert!()
+
+    partition =
+      %PartitionModel{name: "partition", armed: "DISARM"}
+      |> Repo.insert!()
 
     %PartitionScenarioModel{
-      partition_id: partition.id, scenario_id: scenario.id,
+      partition_id: partition.id,
+      scenario_id: scenario.id,
       mode: "ARMSTAY"
     }
-    |> Repo.insert!
+    |> Repo.insert!()
 
     %UserModel{username: "test@local", pin: "230477"}
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn |> Helper.newconn
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :run, scenario))
     |> response(204)
@@ -161,21 +198,26 @@ defmodule DtWeb.ScenarioControllerTest do
   test "arm a scenario with partial modes, but immediate", %{conn: conn} do
     conn = Helper.login(conn)
 
-    scenario = %ScenarioModel{name: "scenario"}
-    |> Repo.insert!
-    partition = %PartitionModel{name: "partition", armed: "DISARM"}
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario"}
+      |> Repo.insert!()
+
+    partition =
+      %PartitionModel{name: "partition", armed: "DISARM"}
+      |> Repo.insert!()
 
     %PartitionScenarioModel{
-      partition_id: partition.id, scenario_id: scenario.id,
+      partition_id: partition.id,
+      scenario_id: scenario.id,
       mode: "ARMSTAYIMMEDIATE"
     }
-    |> Repo.insert!
+    |> Repo.insert!()
 
     %UserModel{username: "test@local", pin: "230477"}
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn |> Helper.newconn
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :run, scenario))
     |> response(204)
@@ -189,30 +231,39 @@ defmodule DtWeb.ScenarioControllerTest do
   test "run a scenario with disarm partition", %{conn: conn} do
     conn = Helper.login(conn)
 
-    scenario = %ScenarioModel{name: "scenario"}
-    |> Repo.insert!
-    partition = %PartitionModel{name: "partition", armed: "ARM"}
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario"}
+      |> Repo.insert!()
+
+    partition =
+      %PartitionModel{name: "partition", armed: "ARM"}
+      |> Repo.insert!()
+
     %PartitionScenarioModel{
-      partition_id: partition.id, scenario_id: scenario.id,
+      partition_id: partition.id,
+      scenario_id: scenario.id,
       mode: "DISARM"
     }
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn = conn
-    |> put_req_header("p-dt-pin", "230477")
-    |> post(scenario_path(conn, :run, scenario))
+    conn =
+      conn
+      |> put_req_header("p-dt-pin", "230477")
+      |> post(scenario_path(conn, :run, scenario))
+
     response(conn, 401)
 
     %UserModel{username: "test@local", pin: "230477"}
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn |> Helper.newconn
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "123456")
     |> post(scenario_path(conn, :run, scenario), %{pin: "123456"})
     |> response(401)
 
-    conn |> Helper.newconn
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :run, scenario), %{pin: "230477"})
     |> response(204)
@@ -226,47 +277,60 @@ defmodule DtWeb.ScenarioControllerTest do
   test "run a scenario with mixed modes", %{conn: conn} do
     conn = Helper.login(conn)
 
-    scenario = %ScenarioModel{name: "scenario"}
-    |> Repo.insert!
-    partition1 = %PartitionModel{name: "partition1", armed: "DISARM"}
-    |> Repo.insert!
-    partition2 = %PartitionModel{name: "partition2", armed: "DISARM"}
-    |> Repo.insert!
-    partition3 = %PartitionModel{name: "partition3", armed: "DISARM"}
-    |> Repo.insert!
-    partition4 = %PartitionModel{name: "partition4", armed: "DISARM"}
-    |> Repo.insert!
+    scenario =
+      %ScenarioModel{name: "scenario"}
+      |> Repo.insert!()
+
+    partition1 =
+      %PartitionModel{name: "partition1", armed: "DISARM"}
+      |> Repo.insert!()
+
+    partition2 =
+      %PartitionModel{name: "partition2", armed: "DISARM"}
+      |> Repo.insert!()
+
+    partition3 =
+      %PartitionModel{name: "partition3", armed: "DISARM"}
+      |> Repo.insert!()
+
+    partition4 =
+      %PartitionModel{name: "partition4", armed: "DISARM"}
+      |> Repo.insert!()
+
+    %PartitionScenarioModel{partition_id: partition1.id, scenario_id: scenario.id, mode: "DISARM"}
+    |> Repo.insert!()
+
+    %PartitionScenarioModel{partition_id: partition2.id, scenario_id: scenario.id, mode: "ARM"}
+    |> Repo.insert!()
 
     %PartitionScenarioModel{
-      partition_id: partition1.id, scenario_id: scenario.id,
-      mode: "DISARM"}
-    |> Repo.insert!
+      partition_id: partition3.id,
+      scenario_id: scenario.id,
+      mode: "ARMSTAY"
+    }
+    |> Repo.insert!()
+
     %PartitionScenarioModel{
-      partition_id: partition2.id, scenario_id: scenario.id,
-      mode: "ARM"}
-    |> Repo.insert!
-    %PartitionScenarioModel{
-      partition_id: partition3.id, scenario_id: scenario.id,
-      mode: "ARMSTAY"}
-    |> Repo.insert!
-    %PartitionScenarioModel{
-      partition_id: partition4.id, scenario_id: scenario.id,
-      mode: "ARMSTAYIMMEDIATE"}
-    |> Repo.insert!
+      partition_id: partition4.id,
+      scenario_id: scenario.id,
+      mode: "ARMSTAYIMMEDIATE"
+    }
+    |> Repo.insert!()
 
     %UserModel{username: "test@local", pin: "230477"}
-    |> Repo.insert!
+    |> Repo.insert!()
 
-    conn |> Helper.newconn
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :run, scenario))
     |> response(204)
 
     records = Repo.all(PartitionModel)
-    assert Enum.any?(records, fn(x) -> x.armed == "DISARM" end)
-    assert Enum.any?(records, fn(x) -> x.armed == "ARM" end)
-    assert Enum.any?(records, fn(x) -> x.armed == "ARMSTAY" end)
-    assert Enum.any?(records, fn(x) -> x.armed == "ARMSTAYIMMEDIATE" end)
+    assert Enum.any?(records, fn x -> x.armed == "DISARM" end)
+    assert Enum.any?(records, fn x -> x.armed == "ARM" end)
+    assert Enum.any?(records, fn x -> x.armed == "ARMSTAY" end)
+    assert Enum.any?(records, fn x -> x.armed == "ARMSTAYIMMEDIATE" end)
 
     assert :meck.called(PartitionProcess, :disarm, [:_, :_])
     assert :meck.called(PartitionProcess, :arm, [:_, :_, :normal])
@@ -282,9 +346,11 @@ defmodule DtWeb.ScenarioControllerTest do
     |> post(scenario_path(conn, :create), %{name: "this is a test"})
     |> response(401)
 
-    conn = Helper.newconn(conn)
-    |> put_req_header("p-dt-pin", "666666")
-    |> post(scenario_path(conn, :create), %{name: "this is a test"})
+    conn =
+      Helper.newconn(conn)
+      |> put_req_header("p-dt-pin", "666666")
+      |> post(scenario_path(conn, :create), %{name: "this is a test"})
+
     json = json_response(conn, 201)
     assert json["name"] == "this is a test"
 
@@ -293,13 +359,17 @@ defmodule DtWeb.ScenarioControllerTest do
     |> assert_receive(5000)
 
     # check that the new record is there
-    conn = Helper.newconn(conn)
-    |> get(scenario_path(conn, :index))
+    conn =
+      Helper.newconn(conn)
+      |> get(scenario_path(conn, :index))
+
     response(conn, 401)
 
-    conn = Helper.newconn(conn)
-    |> put_req_header("p-dt-pin", "666666")
-    |> get(scenario_path(conn, :index))
+    conn =
+      Helper.newconn(conn)
+      |> put_req_header("p-dt-pin", "666666")
+      |> get(scenario_path(conn, :index))
+
     json = json_response(conn, 200)
 
     assert Enum.count(json) == 1

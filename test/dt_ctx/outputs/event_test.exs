@@ -22,56 +22,70 @@ defmodule DtCtx.EventTest do
   end
 
   test "changeset for a partition event" do
-    sconf = %{name: "a name", type: "alarm"}
-    |> Poison.encode!
+    sconf =
+      %{name: "a name", type: "alarm"}
+      |> Poison.encode!()
+
     attrs = %{name: "name", source: "partition", source_config: sconf}
     changeset = Event.create_changeset(%Event{}, attrs)
     assert changeset.valid?
   end
 
   test "changeset for a partition event: missing type" do
-    sconf = %{name: "a name"}
-    |> Poison.encode!
+    sconf =
+      %{name: "a name"}
+      |> Poison.encode!()
+
     attrs = %{name: "name", source: "partition", source_config: sconf}
     changeset = Event.create_changeset(%Event{}, attrs)
     refute changeset.valid?
   end
 
   test "changeset for a partition event: missing name" do
-    sconf = %{type: "alarm"}
-    |> Poison.encode!
+    sconf =
+      %{type: "alarm"}
+      |> Poison.encode!()
+
     attrs = %{name: "name", source: "partition", source_config: sconf}
     changeset = Event.create_changeset(%Event{}, attrs)
     refute changeset.valid?
   end
 
   test "changeset for a sensor event" do
-    sconf = %{address: "1", port: 1, type: "alarm"}
-    |> Poison.encode!
+    sconf =
+      %{address: "1", port: 1, type: "alarm"}
+      |> Poison.encode!()
+
     attrs = %{name: "name", source: "sensor", source_config: sconf}
     changeset = Event.create_changeset(%Event{}, attrs)
     assert changeset.valid?
   end
 
   test "changeset for a sensor event: missing address" do
-    sconf = %{port: 1, type: "alarm"}
-    |> Poison.encode!
+    sconf =
+      %{port: 1, type: "alarm"}
+      |> Poison.encode!()
+
     attrs = %{name: "name", source: "sensor", source_config: sconf}
     changeset = Event.create_changeset(%Event{}, attrs)
     refute changeset.valid?
   end
 
   test "changeset for a sensor event: missing port" do
-    sconf = %{address: "1", type: "alarm"}
-    |> Poison.encode!
+    sconf =
+      %{address: "1", type: "alarm"}
+      |> Poison.encode!()
+
     attrs = %{name: "name", source: "sensor", source_config: sconf}
     changeset = Event.create_changeset(%Event{}, attrs)
     refute changeset.valid?
   end
 
   test "changeset for a sensor event: missing type" do
-    sconf = %{address: "1", port: 1}
-    |> Poison.encode!
+    sconf =
+      %{address: "1", port: 1}
+      |> Poison.encode!()
+
     attrs = %{name: "name", source: "sensor", source_config: sconf}
     changeset = Event.create_changeset(%Event{}, attrs)
     refute changeset.valid?

@@ -7,5 +7,4 @@ defmodule DtWeb.UserView do
   def render("check_pin.json", %{expire: v}) do
     %{expire: v}
   end
-
 end

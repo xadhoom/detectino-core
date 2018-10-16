@@ -60,5 +60,4 @@ defmodule DtBus.CanhelperTest do
   test "decode message id fail" do
     assert nil == C.decode_msgid(283_312_896)
   end
-
 end

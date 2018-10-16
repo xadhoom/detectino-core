@@ -16,12 +16,13 @@ defmodule DtCore.Monitor.Utils do
       :partition,
       name: part.name
     }
+
     {:ok, {:global, name}}
   end
 
   def partition_server_pid(part = %PartitionModel{}) do
     {:ok, {:global, name}} = partition_server_name(part)
-    :global.whereis_name name
+    :global.whereis_name(name)
   end
 
   def sensor_server_name(_sensor = %SensorModel{name: nil}) do
@@ -39,20 +40,18 @@ defmodule DtCore.Monitor.Utils do
   def sensor_server_name(sensor = %SensorModel{}) do
     name = {
       :sensor,
-      name: sensor.name,
-      address: sensor.address,
-      port: sensor.port
+      name: sensor.name, address: sensor.address, port: sensor.port
     }
+
     {:ok, {:global, name}}
   end
 
   def sensor_server_pid(sensor = %SensorModel{}) do
     {:ok, {:global, name}} = sensor_server_name(sensor)
-    :global.whereis_name name
+    :global.whereis_name(name)
   end
 
   def random_id do
     Base.hex_encode32(:crypto.strong_rand_bytes(20), case: :lower)
   end
-
 end

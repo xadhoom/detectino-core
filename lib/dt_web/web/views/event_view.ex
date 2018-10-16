@@ -4,8 +4,7 @@ defmodule DtWeb.EventView do
 
   @model :event
 
-  #def render(_, %{event: item}) do
+  # def render(_, %{event: item}) do
   #  item
-  #end
-
+  # end
 end

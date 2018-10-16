@@ -4,13 +4,13 @@ defmodule DtCtx.Accounts.User do
   alias Comeonin.Bcrypt
 
   schema "users" do
-    field :name, :string
-    field :username, :string
-    field :encrypted_password, :string
-    field :password, :string
-    field :role, :string
-    field :pin, :string
-    field :pin_expire, :integer
+    field(:name, :string)
+    field(:username, :string)
+    field(:encrypted_password, :string)
+    field(:password, :string)
+    field(:role, :string)
+    field(:pin, :string)
+    field(:pin_expire, :integer)
 
     timestamps()
   end
@@ -67,6 +67,7 @@ defmodule DtCtx.Accounts.User do
 
   defp validate_password(changeset, crypted) do
     password = get_change(changeset, :password)
+
     if valid_password?(password, crypted) do
       changeset
     else
@@ -82,11 +83,14 @@ defmodule DtCtx.Accounts.User do
     case fetch_change(changeset, :password) do
       {:ok, password} ->
         changeset
-        |> put_change(:encrypted_password,
-          Bcrypt.hashpwsalt(password))
+        |> put_change(
+          :encrypted_password,
+          Bcrypt.hashpwsalt(password)
+        )
         |> put_change(:password, nil)
-      :error -> changeset
+
+      :error ->
+        changeset
     end
   end
-
 end
