@@ -20,7 +20,7 @@ addons:
 
 before_install:
   - . $HOME/.nvm/nvm.sh
-  - nvm install 6
+  - nvm install 8
   - npm --version
   - npm config set spin false
   - npm config set progress false
