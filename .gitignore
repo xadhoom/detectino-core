@@ -35,3 +35,4 @@ false
 doc
 
 # others
+.elixir_ls
