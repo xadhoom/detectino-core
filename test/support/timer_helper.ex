@@ -17,12 +17,12 @@ defmodule DtCore.Test.TimerHelper do
         name = error.__struct__
         stack = System.stacktrace()
 
-        cond do
-          name == exception ->
+        case name do
+          ^exception ->
             :timer.sleep(10)
             wait_until(max(0, timeout - 10), exception, fun)
 
-          name ->
+          _name ->
             reraise(error, stack)
         end
     end
