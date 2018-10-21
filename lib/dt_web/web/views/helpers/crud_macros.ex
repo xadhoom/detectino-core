@@ -1,4 +1,5 @@
 defmodule DtWeb.CrudMacroView do
+  @moduledoc false
   defmacro __using__(_options) do
     quote do
       import unquote(__MODULE__)

@@ -1,4 +1,5 @@
 defmodule DtWeb.ScenarioController do
+  @moduledoc false
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Monitoring.Scenario, orderby: [:name]
 

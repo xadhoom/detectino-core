@@ -1,4 +1,5 @@
 defmodule DtCtx.Outputs.EventOutput do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

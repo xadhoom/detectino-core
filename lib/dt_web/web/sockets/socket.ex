@@ -1,4 +1,5 @@
 defmodule DtWeb.Sockets.Socket do
+  @moduledoc false
   use Phoenix.Socket
   use Guardian.Phoenix.Socket
 

@@ -1,4 +1,7 @@
 defmodule DtCore.Test.TimerHelper do
+  @moduledoc """
+  Utility to check assertion for a while
+  """
   def wait_until(fun), do: wait_until(1000, fun)
 
   def wait_until(0, fun), do: fun.()

@@ -1,14 +1,17 @@
 defmodule DtCtx.Outputs.Event.ArmEvConf do
+  @moduledoc false
   defstruct name: nil,
             initiator: nil
 end
 
 defmodule DtCtx.Outputs.Event.PartitionEvConf do
+  @moduledoc false
   defstruct name: nil,
             type: nil
 end
 
 defmodule DtCtx.Outputs.Event.SensorEvConf do
+  @moduledoc false
   defstruct name: nil,
             address: nil,
             port: nil,
@@ -16,6 +19,7 @@ defmodule DtCtx.Outputs.Event.SensorEvConf do
 end
 
 defmodule DtCtx.Outputs.Event do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

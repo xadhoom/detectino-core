@@ -1,4 +1,5 @@
 defmodule DtWeb.Plugs.CoreReloader do
+  @moduledoc false
   import Plug.Conn
 
   alias DtWeb.ReloadRegistry

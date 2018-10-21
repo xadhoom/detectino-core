@@ -1,4 +1,5 @@
 defmodule DtCtx.Outputs.EmailSettings do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

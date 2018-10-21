@@ -1,4 +1,5 @@
 defmodule DtCtx.Monitoring.PartitionSensor do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

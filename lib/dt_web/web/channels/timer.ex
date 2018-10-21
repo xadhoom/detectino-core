@@ -1,4 +1,5 @@
 defmodule DtWeb.Channels.Timer do
+  @moduledoc false
   use Phoenix.Channel
 
   require Logger

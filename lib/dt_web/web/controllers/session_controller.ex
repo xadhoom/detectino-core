@@ -1,4 +1,5 @@
 defmodule DtWeb.SessionController do
+  @moduledoc false
   use DtWeb.Web, :controller
 
   alias DtCtx.Accounts.User

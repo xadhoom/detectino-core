@@ -1,4 +1,5 @@
 defmodule DtWeb.PageController do
+  @moduledoc false
   use DtWeb.Web, :controller
 
   def index(conn, _params) do

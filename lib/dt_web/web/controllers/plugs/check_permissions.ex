@@ -1,4 +1,5 @@
 defmodule DtWeb.Plugs.CheckPermissions do
+  @moduledoc false
   import Plug.Conn
 
   alias Plug.Conn.Status

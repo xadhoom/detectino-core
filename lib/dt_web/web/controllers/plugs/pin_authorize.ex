@@ -1,4 +1,5 @@
 defmodule DtWeb.Plugs.PinAuthorize do
+  @moduledoc false
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 

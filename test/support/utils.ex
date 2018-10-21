@@ -1,4 +1,5 @@
 defmodule DtCore.Test.Utils do
+  @moduledoc false
   def flush_mailbox do
     receive do
       _ -> flush_mailbox()

@@ -1,4 +1,5 @@
 defmodule DtWeb.GuardianSerializer do
+  @moduledoc false
   @behaviour Guardian.Serializer
 
   alias DtCtx.Repo

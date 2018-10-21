@@ -1,4 +1,5 @@
 defmodule DtWeb.Channels.Event do
+  @moduledoc false
   use Phoenix.Channel
 
   alias DtCore.StatusTracker

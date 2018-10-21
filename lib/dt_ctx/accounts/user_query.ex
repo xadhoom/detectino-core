@@ -1,4 +1,5 @@
 defmodule DtCtx.Accounts.UserQuery do
+  @moduledoc false
   import Ecto.Query
   alias DtCtx.Accounts.User
 

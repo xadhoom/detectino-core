@@ -1,4 +1,5 @@
 defmodule DtWeb.UserView do
+  @moduledoc false
   use DtWeb.CrudMacroView
   use DtWeb.Web, :view
 

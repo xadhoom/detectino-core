@@ -1,4 +1,5 @@
 defmodule DtWeb.PartitionView do
+  @moduledoc false
   use DtWeb.CrudMacroView
   use DtWeb.Web, :view
 

@@ -1,4 +1,5 @@
 defmodule DtWeb.ControllerHelperTest do
+  @moduledoc false
   use Phoenix.ConnTest
   import DtWeb.Router.Helpers
 

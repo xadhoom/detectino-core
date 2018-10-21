@@ -1,4 +1,5 @@
 defmodule Detectino do
+  @moduledoc false
   use Application
 
   alias DtWeb.ReloadRegistry

@@ -1,4 +1,5 @@
 defmodule DtCtx.Monitoring.Sensor do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

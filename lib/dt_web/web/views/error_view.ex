@@ -1,4 +1,5 @@
 defmodule DtWeb.ErrorView do
+  @moduledoc false
   use DtWeb.Web, :view
 
   def render("404.html", _assigns) do

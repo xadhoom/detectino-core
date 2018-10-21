@@ -1,4 +1,5 @@
 defmodule DtCtx.Monitoring.Partition do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,4 +1,5 @@
 defmodule DtWeb.Router do
+  @moduledoc false
   use DtWeb.Web, :router
 
   @api_methods [:index, :show, :create, :update, :delete]

@@ -1,4 +1,5 @@
 defmodule DtWeb.NotImplementedController do
+  @moduledoc false
   use DtWeb.Web, :controller
 
   alias Plug.Conn.Status

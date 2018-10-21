@@ -1,4 +1,5 @@
 defmodule DtWeb.ScenarioView do
+  @moduledoc false
   use DtWeb.CrudMacroView
   use DtWeb.Web, :view
 
