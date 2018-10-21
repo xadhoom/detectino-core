@@ -1,7 +1,7 @@
 defmodule DtWeb.Plugs.CheckPermissions do
   import Plug.Conn
 
-  alias DtWeb.StatusCodes
+  alias Plug.Conn.Status
 
   require Logger
 
@@ -36,12 +36,12 @@ defmodule DtWeb.Plugs.CheckPermissions do
   def forbidden(conn) do
     conn
     |> halt
-    |> send_resp(403, StatusCodes.status_code(403))
+    |> send_resp(403, Status.reason_phrase(403))
   end
 
   def unauthorized(conn) do
     conn
     |> halt
-    |> send_resp(401, StatusCodes.status_code(401))
+    |> send_resp(401, Status.reason_phrase(401))
   end
 end

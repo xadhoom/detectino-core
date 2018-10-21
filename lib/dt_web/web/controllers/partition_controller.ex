@@ -2,7 +2,6 @@ defmodule DtWeb.PartitionController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Monitoring.Partition, orderby: [:name]
 
-  alias DtWeb.StatusCodes
   alias DtCtx.Monitoring.Partition
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CoreReloader
@@ -10,6 +9,7 @@ defmodule DtWeb.PartitionController do
   alias DtWeb.Plugs.CheckPermissions
   alias DtCore.Monitor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
+  alias Plug.Conn.Status
 
   plug(EnsureAuthenticated, handler: SessionController)
   plug(CoreReloader, nil when action not in [:index, :show, :arm, :disarm])
@@ -19,7 +19,7 @@ defmodule DtWeb.PartitionController do
   def disarm(conn, %{"id" => id}) do
     case Repo.get(Partition, id) do
       nil ->
-        send_resp(conn, 404, StatusCodes.status_code(404))
+        send_resp(conn, 404, Status.reason_phrase(404))
 
       part ->
         part
@@ -27,16 +27,16 @@ defmodule DtWeb.PartitionController do
         |> Repo.update!()
         |> PartitionProcess.disarm(PinAuthorize.username(conn))
 
-        send_resp(conn, 204, StatusCodes.status_code(204))
+        send_resp(conn, 204, Status.reason_phrase(204))
     end
   end
 
   def arm(conn, params) do
     case do_arm(params, conn) do
-      :ok -> send_resp(conn, 204, StatusCodes.status_code(204))
-      {:error, :bad_request} -> send_resp(conn, 400, StatusCodes.status_code(400))
-      {:error, :tripped} -> send_resp(conn, 555, StatusCodes.status_code(555))
-      {:error, :not_found} -> send_resp(conn, 404, StatusCodes.status_code(404))
+      :ok -> send_resp(conn, 204, Status.reason_phrase(204))
+      {:error, :bad_request} -> send_resp(conn, 400, Status.reason_phrase(400))
+      {:error, :tripped} -> send_resp(conn, 555, Status.reason_phrase(555))
+      {:error, :not_found} -> send_resp(conn, 404, Status.reason_phrase(404))
     end
   end
 

@@ -10,13 +10,13 @@ defmodule DtWeb.EventController do
   alias DtWeb.SessionController
   alias DtCtx.Outputs.Event
   alias DtCtx.Outputs.EventOutput
-  alias DtWeb.StatusCodes
   alias DtWeb.CtrlHelpers.Crud
   alias DtWeb.Controllers.Helpers.Utils
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
   alias DtWeb.Plugs.CheckPermissions
   alias Guardian.Plug.EnsureAuthenticated
+  alias Plug.Conn.Status
 
   require Logger
 
@@ -33,7 +33,7 @@ defmodule DtWeb.EventController do
         render(conn, items: items)
 
       {:error, conn, code} ->
-        send_resp(conn, code, StatusCodes.status_code(code))
+        send_resp(conn, code, Status.reason_phrase(code))
     end
   end
 
@@ -60,7 +60,7 @@ defmodule DtWeb.EventController do
         render(conn, item: item)
 
       {:error, conn, code} ->
-        send_resp(conn, code, StatusCodes.status_code(code))
+        send_resp(conn, code, Status.reason_phrase(code))
     end
   end
 

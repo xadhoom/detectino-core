@@ -3,19 +3,18 @@ defmodule DtWeb.UserController do
   use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Accounts.User
 
   alias DtWeb.SessionController
-  alias DtWeb.StatusCodes
   alias DtWeb.Plugs.PinAuthorize
   alias DtWeb.Plugs.CheckPermissions
   alias DtCtx.Accounts.User
-
   alias Guardian.Plug.EnsureAuthenticated
+  alias Plug.Conn.Status
 
   plug(EnsureAuthenticated, handler: SessionController)
   plug(CheckPermissions, [roles: [:admin]] when action not in [:check_pin])
   plug(PinAuthorize when action not in [:check_pin])
 
   def delete(conn, %{"id" => "1"}) do
-    send_resp(conn, 403, StatusCodes.status_code(403))
+    send_resp(conn, 403, Status.reason_phrase(403))
   end
 
   def delete(conn, params) do
@@ -27,7 +26,7 @@ defmodule DtWeb.UserController do
 
     case Repo.one(q) do
       nil ->
-        send_resp(conn, 404, StatusCodes.status_code(404))
+        send_resp(conn, 404, Status.reason_phrase(404))
 
       v ->
         render(conn, :check_pin, expire: v)
@@ -35,6 +34,6 @@ defmodule DtWeb.UserController do
   end
 
   def check_pin(conn, _) do
-    send_resp(conn, 400, StatusCodes.status_code(400))
+    send_resp(conn, 400, Status.reason_phrase(400))
   end
 end

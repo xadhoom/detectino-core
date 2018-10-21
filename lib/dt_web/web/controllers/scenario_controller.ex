@@ -6,12 +6,12 @@ defmodule DtWeb.ScenarioController do
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
   alias DtWeb.Plugs.CheckPermissions
-  alias DtWeb.StatusCodes
   alias DtCtx.Monitoring.Scenario
   alias DtCtx.Accounts.User
   alias DtCtx.Monitoring.Partition
   alias DtCore.Monitor.Partition, as: PartitionProcess
   alias Guardian.Plug.EnsureAuthenticated
+  alias Plug.Conn.Status
 
   require Logger
 
@@ -51,7 +51,7 @@ defmodule DtWeb.ScenarioController do
           |> run_scenario()
       end
 
-    send_resp(conn, code, StatusCodes.status_code(code))
+    send_resp(conn, code, Status.reason_phrase(code))
   end
 
   defp check_user(scenario, pin) do

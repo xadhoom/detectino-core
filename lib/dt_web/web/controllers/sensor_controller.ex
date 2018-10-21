@@ -13,7 +13,6 @@ defmodule DtWeb.SensorController do
   alias DtCtx.Monitoring.PartitionSensor
   alias DtWeb.CtrlHelpers.Crud
   alias DtWeb.SessionController
-  alias DtWeb.StatusCodes
   alias DtWeb.Controllers.Helpers.Utils
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
@@ -32,8 +31,8 @@ defmodule DtWeb.SensorController do
       {:ok, conn, items} ->
         render(conn, items: items)
 
-      {:error, conn, code} ->
-        send_resp(conn, code, StatusCodes.status_code(code))
+      {:error, _conn, _code} ->
+        nil
     end
   end
 
@@ -59,8 +58,8 @@ defmodule DtWeb.SensorController do
 
         render(conn, item: item)
 
-      {:error, conn, code} ->
-        send_resp(conn, code, StatusCodes.status_code(code))
+      {:error, _conn, _code} ->
+        nil
     end
   end
 

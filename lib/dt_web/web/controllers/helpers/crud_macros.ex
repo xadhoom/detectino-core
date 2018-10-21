@@ -2,9 +2,8 @@ defmodule DtWeb.CrudMacros do
   @moduledoc """
   Injects basic CRUD helpers when used.
   """
-
   alias DtWeb.CtrlHelpers.Crud
-  alias DtWeb.StatusCodes
+  alias Plug.Conn.Status
 
   defmacro __using__(opts) do
     quote do
@@ -18,7 +17,7 @@ defmodule DtWeb.CrudMacros do
             render(conn, items: items)
 
           {:error, conn, code} ->
-            send_resp(conn, code, StatusCodes.status_code(code))
+            send_resp(conn, code, Status.reason_phrase(code))
         end
       end
 
@@ -40,7 +39,7 @@ defmodule DtWeb.CrudMacros do
             render(conn, item: item)
 
           {:error, conn, code} ->
-            send_resp(conn, code, StatusCodes.status_code(code))
+            send_resp(conn, code, Status.reason_phrase(code))
         end
       end
 
@@ -50,17 +49,17 @@ defmodule DtWeb.CrudMacros do
             render(conn, item: item)
 
           {:error, conn, code} ->
-            send_resp(conn, code, StatusCodes.status_code(code))
+            send_resp(conn, code, Status.reason_phrase(code))
         end
       end
 
       def delete(conn, params) do
         case Crud.delete(conn, params, @repo, @model) do
           {:response, conn, code} ->
-            send_resp(conn, code, StatusCodes.status_code(code))
+            send_resp(conn, code, Status.reason_phrase(code))
 
           {:error, conn, code} ->
-            send_resp(conn, code, StatusCodes.status_code(code))
+            send_resp(conn, code, Status.reason_phrase(code))
         end
       end
 

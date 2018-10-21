@@ -4,7 +4,7 @@ defmodule DtWeb.Plugs.PinAuthorize do
 
   alias DtCtx.Repo
   alias DtCtx.Accounts.User
-  alias DtWeb.StatusCodes
+  alias Plug.Conn.Status
 
   require Logger
 
@@ -35,6 +35,6 @@ defmodule DtWeb.Plugs.PinAuthorize do
   defp handle_error(conn) do
     conn
     |> halt
-    |> send_resp(401, StatusCodes.status_code(401))
+    |> send_resp(401, Status.reason_phrase(401))
   end
 end

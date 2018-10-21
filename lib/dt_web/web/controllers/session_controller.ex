@@ -4,11 +4,11 @@ defmodule DtWeb.SessionController do
   alias DtCtx.Accounts.User
   alias DtCtx.Accounts.UserQuery
   alias DtWeb.TokenServer
-  alias DtWeb.StatusCodes
   alias DtWeb.SessionController
   alias DtWeb.Plugs.CheckPermissions
   alias Guardian.Claims
   alias Guardian.Plug.EnsureAuthenticated
+  alias Plug.Conn.Status
 
   plug(EnsureAuthenticated, [handler: SessionController] when action in [:refresh, :invalidate])
 
@@ -25,7 +25,7 @@ defmodule DtWeb.SessionController do
       v -> TokenServer.expire({:token, v})
     end
 
-    send_resp(conn, 401, StatusCodes.status_code(401))
+    send_resp(conn, 401, Status.reason_phrase(401))
   end
 
   def create(conn, params = %{}) do
@@ -48,10 +48,10 @@ defmodule DtWeb.SessionController do
         conn
         |> render(:logged_in, token: jwt)
       else
-        send_resp(conn, 401, StatusCodes.status_code(401))
+        send_resp(conn, 401, Status.reason_phrase(401))
       end
     else
-      send_resp(conn, 401, StatusCodes.status_code(401))
+      send_resp(conn, 401, Status.reason_phrase(401))
     end
   end
 
@@ -65,7 +65,7 @@ defmodule DtWeb.SessionController do
 
     case Repo.get(User, claims["dt_user_id"]) do
       nil ->
-        send_resp(conn, 404, StatusCodes.status_code(404))
+        send_resp(conn, 404, Status.reason_phrase(404))
 
       _user ->
         {:ok, jwt, _claims} = Guardian.refresh!(token)
@@ -82,7 +82,7 @@ defmodule DtWeb.SessionController do
       TokenServer.delete(token)
     end)
 
-    send_resp(conn, 204, StatusCodes.status_code(204))
+    send_resp(conn, 204, Status.reason_phrase(204))
   end
 
   defp get_tokens_for_id(id) do

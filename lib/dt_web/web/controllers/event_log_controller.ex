@@ -7,9 +7,9 @@ defmodule DtWeb.EventLogController do
 
   alias DtWeb.SessionController
   alias DtCtx.Outputs.EventLog
-  alias DtWeb.StatusCodes
   alias DtWeb.Plugs.PinAuthorize
   alias Guardian.Plug.EnsureAuthenticated
+  alias Plug.Conn.Status
 
   require Logger
 
@@ -17,7 +17,7 @@ defmodule DtWeb.EventLogController do
   plug(PinAuthorize)
 
   def create(conn, _params) do
-    send_resp(conn, 501, StatusCodes.status_code(501))
+    send_resp(conn, 501, Status.reason_phrase(501))
   end
 
   def ackall(conn, _params) do
@@ -36,7 +36,7 @@ defmodule DtWeb.EventLogController do
           500
       end
 
-    send_resp(conn, code, StatusCodes.status_code(code))
+    send_resp(conn, code, Status.reason_phrase(code))
   end
 
   def ackall_txn do
@@ -63,7 +63,7 @@ defmodule DtWeb.EventLogController do
         eventlog -> do_ack(eventlog)
       end
 
-    send_resp(conn, code, StatusCodes.status_code(code))
+    send_resp(conn, code, Status.reason_phrase(code))
   end
 
   defp do_ack(eventlog) do
