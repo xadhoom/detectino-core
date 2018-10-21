@@ -59,9 +59,6 @@ defmodule DtCore.Monitor.DetectorFsm do
   end
 
   #
-  # TODO: many callbacks share same code, move it to an helper fun
-  #
-  #
   # :idle state callbacks
   #
   # process idle event in idle state
@@ -287,7 +284,7 @@ defmodule DtCore.Monitor.DetectorFsm do
 
   # process disarm request event in idle_arm state
   def handle_event({:call, from}, :disarm, :idle_arm, data) do
-    # TODO needs a new event id?
+    # Maybe needs a new event id?
     send(data.receiver, {:start, data.last_event})
     {:next_state, :idle, data, [{:reply, from, :ok}]}
   end
@@ -463,7 +460,7 @@ defmodule DtCore.Monitor.DetectorFsm do
 
   # process disarm request event in tampered_arm state
   def handle_event({:call, from}, :disarm, :tampered_arm, data) do
-    # TODO needs a new event id?
+    # Maybe needs a new event id?
     send(data.receiver, {:start, data.last_event})
     {:next_state, :tampered, data, [{:reply, from, :ok}]}
   end

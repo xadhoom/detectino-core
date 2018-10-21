@@ -45,7 +45,7 @@ defmodule Detectino do
     :ok
   end
 
-  # TODO: use this fn to automatically run migrations when
+  # This fn may be used to automatically run migrations when
   # starting the app on production
   defp run_migrations do
     path = Application.app_dir(:detectino) <> "/priv/repo/migrations"

@@ -229,7 +229,7 @@ defmodule DtCore.Monitor.Partition do
   defp subscribe_sensors({config = %PartitionModel{}}) do
     Enum.each(config.sensors, fn sensor ->
       :ok = Detector.subscribe({sensor}, {config.entry_delay, config.exit_delay})
-      # TODO figure out later when sup tree is ready
+      # Note for future self: figure out later when sup tree is ready
       true = Detector.link({sensor})
     end)
   end

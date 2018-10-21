@@ -31,9 +31,11 @@ defmodule DtCore.Monitor.Detector do
             fsm: nil,
             debug: false,
             listeners: [],
-            # TODO: find a better way
+            # Setting timeouts to a very high value in order
+            # to compare and use the minor one.
+            # Maybe we can set to zero and find a better way
+            # for proper comparison
             exit_timeout: 100_000,
-            # TODO: find a better way
             entry_timeout: 100_000
 
   #
