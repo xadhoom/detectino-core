@@ -3,10 +3,10 @@ defmodule DtWeb.UserController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Accounts.User
 
-  alias DtWeb.SessionController
-  alias DtWeb.Plugs.PinAuthorize
-  alias DtWeb.Plugs.CheckPermissions
   alias DtCtx.Accounts.User
+  alias DtWeb.Plugs.CheckPermissions
+  alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
   alias Plug.Conn.Status
 

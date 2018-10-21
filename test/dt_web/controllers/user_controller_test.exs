@@ -33,13 +33,15 @@ defmodule DtWeb.UserControllerTest do
 
   test "auth: get all users", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> get(user_path(conn, :index))
 
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> get(user_path(conn, :index))
 
@@ -56,13 +58,15 @@ defmodule DtWeb.UserControllerTest do
 
   test "auth: get one user", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> get(user_path(conn, :show, struct(User, %{id: "1"})))
 
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> get(user_path(conn, :show, struct(User, %{id: "1"})))
 
@@ -72,12 +76,14 @@ defmodule DtWeb.UserControllerTest do
 
   test "auth: get not existent user", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> get(user_path(conn, :show, struct(User, %{id: "2"})))
 
     response(conn, 401)
 
-    Helper.newconn(conn)
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "666666")
     |> get(user_path(conn, :show, struct(User, %{id: "2"})))
     |> response(404)
@@ -85,13 +91,15 @@ defmodule DtWeb.UserControllerTest do
 
   test "auth: save one user", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> post(user_path(conn, :create), @valid_attrs)
 
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> post(user_path(conn, :create), @valid_attrs)
 
@@ -99,7 +107,8 @@ defmodule DtWeb.UserControllerTest do
     assert json["username"] == "test@local"
 
     location =
-      get_resp_header(conn, "location")
+      conn
+      |> get_resp_header("location")
       |> Enum.at(0)
 
     assert location == "/api/users/" <> Integer.to_string(json["id"])
@@ -114,7 +123,8 @@ defmodule DtWeb.UserControllerTest do
       password: "some content"
     }
 
-    Helper.login(conn)
+    conn
+    |> Helper.login()
     |> put_req_header("p-dt-pin", "666666")
     |> post(user_path(conn, :create), attrs)
     |> json_response(400)
@@ -122,13 +132,15 @@ defmodule DtWeb.UserControllerTest do
 
   test "auth: save one invalid user", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
       |> post(user_path(conn, :create), @invalid_attrs)
 
     json_response(conn, 400)
 
-    Helper.newconn(conn)
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "666666")
     |> post(user_path(conn, :create), @missing_username)
     |> json_response(400)
@@ -141,7 +153,8 @@ defmodule DtWeb.UserControllerTest do
     params = Map.put(@valid_attrs, "id", "1")
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
       |> put(user_path(conn, :update, struct(User, %{id: "1"})), params)
 
@@ -152,7 +165,8 @@ defmodule DtWeb.UserControllerTest do
     assert u.username == "test@local"
 
     cnt =
-      Repo.all(User)
+      User
+      |> Repo.all()
       |> Enum.count()
 
     assert cnt == 1
@@ -164,7 +178,8 @@ defmodule DtWeb.UserControllerTest do
 
     params = Map.put(@valid_attrs, "id", "2")
 
-    Helper.login(conn)
+    conn
+    |> Helper.login()
     |> put_req_header("p-dt-pin", "666666")
     |> put(user_path(conn, :update, struct(User, %{id: "2"})), params)
     |> response(404)
@@ -174,7 +189,8 @@ defmodule DtWeb.UserControllerTest do
   end
 
   test "auth: delete admin user", %{conn: conn} do
-    Helper.login(conn)
+    conn
+    |> Helper.login()
     |> put_req_header("p-dt-pin", "666666")
     |> delete(user_path(conn, :delete, struct(User, %{id: "1"})))
     |> response(403)
@@ -182,13 +198,15 @@ defmodule DtWeb.UserControllerTest do
 
   test "auth: delete an user", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
       |> post(user_path(conn, :create), @valid_attrs)
 
     json = json_response(conn, 201)
 
-    Helper.newconn(conn)
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "666666")
     |> delete(user_path(conn, :delete, struct(User, %{id: json["id"]})))
     |> response(204)
@@ -209,18 +227,21 @@ defmodule DtWeb.UserControllerTest do
     response(conn, 404)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> post(user_path(conn, :create), @valid_attrs)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> post(user_path(conn, :check_pin), %{pin: "123456"})
 
     response(conn, 200)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> post(user_path(conn, :check_pin), %{pin: "666666"})
 
     response(conn, 200)

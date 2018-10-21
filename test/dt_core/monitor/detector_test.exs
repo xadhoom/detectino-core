@@ -356,7 +356,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "idle event on idle sensor when armed" do
     {:ok, config, pid} =
-      setup_teol(30, 0.001)
+      30
+      |> setup_teol(0.001)
       |> arm_teol_idle_sensor
 
     # send idle event
@@ -369,7 +370,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "tamper event on idle sensor when armed" do
     {:ok, config, pid} =
-      setup_teol(30, 0.001)
+      30
+      |> setup_teol(0.001)
       |> arm_teol_idle_sensor
 
     # send tamper event
@@ -411,7 +413,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "alarm event on idle, delayed sensor when armed" do
     {:ok, config, pid} =
-      setup_teol(30, 0.001)
+      30
+      |> setup_teol(0.001)
       |> arm_teol_idle_sensor
 
     # send alarm event
@@ -433,7 +436,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "disarm request on idle sensor" do
     {:ok, config, _pid} =
-      setup_teol(30, 0.001)
+      30
+      |> setup_teol(0.001)
       |> arm_teol_idle_sensor
 
     :ok = Detector.disarm({config})
@@ -447,7 +451,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "idle event in exit wait state" do
     {:ok, config, pid} =
-      setup_teol(30, 30)
+      30
+      |> setup_teol(30)
       |> exit_wait_teol_sensor
 
     # send idle event
@@ -460,7 +465,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "tamper event in exit wait state" do
     {:ok, config, pid} =
-      setup_teol(30, 30)
+      30
+      |> setup_teol(30)
       |> exit_wait_teol_sensor
 
     # send tamper event
@@ -479,7 +485,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "timeout event in exit wait state" do
     {:ok, config, _pid} =
-      setup_teol(30, 1)
+      30
+      |> setup_teol(1)
       |> exit_wait_teol_sensor
 
     {:stop, %DetectorExitEv{address: "3", port: 3}}
@@ -495,7 +502,8 @@ defmodule DtCore.Test.Monitor.Detector do
 
   test "disarm request in exit wait state" do
     {:ok, config, _pid} =
-      setup_teol(30, 1)
+      30
+      |> setup_teol(1)
       |> exit_wait_teol_sensor
 
     :ok = Detector.disarm({config})

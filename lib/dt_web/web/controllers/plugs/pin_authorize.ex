@@ -3,8 +3,8 @@ defmodule DtWeb.Plugs.PinAuthorize do
   import Plug.Conn
   import Ecto.Query, only: [from: 2]
 
-  alias DtCtx.Repo
   alias DtCtx.Accounts.User
+  alias DtCtx.Repo
   alias Plug.Conn.Status
 
   require Logger

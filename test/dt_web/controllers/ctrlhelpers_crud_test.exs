@@ -1,4 +1,5 @@
 defmodule DtWeb.CtrlHelpers.CrudTest do
+  @moduledoc false
   use DtWeb.ConnCase
 
   alias DtCtx.Repo
@@ -140,7 +141,8 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
   test "link header" do
     conn = Phoenix.ConnTest.build_conn()
 
-    Crud.links(conn, 2, 5, 26)
+    conn
+    |> Crud.links(2, 5, 26)
     |> ExLinkHeader.parse!()
   end
 
@@ -158,7 +160,8 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert Enum.count(items) == 4
 
     links =
-      get_resp_header(conn, "link")
+      conn
+      |> get_resp_header("link")
       |> Enum.at(0)
       |> ExLinkHeader.parse!()
 
@@ -181,7 +184,8 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
     assert Enum.count(items) == 2
 
     links =
-      get_resp_header(conn, "link")
+      conn
+      |> get_resp_header("link")
       |> Enum.at(0)
       |> ExLinkHeader.parse!()
 

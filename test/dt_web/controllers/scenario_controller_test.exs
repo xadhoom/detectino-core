@@ -347,7 +347,8 @@ defmodule DtWeb.ScenarioControllerTest do
     |> response(401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> post(scenario_path(conn, :create), %{name: "this is a test"})
 
@@ -360,13 +361,15 @@ defmodule DtWeb.ScenarioControllerTest do
 
     # check that the new record is there
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> get(scenario_path(conn, :index))
 
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> get(scenario_path(conn, :index))
 

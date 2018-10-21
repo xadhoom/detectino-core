@@ -19,7 +19,7 @@ defmodule DtWeb.Associations.ScenarioTest do
     |> Ecto.Changeset.put_assoc(:partitions, [part1, part2])
     |> Repo.update!()
 
-    s = Repo.one!(Scenario) |> Repo.preload(:partitions)
+    s = Scenario |> Repo.one!() |> Repo.preload(:partitions)
     assert Enum.count(s.partitions) == 2
 
     tmp = Enum.at(s.partitions, 0)
@@ -40,7 +40,7 @@ defmodule DtWeb.Associations.ScenarioTest do
     |> Ecto.Changeset.put_assoc(:partitions, [part1, part2])
     |> Repo.update!()
 
-    s = Repo.one!(Scenario) |> Repo.preload(:partitions_scenarios)
+    s = Scenario |> Repo.one!() |> Repo.preload(:partitions_scenarios)
     assert Enum.count(s.partitions_scenarios) == 2
 
     tmp = Enum.at(s.partitions_scenarios, 0)

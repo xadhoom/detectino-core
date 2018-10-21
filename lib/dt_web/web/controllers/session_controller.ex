@@ -4,9 +4,9 @@ defmodule DtWeb.SessionController do
 
   alias DtCtx.Accounts.User
   alias DtCtx.Accounts.UserQuery
-  alias DtWeb.TokenServer
-  alias DtWeb.SessionController
   alias DtWeb.Plugs.CheckPermissions
+  alias DtWeb.SessionController
+  alias DtWeb.TokenServer
   alias Guardian.Claims
   alias Guardian.Plug.EnsureAuthenticated
   alias Plug.Conn.Status

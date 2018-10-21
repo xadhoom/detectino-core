@@ -18,7 +18,7 @@ defmodule DtWeb.Associations.SensorTest do
     |> Ecto.Changeset.put_assoc(:partitions, [part1, part2])
     |> Repo.update!()
 
-    s = Repo.one!(Sensor) |> Repo.preload(:partitions)
+    s = Sensor |> Repo.one!() |> Repo.preload(:partitions)
     assert Enum.count(s.partitions) == 2
 
     tmp = Enum.at(s.partitions, 0)

@@ -5,9 +5,9 @@ defmodule DtWeb.EventLogController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Outputs.EventLog
 
-  alias DtWeb.SessionController
   alias DtCtx.Outputs.EventLog
   alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
   alias Plug.Conn.Status
 

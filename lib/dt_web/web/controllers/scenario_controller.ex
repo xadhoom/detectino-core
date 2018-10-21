@@ -3,14 +3,14 @@ defmodule DtWeb.ScenarioController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Monitoring.Scenario, orderby: [:name]
 
-  alias DtWeb.SessionController
-  alias DtWeb.Plugs.CoreReloader
-  alias DtWeb.Plugs.PinAuthorize
-  alias DtWeb.Plugs.CheckPermissions
-  alias DtCtx.Monitoring.Scenario
+  alias DtCore.Monitor.Partition, as: PartitionProcess
   alias DtCtx.Accounts.User
   alias DtCtx.Monitoring.Partition
-  alias DtCore.Monitor.Partition, as: PartitionProcess
+  alias DtCtx.Monitoring.Scenario
+  alias DtWeb.Plugs.CheckPermissions
+  alias DtWeb.Plugs.CoreReloader
+  alias DtWeb.Plugs.PinAuthorize
+  alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
   alias Plug.Conn.Status
 

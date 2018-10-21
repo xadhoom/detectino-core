@@ -7,14 +7,14 @@ defmodule DtWeb.EventController do
   use DtWeb.Web, :controller
   use DtWeb.CrudMacros, repo: DtCtx.Repo, model: DtCtx.Outputs.Event
 
-  alias DtWeb.SessionController
   alias DtCtx.Outputs.Event
   alias DtCtx.Outputs.EventOutput
-  alias DtWeb.CtrlHelpers.Crud
   alias DtWeb.Controllers.Helpers.Utils
+  alias DtWeb.CtrlHelpers.Crud
+  alias DtWeb.Plugs.CheckPermissions
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
-  alias DtWeb.Plugs.CheckPermissions
+  alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
   alias Plug.Conn.Status
 

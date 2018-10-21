@@ -45,7 +45,8 @@ defmodule DtWeb.SensorControllerTest do
 
     # check that the new record is there
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> get(sensor_path(conn, :index))
 
@@ -69,13 +70,15 @@ defmodule DtWeb.SensorControllerTest do
     end)
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> get(sensor_path(conn, :index))
 
     response(conn, 401)
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
       |> get(sensor_path(conn, :index))
 

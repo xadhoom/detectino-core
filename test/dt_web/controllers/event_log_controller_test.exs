@@ -28,7 +28,8 @@ defmodule DtWeb.EventLogControllerTest do
     response(conn, 401)
 
     # even with the pin
-    Helper.newconn(conn)
+    conn
+    |> Helper.newconn()
     |> put_req_header("p-dt-pin", "666666")
     |> post(event_log_path(conn, :create), %{})
     |> response(501)
@@ -37,11 +38,13 @@ defmodule DtWeb.EventLogControllerTest do
   test "retrieve events", %{conn: conn} do
     params = %{type: "alarm", acked: false, operation: "start", details: get_arm_ev()}
 
-    EventLog.create_changeset(%EventLog{}, params)
+    %EventLog{}
+    |> EventLog.create_changeset(params)
     |> Repo.insert!()
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
       |> get(event_log_path(conn, :index))
 
@@ -57,10 +60,12 @@ defmodule DtWeb.EventLogControllerTest do
     params = %{type: "alarm", acked: false, operation: "start", details: get_arm_ev()}
 
     eventlog =
-      EventLog.create_changeset(%EventLog{}, params)
+      %EventLog{}
+      |> EventLog.create_changeset(params)
       |> Repo.insert!()
 
-    Helper.login(conn)
+    conn
+    |> Helper.login()
     |> put_req_header("p-dt-pin", "666666")
     |> put(event_log_path(conn, :ack, eventlog))
     |> response(204)
@@ -75,11 +80,13 @@ defmodule DtWeb.EventLogControllerTest do
       %{type: "alarm", acked: false, operation: "start", details: get_arm_ev()}
     ]
     |> Enum.each(fn ev ->
-      EventLog.create_changeset(%EventLog{}, ev)
+      %EventLog{}
+      |> EventLog.create_changeset(ev)
       |> Repo.insert!()
     end)
 
-    Helper.login(conn)
+    conn
+    |> Helper.login()
     |> put_req_header("p-dt-pin", "666666")
     |> put(event_log_path(conn, :ackall))
     |> response(204)

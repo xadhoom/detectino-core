@@ -33,7 +33,8 @@ defmodule DtWeb.EventControllerTest do
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> post(
         event_path(conn, :create),
@@ -49,13 +50,15 @@ defmodule DtWeb.EventControllerTest do
 
     # check that the new record is there
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> get(event_path(conn, :index))
 
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> get(event_path(conn, :index))
 

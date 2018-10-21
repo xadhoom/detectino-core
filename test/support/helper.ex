@@ -6,7 +6,8 @@ defmodule DtWeb.ControllerHelperTest do
   @endpoint DtWeb.Endpoint
 
   def get_total(conn) do
-    Plug.Conn.get_resp_header(conn, "x-total-count")
+    conn
+    |> Plug.Conn.get_resp_header("x-total-count")
     |> Enum.at(0)
     |> String.to_integer()
   end
@@ -26,7 +27,8 @@ defmodule DtWeb.ControllerHelperTest do
 
   def newconn(conn) do
     token =
-      get_req_header(conn, "authorization")
+      conn
+      |> get_req_header("authorization")
       |> Enum.at(0)
 
     Phoenix.ConnTest.build_conn()

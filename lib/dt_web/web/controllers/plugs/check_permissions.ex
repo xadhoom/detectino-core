@@ -2,6 +2,7 @@ defmodule DtWeb.Plugs.CheckPermissions do
   @moduledoc false
   import Plug.Conn
 
+  alias Guardian.Plug, as: GuardianPlug
   alias Plug.Conn.Status
 
   require Logger
@@ -13,7 +14,7 @@ defmodule DtWeb.Plugs.CheckPermissions do
   end
 
   def call(conn, opts) do
-    case Guardian.Plug.claims(conn) do
+    case GuardianPlug.claims(conn) do
       {:ok, claims} ->
         check_role(conn, claims, opts)
 

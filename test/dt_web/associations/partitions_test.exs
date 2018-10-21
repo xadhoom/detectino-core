@@ -20,7 +20,7 @@ defmodule DtWeb.Associations.PartitionTest do
     |> Ecto.Changeset.put_assoc(:sensors, [sens1, sens2])
     |> Repo.update!()
 
-    p = Repo.one!(Partition) |> Repo.preload(:sensors)
+    p = Partition |> Repo.one!() |> Repo.preload(:sensors)
     assert Enum.count(p.sensors) == 2
 
     tmp = Enum.at(p.sensors, 0)
@@ -41,7 +41,7 @@ defmodule DtWeb.Associations.PartitionTest do
     |> Ecto.Changeset.put_assoc(:scenarios, [scene1, scene2])
     |> Repo.update!()
 
-    p = Repo.one!(Partition) |> Repo.preload(:scenarios)
+    p = Partition |> Repo.one!() |> Repo.preload(:scenarios)
     assert Enum.count(p.scenarios) == 2
 
     tmp = Enum.at(p.scenarios, 0)

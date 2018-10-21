@@ -57,13 +57,15 @@ defmodule DtWeb.PartitionControllerTest do
 
     # check that the new record is there
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> get(partition_path(conn, :index))
 
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> get(partition_path(conn, :index))
 
@@ -80,7 +82,8 @@ defmodule DtWeb.PartitionControllerTest do
       %PartitionModel{entry_delay: 42, exit_delay: 42, name: "some content"}
       |> Repo.insert!()
 
-    post(conn, partition_path(conn, :disarm, part))
+    conn
+    |> post(partition_path(conn, :disarm, part))
     |> response(401)
   end
 
@@ -91,20 +94,23 @@ defmodule DtWeb.PartitionControllerTest do
       %PartitionModel{entry_delay: 42, exit_delay: 42, name: "some content"}
       |> Repo.insert!()
 
-    post(conn, partition_path(conn, :disarm, part))
+    conn
+    |> post(partition_path(conn, :disarm, part))
     |> response(401)
   end
 
   test "disarm a partition with an invalid pin", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "123456")
 
     part =
       %PartitionModel{entry_delay: 42, exit_delay: 42, name: "some content"}
       |> Repo.insert!()
 
-    post(conn, partition_path(conn, :disarm, part))
+    conn
+    |> post(partition_path(conn, :disarm, part))
     |> response(401)
   end
 
@@ -113,7 +119,8 @@ defmodule DtWeb.PartitionControllerTest do
       %PartitionModel{entry_delay: 42, exit_delay: 42, name: "some content"}
       |> Repo.insert!()
 
-    post(conn, partition_path(conn, :arm, part))
+    conn
+    |> post(partition_path(conn, :arm, part))
     |> response(401)
   end
 
@@ -124,20 +131,23 @@ defmodule DtWeb.PartitionControllerTest do
       %PartitionModel{entry_delay: 42, exit_delay: 42, name: "some content"}
       |> Repo.insert!()
 
-    post(conn, partition_path(conn, :arm, part))
+    conn
+    |> post(partition_path(conn, :arm, part))
     |> response(401)
   end
 
   test "arm a partition with an invalid pin", %{conn: conn} do
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "123456")
 
     part =
       %PartitionModel{entry_delay: 42, exit_delay: 42, name: "some content"}
       |> Repo.insert!()
 
-    post(conn, partition_path(conn, :arm, part))
+    conn
+    |> post(partition_path(conn, :arm, part))
     |> response(401)
   end
 
@@ -145,12 +155,14 @@ defmodule DtWeb.PartitionControllerTest do
     part = %PartitionModel{id: 123, entry_delay: 42, exit_delay: 42, name: "some content"}
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
 
     body = %{mode: "ARM"}
 
-    post(conn, partition_path(conn, :arm, part), body)
+    conn
+    |> post(partition_path(conn, :arm, part), body)
     |> response(404)
   end
 
@@ -160,12 +172,14 @@ defmodule DtWeb.PartitionControllerTest do
       |> Repo.insert!()
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
 
     body = %{mode: "ARM"}
 
-    post(conn, partition_path(conn, :arm, part), body)
+    conn
+    |> post(partition_path(conn, :arm, part), body)
     |> response(204)
 
     part = Repo.one!(PartitionModel)
@@ -180,12 +194,14 @@ defmodule DtWeb.PartitionControllerTest do
       |> Repo.insert!()
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
 
     body = %{mode: "ARMSTAY"}
 
-    post(conn, partition_path(conn, :arm, part), body)
+    conn
+    |> post(partition_path(conn, :arm, part), body)
     |> response(204)
 
     part = Repo.one!(PartitionModel)
@@ -200,12 +216,14 @@ defmodule DtWeb.PartitionControllerTest do
       |> Repo.insert!()
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
 
     body = %{mode: "ARMSTAYIMMEDIATE"}
 
-    post(conn, partition_path(conn, :arm, part), body)
+    conn
+    |> post(partition_path(conn, :arm, part), body)
     |> response(204)
 
     part = Repo.one!(PartitionModel)
@@ -220,12 +238,14 @@ defmodule DtWeb.PartitionControllerTest do
       |> Repo.insert!()
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
 
     body = %{mode: "TYPO"}
 
-    post(conn, partition_path(conn, :arm, part), body)
+    conn
+    |> post(partition_path(conn, :arm, part), body)
     |> response(400)
 
     part = Repo.one!(PartitionModel)
@@ -238,10 +258,12 @@ defmodule DtWeb.PartitionControllerTest do
       |> Repo.insert!()
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
 
-    post(conn, partition_path(conn, :disarm, part))
+    conn
+    |> post(partition_path(conn, :disarm, part))
     |> response(204)
 
     part = Repo.one!(PartitionModel)
@@ -254,10 +276,12 @@ defmodule DtWeb.PartitionControllerTest do
     part = %PartitionModel{id: 123, entry_delay: 42, exit_delay: 42, name: "some content"}
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
 
-    post(conn, partition_path(conn, :disarm, part))
+    conn
+    |> post(partition_path(conn, :disarm, part))
     |> response(404)
   end
 end

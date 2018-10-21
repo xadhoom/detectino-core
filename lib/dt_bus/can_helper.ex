@@ -71,7 +71,8 @@ defmodule DtBus.CanHelper do
       when (command === :read or command === :readd) and is_atom(subcommand) and
              is_integer(sender) and is_integer(dest) do
     # set EXT_BIT
-    2 <<< 30
+    2
+    |> bsl(30)
     # sender id
     |> bor(sender <<< 23)
     # dest id
@@ -85,7 +86,8 @@ defmodule DtBus.CanHelper do
   def build_msgid(sender, dest, command, subcommand)
       when is_atom(command) and is_atom(subcommand) and is_integer(sender) and is_integer(dest) do
     # set EXT_BIT
-    2 <<< 30
+    2
+    |> bsl(30)
     # sender id
     |> bor(sender <<< 23)
     # dest id
@@ -103,7 +105,7 @@ defmodule DtBus.CanHelper do
         id = band(msgid, 0x3FFFFFFF)
         src_node_id = band(id >>> 23, 0x7F)
         dst_node_id = band(id >>> 16, 0x7F)
-        command = band(id >>> 8, 0xFF) |> command()
+        command = id |> bsr(8) |> band(0xFF) |> command()
 
         subcommand =
           case command do

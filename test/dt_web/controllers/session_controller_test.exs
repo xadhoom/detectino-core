@@ -89,7 +89,8 @@ defmodule DtWeb.SessionControllerTest do
   end
 
   test "non admin role cannot invalidate sessions", %{conn: conn} do
-    User.create_changeset(%User{}, %{
+    %User{}
+    |> User.create_changeset(%{
       name: "test",
       username: "test",
       password: "mypass",

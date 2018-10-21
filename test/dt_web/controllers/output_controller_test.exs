@@ -47,13 +47,15 @@ defmodule DtWeb.OutputControllerTest do
 
     # check that the new record is there
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> get(output_path(conn, :index))
 
     response(conn, 401)
 
     conn =
-      Helper.newconn(conn)
+      conn
+      |> Helper.newconn()
       |> put_req_header("p-dt-pin", "666666")
       |> get(output_path(conn, :index))
 

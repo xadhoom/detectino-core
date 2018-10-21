@@ -9,14 +9,14 @@ defmodule DtWeb.SensorController do
 
   require Logger
 
-  alias DtCtx.Monitoring.Sensor
   alias DtCtx.Monitoring.PartitionSensor
-  alias DtWeb.CtrlHelpers.Crud
-  alias DtWeb.SessionController
+  alias DtCtx.Monitoring.Sensor
   alias DtWeb.Controllers.Helpers.Utils
+  alias DtWeb.CtrlHelpers.Crud
+  alias DtWeb.Plugs.CheckPermissions
   alias DtWeb.Plugs.CoreReloader
   alias DtWeb.Plugs.PinAuthorize
-  alias DtWeb.Plugs.CheckPermissions
+  alias DtWeb.SessionController
   alias Guardian.Plug.EnsureAuthenticated
 
   plug(EnsureAuthenticated, handler: SessionController)

@@ -31,7 +31,8 @@ defmodule DtWeb.PartitionScenarioControllerTest do
     |> Repo.insert!()
 
     conn =
-      Helper.login(conn)
+      conn
+      |> Helper.login()
       |> put_req_header("p-dt-pin", "666666")
       |> get(scenario_partition_scenario_path(conn, :index, scenario.id))
 
