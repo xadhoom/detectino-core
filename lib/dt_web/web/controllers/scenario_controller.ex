@@ -69,24 +69,22 @@ defmodule DtWeb.ScenarioController do
     end
   end
 
+  defp run_scenario({nil, _user}), do: 401
+
   defp run_scenario({scenario, user}) do
-    case scenario do
-      nil ->
-        401
+    partitions_scenarios = scenario.partitions_scenarios
 
-      x ->
-        case Enum.count(x.partitions_scenarios) do
-          0 ->
-            403
+    case Enum.count(partitions_scenarios) do
+      0 ->
+        403
 
-          _ ->
-            x.partitions_scenarios
-            |> run_scenario_in_txn(user)
-            |> case do
-              {:ok, _} -> 204
-              {:error, :tripped} -> 555
-              _ -> 500
-            end
+      _ ->
+        partitions_scenarios
+        |> run_scenario_in_txn(user)
+        |> case do
+          {:ok, _} -> 204
+          {:error, :tripped} -> 555
+          _ -> 500
         end
     end
   end

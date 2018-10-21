@@ -60,23 +60,27 @@ defmodule DtWeb.PartitionController do
   defp arm_transaction(cset, mode, conn) do
     {_, result} =
       Repo.transaction(fn ->
-        case cset.valid? do
-          true ->
-            res =
-              cset
-              |> Repo.update!()
-              |> PartitionProcess.arm(PinAuthorize.username(conn), mode)
-
-            case res do
-              :ok -> :ok
-              {:error, :tripped} -> Repo.rollback({:error, :tripped})
-            end
-
-          false ->
-            {:error, :bad_request}
-        end
+        arm_transaction_txn(cset, mode, conn)
       end)
 
     result
+  end
+
+  defp arm_transaction_txn(cset, mode, conn) do
+    case cset.valid? do
+      true ->
+        res =
+          cset
+          |> Repo.update!()
+          |> PartitionProcess.arm(PinAuthorize.username(conn), mode)
+
+        case res do
+          :ok -> :ok
+          {:error, :tripped} -> Repo.rollback({:error, :tripped})
+        end
+
+      false ->
+        {:error, :bad_request}
+    end
   end
 end

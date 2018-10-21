@@ -140,7 +140,7 @@ defmodule DtBus.Can do
   end
 
   def handle_cast(value, state) do
-    Logger.warn(fn -> "Got unhandled cast message #{inspect(value)}" end)
+    Logger.warn("Got unhandled cast message #{inspect(value)}")
     {:noreply, state}
   end
 
@@ -150,13 +150,13 @@ defmodule DtBus.Can do
   end
 
   def handle_info({:more_debug, v}, state) when is_boolean(v) do
-    Logger.info(fn -> "Setting can more debug at #{inspect(v)}" end)
+    Logger.info("Setting can more debug at #{inspect(v)}")
     newstate = %{state | debug: v}
     {:noreply, newstate}
   end
 
   def handle_info(what, state) do
-    debug_log(fn -> "Got info message #{inspect(what)}" end, state)
+    debug_log("Got info message #{inspect(what)}", state)
 
     {:ok, state} =
       case what do
@@ -164,7 +164,7 @@ defmodule DtBus.Can do
           {:ok, _state} = handle_canframe(what, state)
 
         default ->
-          Logger.warn(fn -> "Got unknown message #{inspect(default)}" end)
+          Logger.warn("Got unknown message #{inspect(default)}")
       end
 
     {:noreply, state}
@@ -183,51 +183,14 @@ defmodule DtBus.Can do
       case Canhelper.decode_msgid(msgid) do
         {:ok, src_node_id, dst_node_id, command, subcommand} ->
           debug_log(
-            fn ->
-              "Got command:#{command}, " <>
-                "subcommand:#{subcommand} " <>
-                "from id:#{src_node_id} to id:#{dst_node_id} " <>
-                "datalen:#{inspect(len)} payload:#{inspect(data)}"
-            end,
+            "Got command:#{command}, " <>
+              "subcommand:#{subcommand} " <>
+              "from id:#{src_node_id} to id:#{dst_node_id} " <>
+              "datalen:#{inspect(len)} payload:#{inspect(data)}",
             state
           )
 
-          if dst_node_id == 0 do
-            case command do
-              :pong ->
-                {:ok, _state} = handle_pong(data, state)
-
-              :event ->
-                <<_, _, _, _, portd, porta, msb, lsb>> = data
-                value = bor(msb <<< 8, lsb)
-
-                port =
-                  case porta do
-                    0 -> portd
-                    _ -> porta
-                  end
-
-                subtype =
-                  case porta do
-                    0 -> :digital_read
-                    _ -> :analog_read
-                  end
-
-                sendmessage(state, %Event{
-                  address: src_node_id,
-                  type: :sensor,
-                  subtype: subtype,
-                  port: port,
-                  value: value
-                })
-
-                {:ok, state}
-
-              default ->
-                Logger.warn(fn -> "Unhandled command #{inspect(default)}" end)
-                {:ok, state}
-            end
-          end
+          handle_my_canframe({src_node_id, dst_node_id, command, subcommand}, data, state)
 
         _v ->
           {:ok, state}
@@ -235,6 +198,45 @@ defmodule DtBus.Can do
 
     {:ok, state}
   end
+
+  defp handle_my_canframe({src_node_id, 0, command, _}, data, state) do
+    case command do
+      :pong ->
+        {:ok, _state} = handle_pong(data, state)
+
+      :event ->
+        <<_, _, _, _, portd, porta, msb, lsb>> = data
+        value = bor(msb <<< 8, lsb)
+
+        port =
+          case porta do
+            0 -> portd
+            _ -> porta
+          end
+
+        subtype =
+          case porta do
+            0 -> :digital_read
+            _ -> :analog_read
+          end
+
+        sendmessage(state, %Event{
+          address: src_node_id,
+          type: :sensor,
+          subtype: subtype,
+          port: port,
+          value: value
+        })
+
+        {:ok, state}
+
+      default ->
+        Logger.warn("Unhandled command #{inspect(default)}")
+        {:ok, state}
+    end
+  end
+
+  defp handle_my_canframe(_, _, state), do: {:ok, state}
 
   defp handle_pong(data, state) do
     case Map.pop(state.ping, data) do

@@ -64,33 +64,33 @@ defmodule DtWeb.EventController do
     end
   end
 
+  defp do_update(conn, %{"id" => nil}), do: {:error, conn, 400}
+
   defp do_update(conn, params) do
-    case Map.get(params, "id") do
+    case Repo.transaction(fn ->
+           do_update_in_txn(conn, params)
+         end) do
+      {:ok, value} ->
+        value
+
+      {:error, what} ->
+        Logger.error("Got Error #{inspect(what)} in trasaction")
+        {:error, conn, 500}
+    end
+  end
+
+  defp do_update_in_txn(conn, params = %{"id" => event_id}) do
+    case Repo.get(Event, event_id) do
       nil ->
-        {:error, conn, 400}
+        {:error, conn, 404}
 
-      id ->
-        case Repo.transaction(fn ->
-               case Repo.get(Event, id) do
-                 nil ->
-                   {:error, conn, 404}
+      record ->
+        redo_assocs(record.id, params["outputs"])
 
-                 record ->
-                   redo_assocs(record.id, params["outputs"])
-
-                   record
-                   |> Repo.preload(:outputs)
-                   |> Event.update_changeset(params)
-                   |> Utils.apply_update(conn)
-               end
-             end) do
-          {:ok, value} ->
-            value
-
-          {:error, what} ->
-            Logger.error("Got Error #{inspect(what)} in trasaction")
-            {:error, conn, 500}
-        end
+        record
+        |> Repo.preload(:outputs)
+        |> Event.update_changeset(params)
+        |> Utils.apply_update(conn)
     end
   end
 

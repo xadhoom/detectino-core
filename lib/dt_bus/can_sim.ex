@@ -104,26 +104,14 @@ defmodule DtBus.CanSim do
     case Canhelper.decode_msgid(msgid) do
       {:ok, src_node_id, dst_node_id, command, subcommand} ->
         if dst_node_id == state.myid do
-          Logger.info(fn ->
+          Logger.info(
             "Got command:#{command}, " <>
               "subcommand:#{subcommand} " <>
               "from id:#{src_node_id} to id:#{dst_node_id} " <>
               "datalen:#{inspect(len)} payload:#{inspect(data)}"
-          end)
+          )
 
-          case command do
-            :ping ->
-              handle_ping(state.myid, src_node_id, data, state.sender_fn)
-
-            :read ->
-              handle_read(state.myid, subcommand, src_node_id, state.sender_fn)
-
-            :readd ->
-              handle_readd(state.myid, subcommand, src_node_id, state.sender_fn)
-
-            unh ->
-              Logger.warn(fn -> "Unhandled can command #{inspect(unh)}" end)
-          end
+          command |> handle_can_command(subcommand, src_node_id, data, state)
         end
 
       _v ->
@@ -223,5 +211,21 @@ defmodule DtBus.CanSim do
 
     {:can_frame, msgid, 8, payload, 0, -1}
     |> state.sender_fn.()
+  end
+
+  defp handle_can_command(command, subcommand, src_node_id, data, state) do
+    case command do
+      :ping ->
+        handle_ping(state.myid, src_node_id, data, state.sender_fn)
+
+      :read ->
+        handle_read(state.myid, subcommand, src_node_id, state.sender_fn)
+
+      :readd ->
+        handle_readd(state.myid, subcommand, src_node_id, state.sender_fn)
+
+      unh ->
+        Logger.warn("Unhandled can command #{inspect(unh)}")
+    end
   end
 end
