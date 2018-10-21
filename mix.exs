@@ -1,4 +1,5 @@
 defmodule Detectino.Mixfile do
+  @moduledoc false
   use Mix.Project
 
   def project do
@@ -27,43 +28,15 @@ defmodule Detectino.Mixfile do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    # TODO: this long list should is not needed anymore
-    apps = [
-      :logger,
-      :logger_file_backend,
-      :phoenix,
-      :phoenix_pubsub,
-      :phoenix_html,
-      :cowboy,
-      :gettext,
-      :phoenix_ecto,
-      :postgrex,
-      :timex,
-      :swoosh,
-      :etimer,
-      :can,
-      :guardian,
-      :lager_logger,
-      :exjsx,
-      :comeonin,
-      :ex_link_header,
-      :plug,
-      :dthread,
-      :gen_state_machine,
-      :runtime_tools
+    [
+      extra_applications: [:logger],
+      mod: {Detectino.Application, []}
     ]
-
-    prod_apps = apps ++ [:gen_smtp]
-
-    case Mix.env() do
-      :test -> [mod: {Detectino, []}, applications: apps]
-      _ -> [mod: {Detectino, []}, applications: prod_apps]
-    end
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
-  defp elixirc_paths(_), do: ["lib", "web"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
   #

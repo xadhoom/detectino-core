@@ -1,9 +1,9 @@
-defmodule Detectino do
+defmodule Detectino.Application do
   @moduledoc false
   use Application
 
-  alias DtWeb.ReloadRegistry
   alias DtWeb.Endpoint
+  alias DtWeb.ReloadRegistry
 
   require Logger
 
