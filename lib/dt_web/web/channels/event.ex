@@ -2,10 +2,10 @@ defmodule DtWeb.Channels.Event do
   @moduledoc false
   use Phoenix.Channel
 
-  alias DtCore.StatusTracker
+  alias DtCore.DetectorEntryEv
   alias DtCore.EventBridge
   alias DtCore.ExitTimerEv
-  alias DtCore.DetectorEntryEv
+  alias DtCore.StatusTracker
 
   require Logger
 
