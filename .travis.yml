@@ -14,13 +14,15 @@ matrix:
   include:
     - elixir: 1.7.3
       otp_release: 21.1
+    - elixir: 1.8.2
+      otp_release: 21.1
 
 addons:
   postgresql: "9.4"
 
 before_install:
   - . $HOME/.nvm/nvm.sh
-  - nvm install 8.12
+  - nvm install --lts=dubnium
   - npm --version
   - npm config set spin false
   - npm config set progress false
