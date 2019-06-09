@@ -27,7 +27,6 @@ before_install:
   - npm config set spin false
   - npm config set progress false
   - npm install -g @angular/cli@latest
-  - npm rebuild node-sass
   - sh -e /etc/init.d/xvfb start
   - echo "--no-sandbox" > ~/.config/chromium-flags.conf;
 
@@ -38,5 +37,5 @@ cache:
     - _build
 
 script:
-  - "pushd webapp; npm install; ng lint && ng build --progress false && ng test --single-run --progress false && popd"
+  - "pushd webapp; npm install; npm rebuild node-sass; ng lint && ng build --progress false && ng test --single-run --progress false && popd"
   - "MIX_ENV=test mix do deps.get, deps.compile, coveralls.travis"
