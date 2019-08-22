@@ -26,6 +26,7 @@ config :logger, :console,
   format: "$date $time $metadata[$level] $message\n",
   metadata: [:request_id, :pid]
 
+# Lager -> Logger redirects
 # Stop lager redirecting :error_logger messages
 config :lager, :error_logger_redirect, false
 
@@ -36,7 +37,8 @@ config :lager, :error_logger_whitelist, [Logger.ErrorHandler]
 config :lager, :crash_log, false
 
 # Use LagerLogger as lager's only handler.
-config :lager, :handlers, [{LagerLogger, [level: :debug]}]
+config :lager, :handlers, [{DtLogger.LagerLogger, [{:level, :debug}]}]
+# End of lager redirects
 
 # Configure phoenix generators
 config :phoenix, :generators,

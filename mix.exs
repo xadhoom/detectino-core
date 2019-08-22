@@ -64,7 +64,6 @@ defmodule Detectino.Mixfile do
       {:gen_smtp, "~> 0.12"},
       {:can, git: "https://github.com/tonyrog/can.git", tag: "1.3", manager: :rebar},
       {:lager, git: "https://github.com/basho/lager.git", tag: "3.2.2", override: true},
-      {:lager_logger, "~> 1.0"},
       {:gen_state_machine, "~> 2.0"},
       {:logger_file_backend, "~> 0.0.10"},
       # devel stuff
