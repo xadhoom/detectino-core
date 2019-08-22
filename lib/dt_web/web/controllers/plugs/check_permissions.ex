@@ -15,7 +15,7 @@ defmodule DtWeb.Plugs.CheckPermissions do
 
   def call(conn, opts) do
     case GuardianPlug.current_claims(conn) do
-      {:ok, claims} ->
+      claims when is_map(claims) ->
         check_role(conn, claims, opts)
 
       _ ->

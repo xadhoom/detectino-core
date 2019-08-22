@@ -47,7 +47,7 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "partition",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             name: "area one",
             type: "alarm"
           })
@@ -55,7 +55,7 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "sensor",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             address: "10",
             port: 5,
             type: "alarm"
@@ -76,14 +76,14 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "arming",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             name: "area one"
           })
       },
       %EventModel{
         source: "partition",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             name: "area one",
             type: "alarm"
           })
@@ -91,7 +91,7 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "sensor",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             address: "10",
             port: 5,
             type: "alarm"
@@ -124,14 +124,14 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "arming",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             name: "area one"
           })
       },
       %EventModel{
         source: "partition",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             name: "area one",
             type: "alarm"
           })
@@ -139,7 +139,7 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "sensor",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             address: "10",
             port: 5,
             type: "alarm"
@@ -201,7 +201,7 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "sensor",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             address: "10",
             port: 5,
             type: "alarm"
@@ -267,7 +267,7 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "sensor",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             address: "10",
             port: 5,
             type: "alarm"
@@ -353,7 +353,7 @@ defmodule DtCore.Test.Output.Worker do
       %EventModel{
         source: "sensor",
         source_config:
-          Poison.encode!(%{
+          Jason.encode!(%{
             address: "10",
             port: 5,
             type: "alarm"

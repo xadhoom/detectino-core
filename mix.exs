@@ -57,7 +57,7 @@ defmodule Detectino.Mixfile do
       {:gettext, "~> 0.9"},
       {:plug_cowboy, "~> 2.1"},
       {:guardian, "~> 2.0"},
-      {:comeonin, "~> 5.1"},
+      {:bcrypt_elixir, "~> 2.0"},
       {:uuid, "~> 1.1"},
       {:exjsx, "~> 4.0"},
       {:ex_link_header, "~> 0.0.5"},

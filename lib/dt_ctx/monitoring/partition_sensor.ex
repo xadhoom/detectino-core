@@ -10,12 +10,11 @@ defmodule DtCtx.Monitoring.PartitionSensor do
     timestamps()
   end
 
-  @required_fields ~w(partition_id sensor_id)
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @required_fields [:partition_id, :sensor_id]
 
   def changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
   end
 end

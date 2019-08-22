@@ -3,7 +3,7 @@ defmodule DtCtx.Monitoring.Scenario do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Poison.Encoder, only: [:id, :name, :enabled]}
+  @derive {Jason.Encoder, only: [:id, :name, :enabled]}
 
   schema "scenarios" do
     field(:name, :string)
@@ -20,21 +20,20 @@ defmodule DtCtx.Monitoring.Scenario do
     )
   end
 
-  @required_fields ~w(name enabled)
-  @optional_fields ~w()
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @required_fields [:name, :enabled]
+  @optional_fields []
 
   def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> unique_constraint(:name)
   end
 
   def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> unique_constraint(:name)
   end
 end

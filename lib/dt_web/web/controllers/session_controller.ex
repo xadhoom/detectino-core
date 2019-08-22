@@ -6,28 +6,13 @@ defmodule DtWeb.SessionController do
   alias DtCtx.Accounts.UserQuery
   alias DtWeb.Guardian, as: DtGuardian
   alias DtWeb.Plugs.CheckPermissions
-  alias DtWeb.SessionController
   alias DtWeb.TokenServer
   alias Guardian.Plug.EnsureAuthenticated
   alias Plug.Conn.Status
 
-  plug(EnsureAuthenticated, [handler: SessionController] when action in [:refresh, :invalidate])
+  plug(EnsureAuthenticated when action in [:refresh, :invalidate])
 
   plug(CheckPermissions, [roles: [:admin]] when action in [:invalidate])
-
-  def unauthenticated(conn, _params) do
-    token =
-      conn
-      |> get_req_header("authorization")
-      |> Enum.at(0)
-
-    case token do
-      nil -> nil
-      v -> TokenServer.expire({:token, v})
-    end
-
-    send_resp(conn, 401, Status.reason_phrase(401))
-  end
 
   def create(conn, params = %{}) do
     user = Repo.one(UserQuery.by_username(params["user"]["username"] || ""))

@@ -50,7 +50,8 @@ defmodule DtWeb.SessionControllerTest do
       )
 
     json = json_response(conn, 200)
-    jwt_1 = Guardian.decode_and_verify!(json["token"])
+    jwt_1 = json["token"]
+    {:ok, claims_1} = DtWeb.Guardian.decode_and_verify(jwt_1)
     {:ok, _} = TokenServer.get(json["token"])
 
     conn =
@@ -60,9 +61,10 @@ defmodule DtWeb.SessionControllerTest do
       |> post(api_login_path(conn, :refresh))
 
     json2 = json_response(conn, 200)
-    jwt_2 = Guardian.decode_and_verify!(json2["token"])
+    jwt_2 = json2["token"]
+    {:ok, claims_2} = DtWeb.Guardian.decode_and_verify(jwt_2)
 
-    assert jwt_1["exp"] < jwt_2["exp"]
+    assert claims_1["exp"] < claims_2["exp"]
     # refreshing will revoke the token
     {:error, _} = TokenServer.get(json["token"])
   end

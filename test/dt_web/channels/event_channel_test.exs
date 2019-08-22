@@ -37,7 +37,7 @@ defmodule DtWeb.EventChannelTest do
     start_idle_partition()
 
     {:ok, _, _socket} =
-      socket()
+      build_socket()
       |> subscribe_and_join(ChannelEvent, "event:arm", %{})
 
     assert_push("arm", %{armed: false})
@@ -47,7 +47,7 @@ defmodule DtWeb.EventChannelTest do
     start_idle_partition()
 
     {:ok, _, _socket} =
-      socket()
+      build_socket()
       |> subscribe_and_join(ChannelEvent, "event:alarm", %{})
 
     assert_push("alarm", %{alarmed: false})
@@ -57,7 +57,7 @@ defmodule DtWeb.EventChannelTest do
     start_alarmed_partition()
 
     {:ok, _, _socket} =
-      socket()
+      build_socket()
       |> subscribe_and_join(ChannelEvent, "event:arm", %{})
 
     assert_push("arm", %{armed: true}, 1000)
@@ -67,7 +67,7 @@ defmodule DtWeb.EventChannelTest do
     start_alarmed_partition()
 
     {:ok, _, _socket} =
-      socket()
+      build_socket()
       |> subscribe_and_join(ChannelEvent, "event:alarm", %{})
 
     assert_push("alarm", %{alarmed: true}, 2000)
@@ -77,7 +77,7 @@ defmodule DtWeb.EventChannelTest do
     {:ok, part} = start_idle_partition()
 
     {:ok, _, _socket} =
-      socket()
+      build_socket()
       |> subscribe_and_join(ChannelEvent, "event:exit_timer", %{})
 
     :ok = Partition.arm(part, "foo")
@@ -92,7 +92,7 @@ defmodule DtWeb.EventChannelTest do
     start_alarmed_partition()
 
     {:ok, _, _socket} =
-      socket()
+      build_socket()
       |> subscribe_and_join(ChannelEvent, "event:alarm_events", %{})
 
     assert_push("alarm_events", %{events: 3}, 5000)
@@ -149,5 +149,9 @@ defmodule DtWeb.EventChannelTest do
     :ok = Controller.reload({sensors, [part]})
 
     {:ok, part}
+  end
+
+  defp build_socket do
+    socket(DtWeb.Sockets.Socket)
   end
 end

@@ -3,6 +3,7 @@ defmodule DtCtx.Outputs.BusSettings do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive Jason.Encoder
   embedded_schema do
     field(:address, :string)
     field(:port, :integer)
@@ -13,15 +14,14 @@ defmodule DtCtx.Outputs.BusSettings do
     field(:mono_offtime, :integer)
   end
 
-  @required_fields ~w(address port type)
-  @optional_fields ~w(mono_ontime mono_offtime)
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @required_fields [:address, :port, :type]
+  @optional_fields [:mono_ontime, :mono_offtime]
   @types ["monostable", "bistable"]
 
   def changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:type, @types)
     |> validate_timers
   end

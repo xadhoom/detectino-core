@@ -3,7 +3,7 @@ defmodule DtCtx.Monitoring.PartitionScenario do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Poison.Encoder, only: [:id, :mode, :partition_id, :scenario_id]}
+  @derive {Jason.Encoder, only: [:id, :mode, :partition_id, :scenario_id]}
 
   schema "partitions_scenarios" do
     field(:mode, :string)

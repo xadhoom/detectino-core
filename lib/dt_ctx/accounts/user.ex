@@ -2,7 +2,6 @@ defmodule DtCtx.Accounts.User do
   @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
-  alias Comeonin.Bcrypt
 
   schema "users" do
     field(:name, :string)
@@ -18,7 +17,7 @@ defmodule DtCtx.Accounts.User do
 
   def create_changeset(model, params \\ %{}) do
     model
-    |> cast(params, ~w(name username password role pin pin_expire))
+    |> cast(params, [:name, :username, :password, :role, :pin, :pin_expire])
     |> validate_required([:name, :username, :password, :role])
     |> validate_pin_expire()
     |> unique_constraint(:username)
@@ -28,7 +27,7 @@ defmodule DtCtx.Accounts.User do
 
   def update_changeset(model, params \\ %{}) do
     model
-    |> cast(params, ~w(id name username password role pin pin_expire))
+    |> cast(params, [:id, :name, :username, :password, :role, :pin, :pin_expire])
     |> validate_required([:id, :name, :username, :role])
     |> validate_pin_expire()
     |> unique_constraint(:username)
@@ -36,11 +35,11 @@ defmodule DtCtx.Accounts.User do
     |> maybe_update_password
   end
 
-  def login_changeset(model), do: model |> cast(%{}, ~w(), ~w(username password))
+  def login_changeset(model), do: model |> cast(%{}, [], [:username, :password])
 
   def login_changeset(model, params) do
     model
-    |> cast(params, ~w(username password))
+    |> cast(params, [:username, :password])
     |> validate_required([:username, :password])
     |> validate_password
   end
@@ -50,7 +49,7 @@ defmodule DtCtx.Accounts.User do
   def valid_password?(_, nil), do: false
 
   def valid_password?(password, crypted) do
-    Bcrypt.checkpw(password, crypted)
+    Bcrypt.verify_pass(password, crypted)
   end
 
   defp validate_pin_expire(changeset) do
@@ -86,7 +85,7 @@ defmodule DtCtx.Accounts.User do
         changeset
         |> put_change(
           :encrypted_password,
-          Bcrypt.hashpwsalt(password)
+          Bcrypt.hash_pwd_salt(password)
         )
         |> put_change(:password, nil)
 

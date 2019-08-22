@@ -3,7 +3,7 @@ defmodule DtCtx.Outputs.Output do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Poison.Encoder,
+  @derive {Jason.Encoder,
            only: [
              :id,
              :name,
@@ -24,16 +24,15 @@ defmodule DtCtx.Outputs.Output do
     many_to_many(:events, DtCtx.Outputs.Event, join_through: DtCtx.Outputs.EventOutput)
   end
 
-  @required_fields ~w(name type enabled)
-  @optional_fields ~w()
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @required_fields [:name, :type, :enabled]
+  @optional_fields []
   @valid_types ["bus", "email"]
 
   def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> cast_embeds
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:type, @valid_types)
   end
 
@@ -41,7 +40,7 @@ defmodule DtCtx.Outputs.Output do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> cast_embeds
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:type, @valid_types)
   end
 

@@ -14,8 +14,7 @@ defmodule DtWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-    plug(Guardian.Plug.VerifyHeader)
-    plug(Guardian.Plug.LoadResource)
+    plug(DtWeb.Plugs.AuthPipeline)
   end
 
   # Other scopes may use custom stacks.

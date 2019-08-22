@@ -3,7 +3,7 @@ defmodule DtCtx.Monitoring.Sensor do
   use Ecto.Schema
   import Ecto.Changeset
 
-  # @derive {Poison.Encoder, only: [:id, :address, :port, :name, :enabled]}
+  # @derive {Jason.Encoder, only: [:id, :address, :port, :name, :enabled]}
   schema "sensors" do
     field(:address, :string)
     field(:port, :integer)
@@ -30,10 +30,20 @@ defmodule DtCtx.Monitoring.Sensor do
     )
   end
 
-  @required_fields ~w(name address port)
-  @optional_fields ~w(enabled balance th1 th2 th3 th4
-    full24h tamp24h entry_delay exit_delay internal)
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @required_fields [:name, :address, :port]
+  @optional_fields [
+    :enabled,
+    :balance,
+    :th1,
+    :th2,
+    :th3,
+    :th4,
+    :full24h,
+    :tamp24h,
+    :entry_delay,
+    :exit_delay,
+    :internal
+  ]
   @balance_types ["NC", "NO", "EOL", "DEOL", "TEOL"]
 
   @doc """
@@ -45,7 +55,7 @@ defmodule DtCtx.Monitoring.Sensor do
   def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:balance, @balance_types)
     |> unique_constraint(:address, name: :sensors_address_port_index)
     |> unique_constraint(:port, name: :sensors_address_port_index)
@@ -54,7 +64,7 @@ defmodule DtCtx.Monitoring.Sensor do
   def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:balance, @balance_types)
     |> unique_constraint(:address, name: :sensors_address_port_index)
     |> unique_constraint(:port, name: :sensors_address_port_index)

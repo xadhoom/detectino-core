@@ -51,14 +51,13 @@ defmodule DtCtx.Outputs.EventLog do
     timestamps()
   end
 
-  @required_fields ~w(type operation details)
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @required_fields [:type, :operation, :details]
   @source_types ["arm", "exit_timer", "alarm", "disarm", "detector_exit", "detector_entry"]
 
   def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:type, @source_types)
     |> add_id
     |> set_ack

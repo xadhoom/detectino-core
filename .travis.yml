@@ -12,9 +12,7 @@ language: elixir
 
 matrix:
   include:
-    - elixir: 1.7.3
-      otp_release: 21.1
-    - elixir: 1.8.2
+    - elixir: 1.9.1
       otp_release: 21.1
 
 addons:

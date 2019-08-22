@@ -26,8 +26,9 @@ defmodule DtCtx.Outputs.Event do
   alias DtCtx.Outputs.Event.ArmEvConf
   alias DtCtx.Outputs.Event.SensorEvConf
   alias DtCtx.Outputs.Event.PartitionEvConf
+  alias DtLib.Json
 
-  @derive {Poison.Encoder, only: [:id, :name, :description, :source]}
+  @derive {Jason.Encoder, only: [:id, :name, :description, :source]}
   schema "events" do
     field(:name, :string)
     field(:description, :string)
@@ -39,15 +40,14 @@ defmodule DtCtx.Outputs.Event do
     many_to_many(:outputs, DtCtx.Outputs.Output, join_through: DtCtx.Outputs.EventOutput)
   end
 
-  @optional_fields ~w(description)
-  @required_fields ~w(name source source_config)
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @optional_fields [:description]
+  @required_fields [:name, :source, :source_config]
   @source_types ["sensor", "partition", "arming"]
 
   def create_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:source, @source_types)
     |> check_config
   end
@@ -55,7 +55,7 @@ defmodule DtCtx.Outputs.Event do
   def update_changeset(model, params \\ %{}) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:source, @source_types)
     |> check_config
   end
@@ -79,15 +79,15 @@ defmodule DtCtx.Outputs.Event do
         add_error(changeset, :source, "invalid")
 
       {_, "sensor"} ->
-        ret = Poison.decode(change, as: %SensorEvConf{})
+        ret = Json.decode_as(change, SensorEvConf)
         validate_config(changeset, ret)
 
       {_, "partition"} ->
-        ret = Poison.decode(change, as: %PartitionEvConf{})
+        ret = Json.decode_as(change, PartitionEvConf)
         validate_config(changeset, ret)
 
       {_, "arming"} ->
-        ret = Poison.decode(change, as: %ArmEvConf{})
+        ret = Json.decode_as(change, ArmEvConf)
         validate_config(changeset, ret)
 
       _ ->

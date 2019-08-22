@@ -3,7 +3,7 @@ defmodule DtCtx.Monitoring.Partition do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Poison.Encoder,
+  @derive {Jason.Encoder,
            only: [
              :id,
              :name,
@@ -32,9 +32,8 @@ defmodule DtCtx.Monitoring.Partition do
     )
   end
 
-  @required_fields ~w(name entry_delay exit_delay)
-  @optional_fields ~w(armed)
-  @validate_required Enum.map(@required_fields, fn x -> String.to_atom(x) end)
+  @required_fields [:name, :entry_delay, :exit_delay]
+  @optional_fields [:armed]
   @valid_modes ["ARM", "ARMSTAY", "ARMSTAYIMMEDIATE", "DISARM"]
 
   @doc """
@@ -43,7 +42,7 @@ defmodule DtCtx.Monitoring.Partition do
   def create_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:armed, @valid_modes)
     |> unique_constraint(:name)
   end
@@ -51,7 +50,7 @@ defmodule DtCtx.Monitoring.Partition do
   def update_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@validate_required)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:armed, @valid_modes)
     |> unique_constraint(:name)
   end

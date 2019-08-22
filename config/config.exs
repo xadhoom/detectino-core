@@ -40,10 +40,8 @@ config :lager, :crash_log, false
 config :lager, :handlers, [{DtLogger.LagerLogger, [{:level, :debug}]}]
 # End of lager redirects
 
-# Configure phoenix generators
-config :phoenix, :generators,
-  migration: true,
-  binary_id: false
+# Configure phoenix json lib
+config :phoenix, :json_library, Jason
 
 # Custom HTTP Error Codes
 config :plug, :statuses, %{555 => "Partition tripped"}
@@ -52,9 +50,7 @@ config :detectino, DtWeb.Guardian,
   issuer: "DtWeb",
   ttl: {1, :days},
   verify_issuer: true,
-  secret_key: "changemeabsolutelyyaddayadda",
-  serializer: DtWeb.GuardianSerializer,
-  hooks: DtWeb.GuardianHooks
+  secret_key: "changemeabsolutelyyaddayadda"
 
 # Import notification specific configuration
 import_config "notifications.exs"

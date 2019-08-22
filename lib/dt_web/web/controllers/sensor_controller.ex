@@ -45,7 +45,8 @@ defmodule DtWeb.SensorController do
       {:error, conn, code, changeset} ->
         conn
         |> put_status(code)
-        |> render(DtWeb.ChangesetView, :error, changeset: changeset)
+        |> put_view(DtWeb.ChangesetView)
+        |> render(:error, changeset: changeset)
     end
   end
 

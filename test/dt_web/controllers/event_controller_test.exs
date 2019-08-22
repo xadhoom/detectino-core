@@ -21,7 +21,7 @@ defmodule DtWeb.EventControllerTest do
     # create an event
     sconf =
       %{name: "a name", type: "alarm"}
-      |> Poison.encode!()
+      |> Jason.encode!()
 
     conn =
       conn

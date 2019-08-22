@@ -20,6 +20,7 @@ defmodule DtCore.Output.Worker do
   alias DtCore.ArmEv
   alias DtCore.Output.Actions.Bus
   alias DtCore.Output.Actions.Email
+  alias DtLib.Json
 
   #
   # Client APIs
@@ -156,17 +157,17 @@ defmodule DtCore.Output.Worker do
       case event.source do
         "sensor" ->
           event.source_config
-          |> Poison.decode!(as: %SensorEvConf{})
+          |> Json.decode_as!(SensorEvConf)
           |> get_sub_key
 
         "partition" ->
           event.source_config
-          |> Poison.decode!(as: %PartitionEvConf{})
+          |> Json.decode_as!(PartitionEvConf)
           |> get_sub_key
 
         "arming" ->
           event.source_config
-          |> Poison.decode!(as: %ArmEvConf{})
+          |> Json.decode_as!(ArmEvConf)
           |> get_sub_key
 
         _ ->
