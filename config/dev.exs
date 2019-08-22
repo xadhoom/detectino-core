@@ -12,7 +12,8 @@ config :detectino, DtWeb.Endpoint,
   debug_errors: true,
   # code_reloader: true,
   cache_static_lookup: false,
-  check_origin: false
+  check_origin: false,
+  server: true
 
 # watchers: [sh: ["watcher"]]
 
