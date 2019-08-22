@@ -1,14 +1,10 @@
 defmodule DtWeb.Sockets.Socket do
   @moduledoc false
   use Phoenix.Socket
-  use Guardian.Phoenix.Socket
 
   ## Channels
   channel("timer:*", DtWeb.Channels.Timer)
   channel("event:*", DtWeb.Channels.Event)
-
-  ## Transports
-  transport(:websocket, Phoenix.Transports.WebSocket, check_origin: false)
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

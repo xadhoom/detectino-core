@@ -2,7 +2,7 @@ defmodule DtWeb.Endpoint do
   @moduledoc false
   use Phoenix.Endpoint, otp_app: :detectino
 
-  socket("/socket", DtWeb.Sockets.Socket)
+  socket("/socket", DtWeb.Sockets.Socket, websocket: [check_origin: false])
 
   # Serve at "/" the static files from "priv/static" directory.
   #

@@ -1,9 +1,12 @@
-defmodule DtWeb.GuardianHooks do
+defmodule DtWeb.Guardian do
   @moduledoc """
   Adds additional verifications into Guardian JWT chain
   """
-  use Guardian.Hooks
+  # use Guardian.Hooks
+  use Guardian, otp_app: :detectino
 
+  alias DtCtx.Accounts.User
+  alias DtCtx.Repo
   alias DtWeb.TokenServer
 
   require Logger
@@ -39,4 +42,10 @@ defmodule DtWeb.GuardianHooks do
         {:error, :token_delete_failure}
     end
   end
+
+  def subject_for_token(user = %User{}, _claims), do: {:ok, "User:#{user.id}"}
+  def subject_for_token(_, _claims), do: {:error, "Unknown resource type"}
+
+  def resource_from_claims("User:" <> id), do: {:ok, Repo.get(User, String.to_integer(id))}
+  def resource_from_claims(_claims), do: {:error, "Unknown resource type"}
 end

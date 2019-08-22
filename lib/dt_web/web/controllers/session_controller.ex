@@ -4,10 +4,10 @@ defmodule DtWeb.SessionController do
 
   alias DtCtx.Accounts.User
   alias DtCtx.Accounts.UserQuery
+  alias DtWeb.Guardian, as: DtGuardian
   alias DtWeb.Plugs.CheckPermissions
   alias DtWeb.SessionController
   alias DtWeb.TokenServer
-  alias Guardian.Claims
   alias Guardian.Plug.EnsureAuthenticated
   alias Plug.Conn.Status
 
@@ -37,14 +37,13 @@ defmodule DtWeb.SessionController do
 
       if changeset.valid? do
         claims =
-          Claims.app_claims()
+          %{}
           |> Map.put("dt_role", user.role)
           |> Map.put("dt_user_id", user.id)
-          |> Claims.ttl({1, :hours})
 
         {:ok, jwt, _full_claims} =
           user
-          |> Guardian.encode_and_sign(:token, claims)
+          |> DtGuardian.encode_and_sign(claims, ttl: {1, :hours})
 
         conn
         |> render(:logged_in, token: jwt)
@@ -62,14 +61,14 @@ defmodule DtWeb.SessionController do
       |> get_req_header("authorization")
       |> Enum.at(0)
 
-    claims = Guardian.decode_and_verify!(token)
+    {:ok, claims} = DtGuardian.decode_and_verify(token)
 
     case Repo.get(User, claims["dt_user_id"]) do
       nil ->
         send_resp(conn, 404, Status.reason_phrase(404))
 
       _user ->
-        {:ok, jwt, _claims} = Guardian.refresh!(token)
+        {:ok, {_old_token, _old_claims}, {jwt, _new_claims}} = DtGuardian.refresh(token)
         conn |> render(:logged_in, token: jwt)
     end
   end
@@ -89,7 +88,7 @@ defmodule DtWeb.SessionController do
   defp get_tokens_for_id(id) do
     TokenServer.all()
     |> Enum.filter(fn token ->
-      claims = Guardian.peek_claims(token)
+      %{claims: claims} = DtGuardian.peek(token)
       id == claims["dt_user_id"]
     end)
   end

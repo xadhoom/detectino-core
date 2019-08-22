@@ -48,7 +48,7 @@ config :phoenix, :generators,
 # Custom HTTP Error Codes
 config :plug, :statuses, %{555 => "Partition tripped"}
 
-config :guardian, Guardian,
+config :detectino, DtWeb.Guardian,
   issuer: "DtWeb",
   ttl: {1, :days},
   verify_issuer: true,
