@@ -6,8 +6,13 @@ defmodule Detectino.Mixfile do
     [
       app: :detectino,
       version: "0.0.2",
-      elixir: "~> 1.7",
+      elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
+      releases: [
+        detectino: [
+          include_executables_for: [:unix]
+        ]
+      ],
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -70,10 +75,7 @@ defmodule Detectino.Mixfile do
       {:credo, "~> 0.8", only: [:dev, :test]},
       {:excoveralls, "~> 0.7", only: [:dev, :test]},
       {:meck, git: "https://github.com/eproxus/meck.git", only: [:test]},
-      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      # release stuff
-      {:distillery, "~> 1.5"},
-      {:conform, "~> 2.3"}
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
     ]
   end
 

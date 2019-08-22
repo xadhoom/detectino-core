@@ -11,4 +11,4 @@ popd
 rm -fR _build
 mix deps.get --only prod
 export REBAR_DEPS_DIR=`pwd`/deps
-MIX_ENV=prod mix do release.clean, compile, release
+MIX_ENV=prod mix do compile, release
