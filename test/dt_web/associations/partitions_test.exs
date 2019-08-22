@@ -2,12 +2,11 @@ defmodule DtWeb.Associations.PartitionTest do
   @moduledoc """
   These test just assure us that associations names and types are correct
   """
-
   use DtWeb.ConnCase
 
   alias DtCtx.Monitoring.Partition
-  alias DtCtx.Monitoring.Sensor
   alias DtCtx.Monitoring.Scenario
+  alias DtCtx.Monitoring.Sensor
 
   test "sensors association" do
     part = Repo.insert!(%Partition{})

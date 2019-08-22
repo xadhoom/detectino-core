@@ -7,8 +7,8 @@ defmodule DtCtx.Outputs do
 
   import Ecto.Query, only: [from: 2]
 
-  alias DtCtx.Repo
   alias DtCtx.Outputs.EventLog
+  alias DtCtx.Repo
 
   @doc "Return the number of unacked logged events"
   @spec unacked_log_events() :: non_neg_integer()

@@ -4,13 +4,14 @@ defmodule DtCore.EventLogger do
   """
   use GenServer
 
-  alias DtCore.EventBridge
   alias DtCore.ArmEv
+
+  alias DtCore.DetectorEntryEv
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
-  alias DtCore.DetectorEntryEv
-  alias DtCore.PartitionEv
+  alias DtCore.EventBridge
   alias DtCore.ExitTimerEv
+  alias DtCore.PartitionEv
   alias DtCtx.Outputs.EventLog
   alias DtCtx.Repo
 

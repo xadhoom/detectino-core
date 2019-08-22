@@ -3,11 +3,11 @@ defmodule DtCtx.Outputs.EventLogType do
   @behaviour Ecto.Type
 
   alias DtCore.ArmEv
+  alias DtCore.DetectorEntryEv
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
-  alias DtCore.DetectorEntryEv
-  alias DtCore.PartitionEv
   alias DtCore.ExitTimerEv
+  alias DtCore.PartitionEv
 
   def type, do: :jsonb
 

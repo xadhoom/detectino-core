@@ -1,10 +1,11 @@
 defmodule DtWeb.PartitionControllerTest do
+  @moduledoc false
   use DtWeb.ConnCase
 
   alias DtCore.Monitor.Partition, as: PartitionProcess
+  alias DtCore.Test.TimerHelper
   alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtWeb.ControllerHelperTest, as: Helper
-  alias DtCore.Test.TimerHelper
 
   setup_all do
     TimerHelper.wait_until(1000, ErlangError, fn ->

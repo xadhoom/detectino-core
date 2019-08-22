@@ -2,9 +2,9 @@ defmodule DtCore.Output.Actions.Bus do
   @moduledoc """
   Bus action
   """
-  alias DtCore.Output.Worker
   alias DtBus.ActionRegistry
   alias DtBus.OutputAction
+  alias DtCore.Output.Worker
 
   require Logger
 

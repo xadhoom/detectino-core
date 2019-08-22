@@ -13,21 +13,19 @@ defmodule DtCore.Test.TimerHelper do
   def wait_until(0, _exception, fun), do: fun.()
 
   def wait_until(timeout, exception, fun) do
-    try do
-      fun.()
-    rescue
-      error ->
-        name = error.__struct__
-        stack = System.stacktrace()
+    fun.()
+  rescue
+    error ->
+      name = error.__struct__
+      stack = System.stacktrace()
 
-        case name do
-          ^exception ->
-            :timer.sleep(10)
-            wait_until(max(0, timeout - 10), exception, fun)
+      case name do
+        ^exception ->
+          :timer.sleep(10)
+          wait_until(max(0, timeout - 10), exception, fun)
 
-          _name ->
-            reraise(error, stack)
-        end
-    end
+        _name ->
+          reraise(error, stack)
+      end
   end
 end

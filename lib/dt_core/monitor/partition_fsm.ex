@@ -5,11 +5,11 @@ defmodule DtCore.Monitor.PartitionFsm do
   use GenStateMachine, callback_mode: [:handle_event_function]
 
   alias DtCore.ArmEv
-  alias DtCore.ExitTimerEv
   alias DtCore.DetectorEv
-  alias DtCore.PartitionEv
+  alias DtCore.ExitTimerEv
   alias DtCore.Monitor.Detector
   alias DtCore.Monitor.Utils
+  alias DtCore.PartitionEv
   alias DtCtx.Monitoring.Partition, as: PartitionModel
 
   require Logger
@@ -132,20 +132,28 @@ defmodule DtCore.Monitor.PartitionFsm do
         :idle == Detector.status({sensor})
       end)
 
-    with true <- all_idle do
-      if exit_timeout > 0 do
-        if mode in [:stay, :normal] do
-          arm_sensors(data, mode)
-          send(data.receiver, {:start, arm_ev})
-          ex_ev = %ExitTimerEv{name: data.config.name, id: Utils.random_id()}
-          send(data.receiver, {:start, ex_ev})
-          # move to exit_wait state and send back :ok
-          {:next_state, :exit_wait,
-           %{data | armed: true, last_event_id: ex_ev.id, last_arm_event: arm_ev},
-           [
-             {:reply, from, :ok},
-             {:state_timeout, exit_timeout, :exit_timer_expired}
-           ]}
+    case all_idle do
+      true ->
+        if exit_timeout > 0 do
+          if mode in [:stay, :normal] do
+            arm_sensors(data, mode)
+            send(data.receiver, {:start, arm_ev})
+            ex_ev = %ExitTimerEv{name: data.config.name, id: Utils.random_id()}
+            send(data.receiver, {:start, ex_ev})
+            # move to exit_wait state and send back :ok
+            {:next_state, :exit_wait,
+             %{data | armed: true, last_event_id: ex_ev.id, last_arm_event: arm_ev},
+             [
+               {:reply, from, :ok},
+               {:state_timeout, exit_timeout, :exit_timer_expired}
+             ]}
+          else
+            arm_sensors(data, mode)
+            send(data.receiver, {:start, arm_ev})
+            # move to idle_arm state and send back :ok
+            {:next_state, :idle_arm, %{data | armed: true, last_arm_event: arm_ev},
+             {:reply, from, :ok}}
+          end
         else
           arm_sensors(data, mode)
           send(data.receiver, {:start, arm_ev})
@@ -153,14 +161,7 @@ defmodule DtCore.Monitor.PartitionFsm do
           {:next_state, :idle_arm, %{data | armed: true, last_arm_event: arm_ev},
            {:reply, from, :ok}}
         end
-      else
-        arm_sensors(data, mode)
-        send(data.receiver, {:start, arm_ev})
-        # move to idle_arm state and send back :ok
-        {:next_state, :idle_arm, %{data | armed: true, last_arm_event: arm_ev},
-         {:reply, from, :ok}}
-      end
-    else
+
       # blah blah keep state and send back {:error, :tripped}
       _ ->
         Logger.error("Not all sensors are idle, cannot arm!")

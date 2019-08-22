@@ -1,10 +1,11 @@
 defmodule DtCore.Test.Monitor.Detector do
+  @moduledoc false
   use ExUnit.Case
 
-  alias DtCore.Event
+  alias DtCore.DetectorEntryEv
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
-  alias DtCore.DetectorEntryEv
+  alias DtCore.Event
   alias DtCore.Monitor.Detector
 
   alias DtCtx.Monitoring.Sensor, as: SensorModel

@@ -1,10 +1,11 @@
 defmodule DtCtx.EventLog do
+  @moduledoc false
   use DtCtx.DataCase
 
-  alias Ecto.Changeset
-  alias DtCtx.Outputs.EventLog
   alias DtCore.DetectorEv
   alias DtCore.PartitionEv
+  alias DtCtx.Outputs.EventLog
+  alias Ecto.Changeset
 
   test "detector event changeset" do
     ev = %DetectorEv{id: "yadda"}

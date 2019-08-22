@@ -4,14 +4,13 @@ defmodule DtCore.Monitor.DetectorFsm do
   """
   use GenStateMachine, callback_mode: [:handle_event_function]
 
-  require Logger
-
-  alias DtCtx.Monitoring.Sensor, as: SensorModel
-
+  alias DtCore.DetectorEntryEv
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
-  alias DtCore.DetectorEntryEv
   alias DtCore.Monitor.Utils
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+
+  require Logger
 
   def start_link({config = %SensorModel{}, receiver}) when is_pid(receiver) do
     GenStateMachine.start_link(__MODULE__, {config, receiver})

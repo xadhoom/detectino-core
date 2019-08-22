@@ -4,16 +4,16 @@ defmodule DtCore.Monitor.Partition do
   """
   use GenServer
 
-  alias DtCore.EventBridge
   alias DtCore.ArmEv
-  alias DtCore.ExitTimerEv
-  alias DtCore.DetectorEv
   alias DtCore.DetectorEntryEv
+  alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
-  alias DtCore.PartitionEv
-  alias DtCore.Monitor.Utils
+  alias DtCore.EventBridge
+  alias DtCore.ExitTimerEv
   alias DtCore.Monitor.Detector
   alias DtCore.Monitor.PartitionFsm
+  alias DtCore.Monitor.Utils
+  alias DtCore.PartitionEv
   alias DtCtx.Monitoring.Partition, as: PartitionModel
 
   require Logger

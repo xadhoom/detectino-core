@@ -23,8 +23,8 @@ defmodule DtBus.Can do
   use GenServer
   use Bitwise
 
-  alias DtBus.Event, as: Event
   alias DtBus.CanHelper, as: Canhelper
+  alias DtBus.Event, as: Event
 
   require Logger
 

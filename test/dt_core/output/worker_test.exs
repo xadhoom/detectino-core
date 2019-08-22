@@ -1,22 +1,23 @@
 defmodule DtCore.Test.Output.Worker do
+  @moduledoc false
   use DtCtx.DataCase
 
   alias DtBus.ActionRegistry
+  alias DtCore.ArmEv
+  alias DtCore.DetectorEntryEv
+  alias DtCore.DetectorEv
   alias DtCore.Monitor.Sup
   alias DtCore.Monitor.Utils
-  alias DtCtx.Outputs.Output, as: OutputModel
-  alias DtCtx.Outputs.Event, as: EventModel
-  alias DtCtx.Outputs.EmailSettings, as: EmailSettingsModel
-  alias DtCtx.Outputs.BusSettings, as: BusSettingsModel
-  alias DtCore.OutputsRegistry
-  alias DtCore.Output.Worker
-  alias DtCore.Test.TimerHelper
-  alias DtCore.DetectorEv
-  alias DtCore.DetectorEntryEv
-  alias DtCore.PartitionEv
-  alias DtCore.ArmEv
-  alias Swoosh.Email
   alias DtCore.Output.Actions.Email, as: EmailConfig
+  alias DtCore.Output.Worker
+  alias DtCore.OutputsRegistry
+  alias DtCore.PartitionEv
+  alias DtCore.Test.TimerHelper
+  alias DtCtx.Outputs.BusSettings, as: BusSettingsModel
+  alias DtCtx.Outputs.EmailSettings, as: EmailSettingsModel
+  alias DtCtx.Outputs.Event, as: EventModel
+  alias DtCtx.Outputs.Output, as: OutputModel
+  alias Swoosh.Email
 
   setup_all do
     {:ok, _} = Registry.start_link(keys: :duplicate, name: OutputsRegistry.registry())

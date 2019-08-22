@@ -6,7 +6,8 @@ defmodule DtWeb.TimerChannelTest do
 
   test "channel pushes time" do
     {:ok, _, _socket} =
-      socket(DtWeb.Sockets.Socket)
+      DtWeb.Sockets.Socket
+      |> socket()
       |> subscribe_and_join(Timer, "timer:time", %{})
 
     assert_push("time", %{time: data})

@@ -12,8 +12,9 @@ defmodule DtWeb.ConnCase do
   inside a transaction which is reset at the beginning
   of the test unless the test case is marked as async.
   """
-
   use ExUnit.CaseTemplate
+
+  alias Ecto.Adapters.SQL.Sandbox
 
   using do
     quote do
@@ -33,8 +34,8 @@ defmodule DtWeb.ConnCase do
 
   setup tags do
     unless tags[:async] do
-      :ok = Ecto.Adapters.SQL.Sandbox.checkout(DtCtx.Repo)
-      Ecto.Adapters.SQL.Sandbox.mode(DtCtx.Repo, {:shared, self()})
+      :ok = Sandbox.checkout(DtCtx.Repo)
+      Sandbox.mode(DtCtx.Repo, {:shared, self()})
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}

@@ -1,9 +1,10 @@
 defmodule DtWeb.PartitionScenarioControllerTest do
+  @moduledoc false
   use DtWeb.ConnCase
 
   alias DtCtx.Monitoring.Partition, as: PartitionModel
-  alias DtCtx.Monitoring.Scenario, as: ScenarioModel
   alias DtCtx.Monitoring.PartitionScenario, as: PartitionScenarioModel
+  alias DtCtx.Monitoring.Scenario, as: ScenarioModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do

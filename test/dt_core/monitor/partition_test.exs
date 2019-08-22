@@ -1,20 +1,21 @@
 defmodule DtCore.Test.Monitor.Partition do
+  @moduledoc false
   use ExUnit.Case, async: true
 
   alias DtCore.ArmEv
-  alias DtCore.Event
-  alias DtCore.ExitTimerEv
+  alias DtCore.DetectorEntryEv
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
-  alias DtCore.DetectorEntryEv
-  alias DtCore.PartitionEv
+  alias DtCore.Event
   alias DtCore.EventBridge
+  alias DtCore.ExitTimerEv
   alias DtCore.Monitor.Detector
   alias DtCore.Monitor.Partition
   alias DtCore.Monitor.Utils
-  alias DtCtx.Monitoring.Sensor, as: SensorModel
-  alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCore.PartitionEv
   alias DtCore.Test.TimerHelper
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
 
   setup_all do
     {:ok, _} = Registry.start_link(keys: :duplicate, name: DtCore.OutputsRegistry.registry())

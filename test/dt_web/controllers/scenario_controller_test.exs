@@ -1,14 +1,15 @@
 defmodule DtWeb.ScenarioControllerTest do
+  @moduledoc false
   use DtWeb.ConnCase
 
-  alias DtCtx.Accounts.User, as: UserModel
-  alias DtCtx.Monitoring.Scenario, as: ScenarioModel
-  alias DtCtx.Monitoring.Partition, as: PartitionModel
-  alias DtCtx.Monitoring.PartitionScenario, as: PartitionScenarioModel
-  alias DtWeb.ControllerHelperTest, as: Helper
-  alias DtWeb.ReloadRegistry
   alias DtCore.Monitor.Partition, as: PartitionProcess
   alias DtCore.Test.TimerHelper
+  alias DtCtx.Accounts.User, as: UserModel
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.PartitionScenario, as: PartitionScenarioModel
+  alias DtCtx.Monitoring.Scenario, as: ScenarioModel
+  alias DtWeb.ControllerHelperTest, as: Helper
+  alias DtWeb.ReloadRegistry
 
   setup_all do
     TimerHelper.wait_until(1000, ErlangError, fn ->

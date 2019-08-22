@@ -43,7 +43,7 @@ defmodule DtWeb.Guardian do
     end
   end
 
-  def on_refresh({old_token, _old_claims} = old, {new_token, new_claims} = new, _opts) do
+  def on_refresh(old = {old_token, _old_claims}, new = {new_token, new_claims}, _opts) do
     expiry = new_claims["exp"] - new_claims["iat"]
 
     with :ok <- TokenServer.delete(old_token),
@@ -54,7 +54,7 @@ defmodule DtWeb.Guardian do
     end
   end
 
-  def subject_for_token(%User{} = user, _claims), do: {:ok, "User:#{user.id}"}
+  def subject_for_token(user = %User{}, _claims), do: {:ok, "User:#{user.id}"}
   def subject_for_token(_, _claims), do: {:error, "Unknown resource type"}
 
   def resource_from_claims("User:" <> id), do: {:ok, Repo.get(User, String.to_integer(id))}

@@ -1,11 +1,12 @@
 defmodule DtCore.Test.Output.Server do
+  @moduledoc false
   use DtCtx.DataCase
 
-  alias DtCore.Output.Sup
   alias DtCore.Output.Server
+  alias DtCore.Output.Sup
+  alias DtCore.Test.TimerHelper
   alias DtCtx.Outputs.Event, as: EventModel
   alias DtCtx.Outputs.Output, as: OutputModel
-  alias DtCore.Test.TimerHelper
   alias DtWeb.ReloadRegistry
 
   setup do

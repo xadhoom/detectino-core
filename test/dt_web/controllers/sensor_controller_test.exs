@@ -1,9 +1,10 @@
 defmodule DtWeb.SensorControllerTest do
+  @moduledoc false
   use DtWeb.ConnCase
 
-  alias DtCtx.Monitoring.Sensor, as: SensorModel
   alias DtCtx.Monitoring.Partition, as: PartitionModel
   alias DtCtx.Monitoring.PartitionSensor, as: PartitionSensorModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
   alias DtWeb.ControllerHelperTest, as: Helper
 
   setup %{conn: conn} do

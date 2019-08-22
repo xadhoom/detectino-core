@@ -6,17 +6,16 @@ defmodule DtCore.Monitor.Detector do
   """
   use GenServer
 
-  require Logger
-
-  alias DtCtx.Monitoring.Sensor, as: SensorModel
-
-  alias DtCore.Event
-  alias DtCore.EventBridge
+  alias DtCore.DetectorEntryEv
   alias DtCore.DetectorEv
   alias DtCore.DetectorExitEv
-  alias DtCore.DetectorEntryEv
-  alias DtCore.Monitor.Utils
+  alias DtCore.Event
+  alias DtCore.EventBridge
   alias DtCore.Monitor.DetectorFsm
+  alias DtCore.Monitor.Utils
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+
+  require Logger
 
   # Internal types
 

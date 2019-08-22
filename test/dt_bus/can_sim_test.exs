@@ -1,9 +1,10 @@
 defmodule DtBus.CanSimTest do
+  @moduledoc false
   use ExUnit.Case, async: true
   use Bitwise
 
-  alias DtBus.CanSim, as: C
   alias DtBus.CanHelper, as: CH
+  alias DtBus.CanSim, as: C
 
   test "canbus info handler" do
     fun = fn frame -> frame end

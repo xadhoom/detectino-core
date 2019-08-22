@@ -2,9 +2,9 @@ defmodule DtCore.StatusTracker do
   @moduledoc """
   Helper module to get alarm status on partitions and sensors.
   """
-  alias DtCtx.Outputs
-  alias DtCore.Monitor.Partition
   alias DtCore.Monitor.Controller
+  alias DtCore.Monitor.Partition
+  alias DtCtx.Outputs
 
   require Logger
 

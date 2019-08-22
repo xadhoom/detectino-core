@@ -1,13 +1,14 @@
 defmodule DtCore.Test.Monitor.Controller do
+  @moduledoc false
   use DtCtx.DataCase
 
-  alias DtCore.Monitor.Sup
-  alias DtCore.Monitor.Controller
-  alias DtCtx.Monitoring.Sensor, as: SensorModel
-  alias DtCtx.Monitoring.Partition, as: PartitionModel
-  alias DtCore.Test.TimerHelper
-  alias DtWeb.ReloadRegistry
   alias DtBus.Event, as: BusEvent
+  alias DtCore.Monitor.Controller
+  alias DtCore.Monitor.Sup
+  alias DtCore.Test.TimerHelper
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtWeb.ReloadRegistry
 
   setup do
     TimerHelper.wait_until(fn ->

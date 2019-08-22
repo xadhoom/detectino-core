@@ -1,16 +1,16 @@
 defmodule DtCore.Test.EventLoggerTest do
+  @moduledoc false
   use DtCtx.DataCase
-
-  alias DtCore.EventBridge
-  alias DtCore.EventLogger
-  alias DtCore.Monitor.Utils
-  alias DtCtx.Outputs.EventLog
-  alias DtCore.Test.TimerHelper
 
   alias DtCore.ArmEv
   alias DtCore.DetectorEv
-  alias DtCore.PartitionEv
+  alias DtCore.EventBridge
+  alias DtCore.EventLogger
   alias DtCore.ExitTimerEv
+  alias DtCore.Monitor.Utils
+  alias DtCore.PartitionEv
+  alias DtCore.Test.TimerHelper
+  alias DtCtx.Outputs.EventLog
 
   setup_all do
     {:ok, _} = Registry.start_link(keys: :duplicate, name: DtCore.OutputsRegistry.registry())

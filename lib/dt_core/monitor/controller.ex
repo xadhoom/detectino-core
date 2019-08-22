@@ -17,13 +17,14 @@ defmodule DtCore.Monitor.Controller do
   alias DtBus.Event, as: BusEvent
 
   alias DtCore.Event
-  alias DtCore.Monitor.Utils
-  alias DtCore.Monitor.Partition
   alias DtCore.Monitor.Detector
+  alias DtCore.Monitor.Partition
+  alias DtCore.Monitor.Utils
 
-  alias DtCtx.Repo
-  alias DtCtx.Monitoring.Sensor, as: SensorModel
   alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtCtx.Repo
+
   alias DtWeb.ReloadRegistry
 
   require Logger

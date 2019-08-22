@@ -6,21 +6,22 @@ defmodule DtCore.Output.Worker do
   """
   use GenServer
 
-  require Logger
-  alias DtCore.Output.Utils
-  alias DtCtx.Outputs.Output, as: OutputModel
-  alias DtCtx.Outputs.Event, as: EventModel
-  alias DtCtx.Outputs.Event.SensorEvConf
-  alias DtCtx.Outputs.Event.PartitionEvConf
-  alias DtCtx.Outputs.Event.ArmEvConf
-  alias DtCore.OutputsRegistry
-  alias DtCore.DetectorEv
-  alias DtCore.DetectorEntryEv
-  alias DtCore.PartitionEv
   alias DtCore.ArmEv
+  alias DtCore.DetectorEntryEv
+  alias DtCore.DetectorEv
   alias DtCore.Output.Actions.Bus
   alias DtCore.Output.Actions.Email
+  alias DtCore.Output.Utils
+  alias DtCore.OutputsRegistry
+  alias DtCore.PartitionEv
+  alias DtCtx.Outputs.Event, as: EventModel
+  alias DtCtx.Outputs.Event.ArmEvConf
+  alias DtCtx.Outputs.Event.PartitionEvConf
+  alias DtCtx.Outputs.Event.SensorEvConf
+  alias DtCtx.Outputs.Output, as: OutputModel
   alias DtLib.Json
+
+  require Logger
 
   #
   # Client APIs

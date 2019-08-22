@@ -13,11 +13,11 @@ defmodule DtCore.Output.Actions.Email do
   import Swoosh.Email
 
   alias DtCore.ArmEv
-  alias DtCore.DetectorEv
   alias DtCore.DetectorEntryEv
-  alias DtCore.PartitionEv
+  alias DtCore.DetectorEv
   alias DtCore.Output.Actions.Email
   alias DtCore.Output.Actions.Email.Mailer
+  alias DtCore.PartitionEv
 
   def recover(ev, config) do
     subject = build_subject({:off, ev})

@@ -2,8 +2,8 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
   @moduledoc false
   use DtWeb.ConnCase
 
-  alias DtCtx.Repo
   alias DtCtx.Accounts.User
+  alias DtCtx.Repo
   alias DtWeb.CtrlHelpers.Crud
 
   @user1 %User{name: "a", username: "a"}
@@ -86,8 +86,8 @@ defmodule DtWeb.CtrlHelpers.CrudTest do
   end
 
   test "Get within a json field" do
-    alias DtCtx.Outputs.EventLog
     alias DtCore.DetectorEv
+    alias DtCtx.Outputs.EventLog
 
     %EventLog{
       type: "alarm",

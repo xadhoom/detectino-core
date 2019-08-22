@@ -1,15 +1,15 @@
 defmodule DtWeb.EventChannelTest do
+  @moduledoc false
   use DtWeb.ChannelCase
 
   alias DtCore.Event, as: Event
-  alias DtWeb.Channels.Event, as: ChannelEvent
-  alias DtCore.Monitor.Partition
-  alias DtCore.Monitor.Controller
-  alias DtCore.EventBridge
-  alias DtCore.EventLogger
-  alias DtCtx.Monitoring.Sensor, as: SensorModel
-  alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCore.Monitor.{Controller, Partition}
+  alias DtCore.{EventBridge, EventLogger}
+  alias DtCore.Monitor.Sup, as: MonitorSup
   alias DtCore.Test.TimerHelper
+  alias DtCtx.Monitoring.Partition, as: PartitionModel
+  alias DtCtx.Monitoring.Sensor, as: SensorModel
+  alias DtWeb.Channels.Event, as: ChannelEvent
 
   setup_all do
     {:ok, _} = Registry.start_link(keys: :duplicate, name: DtCore.OutputsRegistry.registry())
@@ -18,7 +18,7 @@ defmodule DtWeb.EventChannelTest do
   end
 
   setup do
-    {:ok, _} = DtCore.Monitor.Sup.start_link()
+    {:ok, _} = MonitorSup.start_link()
 
     on_exit(fn ->
       TimerHelper.wait_until(fn ->

@@ -8,8 +8,8 @@ defmodule DtCore.Output.Server do
 
   alias DtCore.Output.OutputSup
   alias DtCore.Output.Worker
-  alias DtCtx.Repo
   alias DtCtx.Outputs.Output, as: OutputModel
+  alias DtCtx.Repo
   alias DtWeb.ReloadRegistry
 
   @name :output_server

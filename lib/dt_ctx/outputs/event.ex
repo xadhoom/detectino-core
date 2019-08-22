@@ -24,8 +24,8 @@ defmodule DtCtx.Outputs.Event do
   import Ecto.Changeset
 
   alias DtCtx.Outputs.Event.ArmEvConf
-  alias DtCtx.Outputs.Event.SensorEvConf
   alias DtCtx.Outputs.Event.PartitionEvConf
+  alias DtCtx.Outputs.Event.SensorEvConf
   alias DtLib.Json
 
   @derive {Jason.Encoder, only: [:id, :name, :description, :source]}
