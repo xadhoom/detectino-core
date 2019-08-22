@@ -59,7 +59,7 @@ defmodule Detectino.Application do
         :ok = DtCtx.Repo.stop(pid)
 
       v ->
-        Logger.info("Not production (#{inspect(v)}, disabling auto database migration")
+        Logger.info("Not production (#{inspect(v)}), disabling auto database migration")
     end
   end
 end
