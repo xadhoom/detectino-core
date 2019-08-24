@@ -14,7 +14,7 @@ alias DtCtx.Accounts.User
 admin_user = %User{
   name: "admin",
   username: "admin@local",
-  password: Bcrypt.hash_pwd_salt("password"),
+  encrypted_password: Bcrypt.hash_pwd_salt("password"),
   role: "admin",
   pin: "666666"
 }
