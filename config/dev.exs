@@ -1,6 +1,4 @@
-use Mix.Config
-config :detectino, :environment, :dev
-
+import Config
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

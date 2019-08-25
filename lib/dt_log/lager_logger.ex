@@ -5,7 +5,7 @@ defmodule DtLog.LagerLogger do
   To forward all lager messages to Logger and otherwise disable lager
   include the following in a config.exs file:
 
-      use Mix.Config
+      import Config
 
       # Stop lager redirecting :error_logger messages
       config :lager, :error_logger_redirect, false
