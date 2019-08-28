@@ -114,7 +114,7 @@ defmodule DtWeb.ScenarioControllerTest do
     |> Helper.newconn()
     |> put_req_header("p-dt-pin", "230477")
     |> post(scenario_path(conn, :run, scenario))
-    |> response(403)
+    |> response(556)
   end
 
   test "run a scenario with an ARM partition", %{conn: conn} do

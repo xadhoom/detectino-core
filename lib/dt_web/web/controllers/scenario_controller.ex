@@ -76,7 +76,7 @@ defmodule DtWeb.ScenarioController do
 
     case Enum.count(partitions_scenarios) do
       0 ->
-        403
+        556
 
       _ ->
         partitions_scenarios

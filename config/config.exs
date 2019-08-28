@@ -40,7 +40,7 @@ config :lager, :handlers, [{DtLogger.LagerLogger, [{:level, :debug}]}]
 config :phoenix, :json_library, Jason
 
 # Custom HTTP Error Codes
-config :plug, :statuses, %{555 => "Partition tripped"}
+config :plug, :statuses, %{555 => "Partition tripped", 556 => "No partitions for scenario"}
 
 config :detectino, DtWeb.Guardian,
   issuer: "DtWeb",
