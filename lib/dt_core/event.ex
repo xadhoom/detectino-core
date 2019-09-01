@@ -46,6 +46,7 @@ defmodule DtCore.DetectorExitEv do
   @enforce_keys [:id]
   defstruct address: nil,
             port: nil,
+            name: nil,
             id: nil
 end
 
@@ -54,6 +55,7 @@ defmodule DtCore.DetectorEntryEv do
   @enforce_keys [:id]
   defstruct address: nil,
             port: nil,
+            name: nil,
             id: nil
 end
 

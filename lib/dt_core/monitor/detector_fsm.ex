@@ -105,6 +105,7 @@ defmodule DtCore.Monitor.DetectorFsm do
       ex_ev = %DetectorExitEv{
         port: data.config.port,
         address: data.config.address,
+        name: data.config.name,
         id: Utils.random_id()
       }
 
@@ -264,6 +265,7 @@ defmodule DtCore.Monitor.DetectorFsm do
         en_ev = %DetectorEntryEv{
           port: data.config.port,
           address: data.config.address,
+          name: data.config.name,
           id: Utils.random_id()
         }
 
@@ -440,6 +442,7 @@ defmodule DtCore.Monitor.DetectorFsm do
         en_ev = %DetectorEntryEv{
           port: data.config.port,
           address: data.config.address,
+          name: data.config.name,
           id: Utils.random_id()
         }
 
